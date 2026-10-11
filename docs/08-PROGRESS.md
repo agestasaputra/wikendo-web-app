@@ -17,6 +17,7 @@
 
 
 ### 🔥 NOW (lagi dikerjain)
+- [ ] Board 20 opsi voucher-claim v12 GATE ⏳ 11 Okt: request Agesta "20 rekomendasi, gua pilih" — `design/revamp-options-v12.html` + `revamp-options-v12-compare.png` QA PASS (20 panel VC1-VC20 readable, NOL tofu/overlap, VC5 distinct border merah) + script `revamp-options-v12-compare.py` — diagnosis: gift = banner (NOL kode/expiry/urgensi) + CTA berebut 4 aksi + wall buta value + NOL cara pakai — rekom tunggal VC5 code-expand in-place (S 1.5h, risiko rendah, P0 on-track) — app/ NOL sentuh — next: Agesta balas "Gua suka VCx"
 - [x] Flowchart alur klik Buka DONE ✅ 11 Okt: request Agesta — PNG `design/voucher-buka-flow-2026-10-11.png` QA PASS (title readable, 7 box + diamond urut, BELUM/SUDAH + loop-back benar) + script `voucher-buka-flow.py` — push `3367942` ✅
 - [x] Voucher gift pindah ke hero DONE ✅ 11 Okt: request Agesta — tiket dashed + Klaim di atas dihapus, diganti model banner bawah (Ada -20% buat lu + Buka →) pindah ke dalam hero; voucher bawah dihapus (anti dobel CTA, bawah bersih) — TDD result-makan-voucher 4/4 ✅ full 234/234 (23 files) ✅ lint 0 ✅ build 9.59s ✅ push `f9c2490` ✅ prod `/result-makan` 200 + marker (buat lu:1 Buka:1 Lainnya:1 Maps tenant:1) ✅
 - [x] Anti-flaky makan 500 DONE ✅ 11 Okt malam: loop CP 8x → 7×200+1×500 generik (LLM trailing teks + `"false"` string truthy) → fix `coerceBool()` + `parseRankResults/parseTempatResults` validasi nama halu + `cleanJSON` buang trailing + retry 1x + `buildRankFallback` deterministik (makan TIDAK PERNAH 500) — TDD llm-routing 19/19 ✅ full 230/230 ✅ lint 0 ✅ build 9.70s ✅ push `aa3f7b6` ✅ prod loop CP 12x → 12/12 200 NOL 500 ✅ — next: Agesta re-tap /result-makan di HP
@@ -108,6 +109,13 @@
 ---
 
 ## 🧾 LOG (newest first)
+
+## 2026-10-11 — Board 20 opsi voucher-claim v12 GATE ⏳ (request Agesta: UI adjustment + 20 rekomendasi)
+- **Kenapa:** gift live = banner (NOL kode/expiry/urgensi) + 1 kartu 4 aksi berebut (Buka rose vs Lainnya rose) + wall buta value (note generik, NOL janji kode) + NOL cara pakai/bukti → pull failure, klaim sepi walau S1-S3 siap.
+- **Dikerjain:** `design/revamp-options-v12.html` (filter 5 keluarga + shortlist `wikendo-voucher20-pick` + copy-pick + token swatch + H2H Top5 + rekom VC5 + gate banner, app/ NOL sentuh) + `design/revamp-options-v12-compare.py` (grid 4x5, PIL ASCII-only) + `design/revamp-options-v12-compare.png` 1400x3580 QA PASS (20 panel readable, NOL tofu/overlap/potong, VC5 border merah distinct) + BOARD NOW file ini.
+- **Verifikasi:** vision_analyze QA lolos NOL revisi blocking; design-only → NOL test/build; git status app/ bersih (cuma design/ + docs).
+- **File:** `design/revamp-options-v12.html` + `design/revamp-options-v12-compare.py` + `design/revamp-options-v12-compare.png` + `docs/08-PROGRESS.md`.
+- **Next:** Agesta balas "Gua suka VCx" (+ feedback opsional) → Addendum final ikut ID → TDD slice S1→S4.
 
 ## 2026-10-11 — Backlog voucher claim PROPOSED ✅ (request Agesta: best practice + todolist eksekusi)
 - **Kenapa:** tombol Buka sekarang cuma wall login (NOL kode); voucher = duit tenant → butuh pola kode unik show-to-cashier (kayak Klook/Chope), bukan auto-discount (butuh POS, mahal).

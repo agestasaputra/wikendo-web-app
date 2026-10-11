@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wikendo voucher-claim — 20 opsi UI klaim (v12)</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif; background: #fafaf9; color: #1c1917; padding: 20px 16px 140px; }
+  .wrap { max-width: 1180px; margin: 0 auto; }
+  .approve { background: #0C0A09; color: #fff; border-radius: 16px; padding: 16px 18px; margin-bottom: 18px; border-left: 4px solid #E11D48; }
+  .approve b { color: #FECDD3; }
+  h1 { font-size: 22px; margin-bottom: 6px; }
+  .sub { color: #78716c; font-size: 13px; margin-bottom: 14px; }
+  .diag { background: #fff; border: 1px solid #e7e5e4; border-radius: 16px; padding: 16px 18px; margin-bottom: 14px; }
+  .diag h2, .sec h2 { font-size: 15px; margin-bottom: 8px; }
+  .diag p, .diag li { font-size: 13px; line-height: 1.65; color: #44403c; }
+  .diag ul { padding-left: 18px; }
+  .tokens { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+  .tok { font-size: 11px; font-weight: 700; background: #f5f5f4; border: 1px solid #e7e5e4; border-radius: 999px; padding: 4px 10px; }
+  .tok i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; vertical-align: baseline; }
+  .filters { display: flex; gap: 8px; margin: 14px 0; flex-wrap: wrap; }
+  .filters button { border: 1.5px solid #d6d3d1; background: #fff; border-radius: 999px; padding: 7px 14px; font-size: 12px; font-weight: 800; cursor: pointer; }
+  .filters button.on { background: #0C0A09; color: #fff; border-color: #0C0A09; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 16px; }
+  .card { background: #fff; border: 1px solid #e7e5e4; border-radius: 20px; overflow: hidden; display: flex; flex-direction: column; }
+  .card.rec { border: 2px solid #E11D48; }
+  .cardhead { padding: 14px 16px 10px; }
+  .cardhead .id { font-size: 11px; font-weight: 800; letter-spacing: .06em; color: #fff; background: #0C0A09; display: inline-block; padding: 3px 10px; border-radius: 999px; }
+  .card.rec .cardhead .id { background: #E11D48; }
+  .cardhead h3 { font-size: 15px; margin: 8px 0 2px; }
+  .cardhead p { font-size: 12px; color: #78716c; }
+  .phonewrap { background: #f5f5f4; padding: 12px; }
+  .phone { background: #F5F5F4; border: 1px solid #e7e5e4; border-radius: 22px; padding: 10px 10px 14px; min-width: 0; max-width: 380px; margin: 0 auto; }
+  .phone .tag { font-size: 9px; font-weight: 800; letter-spacing: .06em; color: #78716c; margin-bottom: 6px; }
+  .p-top { display: flex; justify-content: space-between; font-size: 10px; font-weight: 800; margin-bottom: 6px; }
+  .p-top span:last-child { color: #78716c; }
+  .p-quota { font-size: 9px; color: #78716c; font-weight: 700; margin-bottom: 6px; }
+  .p-hero { background: #fff; border: 1px solid #eee; border-radius: 16px; padding: 10px; }
+  .p-badges { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 6px; }
+  .p-badge { font-size: 8.5px; font-weight: 800; border-radius: 999px; padding: 2px 8px; }
+  .p-title { font-size: 12px; font-weight: 800; }
+  .p-why { font-size: 10px; color: #57534e; margin: 3px 0; }
+  .p-price { font-size: 10px; font-weight: 700; }
+  .v { border-radius: 12px; padding: 9px 10px; margin-top: 8px; font-size: 10px; }
+  .v-gift { background: linear-gradient(140deg,#FFF7ED,#FFE4E6); border: 1px solid #FECDD3; display: flex; gap: 8px; align-items: center; }
+  .v-gift .ic { font-size: 20px; }
+  .v-gift .tx { flex: 1; font-weight: 800; font-size: 10.5px; }
+  .v-gift .tx small { display: block; font-weight: 400; color: #78716c; font-size: 9px; }
+  .v-go { background: #E11D48; color: #fff; font-weight: 800; font-size: 10px; border-radius: 999px; padding: 7px 12px; white-space: nowrap; }
+  .v-outline { background: #fff; border: 1.5px solid #FECDD3; display: flex; gap: 8px; align-items: center; }
+  .v-compact { background: linear-gradient(140deg,#FFF7ED,#FFE4E6); border: 1px solid #FECDD3; display: flex; gap: 6px; align-items: center; padding: 6px 8px; }
+  .v-fullbtn { background: #E11D48; color: #fff; text-align: center; font-weight: 800; font-size: 12px; padding: 12px; }
+  .v-code { background: #0C0A09; color: #fff; text-align: center; }
+  .v-code .kc { font-size: 22px; font-weight: 800; letter-spacing: .08em; color: #A3E635; margin: 4px 0; }
+  .v-code .cd { font-size: 9.5px; font-weight: 700; opacity: .9; }
+  .v-code .use { display: inline-block; margin-top: 6px; background: #E11D48; color: #fff; font-size: 9.5px; font-weight: 800; border-radius: 999px; padding: 6px 12px; }
+  .v-ticket { background: #fff; border: 1.5px dashed #E11D48; text-align: center; }
+  .v-ticket .kc { font-size: 20px; font-weight: 800; letter-spacing: .08em; }
+  .v-copy { background: #0C0A09; color: #fff; display: flex; align-items: center; gap: 8px; }
+  .v-copy .kc { flex: 1; font-size: 16px; font-weight: 800; letter-spacing: .06em; color: #A3E635; }
+  .v-copy .cp { background: #fff; color: #0C0A09; font-weight: 800; font-size: 9px; border-radius: 8px; padding: 6px 10px; }
+  .v-sticky { background: #0C0A09; color: #fff; display: flex; align-items: center; gap: 8px; position: relative; }
+  .v-sticky .kc { font-weight: 800; color: #A3E635; font-size: 12px; }
+  .v-count { background: #FFF7ED; border: 1px solid #FDBA74; text-align: center; }
+  .v-count .big { font-size: 18px; font-weight: 800; color: #C2410C; }
+  .v-bar { height: 6px; background: #fed7aa; border-radius: 99px; margin-top: 6px; overflow: hidden; }
+  .v-bar i { display: block; height: 100%; background: #EA580C; border-radius: 99px; }
+  .v-slot { background: #fff; border: 1px solid #e7e5e4; }
+  .v-dots { display: flex; gap: 5px; margin-top: 6px; }
+  .v-dots i { width: 22px; height: 8px; border-radius: 99px; background: #A3E635; display: block; }
+  .v-dots i.off { background: #e7e5e4; }
+  .v-done { background: #F0FDF4; border: 1px solid #86efac; text-align: center; }
+  .v-done .kc { font-size: 17px; font-weight: 800; letter-spacing: .06em; }
+  .v-exp { background: #f4f4f5; border: 1px solid #e7e5e4; text-align: center; color: #71717a; }
+  .v-steps { background: #fff; border: 1px solid #e7e5e4; }
+  .v-steps .st { display: flex; gap: 7px; align-items: center; font-size: 9.5px; font-weight: 700; padding: 3px 0; }
+  .v-steps .n { width: 18px; height: 18px; border-radius: 50%; background: #0C0A09; color: #fff; font-size: 10px; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; flex: none; }
+  .v-receipt { background: #fff; border: 1px solid #e7e5e4; text-align: center; font-family: monospace; }
+  .v-proof { background: #ECFDF5; border: 1px solid #86efac; display: flex; gap: 8px; align-items: center; }
+  .v-trust { background: linear-gradient(140deg,#FFF7ED,#FFE4E6); border: 1px solid #FECDD3; }
+  .v-trust .row { display: flex; gap: 4px; margin-top: 6px; flex-wrap: wrap; }
+  .v-sheet { background: #fff; border: 1.5px solid #0C0A09; border-top: 4px solid #0C0A09; border-radius: 16px 16px 12px 12px; text-align: center; }
+  .v-sheet .handle { width: 40px; height: 4px; background: #d6d3d1; border-radius: 99px; margin: 0 auto 6px; }
+  .v-sheet .kc { font-size: 22px; font-weight: 800; letter-spacing: .08em; }
+  .v-blur { background: #0C0A09; color: #fff; text-align: center; }
+  .v-blur .kc { font-size: 18px; font-weight: 800; letter-spacing: .1em; color: #78716c; }
+  .v-duo { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 8px; }
+  .v-duo div { border-radius: 10px; font-size: 10px; font-weight: 800; text-align: center; padding: 10px 4px; }
+  .v-kasir { background: #fff; border: 1px dashed #a8a29e; text-align: center; color: #57534e; }
+  .v-note { font-size: 8.5px; color: #78716c; font-weight: 700; margin-top: 5px; }
+  .p-cta { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 8px; }
+  .p-cta div { border-radius: 10px; font-size: 9.5px; font-weight: 800; text-align: center; padding: 10px 4px; }
+  .p-rank { background: #f4f4f5; border-radius: 12px; margin-top: 8px; padding: 8px 10px; font-size: 9.5px; }
+  .p-rank div { padding: 2px 0; }
+  .p-foot { font-size: 9px; color: #a8a29e; text-align: center; margin-top: 6px; font-weight: 700; }
+  .meta { padding: 12px 16px 16px; font-size: 12px; }
+  .meta .sw { display: flex; gap: 6px; margin: 8px 0; align-items: center; }
+  .meta .sw i { width: 16px; height: 16px; border-radius: 50%; border: 1px solid #e7e5e4; display: inline-block; }
+  .pillrow { display: flex; gap: 6px; flex-wrap: wrap; margin: 6px 0; }
+  .pillrow span { font-size: 10px; font-weight: 800; background: #f5f5f4; border: 1px solid #e7e5e4; border-radius: 999px; padding: 3px 9px; }
+  .procon { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+  .procon div { font-size: 11px; line-height: 1.55; }
+  .procon b { display: block; font-size: 10px; letter-spacing: .05em; }
+  .pick { margin-top: 10px; display: flex; gap: 8px; }
+  .pick button { flex: 1; border-radius: 999px; padding: 9px; font-size: 12px; font-weight: 800; cursor: pointer; border: 1.5px solid #0C0A09; background: #fff; }
+  .pick button.saved { background: #0C0A09; color: #fff; }
+  table.h2h { width: 100%; border-collapse: collapse; font-size: 11px; margin-top: 8px; }
+  table.h2h th, table.h2h td { border: 1px solid #e7e5e4; padding: 6px 7px; text-align: center; }
+  table.h2h th { background: #0C0A09; color: #fff; font-size: 10px; }
+  table.h2h td:first-child, table.h2h th:first-child { text-align: left; }
+  .recbox { background: #fff1f2; border: 2px solid #E11D48; border-radius: 16px; padding: 16px 18px; margin-top: 14px; }
+  .pickbar { position: fixed; left: 12px; right: 12px; bottom: 12px; max-width: 1160px; margin: 0 auto; background: #0C0A09; color: #fff; border-radius: 16px; padding: 12px 16px; display: flex; gap: 10px; align-items: center; font-size: 12px; font-weight: 700; box-shadow: 0 8px 30px rgba(0,0,0,.25); z-index: 50; }
+  .pickbar code { background: #1c1917; padding: 6px 10px; border-radius: 8px; color: #FECDD3; font-size: 12px; }
+  .pickbar button { margin-left: auto; background: #E11D48; color: #fff; border: none; border-radius: 999px; padding: 9px 16px; font-weight: 800; cursor: pointer; }
+  .sec { background: #fff; border: 1px solid #e7e5e4; border-radius: 16px; padding: 16px 18px; margin-top: 14px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="approve">GATE: pilih 1 dari 20 opsi di bawah. Balas <b>Gua suka [ID]</b> (contoh: <b>Gua suka VC5</b>). Dengan feedback: <b>Gua suka [ID], tapi ada beberapa feedback: - ...</b> — tanpa ID = belum lock, belum coding. Board ini mock di <b>design/</b>, <b>app/ NOL disentuh</b>.</div>
+  <h1>Voucher-claim — 20 opsi UI klaim show-to-cashier (v12)</h1>
+  <p class="sub">Scope S4 Addendum 23: tap Buka → kode unik <b>WKD-XXXXXX</b> + countdown s/d 23:59 WIB + "Tunjukin ke kasir" + state 401/409/429 + spinner + :disabled. Full page result-makan per opsi (hero + gift + Maps/Lainnya + rank). Token lock ikut live.</p>
+
+  <div class="diag">
+    <h2>Diagnosis — kenapa gift sekarang tidak menghasilkan klaim (audit live 11 Okt)</h2>
+    <ul>
+      <li><b>Banner, bukan reward:</b> gift <span style="font-family:monospace">Ada -20% + Buka</span> terlihat seperti promo statis — tidak ada kode preview, expiry, atau urgensi → tidak ada alasan tap sekarang.</li>
+      <li><b>CTA berebut:</b> 1 kartu isi 4 aksi (Buka + Maps tenant + save + Lainnya) → hierarchy failure. Warna aksi makan (rose) dipakai 2x (Buka + Lainnya) → user bingung mana yang utama.</li>
+      <li><b>Wall buta value:</b> tap Buka = note generik "Login 10 detik..." tanpa janji kode + expiry hari ini → login conversion bocor di titik paling mahal.</li>
+      <li><b>NOL bukti + NOL cara pakai:</b> tidak ada "Tunjukin ke kasir", tidak ada "1 kode = 1 transaksi", tidak ada social proof → user takut malu di kasir.</li>
+    </ul>
+    <p style="margin-top:8px"><b>Slop verdict:</b> bukan selera — ini pull failure: voucher di-push sebagai banner iklan, bukan di-pull sebagai kode yang mau diklaim. Fix = kode GEDE + countdown 23:59 + cara pakai 1 baris + state 409/429 jelas. Tanpa itu S1-S3 siap pun klaim tetap sepi.</p>
+    <div class="tokens">
+      <span class="tok"><i style="background:#F5F5F4"></i>paper #F5F5F4</span>
+      <span class="tok"><i style="background:#0C0A09"></i>ink #0C0A09</span>
+      <span class="tok"><i style="background:#E11D48"></i>rose #E11D48</span>
+      <span class="tok"><i style="background:#FFE4E6"></i>rose-wash</span>
+      <span class="tok"><i style="background:#FECDD3"></i>gift-border</span>
+      <span class="tok"><i style="background:#A3E635"></i>lime #A3E635</span>
+      <span class="tok"><i style="background:#ECFDF5"></i>mint #ECFDF5</span>
+      <span class="tok">max-w-md</span><span class="tok">1 CTA dominan</span><span class="tok">$0</span>
+    </div>
+    <p style="margin-top:8px;font-size:12px;color:#44403c"><b>Constraint semua opsi:</b> TENANT saja (0 wisata) · gift di hero, bawah bersih · klaim WAJIB login (401) + 409 tampilkan kode lama + 429 max 3/hari · tombol API wajib spinner + :disabled + early-return · kode format WKD-XXXXXX tanpa 0/O/1/I · expiry hari itu 23:59 WIB · NOL warna baru · NOL app kasir di P0.</p>
+  </div>
+
+  <div class="filters" id="filters">
+    <button data-f="all" class="on">Semua (20)</button>
+    <button data-f="minimal">Minimal</button>
+    <button data-f="code">Kode</button>
+    <button data-f="urgency">Urgency</button>
+    <button data-f="trust">Trust</button>
+    <button data-f="convert">Convert</button>
+  </div>
+
+  <div class="grid" id="grid"></div>
+
+  <div class="sec">
+    <h2>Head-to-head — Top 5 vs North Star (klaim start + show-to-cashier + repeat + monetisasi)</h2>
+    <table class="h2h">
+      <tr><th>Opsi</th><th>Klaim start</th><th>Kasir success</th><th>Effort</th><th>Risiko</th><th>Monetisasi</th></tr>
+      <tr><td style="text-align:left"><b>VC5</b> code-expand (REC)</td><td>5</td><td>5</td><td>S 1.5h</td><td>Rendah</td><td>Kode terukur, bahan jualan tenant</td></tr>
+      <tr><td style="text-align:left"><b>VC17</b> bottom-sheet</td><td>5</td><td>5</td><td>M 3h</td><td>Sedang</td><td>Sama, fokus terbaik di HP</td></tr>
+      <tr><td style="text-align:left"><b>VC9</b> countdown-hero</td><td>5</td><td>4</td><td>S 1.5h</td><td>Rendah</td><td>Urgency kunjungan hari ini</td></tr>
+      <tr><td style="text-align:left"><b>VC6</b> dashed-ticket</td><td>4</td><td>5</td><td>S 1.5h</td><td>Rendah</td><td>Pull pattern, kasir gampang baca</td></tr>
+      <tr><td style="text-align:left"><b>VC18</b> login-blur</td><td>4</td><td>4</td><td>S 2h</td><td>Sedang</td><td>Wall conversion naik</td></tr>
+    </table>
+  </div>
+
+  <div class="recbox">
+    <h2 style="font-size:15px;margin-bottom:6px">Rekomendasi tunggal: VC5 — code-expand in-place</h2>
+    <p style="font-size:13px;line-height:1.65;color:#881337">Tap Buka → kartu gift <b>expand di tempat</b> (kode <b>WKD-7X2K9A</b> 28px lime di atas ink + countdown "berlaku s/d 23:59 WIB" + tombol "Tunjukin ke kasir" + note "1 kode = 1 transaksi, screenshot tetap 1x pakai") + spinner + :disabled saat POST. Menang di bisnis bukan selera: satu-satunya opsi yang <b>tetap di konteks hero</b> (user tidak kehilangan tenant + Maps) + effort S 1.5h + risiko rendah + TDD paling gampang (assert slot kode + state 401/409/429) → P0 ~5.5h tetap on-track. Sheet (VC17) fokusnya sedikit lebih baik tapi effort M + animasi + risiko scroll — cocok P1, bukan P0. Anon 1:1, token lock, $0.</p>
+  </div>
+
+  <div class="sec">
+    <h2>Next step setelah pick</h2>
+    <p style="font-size:13px;color:#44403c">Agesta balas <b>Gua suka [ID]</b> → AI tulis Addendum final (ikut ID) + TDD slice S1→S4 (test → lint → build → commit + push + deploy, verifikasi prod 200 + marker kode).</p>
+  </div>
+</div>
+
+<div class="pickbar">
+  <span>Shortlist: <b id="count">0</b> • Balas:</span>
+  <code id="picktext">Gua suka ...</code>
+  <button id="copybtn">Copy pick</button>
+</div>
+
+<script>
+var STORE = 'wikendo-voucher20-pick';
+var HEROTITLE = '🍜 Kopi Kekinian — GI L2';
+var OPTIONS = [
+  {id:'VC1',fam:'minimal',name:'Gift-inline live+',desc:'Banner live + microcopy expiry + spinner. Perubahan paling kecil.',gift:'banner',effort:'S · 1h',risk:'Rendah',pros:'Paling aman, diff 3 baris, anon 1:1.',cons:'Masih banner, pull lemah.'},
+  {id:'VC2',fam:'minimal',name:'Gift-compact row',desc:'Ikon + teks + Buka sebaris. Hemat 40px vertikal.',gift:'compact',effort:'S · 1h',risk:'Rendah',pros:'Hero lebih ramping, Maps naik.',cons:'Teks kecil di 320px.'},
+  {id:'VC3',fam:'minimal',name:'Outline kalem',desc:'Gift putih outline pink. Tidak teriak promo.',gift:'outline',effort:'S · 1h',risk:'Rendah',pros:'Paling kalem, cocok mode hemat.',cons:'Bisa miss sebagai secondary.'},
+  {id:'VC4',fam:'minimal',name:'Buka fullwidth 56px',desc:'Pill jadi CTA fullwidth rose 56px. Thumb-zone.',gift:'fullbtn',effort:'S · 1h',risk:'Rendah',pros:'Tap-area 3x, CTR naik.',cons:'Rebut fokus vs Maps.'},
+  {id:'VC5',fam:'code',name:'Code-expand (REC)',desc:'Tap Buka → expand kode GEDE + countdown + Tunjukin. S4 1:1.',gift:'code',effort:'S · 1.5h',risk:'Rendah',pros:'Konteks hero utuh, TDD gampang, P0 on-track.',cons:'Hampir tidak ada — opsi paling aman.'},
+  {id:'VC6',fam:'code',name:'Dashed-ticket',desc:'Kode di tiket dashed putih. Pull pattern kasir.',gift:'ticket',effort:'S · 1.5h',risk:'Rendah',pros:'Kasir paling gampang baca kode.',cons:'Dashed = komponen baru.'},
+  {id:'VC7',fam:'code',name:'Code + Salin',desc:'Kode + tombol Salin. Kasir ketik manual.',gift:'copy',effort:'S · 1.5h',risk:'Rendah',pros:'Anti salah baca (copy-paste WA).',cons:'Clipboard di WebView kadang ditolak.'},
+  {id:'VC8',fam:'code',name:'Sticky code bar',desc:'Bar kode nempel bawah hero saat scroll.',gift:'sticky',effort:'S · 2h',risk:'Sedang',pros:'Kode selalu kelihatan.',cons:'Sticky + rank bisa sempit.'},
+  {id:'VC9',fam:'urgency',name:'Countdown-hero',desc:'Timer 5j 12m gede + bar hari. Dorong hari ini.',gift:'count',effort:'S · 1.5h',risk:'Rendah',pros:'Urgency kunjungan hari ini paling kuat.',cons:'Timer live = interval + testing.'},
+  {id:'VC10',fam:'urgency',name:'Slot-hari 3/3',desc:'Sisa 3 klaim hari ini + dots. Rate-limit jujur.',gift:'slot',effort:'S · 1.5h',risk:'Rendah',pros:'429 tidak kaget, anti-farming kelihatan.',cons:'Angka 0/3 bisa takutkan user baru.'},
+  {id:'VC11',fam:'urgency',name:'Already-claimed 409',desc:'State 409: kode lama + "Lu udah klaim".',gift:'done',effort:'S · 1h',risk:'Rendah',pros:'Double-klaim jelas, bukan error.',cons:'Hanya state, bukan akuisisi.'},
+  {id:'VC12',fam:'urgency',name:'Expired-safe',desc:'State expired grey + "Besok lagi ya" + quiz lagi.',gift:'exp',effort:'S · 1h',risk:'Rendah',pros:'Gagal dengan elegan, repeat besok.',cons:'Grey bisa dibaca mati total.'},
+  {id:'VC13',fam:'trust',name:'Cara-pakai 3 steps',desc:'1 Klaim → 2 Tunjukin → 3 Kasir input.',gift:'steps',effort:'S · 1.5h',risk:'Rendah',pros:'Takut malu di kasir hilang.',cons:'3 baris = vertikal +60px.'},
+  {id:'VC14',fam:'trust',name:'Struk Mono',desc:'Kode ala struk POS + logo Mono. Kasir familiar.',gift:'receipt',effort:'S · 2h',risk:'Sedang',pros:'Kasir paling percaya (mirip struk).',cons:'Mono di HP kecil bisa kaku.'},
+  {id:'VC15',fam:'trust',name:'Proof-row',desc:'"127 diklaim minggu ini di GI" + dots.',gift:'proof',effort:'S · 2h',risk:'Sedang',pros:'Social proof → FOMO.',cons:'Butuh count real (jangan overclaim).'},
+  {id:'VC16',fam:'trust',name:'Halal + promo lock',desc:'Halal mint + -20% lime + gift border 1 baris.',gift:'trust',effort:'S · 1h',risk:'Rendah',pros:'Trust + value 1 pandang.',cons:'Badge 3x bisa ramai.'},
+  {id:'VC17',fam:'convert',name:'Bottom-sheet',desc:'Tap Buka → sheet bawah + handle. Mobile-native.',gift:'sheet',effort:'M · 3h',risk:'Sedang',pros:'Fokus terbaik, thumb-zone.',cons:'Effort terbesar, animasi sheet.'},
+  {id:'VC18',fam:'convert',name:'Login-blur',desc:'Anon lihat blur WKD-XXXXXX + "Login 10 dtk".',gift:'blur',effort:'S · 2h',risk:'Sedang',pros:'Wall conversion naik (tease kode).',cons:'Blur = janji, harus konsisten.'},
+  {id:'VC19',fam:'convert',name:'Save + klaim duo',desc:'Dua tombol: Simpan + Klaim. Explicit.',gift:'duo',effort:'S · 2h',risk:'Sedang',pros:'Wishlist + klaim 1 tap.',cons:'Duo = hierarchy risk.'},
+  {id:'VC20',fam:'convert',name:'Kasir-mode link',desc:'Link "/t/kopi demo kasir" buat owner test P1.',gift:'kasir',effort:'S · 1.5h',risk:'Sedang',pros:'Jembatan P1 PIN, gampang demo tenant.',cons:'Link owner di user-page = bocor.'}
+];
+
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
+function badges(){
+  return '<div class="p-badges"><span class="p-badge" style="background:#A3E635;color:#0C0A09">★ BEST MATCH</span>'
+  +'<span class="p-badge" style="background:#ECFDF5;color:#047857">✅ Halal</span></div>';
+}
+function giftHTML(o){
+  var sub = '<small>Kopi Kekinian · GI L2 · hari ini</small>';
+  if(o.gift==='banner') return '<div class="v v-gift"><div class="ic">🎁</div><div class="tx">Ada <b>-20%</b> buat lu'+sub+'</div><div class="v-go">Buka →</div></div><div class="v-note">berlaku s/d 23:59 WIB · 1 kode = 1 transaksi</div>';
+  if(o.gift==='compact') return '<div class="v v-compact"><div class="ic">🎁</div><div class="tx" style="flex:1">-20% Kopi Kekinian · s/d 23:59</div><div class="v-go">Buka</div></div>';
+  if(o.gift==='outline') return '<div class="v v-gift v-outline"><div class="ic">🎁</div><div class="tx" style="color:#0C0A09">Ada <b>-20%</b> buat lu'+sub+'</div><div class="v-go">Buka →</div></div>';
+  if(o.gift==='fullbtn') return '<div class="v v-gift"><div class="ic">🎁</div><div class="tx">Ada <b>-20%</b> buat lu'+sub+'</div></div><div class="v v-fullbtn">Buka voucher −20% →</div>';
+  if(o.gift==='code') return '<div class="v v-code"><div style="font-size:9px;font-weight:800;opacity:.75">KODE LU · TUNJUKIN KE KASIR</div><div class="kc">WKD-7X2K9A</div><div class="cd">berlaku s/d 23:59 WIB · 1 kode = 1 transaksi</div><div class="use">Tunjukin ke kasir →</div></div><div class="v-note">screenshot tetap 1x pakai · refresh = kode SAMA</div>';
+  if(o.gift==='ticket') return '<div class="v v-ticket"><div style="font-size:9px;font-weight:800;color:#E11D48">−20% KOPI KEKINIAN · GI L2</div><div class="kc">WKD-7X2K9A</div><div style="font-size:9px;font-weight:700;color:#78716c">s/d 23:59 WIB · tunjukin ke kasir</div><div class="v-go" style="display:inline-block;margin-top:6px">Buka →</div></div>';
+  if(o.gift==='copy') return '<div class="v v-copy"><div class="kc">WKD-7X2K9A</div><div class="cp">Salin</div></div><div class="v-note">s/d 23:59 WIB · tempel ke WA / tunjukin kasir</div>';
+  if(o.gift==='sticky') return '<div class="v v-gift"><div class="ic">🎁</div><div class="tx">Ada <b>-20%</b> buat lu'+sub+'</div><div class="v-go">Buka →</div></div><div class="v v-sticky"><div style="flex:1;font-size:9.5px;font-weight:800">WKD-7X2K9A · s/d 23:59</div><div class="v-go">Tunjukin</div></div>';
+  if(o.gift==='count') return '<div class="v v-count"><div style="font-size:9px;font-weight:800;color:#9a3412">BERAKHIR 23:59 WIB</div><div class="big">5j 12m</div><div style="font-size:9.5px;font-weight:700;color:#9a3412">WKD-7X2K9A · tunjukin ke kasir</div><div class="v-bar"><i style="width:64%"></i></div></div>';
+  if(o.gift==='slot') return '<div class="v v-slot"><div style="font-size:10px;font-weight:800">Sisa klaim hari ini: <b>3</b></div><div class="v-dots"><i></i><i></i><i></i><i class="off"></i><i class="off"></i></div><div class="v-note">max 3/hari · 1 tenant 1x/hari · login wajib</div><div class="v-go" style="display:inline-block;margin-top:6px">Buka →</div></div>';
+  if(o.gift==='done') return '<div class="v v-done"><div style="font-size:9px;font-weight:800;color:#047857">LU UDAH KLAIM HARI INI</div><div class="kc">WKD-7X2K9A</div><div style="font-size:9.5px;font-weight:700;color:#047857">tunjukin kode ini ke kasir · s/d 23:59</div></div>';
+  if(o.gift==='exp') return '<div class="v v-exp"><div style="font-size:11px;font-weight:800">Voucher kemarin habis</div><div style="font-size:9.5px;font-weight:700">Besok lagi ya · quiz lagi →</div></div>';
+  if(o.gift==='steps') return '<div class="v v-gift"><div class="ic">🎁</div><div class="tx">Ada <b>-20%</b> buat lu'+sub+'</div><div class="v-go">Buka →</div></div><div class="v v-steps"><div class="st"><span class="n">1</span> Klaim → kode WKD-XXXXXX</div><div class="st"><span class="n">2</span> Tunjukin ke kasir GI L2</div><div class="st"><span class="n">3</span> Kasir input + cap lunas</div></div>';
+  if(o.gift==='receipt') return '<div class="v v-receipt"><div>WIKENDO * GI L2</div><div style="font-size:16px;font-weight:800">WKD-7X2K9A</div><div>-20% KOPI KEKINIAN</div><div>EXP 23:59 WIB</div></div><div class="v-note">struk Mono 1-warna · kasir cocokkan kode</div>';
+  if(o.gift==='proof') return '<div class="v v-gift"><div class="ic">🎁</div><div class="tx">Ada <b>-20%</b> buat lu'+sub+'</div><div class="v-go">Buka →</div></div><div class="v v-proof"><div style="font-size:16px">🔥</div><div style="font-size:9.5px;font-weight:800">127 diklaim minggu ini di GI</div></div>';
+  if(o.gift==='trust') return '<div class="v v-trust"><div style="font-size:10.5px;font-weight:800">🎁 Ada <b>-20%</b> buat lu ' + '<span class="p-badge" style="background:#ECFDF5;color:#047857">✅ Halal</span> <span class="p-badge" style="background:#A3E635;color:#0C0A09">-20%</span></div><div class="row"><div class="v-go">Buka →</div><span style="font-size:9px;font-weight:700;color:#78716c">s/d 23:59 · 1x pakai</span></div></div>';
+  if(o.gift==='sheet') return '<div class="v v-gift"><div class="ic">🎁</div><div class="tx">Ada <b>-20%</b> buat lu'+sub+'</div><div class="v-go">Buka →</div></div><div class="v v-sheet"><div class="handle"></div><div style="font-size:9px;font-weight:800;color:#78716c">GESER ATAS · KODE LU</div><div class="kc">WKD-7X2K9A</div><div style="font-size:9.5px;font-weight:700">s/d 23:59 WIB · Tunjukin ke kasir →</div></div>';
+  if(o.gift==='blur') return '<div class="v v-blur"><div style="font-size:9px;font-weight:800;opacity:.75">KODE LU TERKUNCI</div><div class="kc">WKD-••••••</div><div class="v-go" style="display:inline-block;margin-top:6px">Login 10 dtk untuk buka →</div></div>';
+  if(o.gift==='duo') return '<div class="v v-gift"><div class="ic">🎁</div><div class="tx">Ada <b>-20%</b> buat lu'+sub+'</div></div><div class="v-duo"><div style="background:#fff;border:1.5px solid #e7e5e4">♡ Simpan</div><div style="background:#E11D48;color:#fff">Buka →</div></div>';
+  if(o.gift==='kasir') return '<div class="v v-gift"><div class="ic">🎁</div><div class="tx">Ada <b>-20%</b> buat lu'+sub+'</div><div class="v-go">Buka →</div></div><div class="v v-kasir">owner? <u>/t/kopi-kekinian demo kasir + PIN</u> (P1)</div>';
+  return '';
+}
+function phone(o){
+  return '<div class="phone"><div class="tag">RESULT-MAKAN · FULL PAGE ('+o.id+')</div>'
+  +'<div class="p-top"><span>← Hasil 🍜/📍</span><span>5 rekomendasi</span></div>'
+  +'<div class="p-quota">Quota makan 2/2 tersisa · GI</div>'
+  +'<div class="p-hero">'+badges()
+  +'<div class="p-title">'+HEROTITLE+'</div>'
+  +'<div class="p-why">Kenapa: kopi susu aren + kids corner · cocok nongkrong lama</div>'
+  +'<div class="p-price">💰 50-100rb · 👶 kids · 📍 L2</div>'
+  +giftHTML(o)
+  +'<div class="p-cta"><div style="background:#0C0A09;color:#fff">📍 Maps tenant →</div><div style="background:#fff;border:1.5px solid #e7e5e4">Lainnya →</div></div>'
+  +'<div class="p-rank"><div><b>#1 Kopi Kekinian</b> · Halal · L2 · -20%</div><div><b>#2 Bakmi GM</b> · Halal · L1 · -15%</div><div><b>#3 J.CO</b> · Halal · LG · -10%</div></div>'
+  +'<div class="p-foot">Gift di hero · klaim WAJIB login</div>'
+  +'</div></div>';
+}
+function getSaved(){ try { return JSON.parse(localStorage.getItem(STORE)||'[]'); } catch(e){ return []; } }
+function setSaved(a){ localStorage.setItem(STORE, JSON.stringify(a)); }
+function render(){
+  var grid = document.getElementById('grid');
+  var html = '';
+  OPTIONS.forEach(function(o){
+    var rec = o.id==='VC5' ? ' rec' : '';
+    html += '<div class="card'+rec+'" data-fam="'+o.fam+'" data-id="'+o.id+'">'
+    +'<div class="cardhead"><span class="id">'+o.id+(o.id==='VC5'?' • REKOMENDASI':'')+'</span><h3>'+esc(o.name)+'</h3><p>'+esc(o.desc)+'</p></div>'
+    +'<div class="phonewrap">'+phone(o)+'</div>'
+    +'<div class="meta"><div class="sw"><i style="background:#F5F5F4"></i><i style="background:#0C0A09"></i><i style="background:#E11D48"></i><i style="background:#FFE4E6"></i><i style="background:#A3E635"></i><span style="font-size:10px;font-weight:700;color:#78716c">token lock live</span></div>'
+    +'<div class="pillrow"><span>Effort '+esc(o.effort)+'</span><span>Risiko '+esc(o.risk)+'</span><span>'+o.fam+'</span></div>'
+    +'<div class="procon"><div><b>+ PRO</b>'+esc(o.pros)+'</div><div><b>− KONTRA</b>'+esc(o.cons)+'</div></div>'
+    +'<div class="pick"><button data-pick="'+o.id+'">☆ Shortlist '+o.id+'</button></div></div></div>';
+  });
+  grid.innerHTML = html;
+  bind();
+  refresh();
+}
+function bind(){
+  document.querySelectorAll('#filters button').forEach(function(b){
+    b.onclick = function(){
+      document.querySelectorAll('#filters button').forEach(function(x){x.classList.remove('on')});
+      b.classList.add('on');
+      var f = b.getAttribute('data-f');
+      document.querySelectorAll('.card').forEach(function(c){
+        c.style.display = (f==='all'||c.getAttribute('data-fam')===f) ? '' : 'none';
+      });
+    };
+  });
+  document.querySelectorAll('[data-pick]').forEach(function(b){
+    b.onclick = function(){
+      var id = b.getAttribute('data-pick');
+      var s = getSaved();
+      if(s.indexOf(id)>=0) s = s.filter(function(x){return x!==id});
+      else s.push(id);
+      setSaved(s); refresh();
+    };
+  });
+  document.getElementById('copybtn').onclick = function(){
+    var s = getSaved();
+    var t = s.length ? ('Gua suka '+s.join(', ')) : 'Gua suka ...';
+    if(navigator.clipboard) navigator.clipboard.writeText(t);
+    document.getElementById('picktext').textContent = t;
+  };
+}
+function refresh(){
+  var s = getSaved();
+  document.getElementById('count').textContent = s.length;
+  document.getElementById('picktext').textContent = s.length ? ('Gua suka '+s.join(', ')) : 'Gua suka ...';
+  document.querySelectorAll('[data-pick]').forEach(function(b){
+    var id = b.getAttribute('data-pick');
+    if(s.indexOf(id)>=0){ b.classList.add('saved'); b.textContent = '★ '+id+' dipilih'; }
+    else { b.classList.remove('saved'); b.textContent = '☆ Shortlist '+id; }
+  });
+}
+render();
+</script>
+</body>
+</html>
