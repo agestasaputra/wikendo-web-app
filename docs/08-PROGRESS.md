@@ -74,10 +74,13 @@
 - [x] Push + Deploy Vercel AUTO via main (kombo `e12be1b` live, prod 200 `QUOTA HARI INI` ✅ 7 Okt malam)
 
 ### ⏳ NEXT (antrian dekat)
+- [ ] Voucher claim P0 (Addendum 23 v1.0 PROPOSED 11 Okt — pola kode unik show-to-cashier `WKD-XXXXXX`, expiry 23:59 WIB, anti-farming login+1x/hari+3/hari): S1 auth session (~2h, BLOCKER) → S2 tabel `voucher_claims` (~30mnt) → S3 `POST /api/voucher/claim` 401/409/429 (~1.5h) → S4 UI bottom-sheet kode (~1.5h) = **~5.5h** — next: Agesta balas "gas voucher S1"
 - [ ] Slice auth (register/login/session, Google 1-tap primary) → baru `POST /api/voucher/claim` beneran (kontrak 401 anon)
 - [ ] 8.4 E2E (butuh DB seeded dulu)
 
 ### 📦 BACKLOG (nanti)
+- [ ] Voucher P1 kasir PIN (Addendum 23 S5 ~3h — `/t/:slug` + redeem + `redeemed`, jalanin pas ada 1 tenant aktif)
+- [ ] Voucher P2 dashboard tenant (Addendum 23 S6 ~4h — diklaim vs ditebus, baru kalau revenue)
 - [ ] Board 20 gradasi background (SKIP ⏸️ 8 Okt — `design/background-gradients-20.html` nunggu "Gua suka Gx" / "gas Gx" → eksekusi via TDD)
 - [ ] `components/`/`composables/`/`layouts/` + `GET /api/health` (UI masih inline)
 - [ ] Vote/report tenant P1 (`POST /api/vote`, `POST /api/report-tenant`)
@@ -105,6 +108,13 @@
 ---
 
 ## 🧾 LOG (newest first)
+
+## 2026-10-11 — Backlog voucher claim PROPOSED ✅ (request Agesta: best practice + todolist eksekusi)
+- **Kenapa:** tombol Buka sekarang cuma wall login (NOL kode); voucher = duit tenant → butuh pola kode unik show-to-cashier (kayak Klook/Chope), bukan auto-discount (butuh POS, mahal).
+- **Dikerjain:** `docs/23-PRD-Addendum-Voucher-Claim.md` v1.0 (keputusan 6 kunci + gap jujur + S1→S6: S1 auth session ~2h BLOCKER → S2 tabel ~30mnt → S3 API 401/409/429 ~1.5h → S4 UI kode ~1.5h = P0 ~5.5h; S5 kasir PIN P1 ~3h; S6 dashboard P2 ~4h) + sinkron `06-MVP-Checklist.md` 8.1/8.2/8.3/8.4 → Addendum 23 + board NEXT/BACKLOG file ini.
+- **Verifikasi:** NOL sentuh `app/` (docs only) → NOL test/build needed; scan secrets sebelum push.
+- **File:** `docs/23-PRD-Addendum-Voucher-Claim.md` (BARU) + `docs/06-MVP-Checklist.md` + `docs/08-PROGRESS.md`.
+- **Next:** Agesta balas "gas voucher S1" → eksekusi S1 via TDD sampai deploy.
 
 ## 2026-10-11 — Voucher gift pindah ke hero DONE ✅ (request Agesta, tiket atas → banner bawah)
 - **Kenapa:** di prod ada 2 voucher dobel (tiket dashed + Klaim di hero + banner Ada -20% + Buka di bawah) → Agesta: hapus voucher atas, replace pakai model bawah, bawah bersih tanpa voucher.

@@ -384,9 +384,9 @@ This checklist breaks down Weekend Planner MVP into actionable tasks with priori
 
 **Goal:** Quiz makan + direktori tenant terpisah total dari quiz tempat. Result tidak dicampur. Anon makan 2x cookie `makan_quota_used`, register 5x `mall_search_quota`; voucher WAJIB login (`voucher_claims` UNIQUE user+tenant+hari).
 
-### 8.1 Backend Mall (DB + Seed) (patch Addendum 09 v1.3 — tambah `voucher_claims`)
+### 8.1 Backend Mall (DB + Seed) (patch Addendum 09 v1.3 — tambah `voucher_claims`; eksekusi ikut Addendum 23 v1.0)
 - [x] **P0** Create tables `malls`, `tenants`, `mall_search_quota` + `raw_scrape` staging + RLS (public read, staging closed) - *30 min* ✅ BERES 6 Okt 2026 (`supabase/migration.sql`: 4 tabel + `idx_tenants_needs_survey` + `idx_raw_scrape_city_status`)
-- [ ] **P0** Create table `voucher_claims` (user_id NOT NULL, tenant_id, date, code WIK-XXXXX, redeemed, UNIQUE user+tenant+hari) + RLS own-claims - *30 min* ⏳ NEXT (spekschema v1.1, anti-farming 1 tenant 1x/hari)
+- [ ] **P0** Create table `voucher_claims` (user_id NOT NULL, tenant_id, date, code WKD-XXXXXX, redeemed, UNIQUE user+tenant+hari) + RLS own-claims - *30 min* ⏳ NEXT → jadi **S2 di `docs/23-PRD-Addendum-Voucher-Claim.md`** (+ kolom `test`/`expires_at` 23:59 WIB/`redeemed_at` + idx code + kolom `pin` di tenants buat P1)
 - [x] **P0** Import `data/tenants-seed.csv` 200 rows (5 mall x 40) + verifikasi - *30 min* ✅ BERES (`generate_seed.py` + `seed.sql` 205 INSERT, pytest 10/10)
 - [x] **P0** Patch NULL tri-state: kosong → `NULL` + `data_source`/`verified_at`/`needs_survey`, filter `.eq(true)` exclude NULL, badge ❓ - *1 jam* ✅ BERES 6 Okt 2026 (generator + migrasi + `types/` + `recommend.post.ts` + `tenants.get.ts` + `result-makan.vue` + `mall/[slug].vue` + `AUDIT.md`)
 
@@ -394,21 +394,21 @@ This checklist breaks down Weekend Planner MVP into actionable tasks with priori
 
 ---
 
-### 8.2 Makan API (patch Addendum 09 v1.3 — klaim voucher WAJIB login)
+### 8.2 Makan API (patch Addendum 09 v1.3 — klaim voucher WAJIB login; eksekusi ikut Addendum 23 v1.0)
 - [x] **P0** `GET /api/malls` + `GET /api/malls/:slug` - *45 min* ✅ CODE-COMPLETE (`index.get.ts` ada; `:slug` detail via tenants.get — baca mall inline)
 - [x] **P0** `GET /api/malls/:slug/tenants` (filter halal/budget/mission/kids/search, tanpa LLM) - *1 hour* ✅ CODE-COMPLETE + aturan NULL `.eq(true)` + JSDoc tri-state
 - [x] **P0** `POST /api/makan/recommend` (cek quota makan → filter Supabase → LLM ranking Top 5 + reason 1 kalimat → save `generations {type:'makan'}`) - *2 hours* ✅ CODE-COMPLETE + passthrough `data_source`/`needs_survey`
-- [ ] **P0** `POST /api/voucher/claim` (WAJIB login: anon 401 → bottom sheet; cek promo aktif → cek `voucher_claims` → code WIK-XXXXX → double 409) - *1 hour* ⏳ NEXT (spek API v1.1, momen wall #4)
+- [ ] **P0** `POST /api/voucher/claim` (WAJIB login: anon 401 → bottom sheet; cek promo aktif → cek `voucher_claims` → code WKD-XXXXXX → double 409) - *1.5 jam* ⏳ NEXT → jadi **S3 di `docs/23-PRD-Addendum-Voucher-Claim.md`** (+ 429 rate-limit 3/hari + `existing_code` saat 409 + flag `test`)
 - [ ] **P1** `POST /api/vote` (tanpa login, rate-limit IP) + `POST /api/report-tenant` - *1.5 hours* ⏳ BELUM — NEXT setelah 8.4 (nutup loop `is_open`/`needs_survey` dari AUDIT.md)
 
 **Subtotal (P0):** ~3.75 hours
 
 ---
 
-### 8.3 Frontend Makan + Direktori (patch Addendum 09 v1.3 — voucher gate + wallet)
+### 8.3 Frontend Makan + Direktori (patch Addendum 09 v1.3 — voucher gate + wallet; eksekusi ikut Addendum 23 v1.0)
 - [x] **P0** `pages/makan.vue` - Quiz 4Q (mall wajib 1 → misi → budget → rombongan+toggle halal/kids), reuse quiz tempat 80% - *2.5 hours* ✅ CODE-COMPLETE (+ pre-fill `?mall=` skip Q1 via `getMakanStartStep`, tested)
 - [x] **P0** `pages/result-makan.vue` - 5 kartu TENANT murni (nama + kategori•mall•lantai + halal + hype + reason + price_range + Maps gede + Simpan + Lapor tutup) - *2.5 hours* ✅ CODE-COMPLETE (+ badge ❓/📋 tri-state; tombol Simpan/Lapor ⏳ butuh auth/vote API)
-- [ ] **P0** Tombol "Klaim Voucher" di `result-makan.vue` (anon tap → bottom sheet login; login → `POST /api/voucher/claim` → code WIK-XXXXX + "Tunjukin ke kasir") - *1 hour* ⏳ NEXT (momen wall #4, sinyal monetisasi tenant)
+- [ ] **P0** Tombol "Klaim Voucher" di `result-makan.vue` (anon tap → bottom sheet login; login → `POST /api/voucher/claim` → code WKD-XXXXXX + "Tunjukin ke kasir") - *1.5 jam* ⏳ NEXT → jadi **S4 di `docs/23-PRD-Addendum-Voucher-Claim.md`** (momen wall #4, sinyal monetisasi tenant; spinner + :disabled + 409 tampilkan kode lama)
 - [x] **P0** `pages/mall/[slug].vue` - Direktori SEO (list 40 + filter + search + banner "Cariin yang cocok → /makan?mall=") - *2.5 hours* ✅ CODE-COMPLETE (+ badge ❓/📋; SEO meta ⏳ menyusul)
 - [x] **P0** Update landing dual CTA (🗺️ Cari Tempat gede + 🍜 Cari Makan kedua) + navbar [Makan] - *45 min* ✅ SEBAGIAN (dual CTA di `index.vue` ✅; navbar [Makan] ⏳ BELUM — `layouts/` belum ada)
 - [ ] **P1** History/Favorites tab Tempat | Makanan (`type` field) - *1.5 hours*
@@ -417,8 +417,8 @@ This checklist breaks down Weekend Planner MVP into actionable tasks with priori
 
 ---
 
-### 8.4 Testing Makan (patch Addendum 09 v1.3 — split + wall + voucher)
-- [ ] **P0** Test makan flow (landing → /makan 2x anon → /result-makan → ke-3 = wall → login → klaim voucher WIK-XXXXX) - *30 min*
+### 8.4 Testing Makan (patch Addendum 09 v1.3 — split + wall + voucher; eksekusi ikut Addendum 23 §6)
+- [ ] **P0** Test makan flow (landing → /makan 2x anon → /result-makan → ke-3 = wall → login → klaim voucher WKD-XXXXXX) - *30 min*
 - [ ] **P0** Test quota pisah (tempat 2/hari vs makan 5/hari, tidak saling makan; cookie ganda anon) - *20 min*
 - [ ] **P0** Test direktori filter + SEO meta `/mall/:slug` - *20 min*
 
