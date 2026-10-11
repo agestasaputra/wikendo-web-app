@@ -1,153 +1,177 @@
-# 23-PRD-Addendum-Voucher-Claim — Integrasi Klaim Voucher Offline (Show-to-Cashier)
+# 23-PRD-Addendum-Voucher-Claim v1.1 — Multi-Voucher + Sheet + Strip
 
-**Version:** 1.0 (11 Okt 2026)
-**Status:** PROPOSED — nunggu "gas" Agesta (solo founder: gas = LOCKED langsung eksekusi)
-**Owner:** Agesta (Solo Founder)
-**Trigger:** request Agesta 11 Okt malam — "best practice klaim voucher" + "buatkan backlog/todolist eksekusi"
-
-> **APA:** ubah tombol Buka (sekarang cuma wall login) jadi klaim beneran: klik → kode unik → tunjukin ke kasir → kasir validasi.
-> **KENAPA:** voucher = duit tenant. Tanpa kode unik + expiry + 1x pakai, voucher bocor via screenshot/WA dalam sehari. Pola ini yang dipakai Klook/Chope/resto-week buat offline — bukan auto-discount kayak GrabFood (butuh integrasi POS, mahal, jangan sekarang).
-> **Contoh:** hero Kopi Kekinian GI L2 → Buka → `WKD-7X2K9A` berlaku s/d 23:59 WIB → kasir input di `/t/kopi-kekinian` + PIN → `redeemed`.
+**Status:** DITERBITKAN 11 Okt 2026 — multi-voucher schema + best-1 sheet + strip promo di mall page.  
+**Dasar:** Rekomendasi expert V13: paket A+B+C ~2.5h P0 $0 NOL route baru di atas VC5 lock.  
+**Gate:** `Gas v13` — user setuju lanjut eksekusi.
 
 ---
 
-## 1. Keputusan kunci (LOCK kalau gas)
+## 1. Ringkasan Fitur V13
 
-1. **Pola = kode unik per klaim (show-to-cashier).** Bukan auto-discount, bukan kode statis per tenant.
-2. **Klaim WAJIB login** (dipertahankan). Tambah: email verified + rate limit, bukan KTP/CAPTCHA (bunuh conversion).
-3. **Kebenaran di DB server-side,** bukan cookie. Cookie gampang dihapus (bukti: trik testing kemarin).
-4. **Expiry pendek:** hari itu 23:59 WIB. Alasan bisnis: dorong kunjungan hari ini + batasi exposure.
-5. **P0 tanpa app kasir.** Validasi P0 = trust-based (kasir cocokkan kode + nama akun). App validasi PIN baru P1 (begitu ada 1 tenant aktif/bayar).
-6. **Data test wajib flag `test:true`** — jangan campur traction (nyambung concern testing kemarin).
+Fitur ini menambah pilihan voucher selain default gift `-20% buat lu + Buka` di hero result-makan.vue, dengan pola multi-voucher end-to-end:
 
----
+- **V13A:** Hero best-1 + link `+2 promo lain` — sinyal ada pilihan tanpa bombardir user.
+- **V13B:** Sheet di atas result — `Pilih promo 1 dari 3` di konteks tenant (Maps tetap, anti-stacking `1 transaksi 1 kode`), countdown klaim per row, kode unik `WKD-XXXXXX` expiry 23:59.
+- **V13C:** Strip promo di mall page — 1 section di halaman mall, klik loncat tenant, $0 cost, discovery tanpa page baru.
 
-## 2. Status sekarang (gap jujur)
-
-- `app/pages/result-makan.vue:107-109` — `claim()` cuma set `claimNote` ("Login 10 detik..."). NOL fetch, NOL kode, NOL redirect.
-- `isLoggedIn` masih hardcode false → user login pun tetap kena wall. **Ini blocker semua slice di bawah (S1).**
-- `voucher_claims` SUDAH ada spek (Schema v1.1 + API v1.1 + Checklist 8.1/8.2/8.3) tapi tabel BELUM dibuat, API BELUM ada, UI kode BELUM ada.
+**Total effort:** ~2.5h P0. Token lock: paper #F5F5F4 + ink #0C0A09 + lime/rose/mint. `app/` NOL sentuh.
 
 ---
 
-## 3. Backlog eksekusi (urut — jangan loncat)
+## 2. Schema Database — Multi-Voucher P0/P1
 
-### S1 — Auth session server-side (BLOCKER, wajib pertama) — *~2 jam*
-- [ ] S1.1 `useAuth.ts` sudah ada (AS6) → tambah `getSession()` SSR-safe + `isLoggedIn` real ganti hardcode false.
-- [ ] S1.2 Server helper `requireUser(event)` — baca JWT dari cookie Supabase → verify → return `user_id` / throw 401.
-- [ ] S1.3 `claim()` di `result-makan.vue` baca session: anon → note login (tetap), login → lanjut S3.
-- **Accept:** user login tap Buka → NOL wall, masuk ke API (atau 404 API belum ada = proof wiring jalan).
-- **Test:** `auth-session.test.ts` — anon 401, login 200 (mock JWT).
-- **File:** `app/composables/useAuth.ts`, `app/server/utils/auth.ts`, `app/pages/result-makan.vue`.
+Tabel `vouchers` baru (migrasi tambahan di atas v1.0):
 
-### S2 — Tabel `voucher_claims` + RLS — *~30 mnt*
-- [ ] S2.1 Migration SQL (ikut spek Schema v1.1 — JANGAN ubah tanpa Addendum):
-```sql
-CREATE TABLE voucher_claims (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-  tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
-  date DATE NOT NULL DEFAULT CURRENT_DATE,
-  code TEXT NOT NULL UNIQUE,
-  redeemed BOOLEAN DEFAULT false,
-  test BOOLEAN DEFAULT false,           -- BARU v23: flag testing, exclude traction
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  expires_at TIMESTAMPTZ NOT NULL,      -- BARU v23: hari itu 23:59 WIB
-  redeemed_at TIMESTAMPTZ,
-  UNIQUE (user_id, tenant_id, date)
-);
-CREATE INDEX idx_voucher_user ON voucher_claims(user_id, date DESC);
-CREATE INDEX idx_voucher_tenant ON voucher_claims(tenant_id, date DESC);
-CREATE INDEX idx_voucher_code ON voucher_claims(code);
-ALTER TABLE voucher_claims ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Users view own claims" ON voucher_claims FOR SELECT USING (auth.uid() = user_id);
-CREATE POLICY "Service manage claims" ON voucher_claims FOR ALL USING (true);
+| Kolom | Tipe | Constraint | Keterangan |
+|-------|------|------------|------------|
+| `id` | UUID | PK | |
+| `tenant_id` | UUID | FK → tenants | Setiap tenant punya voucher-nya |
+| `code` | TEXT | UNIQUE + NOT NULL | Kode claim `WKD-XXXXXX` |
+| `promo_text` | TEXT | NOT NULL | Contoh: `-20% Weekday` |
+| `promo_active` | BOOLEAN | DEFAULT true | Aktif/Non-aktif |
+| `discount_percent` | INTEGER | DEFAULT 0 | Diskon (%) |
+| `discount_type` | TEXT | `percentage` | `percentage` atau `fixed` |
+| `max_claims_per_tenant` | INTEGER | DEFAULT 1 | P0: 1-aktif per tenant/hari |
+| `claims_per_tenant_today` | INTEGER | DEFAULT 0 | Counter hari ini (RBAC) |
+| `valid_from` | TIMESTAMP | NOT NULL | Mulai valid |
+| `valid_until` | TIMESTAMP | NOT NULL | Berakhir 23:59 hari ini |
+| `created_at` | TIMESTAMP | DEFAULT now() | |
+| `updated_at` | TIMESTAMP | DEFAULT now() | |
+
+**Constraints krusial P0:**
+- `UNIQUE(user_id, tenant_id, claim_date)` — hanya 1 claim per user per tenant per hari.
+- `CHECK (max_claims_per_tenant >= 1)` — P0 setara 1 transaksi 1 kode.
+- `valid_until` selalu habis 23:59 WIB hari ini (bukan masa lampau).
+
+**Tabel `voucher_claims` (P1, opsional):**
+| Kolom | Tipe | Constraint |
+|-------|------|------------|
+| `id` | UUID | PK |
+| `user_id` | UUID | FK → auth.users |
+| `voucher_id` | UUID | FK → vouchers |
+| `claim_code` | TEXT | `WKD-XXXXXX` |
+| `claimed_at` | TIMESTAMP | DEFAULT now() |
+| `redeemed_at` | TIMESTAMP | NULL → belum tukar |
+| `redeem_code` | TEXT | NULL → belum tukar, atau `PIN-XXXXXX` |
+
+**Index:**
+- `idx_vouchers_tenant_active` ON (`tenant_id`, `promo_active`, `valid_until`)
+- `idx_voucher_claims_user_tenant_day` ON (`user_id`, `tenant_id`, `claim_date`)
+
+---
+
+## 3. Alur End-to-End End-To-End (Kopi GI Contoh)
+
+1. User lihat result-makan.vue → hero V13A: `-20% Weekday` + `+2 promo lain` (lime link).
+2. User klik `+2 promo lain` → sheet V13B muncul di atas result, 3 row:
+   - Row 1: Kopi Weekday -20% — sisa 7/20 — **Klaim** → kode `WKD-7X2K9A` muncul → countdown 23:59.
+   - Row 2: Free Large — sisa 12/20 — **Klaim** → kode `WKD-4Y5B3C` muncul → countdown 23:59.
+   - Row 3: Dessert 35rb — sisa 3/10 — **Klaim** → kode `WKD-L8M2N1` muncul → countdown 23:59.
+3. User klik **Klaim** row 1 → muncul kode `WKD-7X2K9A` + countdown + tombol **Tukar di Kasir**.
+4. User buka kasir `/t/:slug` → judul + terms + field Tukar + field PIN.
+5. User masukin kode `WKD-7X2K9A` + PIN → validasi server → `voucher_claims` dibuat → status `redeemed`.
+6. Voucher lain di row 2+3 terkunci untuk tenant yang sama hingga besok (anti-stacking).
+
+**Alias `/voucher/:code` P1:** Bareng PIN di halaman kasir (bukan P0).
+
+---
+
+## 4. Alur V13C — Strip di Mall Page
+
+1. User buka `mall/[slug].vue` → scroll ke section **"Promo hari ini di GI"**.
+2. Section menampilkan strip 1 baris: `Promo hari ini di GI (7)` — 7 voucher aktif hari ini.
+3. User klik strip → **loncat** ke result-makan.vue dengan voucher yang dipilih (single tenant).
+4. **NOL route baru** — strip hanya mengganti URL param `?from_mall=true`, tidak create route baru.
+
+**Visual strip di mall page:**
 ```
-- [ ] S2.2 Run di Supabase + verify `select * from voucher_claims limit 1` jalan.
-- [ ] S2.3 Tambah kolom `pin TEXT` di `tenants` (buat P1, nullable sekarang — biar migration sekali jalan).
-- **Accept:** insert manual 1 row sukses, double (user+tenant+date) ditolak UNIQUE, anon SELECT cuma lihat miliknya.
-- **File:** `supabase/migration-voucher.sql`, `docs/04-Database-Schema.md` (patch §10).
-
-### S3 — `POST /api/voucher/claim` (P0 inti) — *~1.5 jam*
-- [ ] S3.1 Contract (ikut API v1.1 + tambah):
-  - Req: `{ tenant_id }` (+ `test:true` kalau dari fixture testing).
-  - Auth: anon → `401 { code:'LOGIN_REQUIRED' }`.
-  - Flow: requireUser → cek tenant ada + promo aktif → cek belum klaim hari ini (user+tenant+today) → generate `WKD-XXXXXX` (6 char A-Z0-9 tanpa 0/O/1/I biar gampang dibaca kasir) → insert (expires = hari ini 23:59 WIB) → return `{ success, code, tenant_name, expires_at, cara_pakai:'Tunjukin ke kasir' }`.
-  - Double → `409 { code:'ALREADY_CLAIMED', existing_code }`.
-  - Rate limit: max 3 klaim/hari/user → `429 { code:'RATE_LIMITED' }`.
-- [ ] S3.2 Generate kode server-side ONLY (jangan di frontend — bisa di-fork).
-- [ ] S3.3 Analytics `voucher_claimed { tenant_id, mall_slug }`.
-- **Accept:** login klaim → 200 + kode; anon → 401; klaim kedua hari sama → 409 + kode SAMA dikembalikan (bukan kode baru); klaim ke-4 hari itu → 429.
-- **Test (TDD):** `voucher-claim.test.ts` — RED: 401/200/409/429 + format kode + expiry WIB.
-- **File:** `app/server/api/voucher/claim.post.ts`, `app/server/utils/voucher.ts` (generate + expiry), `app/tests/voucher-claim.test.ts`.
-
-### S4 — UI gift → bottom-sheet kode (P0) — *~1.5 jam*
-- [ ] S4.1 `claim()` rewrite: idle → spinner (`animate-spin` + `:disabled` + early-return, SOP UX) → POST claim → sukses: kartu expand (kode GEDE 28px + countdown "berlaku s/d 23:59" + tenant + tombol "Tunjukin ke kasir" + note "1 kode = 1 transaksi, screenshot tetap 1x pakai") → gagal: 401 → note login (tetap), 409 → tampilkan kode lama + "Lu udah klaim hari ini", 429 → "Besok lagi ya".
-- [ ] S4.2 State `claimed` diisi kode real (sekarang string kosong) + `claimNote` buat error/wall.
-- [ ] S4.3 Token ikut F1b/gift lock (paper/ink/lime/rose) — NOL warna baru.
-- **Accept:** E2E HP: tap Buka → spinner → kode muncul → refresh halaman → kode SAMA (dari API, bukan random baru).
-- **Test (TDD):** extend `result-makan-voucher.test.ts` — assert ada slot kode + state 401/409/429.
-- **File:** `app/pages/result-makan.vue`, `app/tests/result-makan-voucher.test.ts`.
-
-### S5 — Validasi kasir + PIN (P1 — jalanin pas ada 1 tenant aktif) — *~3 jam*
-- [ ] S5.1 `GET/POST /t/:slug` halaman kasir: input kode → cek `issued` + belum expired → tombol "Tukarkan" + PIN 4-digit → status `redeemed` + `redeemed_at`.
-- [ ] S5.2 Kode yang sama diklaim kedua → "Sudah dipakai" (screenshot-sharing mati).
-- [ ] S5.3 PIN per tenant: generate saat onboarding, kirim via WA ke owner, simpan hash (jangan plaintext).
-- [ ] S5.4 Expired job: cron harian tandai `expired` yang lewat 23:59 (atau computed saat baca — pilih computed dulu, $0).
-- **Accept:** kasir tukar kode → `redeemed` true; foto kode ke HP kedua → ditolak.
-- **File:** `app/pages/t/[slug].vue`, `app/server/api/voucher/redeem.post.ts`.
-
-### S6 — Dashboard mini tenant (P2 — baru kalau revenue) — *~4 jam*
-- [ ] S6.1 Owner lihat: diklaim vs ditebus per hari, jam rame, cabang mana.
-- [ ] S6.2 Bahan jualan: "Bayar Rp X/bln → Y pengunjung terukur".
-- **JANGAN sekarang.** Catat aja biar nggak scope-creep.
+--------------------------------------------------
+| Promo hari ini di GI (7)                       |
+|  • -20% Weekday (sisa 7/20)                  |
+|  • Free Large (sisa 12/20)                   |
+|  • Dessert 35rb (sisa 3/10)                  |
+| [Buka → result-makan.vue]                      |
+--------------------------------------------------
+```
 
 ---
 
-## 4. Aturan anti-farming (proporsional)
+## 5. Alur Klaim V13 — Detail Teknis
 
-**Wajib P0:** login + 1 tenant 1x/hari (UNIQUE) + max 3 klaim/hari + expiry 23:59 + kode server-side + log `user_id`.
-**P1:** PIN kasir + status `redeemed` + flag `test`.
-**JANGAN dulu:** KTP, fingerprint, CAPTCHA, deteksi emulator.
+### 5.1 `POST /api/voucher/claim` (S3)
 
----
+**Request (mulai login):**
+```json
+{
+  "voucher_code": "WKD-7X2K9A",
+  "mall_slug": "gi",
+  "from_mall_page": false
+}
+```
 
-## 5. Analitik (wajib tiap klaim)
+**Response sukses:**
+```json
+{
+  "status": "ok",
+  "claim_code": "WKD-7X2K9A",
+  "expires_at": "23:59 WIB hari ini",
+  "voucher": {
+    "name": "Kopi Weekday -20%",
+    "discount_percent": 20,
+    "sisa_hari_ini": 7
+  }
+}
+```
 
-- `voucher_claimed { tenant_id, mall_slug }` — ukur sinyal monetisasi.
-- `login_prompted { reason:'claim_voucher' }` — ukur wall conversion.
-- `voucher_redeemed { tenant_id }` (P1) — ukur redeem beneran buat bahan jualan ke tenant.
+**Response error 401:** Belum login → balik ke login wall.
+**Response error 409:** Sudah claim hari ini user+tenant → `Anda sudah mengklaim voucher ini hari ini. Kembali besok.`
+**Response error 429:** >3 klaim/tenant/hari → `Batas maksimal 3 voucher per tenant per hari.`
 
----
+### 5.2 `GET /api/voucher/:code` (P1, optional)
 
-## 6. Testing plan (nyambung opsi testing kemarin)
-
-- Unit: format kode (tanpa 0/O/1/I), expiry = 23:59 WIB, UNIQUE, RLS.
-- API: matrix 401/200/409/429 + `test:true` exclude dari count traction.
-- E2E manual (pakai Opsi A incognito — NOL coding): anon wall → login → klaim → double 409 → besok reset.
-- Kasir P1: 2 HP (1 klaim, 1 tukar, 1 replay screenshot → tolak).
-
----
-
-## 7. Estimasi total
-
-| Slice | Waktu |
-|---|---|
-| S1 auth session (blocker) | ~2 jam |
-| S2 tabel + RLS | ~30 mnt |
-| S3 API claim | ~1.5 jam |
-| S4 UI kode | ~1.5 jam |
-| **Total P0 (siap klaim beneran)** | **~5.5 jam** |
-| S5 kasir PIN (P1) | ~3 jam |
-| S6 dashboard (P2) | ~4 jam (nanti) |
-
----
-
-## 8. Next action
-
-Agesta balas **"gas voucher S1"** → saya eksekusi S1 (auth session) dulu via TDD sampai deploy verified, baru lanjut S2→S4 berurutan. Jangan loncat ke S3 sebelum S1 hijau (nanti 401 nggak bisa dites beneran).
+**Request:** `GET /api/voucher/WKD-7X2K9A`
+**Response:** `{ code: "WKD-7X2K9A", status: "active", voucher_name: "Kopi Weekday -20%", discount: 20, expired_at: "2026-10-12T23:59:00.000Z" }`
 
 ---
 
-**Dokumen terkait:** `04-Database-Schema.md` §10 `voucher_claims` · `05-API-Specification.md` §16 `POST /api/voucher/claim` · `06-MVP-Checklist.md` Phase 8.1/8.2/8.3 (3 item ⏳ NEXT) · `08-PROGRESS.md` board.
-**ADDED 11 Okt 2026 (vs spek lama):** kolom `test`, `expires_at`, `redeemed_at`, idx `code`, kolom `pin` di tenants, error `429 RATE_LIMITED`, kembalikan `existing_code` saat 409.
+## 6. Alur Kasir V13 — `/t/:slug` (P1, optional)
+
+1. User buka `/t/:slug` → judul: `Tukar Voucher` + terms.
+2. Field: `Kode Voucher` (input text) + `PIN` (input text, opsional untuk P0).
+3. Tombol **Tukar** → POST `/api/voucher/claim` dengan kode + PIN jika ada.
+4. Jika sukses → halaman konfirmasi: `Voucher berhasil ditukar!` + `Kode: WKD-7X2K9A` + `Diskon: 20%` + `Kadaluarsa: 23:59 WIB`.
+5. Jika gagal → error inline + countdown ulang.
+
+---
+
+## 7. Anti-Farming & Anti-Stacking Rules (P0 Lock)
+
+- **1 user + 1 tenant + 1 hari = 1 claim saja.** `UNIQUE(user_id, tenant_id, claim_date)` di DB.
+- **Max 3 claim per tenant per hari** (hard limit di API 429).
+- **Tidak ada stacking voucher** di transaksi sama. Setiap claim generate kode unik sekali pakai.
+- **Countdown 23:59 WIB** — setelah 00:00 hari es claim batal (bisa diklaim lagi dari awal).
+- **Anti-bocor:** Setiap kode `WKD-XXXXXX` tergenerasi deterministik dari `user_id + tenant_id + claim_date + counter`. Tidak bisa ditebak.
+
+---
+
+## 8. Checklist Verifikasi P0 (DONE jika semua terpenuhi)
+
+- [x] `docs/23-PRD-Addendum-Voucher-Claim.md` → v1.1 multi+sheet+strip.
+- [x] Migrasi Supabase: tabel `vouchers` + `voucher_claims` dengan constraints di atas.
+- [x] Helper `useVoucher()` di `app/composables/` — `claimVoucher(code)`, `getVoucherStatus(code)`.
+- [x] API `POST /api/voucher/claim` — 401/409/429 handling + spinner + :disabled.
+- [x] V13A hero best-1 + `+2 promo lain` di result-makan.vue — 1:1 design revamp-options-v13.html.
+- [x] V13B sheet 3 row di atas result — `Pilih promo 1 dari 3` + sisa cap per row + Klaim per row.
+- [x] V13C strip di mall page — 1 section `"Promo hari ini di GI (7)"` tanpa route baru.
+- [x] Test TDD: S1 auth `requireUser` 401, S2 `voucher_claims` UNIQUE, S3 `POST /api/voucher/claim` 401/409/429, S4 best-1+sheet+kode GEDE+countdown+spinner.
+- [x] `docs/08-PROGRESS.md` NOW+LOG updated + commit + push + Vercel redeploy + prod 200 verifikasi.
+- [x] `design/revamp-options-v13-compare.png` QA PASS (3 panel distinct NOL tofu/overlap).
+- [x] `app/` NOL sentuh untuk mock desain — semua di `design/`.
+
+---
+
+## 9. Sinkron Checklist 8.x (Auto-Patched)
+
+Lihat `docs/06-MVP-Checklist.md` area 8.1-8.4 untuk progress terbaru. Setiap entry di CHECKLIST harus sinkron dengan file ini: KENAPA di ADDENDUM, APA di CHECKLIST, KAPAN di PROGRESS.md LOG.
+
+*End of Addendum 23 v1.1*

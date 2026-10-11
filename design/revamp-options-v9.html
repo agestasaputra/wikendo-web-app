@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wikendo — Opsi Login + Register (L1–L10 + R1–R10)</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;background:#e7e5e4;color:#18181b;padding:16px 12px 120px}
+.wrap{max-width:1150px;margin:0 auto}
+h1{font-size:22px;font-weight:800}
+.sub{font-size:13px;color:#52525b;margin-top:4px}
+.card{background:#fff;border-radius:16px;padding:14px;margin-top:12px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.card h2{font-size:15px;font-weight:800;margin-bottom:6px}
+.card p,.card li{font-size:12.5px;line-height:1.55}
+.card ul{padding-left:18px}
+.sw{display:inline-block;width:14px;height:14px;border-radius:4px;vertical-align:-2px;margin-right:4px;border:1px solid #d4d4d8}
+.filters{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.filters button{border:2px solid #d4d4d8;background:#fff;border-radius:999px;padding:7px 14px;font-size:12.5px;font-weight:800;cursor:pointer}
+.filters button.on{border-color:#EA580C;color:#EA580C}
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px;margin-top:12px}
+.opt{background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.08);border:3px solid transparent}
+.opt.short{border-color:#EA580C}
+.oid{font-size:38px;font-weight:800;background:#0C0A09;color:#fff;text-align:center;padding:6px}
+.oid small{display:block;font-size:11px;font-weight:700;color:#A3E635}
+.phone{width:300px;margin:12px auto;border:2px solid #d4d4d8;border-radius:24px;overflow:hidden;background:#F5F5F4}
+.prow{padding:8px 10px;min-height:430px}
+.topbar{display:flex;justify-content:space-between;align-items:center;font-size:11px;font-weight:800;padding:4px 2px}
+.hero{background:#0C0A09;border-left:4px solid #EA580C;border-radius:12px;color:#fff;padding:8px;font-size:10px;font-weight:800}
+.hero.rose{border-left-color:#E11D48}
+.hero .big{color:#D9F99D;font-size:17px}
+.btn{display:block;width:100%;border-radius:12px;padding:10px;font-size:11px;font-weight:800;text-align:center;margin-top:6px;border:none}
+.btn.g{background:#fff;color:#0C0A09;border:1.5px solid #e4e4e7}
+.btn.ink{background:#0C0A09;color:#fff}
+.btn.lime{background:#A3E635;color:#0C0A09}
+.inp{background:#fff;border:1.5px solid #e4e4e7;border-radius:10px;padding:8px;font-size:10px;margin-top:6px;color:#71717a}
+.mini{background:#fff;border-radius:10px;padding:7px;margin-top:6px;font-size:9.5px;font-weight:700;box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.chk{font-size:9.5px;font-weight:700;margin-top:4px}
+.sheet{margin-top:14px;background:#fff;border-radius:16px 16px 0 0;padding:8px;box-shadow:0 -4px 14px rgba(0,0,0,.12)}
+.handle{width:40px;height:4px;border-radius:99px;background:#d4d4d8;margin:0 auto 6px}
+.meta{padding:10px 12px;font-size:12px}
+.meta .row{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}
+.pill{font-size:10.5px;font-weight:800;border-radius:999px;padding:2px 10px;background:#f4f4f5}
+.pill.rec{background:#A3E635}
+.proscons{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px}
+.proscons div{background:#f4f4f5;border-radius:8px;padding:6px;font-size:11px}
+.shortbtn{width:100%;margin-top:8px;border:2px solid #0C0A09;background:#fff;border-radius:10px;padding:8px;font-weight:800;font-size:12.5px;cursor:pointer}
+.opt.short .shortbtn{background:#0C0A09;color:#fff}
+table{width:100%;border-collapse:collapse;font-size:11.5px;margin-top:8px}
+th,td{border:1px solid #e4e4e7;padding:6px;text-align:left}
+th{background:#0C0A09;color:#fff}
+td.win{background:#ecfccb;font-weight:800}
+.banner{background:#0C0A09;color:#fff;border-radius:16px;padding:14px;margin-top:12px}
+.banner b{color:#A3E635}
+.pickbar{position:fixed;bottom:0;left:0;right:0;background:#0C0A09;color:#fff;padding:10px 12px;display:flex;gap:8px;align-items:center;z-index:50}
+.pickbar code{flex:1;background:#27272a;border-radius:8px;padding:8px;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pickbar button{background:#A3E635;border:none;border-radius:8px;padding:8px 14px;font-weight:800;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>🔐 Login + Register — 20 opsi visual</h1>
+<p class="sub">Board visual. Pilih dengan format <b>Gua suka [ID]</b> (contoh: <b>Gua suka L1+R1</b>). Tanpa ID = belum eksekusi. Produksi belum disentuh.</p>
+
+<div class="card"><h2>🔍 Analisis preferensi lu (3 baris)</h2>
+<ul>
+<li><b>Ink + ember/rose + lime:</b> hero ink #0C0A09 strip ember #EA580C, angka #D9F99D, CTA lime #A3E635 — semua opsi ikut token ini.</li>
+<li><b>Google PRIMARY, email secondary:</b> copy jual benefit "Login 10 detik → buka 2 tempat + 5 makan/hari", bukan blokir.</li>
+<li><b>Mobile max-w-md, tombol 56px thumb-zone:</b> sheet + sticky CTA di semua opsi high-intent (Simpan/Klaim/wall).</li>
+</ul></div>
+
+<div class="card"><h2>🔒 Batasan + token (berlaku semua opsi)</h2>
+<p>Mobile-first 375px • content <b>max-w-md</b> • header icon Day + kanan mutual-exclusive (login? bell : tombol login) • Dual Entry Split never mix • Anon 1+2 vs register 2+5 • Voucher WAJIB login •
+<span class="sw" style="background:#F5F5F4"></span>paper #F5F5F4
+<span class="sw" style="background:#fffdf9"></span>base #fffdf9
+<span class="sw" style="background:#0C0A09"></span>ink #0C0A09
+<span class="sw" style="background:#A3E635"></span>lime #A3E635
+<span class="sw" style="background:#EA580C"></span>ember #EA580C
+<span class="sw" style="background:#E11D48"></span>rose #E11D48</p></div>
+
+<div class="filters">
+<button data-f="all" class="on">Semua (20)</button>
+<button data-f="login">Login</button>
+<button data-f="register">Register</button>
+<button data-f="sheet">Sheet</button>
+<button data-f="minimal">Minimal</button>
+<button data-f="benefit">Benefit</button>
+</div>
+
+<div class="opts">
+<!-- L1 -->
+<div class="opt" data-cat="login benefit" id="opt-L1">
+<div class="oid">L1<small>LOGIN • EMBER HERO ★</small></div>
+<div class="phone"><div class="prow">
+<div class="topbar"><span>◼️ Wikendo</span><span>🔔</span></div>
+<div class="hero">QUOTA HABIS • reset 00.00<div class="big">0 • 0</div>Login gratis → buka 2 + 5</div>
+<div class="btn g">🔵 Lanjut dengan Google</div>
+<div class="inp">✉️ Email</div>
+<div class="inp">🔒 Password • <u>Lupa?</u></div>
+<div class="btn ink">Masuk →</div>
+<div class="mini">10 detik • quota reset tiap hari • gratis</div>
+<div class="chk">Belum punya akun? <u>Daftar</u></div>
+</div></div>
+<div class="meta">
+<div class="row"><span class="pill">Effort: S ±3 jam</span><span class="pill">Risiko: rendah</span><span class="pill rec">Rekomendasi ★</span><span class="pill">Login</span></div>
+<div class="proscons"><div>✅ <b>Plus:</b> nyambung hero Home; Google jelas PRIMARY; copy benefit.</div><div>⚠️ <b>Minus:</b> hero makan tempat vertikal.</div></div>
+<button class="shortbtn" data-id="L1">＋ Shortlist L1</button>
+</div></div>
+<!-- L2 -->
+<div class="opt" data-cat="login minimal" id="opt-L2">
+<div class="oid">L2<small>LOGIN • WHITE CARD</small></div>
+<div class="phone"><div class="prow">
+<div class="topbar"><span>◼️ Wikendo</span><span>Masuk</span></div>
+<div style="text-align:center;font-size:40px;margin-top:10px">🎲</div>
+<div style="text-align:center;font-weight:800;font-size:13px">Selamat datang kembali</div>
+<div class="btn g">🔵 Lanjut dengan Google</div>
+<div style="text-align:center;font-size:10px;color:#71717a;margin-top:6px">— atau —</div>
+<div class="inp">✉️ Email</div>
+<div class="inp">🔒 Password</div>
+<div class="btn ink">Masuk</div>
+<div class="chk"><u>Lupa password?</u> • <u>Daftar</u></div>
+</div></div>
+<div class="meta">
+<div class="row"><span class="pill">Effort: S ±3 jam</span><span class="pill">Risiko: rendah</span><span class="pill">Login</span></div>
+<div class="proscons"><div>✅ <b>Plus:</b> bersih, fokus; dadu 56px brand.</div><div>⚠️ <b>Minus:</b> benefit tersembunyi, convert dingin.</div></div>
+<button class="shortbtn" data-id="L2">＋ Shortlist L2</button>
+</div></div>
+<!-- L3 -->
+<div class="opt" data-cat="login sheet" id="opt-L3">
+<div class="oid">L3<small>LOGIN • SHEET</small></div>
+<div class="phone"><div class="prow" style="background:#27272a">
+<div class="topbar" style="color:#fff"><span>◼️ Result makan</span><span>✕</span></div>
+<div class="mini">🎟️ Voucher -20% • tap Klaim →</div>
+<div class="sheet"><div class="handle"></div>
+<div style="font-weight:800;font-size:12px">Login buat klaim 🎟️</div>
+<div class="btn g">🔵 Google 1-tap</div>
+<div class="inp">✉️ Email + 🔒 Password</div>
+<div class="btn lime">Masuk & klaim →</div>
+<div class="chk">10 detik • gratis • reset tiap hari</div>
+</div>
+</div></div>
+<div class="meta">
+<div class="row"><span class="pill">Effort: M ±4 jam</span><span class="pill">Risiko: sedang</span><span class="pill">Sheet</span></div>
+<div class="proscons"><div>✅ <b>Plus:</b> high-intent (Klaim/Simpan); konteks kebawa.</div><div>⚠️ <b>Minus:</b> perlu backdrop + fokus trap.</div></div>
+<button class="shortbtn" data-id="L3">＋ Shortlist L3</button>
+</div></div>
+<!-- L4 -->
+<div class="opt" data-cat="login benefit" id="opt-L4">
+<div class="oid">L4<small>LOGIN • WALLET SPLIT</small></div>
+<div class="phone"><div class="prow">
+<div class="topbar"><span>◼️ Wikendo</span><span>Masuk</span></div>
+<div class="mini">Sekarang (anon): <b>1 • 2</b><br>Setelah login: <b>2 • 5 + simpan + riwayat</b></div>
+<div class="btn g">🔵 Lanjut dengan Google</div>
+<div class="inp">✉️ Email</div>
+<div class="inp">🔒 Password</div>
+<div class="btn ink" style="position:sticky;bottom:6px">Masuk → buka full</div>
+</div></div>
+<div class="meta">
+<div class="row"><span class="pill">Effort: S ±3 jam</span><span class="pill">Risiko: rendah</span><span class="pill">Benefit</span></div>
+<div class="proscons"><div>✅ <b>Plus:</b> scarcity jujur; wallet lock.</div><div>⚠️ <b>Minus:</b> angka ganda, copy harus pas.</div></div>
+<button class="shortbtn" data-id="L4">＋ Shortlist L4</button>
+</div></div>
+<!-- L5 -->
+<div class="opt" data-cat="login minimal" id="opt-L5">
+<div class="oid">L5<small>LOGIN • ONE-TAP</small></div>
+<div class="phone"><div class="prow">
+<div class="topbar"><span>◼️ Wikendo</span><span>Masuk</span></div>
+<div class="mini">🔵 <b>Login sebagai Agesta?</b><br>agesta@gmail.com • <b>1 tap → masuk</b></div>
+<div class="btn g">🔵 Ya, lanjut 1-tap</div>
+<div class="chk"><u>Ganti akun</u> • atau email manual ↓</div>
+<div class="inp">✉️ Email</div>
+<div class="inp">🔒 Password</div>
+<div class="btn ink">Masuk manual →</div>
+</div></div>
+<div class="meta">
+<div class="row"><span class="pill">Effort: M ±5 jam</span><span class="pill">Risiko: sedang</span><span class="pill">Minimal</span></div>
+<div class="proscons"><div>✅ <b>Plus:</b> friksi nol; tercepat.</div><div>⚠️ <b>Minus:</b> butuh GIS setup + fallback.</div></div>
+<button class="shortbtn" data-id="L5">＋ Shortlist L5</button>
+</div></div>
+<!-- L6 -->
+<div class="opt" data-cat="login minimal" id="opt-L6">
+<div class="oid">L6<small>LOGIN • COLLAPSE</small></div>
+<div class="phone"><div class="prow">
+<div class="topbar"><span>◼️ Wikendo</span><span>Masuk</span></div>
+<div style="font-weight:800;font-size:14px;margin-top:8px">Masuk 10 detik ⚡</div>
+<div class="btn g">🔵 Lanjut dengan Google</div>
+<div class="mini">▸ Masuk pakai email (tap buka)</div>
+<div class="mini">✅ 2 tempat • ✅ 5 makan • ✅ voucher</div>
+<div class="chk">Belum punya akun? <u>Daftar</u></div>
+</div></div>
+<div class="meta">
+<div class="row"><span class="pill">Effort: S ±2 jam</span><span class="pill">Risiko: rendah</span><span class="pill">Minimal</span></div>
+<div class="proscons"><div>✅ <b>Plus:</b> 1 aksi dominan; bersih.</div><div>⚠️ <b>Minus:</b> email 1 tap ekstra.</div></div>
+<button class="shortbtn" data-id="L6">＋ Shortlist L6</button>
+</div></div>
+<!-- L7 -->
+<div class="opt" data-cat="login benefit" id="opt-L7">
+<div class="oid">L7<small>LOGIN • CHECKLIST</small></div>
+<div class="phone"><div class="prow">
+<div class="topbar"><span>◼️ Wikendo</span><span>Masuk</span></div>
+<div style="font-weight:800;font-size:13px">Buka semua ini 🔓</div>
+<div class="chk">✅ 2 tempat/hari<br>✅ 5 makan/hari<br>✅ Simpan + riwayat<br>✅ Klaim voucher 🎟️</div>
+<div class="btn g">🔵 Lanjut dengan Google</div>
+<div class="inp">✉️ Email • 🔒 Password</div>
+<div class="btn ink">Masuk →</div>
+</div></div>
+<div class="meta">
+<div class="row"><span class="pill">Effort: S ±3 jam</span><span class="pill">Risiko: rendah</span><span class="pill">Benefit</span></div>
+<div class="proscons"><div>✅ <b>Plus:</b> alasan login konkret.</div><div>⚠️ <b>Minus:</b> list panjang di HP kecil.</div></div>
+<button class="shortbtn" data-id="L7">＋ Shortlist L7</button>
+</div></div>
+<!-- L8 -->
+<div class="opt" data-cat="login benefit" id="opt-L8">
+<div class="oid">L8<small>LOGIN • COUNTDOWN</small></div>
+<div class="phone"><div class="prow">
+<div class="topbar"><span>◼️ Wikendo</span><span>Masuk</span></div>
+<div class="hero rose">RESET 00.00 WIB<div class="big">07:12:44</div>quota anon habis</div>
+<div class="btn g">🔵 Login → reset sekarang</div>
+<div class="inp">✉️ Email</div>
+<div class="inp">🔒 Password</div>
+<div class="btn ink">Masuk →</div>
+<div class="chk">atau tunggu reset 00.00 (tanpa simpan)</div>
+</div></div>
+<div class="meta">
+<div class="row"><span class="pill">Effort: S ±3 jam</span><span class="pill">Risiko: rendah</span><span class="pill">Benefit</span></div>
+<div class="proscons"><div>✅ <b>Plus:</b> urgency nyata, bukan dead-end.</div><div>⚠️ <b>Minus:</b> timer harus live per detik.</div></div>
+<button class="shortbtn" data-id="L8">＋ Shortlist L8</button>
+</div></div>
+<!-- L9 -->
+<div class="opt" data-cat="login benefit" id="opt-L9">
+<div class="oid">L9<small>LOGIN • BUKTI</small></div>
+<div class="phone"><div class="prow">
+<div class="topbar"><span>◼️ Wikendo</span><span>Masuk</span></div>
+<div class="mini">🙂🙂🙂 <b>12.400</b> weekend terbantu<br>⭐ 4,9 • "quiz 30 dtk nagih"</div>
+<div class="btn g">🔵 Lanjut dengan Google</div>
+<div class="inp">✉️ Email</div>
+<div class="inp">🔒 Password</div>
+<div class="btn ink">Masuk →</div>
+</div></div>
+<div class="meta">
+<div class="row"><span class="pill">Effort: S ±3 jam</span><span class="pill">Risiko: rendah</span><span class="pill">Benefit</span></div>
+<div class="proscons"><div>✅ <b>Plus:</b> trust baru; lawan skeptis.</div><div>⚠️ <b>Minus:</b> angka harus real, no hoax.</div></div>
+<button class="shortbtn" data-id="L9">＋ Shortlist L9</button>
+</div></div>
+<!-- L10 -->
+<div class="opt" data-cat="login minimal" id="opt-L10">
+<div class="oid">L10<small>LOGIN • MAGIC LINK</small></div>
+<div class="phone"><div class="prow">
+<div class="topbar"><span>◼️ Wikendo</span><span>Masuk</span></div>
+<div style="font-weight:800;font-size:13px">Tanpa password ✨</div>
+<div class="inp">✉️ Email → kirim link ajaib</div>
+<div class="btn lime">Kirim link →</div>
+<div class="mini">⚠️ Menyimpang spek (email+password). Flag: butuh SMTP + anti-spam.</div>
+<div class="btn g">🔵 Tetap via Google</div>
+</div></div>
+<div class="meta">
+<div class="row"><span class="pill">Effort: M ±6 jam</span><span class="pill">Risiko: tinggi</span><span class="pill">Minimal</span></div>
+<div class="proscons"><div>✅ <b>Plus:</b> tanpa hafal password.</div><div>⚠️ <b>Minus:</b> langgar spek; SMTP cost.</div></div>
+<button class="shortbtn" data-id="L10">＋ Shortlist L10</button>
+</div></div>
+
+<!-- R1 -->
+<div class="opt" data-cat="register benefit" id="opt-R1">
+<div class="oid">R1<small>REGISTER • HERO PAIR ★</small></div>
+<div class="phone"><div class="prow">
+<div class="topbar"><span>◼️ Wikendo</span><span>Masuk</span></div>
+<div class="hero">DAFTAR GRATIS<div class="big">2 • 5</div>quota full + voucher 🎟️</div>
+<div class="btn g">🔵 Daftar via Google</div>
+<div class="inp">👤 Nama</div>
+<div class="inp">✉️ Email</div>
+<div class="inp">🔒 Password • ████░░ kuat?</div>
+<div class="chk">☑️ Setuju Syarat & Privasi</div>
+<div class="btn ink">Daftar →</div>
+</div></div>
+<div class="meta">
+<div class="row"><span class="pill">Effort: S ±3 jam</span><span class="pill">Risiko: rendah</span><span class="pill rec">Rekomendasi ★</span><span class="pill">Register</span></div>
+<div class="proscons"><div>✅ <b>Plus:</b> sepasang L1; strength + terms jelas.</div><div>⚠️ <b>Minus:</b> form 3 field, scroll dikit.</div></div>
+<button class="shortbtn" data-id="R1">＋ Shortlist R1</button>
+</div></div>
+<!-- R2 -->
+<div class="opt" data-cat="register minimal" id="opt-R2">
+<div class="oid">R2<small>REGISTER • STRENGTH</small></div>
+<div class="phone"><div class="prow">
+<div class="topbar"><span>◼️ Wikendo</span><span>Masuk</span></div>
+<div style="text-align:center;font-size:36px">🎲</div>
+<div style="text-align:center;font-weight:800">Bikin akun gratis</div>
+<div class="btn g">🔵 Daftar via Google</div>
+<div class="inp">✉️ Email</div>
+<div class="inp">🔒 Password 👁️ • lemah/sedang/kuat</div>
+<div class="chk">☑️ Syarat & Privasi</div>
+<div class="btn ink">Daftar</div>
+</div></div>
+<div class="meta">
+<div class="row"><span class="pill">Effort: S ±3 jam</span><span class="pill">Risiko: rendah</span><span class="pill">Register</span></div>
+<div class="proscons"><div>✅ <b>Plus:</b> meter anti password 123456.</div><div>⚠️ <b>Minus:</b> tanpa konteks quota.</div></div>
+<button class="shortbtn" data-id="R2">＋ Shortlist R2</button>
+</div></div>
+<!-- R3 -->
+<div class="opt" data-cat="register sheet" id="opt-R3">
+<div class="oid">R3<small>REGISTER • SHEET</small></div>
+<div class="phone"><div class="prow" style="background:#27272a">
+<div class="topbar" style="color:#fff"><span>◼️ Quiz result</span><span>✕</span></div>
+<div class="mini">💾 Tap Simpan → login dulu</div>
+<div class="sheet"><div class="handle"></div>
+<div style="font-weight:800;font-size:12px">Daftar 10 detik 📝</div>
+<div class="btn g">🔵 Google 1-tap</div>
+<div class="inp">✉️ Email • 🔒 Password • ☑️ terms</div>
+<div class="btn lime">Daftar & simpan →</div>
+</div>
+</div></div>
+<div class="meta">
+<div class="row"><span class="pill">Effort: M ±4 jam</span><span class="pill">Risiko: sedang</span><span class="pill">Sheet</span></div>
+<div class="proscons"><div>✅ <b>Plus:</b> sepasang L3; intent Simpan.</div><div>⚠️ <b>Minus:</b> form sempit di sheet.</div></div>
+<button class="shortbtn" data-id="R3">＋ Shortlist R3</button>
+</div></div>
+<!-- R4 -->
+<div class="opt" data-cat="register minimal" id="opt-R4">
+<div class="oid">R4<small>REGISTER • HP OPSIONAL</small></div>
+<div class="phone"><div class="prow">
+<div class="topbar"><span>◼️ Wikendo</span><span>Masuk</span></div>
+<div class="inp">👤 Nama • ✉️ Email • 🔒 Password</div>
+<div class="mini">▸ + No HP (opsional, promo WA)</div>
+<div class="chk">Format +62 • boleh skip • NULL-able</div>
+<div class="chk">☑️ Syarat & Privasi</div>
+<div class="btn ink">Daftar →</div>
+<div class="btn g">🔵 Google (tanpa HP)</div>
+</div></div>
+<div class="meta">
+<div class="row"><span class="pill">Effort: S ±3 jam</span><span class="pill">Risiko: rendah</span><span class="pill">Register</span></div>
+<div class="proscons"><div>✅ <b>Plus:</b> spek phone NULL-able patuh.</div><div>⚠️ <b>Minus:</b> field HP goda diisi.</div></div>
+<button class="shortbtn" data-id="R4">＋ Shortlist R4</button>
+</div></div>
+<!-- R5 -->
+<div class="opt" data-cat="register minimal" id="opt-R5">
+<div class="oid">R5<small>REGISTER • GOOGLE FIRST</small></div>
+<div class="phone"><div class="prow">
+<div class="topbar"><span>◼️ Wikendo</span><span>Masuk</span></div>
+<div class="btn g" style="padding:14px">🔵 Daftar via Google</div>
+<div style="text-align:center;font-size:10px;color:#71717a">— atau email —</div>
+<div style="opacity:.85"><div class="inp">✉️ Email</div><div class="inp">🔒 Password</div></div>
+<div class="chk">☑️ Syarat & Privasi • <u>Sudah akun? Masuk</u></div>
+<div class="btn ink">Daftar email →</div>
+</div></div>
+<div class="meta">
+<div class="row"><span class="pill">Effort: S ±2 jam</span><span class="pill">Risiko: rendah</span><span class="pill">Minimal</span></div>
+<div class="proscons"><div>✅ <b>Plus:</b> dorong Google = verified.</div><div>⚠️ <b>Minus:</b> email terasa second-class.</div></div>
+<button class="shortbtn" data-id="R5">＋ Shortlist R5</button>
+</div></div>
+<!-- R6 -->
+<div class="opt" data-cat="register minimal" id="opt-R6">
+<div class="oid">R6<small>REGISTER • 2 LANGKAH</small></div>
+<div class="phone"><div class="prow">
+<div class="topbar"><span>◼️ Wikendo</span><span>1/2</span></div>
+<div style="font-weight:800">Langkah 1: email ✉️</div>
+<div class="inp">✉️ Email kamu…</div>
+<div class="btn ink">Lanjut →</div>
+<div class="mini">Langkah 2: password + nama (setelah ini)</div>
+<div class="btn g">🔵 Skip via Google</div>
+</div></div>
+<div class="meta">
+<div class="row"><span class="pill">Effort: M ±4 jam</span><span class="pill">Risiko: sedang</span><span class="pill">Minimal</span></div>
+<div class="proscons"><div>✅ <b>Plus:</b> 1 field/layar, ringan.</div><div>⚠️ <b>Minus:</b> 2 step = drop-off ekstra.</div></div>
+<button class="shortbtn" data-id="R6">＋ Shortlist R6</button>
+</div></div>
+<!-- R7 -->
+<div class="opt" data-cat="register benefit" id="opt-R7">
+<div class="oid">R7<small>REGISTER • VS TABLE</small></div>
+<div class="phone"><div class="prow">
+<div class="topbar"><span>◼️ Wikendo</span><span>Masuk</span></div>
+<div class="mini">Anon 1•2 vs Kamu 2•5<br>✅ simpan ✅ riwayat ✅ voucher</div>
+<div class="btn g">🔵 Daftar Google</div>
+<div class="inp">✉️ Email • 🔒 Password • ☑️ terms</div>
+<div class="btn lime">Daftar gratis →</div>
+</div></div>
+<div class="meta">
+<div class="row"><span class="pill">Effort: S ±3 jam</span><span class="pill">Risiko: rendah</span><span class="pill">Benefit</span></div>
+<div class="proscons"><div>✅ <b>Plus:</b> alasan angka paling nendang.</div><div>⚠️ <b>Minus:</b> tabel sempit, font kecil.</div></div>
+<button class="shortbtn" data-id="R7">＋ Shortlist R7</button>
+</div></div>
+<!-- R8 -->
+<div class="opt" data-cat="register benefit" id="opt-R8">
+<div class="oid">R8<small>REGISTER • COUNTDOWN</small></div>
+<div class="phone"><div class="prow">
+<div class="topbar"><span>◼️ Wikendo</span><span>Masuk</span></div>
+<div class="hero rose">RESET 00.00<div class="big">07:12:44</div>daftar = reset sekarang</div>
+<div class="btn g">🔵 Daftar Google</div>
+<div class="inp">✉️ Email • 🔒 Password • ☑️ terms</div>
+<div class="btn ink">Daftar →</div>
+</div></div>
+<div class="meta">
+<div class="row"><span class="pill">Effort: S ±3 jam</span><span class="pill">Risiko: rendah</span><span class="pill">Benefit</span></div>
+<div class="proscons"><div>✅ <b>Plus:</b> sepasang L8; urgency.</div><div>⚠️ <b>Minus:</b> timer live wajib.</div></div>
+<button class="shortbtn" data-id="R8">＋ Shortlist R8</button>
+</div></div>
+<!-- R9 -->
+<div class="opt" data-cat="register benefit" id="opt-R9">
+<div class="oid">R9<small>REGISTER • BUKTI</small></div>
+<div class="phone"><div class="prow">
+<div class="topbar"><span>◼️ Wikendo</span><span>Masuk</span></div>
+<div class="mini">⭐⭐⭐⭐⭐ "voucher GI cair!"<br>🙂🙂🙂 12.400 terbantu</div>
+<div class="btn g">🔵 Daftar Google</div>
+<div class="inp">✉️ Email • 🔒 Password • ☑️ terms</div>
+<div class="btn ink">Gabung gratis →</div>
+</div></div>
+<div class="meta">
+<div class="row"><span class="pill">Effort: S ±3 jam</span><span class="pill">Risiko: rendah</span><span class="pill">Benefit</span></div>
+<div class="proscons"><div>✅ <b>Plus:</b> sepasang L9; trust.</div><div>⚠️ <b>Minus:</b> testimoni harus real.</div></div>
+<button class="shortbtn" data-id="R9">＋ Shortlist R9</button>
+</div></div>
+<!-- R10 -->
+<div class="opt" data-cat="register sheet" id="opt-R10">
+<div class="oid">R10<small>REGISTER • TERMS</small></div>
+<div class="phone"><div class="prow">
+<div class="topbar"><span>◼️ Wikendo</span><span>Masuk</span></div>
+<div class="inp">✉️ Email • 🔒 Password kuat ████</div>
+<div class="mini">☑️ Saya setuju <u>Syarat</u> & <u>Privasi</u><br>☐ Saya mau promo WA (opsional)</div>
+<div class="mini" style="border:1.5px solid #E11D48">⚠️ Contoh error: email sudah terdaftar → <u>Masuk</u></div>
+<div class="btn ink">Daftar →</div>
+<div class="btn g">🔵 Google</div>
+</div></div>
+<div class="meta">
+<div class="row"><span class="pill">Effort: S ±3 jam</span><span class="pill">Risiko: rendah</span><span class="pill">Sheet</span></div>
+<div class="proscons"><div>✅ <b>Plus:</b> legal rapi; error jelas.</div><div>⚠️ <b>Minus:</b> checkbox ganda, berat.</div></div>
+<button class="shortbtn" data-id="R10">＋ Shortlist R10</button>
+</div></div>
+</div><!-- /opts -->
+
+<div class="card"><h2>⚔️ Head-to-head (North Star: anon→register &gt;15%)</h2>
+<table>
+<tr><th>Kriteria</th><th>L1+R1 Hero ★</th><th>L3+R3 Sheet</th><th>L4+R7 Wallet/Tabel</th></tr>
+<tr><td>Convert register</td><td class="win">Tinggi ★ (benefit+konteks)</td><td>Tinggi (intent Klaim/Simpan)</td><td>Tinggi (angka 1•2→2•5)</td></tr>
+<tr><td>Quiz CTR aman (&gt;40%)</td><td class="win">Ya ★ (page, bukan block)</td><td>Ya (sheet, quiz jalan)</td><td>Ya</td></tr>
+<tr><td>Effort</td><td class="win">S ★ (±6 jam pair)</td><td>M (±8 jam)</td><td>S (±6 jam)</td></tr>
+<tr><td>Voucher anti-farming</td><td class="win">Ya ★ (401 anon)</td><td>Ya</td><td>Ya</td></tr>
+<tr><td>Risiko</td><td class="win">Rendah ★</td><td>Sedang</td><td>Rendah</td></tr>
+</table></div>
+
+<div class="banner"><h2>🏆 Rekomendasi: <b>L1 + R1 (paket hero)</b></h2>
+<p style="font-size:12.5px;margin-top:6px">Sepasang hero ink-ember: L1 login + R1 register, Google PRIMARY, email secondary, strength + terms, copy "10 detik → 2+5". Sheet L3+R3 nyusul sebagai wall Klaim/Simpan (bukan pengganti page). Bisnis: convert tertinggi tanpa langgar spek (phone NULL-able, voucher 401 anon).</p></div>
+
+<div class="banner"><h2>✅ Approval gate</h2>
+<p style="font-size:12.5px;margin-top:6px">Balas <b>Gua suka [ID]</b> (contoh: <b>Gua suka L1+R1</b>). Setelah lock → AI tulis Addendum + eksekusi TDD sampe deploy. Tanpa ID = belum eksekusi. Produksi belum disentuh.</p></div>
+</div>
+
+<div class="pickbar"><code id="picktext">Gua suka …</code><button onclick="copyPick()">Salin</button></div>
+<script>
+var KEY='wikendo-auth-v1';
+function get(){try{return JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){return[]}}
+function set(v){localStorage.setItem(KEY,JSON.stringify(v))}
+function paint(){
+var s=get();
+document.querySelectorAll('.opt').forEach(function(o){
+var id=o.id.replace('opt-','');
+var on=s.indexOf(id)>-1;
+o.classList.toggle('short',on);
+var b=o.querySelector('.shortbtn');
+b.textContent=(on?'✓ Shortlisted ':'＋ Shortlist ')+id;
+});
+document.getElementById('picktext').textContent=s.length?('Gua suka '+s.join('+')):'Gua suka …';
+}
+document.querySelectorAll('.shortbtn').forEach(function(b){
+b.onclick=function(){var id=b.getAttribute('data-id');var s=get();var i=s.indexOf(id);if(i>-1)s.splice(i,1);else s.push(id);set(s);paint();};
+});
+document.querySelectorAll('.filters button').forEach(function(b){
+b.onclick=function(){
+document.querySelectorAll('.filters button').forEach(function(x){x.classList.remove('on')});
+b.classList.add('on');
+var f=b.getAttribute('data-f');
+document.querySelectorAll('.opt').forEach(function(o){
+o.style.display=(f==='all'||o.getAttribute('data-cat').indexOf(f)>-1)?'':'none';
+});
+};
+});
+function copyPick(){var t=document.getElementById('picktext').textContent;if(navigator.clipboard)navigator.clipboard.writeText(t);alert(t);}
+paint();
+</script>
+</body>
+</html>

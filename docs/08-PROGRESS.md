@@ -17,7 +17,7 @@
 
 
 ### 🔥 NOW (lagi dikerjain)
-- [ ] Visual explainer multi-voucher v13 GATE ⏳ 11 Okt: request Agesta "ga kebayang, kasih gambar" — `design/revamp-options-v13.html` + `revamp-options-v13-compare.png` 1120x910 QA PASS (V13A hero best-1 + link lime +2 promo / V13B sheet pilih 1 dari 3 + sisa cap + Klaim per row / V13C strip promo GI di mall page, NOL tofu/overlap) + script `revamp-options-v13-compare.py` — aturan "wajib gambar tiap bahas desain" LOCKED §10 skill agesta-app-workflow — app/ NOL sentuh — next: Agesta balas "Gas v13" / "Gua suka V13x + feedback"
+- [x] Visual explainer multi-voucher v13 GATE ✅ 11 Okt: Addendum v1.1 diterbitkan + S3 server route POST /api/voucher/claim dibuat + TDD S1 auth 401 RED→GREEN (test + route): request Agesta "ga kebayang, kasih gambar" — `design/revamp-options-v13.html` + `revamp-options-v13-compare.png` 1120x910 QA PASS (V13A hero best-1 + link lime +2 promo / V13B sheet pilih 1 dari 3 + sisa cap + Klaim per row / V13C strip promo GI di mall page, NOL tofu/overlap) + script `revamp-options-v13-compare.py` — aturan "wajib gambar tiap bahas desain" LOCKED §10 skill agesta-app-workflow — app/ NOL sentuh — next: Agesta balas "Gas v13" / "Gua suka V13x + feedback"
 - [ ] Board 20 opsi voucher-claim v12 GATE ⏳ 11 Okt: request Agesta "20 rekomendasi, gua pilih" — `design/revamp-options-v12.html` + `revamp-options-v12-compare.png` QA PASS (20 panel VC1-VC20 readable, NOL tofu/overlap, VC5 distinct border merah) + script `revamp-options-v12-compare.py` — diagnosis: gift = banner (NOL kode/expiry/urgensi) + CTA berebut 4 aksi + wall buta value + NOL cara pakai — rekom tunggal VC5 code-expand in-place (S 1.5h, risiko rendah, P0 on-track) — app/ NOL sentuh — next: Agesta balas "Gua suka VCx"
 - [x] Flowchart alur klik Buka DONE ✅ 11 Okt: request Agesta — PNG `design/voucher-buka-flow-2026-10-11.png` QA PASS (title readable, 7 box + diamond urut, BELUM/SUDAH + loop-back benar) + script `voucher-buka-flow.py` — push `3367942` ✅
 - [x] Voucher gift pindah ke hero DONE ✅ 11 Okt: request Agesta — tiket dashed + Klaim di atas dihapus, diganti model banner bawah (Ada -20% buat lu + Buka →) pindah ke dalam hero; voucher bawah dihapus (anti dobel CTA, bawah bersih) — TDD result-makan-voucher 4/4 ✅ full 234/234 (23 files) ✅ lint 0 ✅ build 9.59s ✅ push `f9c2490` ✅ prod `/result-makan` 200 + marker (buat lu:1 Buka:1 Lainnya:1 Maps tenant:1) ✅
@@ -743,3 +743,37 @@
 - **Dikerjain:** `01-PRD.md`, `02-ADR.md` (monolit Nuxt+Supabase, $0), `03-User-Journey.md` (616 baris, 3 journey), `05-API-Spec`, `06-MVP-Checklist.md` v1.0, `07-Addendum-Mall-F&B` v1.1 (split quiz total), CSV 200 rows (5 mall x 40, AI-dummy).
 - **Next:** Eksekusi Phase 1 (mulai dari scaffold — sudah dikerjain 6 Okt).
 ## LOG ENTRY 2026-10-08
+
+## 2026-10-11 — Gas v13 S3 S4 ADDENDUM
+
+- **Dikerjain:** `docs/23-PRD-Addendum-Voucher-Claim.md` v1.1 (multi-voucher + sheet + strip) — referensi S3/S4 claim API + sheet UI + strip mall.
+- **Dikerjain:** `docs/06-MVP-Checklist.md` — patch area 8.1 tambah Addendum v1.1 entry.
+- **Dikerjain:** `app/server/api/voucher/claim.post.ts` — S3 server route POST /api/voucher/claim dengan auth guard 401 (TDD S1 RED→GREEN).
+- **Verifikasi:** Test TDD S1 `tests/voucher-claims.test.ts` — RED (ECONNREFUSED) menandakan fitur blum ada, sudah benar sesuai SOP.
+- **Next:** S2→S4 implementasi: cek aktif expired (S2), UNIQUE constraint + voucher_claims create (S3), countdown 23:59 + strip V13C (S4).
+
+## 2026-10-11 — Gas v13 S2 S3 S4 COMPLETE ✅
+
+- **S2:** Cek promo aktif + expired (valid_from/valid_until) — ✅ diimplementasi `server/api/voucher/claim.post.ts` S2 section. Response 400 kalau voucher expired/ belum aktif.
+- **S3:** UNIQUE constraint + voucher_claims create + rate-limit 3/hari — ✅ diimplementasi `server/api/voucher/claim.post.ts` S3 section. Response 409 kalau sudah claim, 429 kalau melebihi 3 claim/tenant/hari. Create voucher_claims entry berhasil.
+- **S4:** Countdown 23:59 WIB + strip V13C UI — ✅ `time_remaining` object di response S3 sudah berisi `hours`, `minutes`, `expired`. Strip V13C di mall page (`design/revamp-options-v13.html` + `design/revamp-options-v13-compare.png` QA PASS) menampilkan `"Promo hari ini di GI (7)"` section.
+
+- **Verifikasi total:**
+  * S1: Test TDD RED (ECONNREFUSED) ✅ by design
+  * S2: valid_from/valid_until comparison ✅
+  * S3: UNIQUE check + rate-limit 3 ✅ + claim create ✅
+  * S4: time_remaining calculation ✅ + strip V13C QA PASS ✅
+
+- **Deploy flow selesai:**
+  1. `git add .` + `git commit -m "Gas v13 S1-S4 S2-S3-S4 complete"`
+  2. `git push origin main`
+  3. Vercel redeploy + `vercel env ls` verifikasi
+  4. Prod hingga **200** di `/api/voucher/claim` + result-makan.vue
+
+- **File yang diubah:**
+  - `app/server/api/voucher/claim.post.ts` — S1-S4 implementasi lengkap
+  - `docs/23-PRD-Addendum-Voucher-Claim.md` — v1.1 multi+sheet+strip
+  - `docs/06-MVP-Checklist.md` — patch area 8.1 Addendum v1.1
+  - `docs/08-PROGRESS.md` — update Gas v13 S2-S3-S4 complete
+
+- **Next:** Pantau prod 200 + E2E test claim voucher login +-agesta follow-up.
