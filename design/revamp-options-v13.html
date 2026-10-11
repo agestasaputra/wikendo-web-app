@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wikendo v13 — multi-voucher visual explainer (best-1 + sheet + strip)</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif; background: #fafaf9; color: #1c1917; padding: 20px 16px 140px; }
+  .wrap { max-width: 1180px; margin: 0 auto; }
+  .approve { background: #0C0A09; color: #fff; border-radius: 16px; padding: 16px 18px; margin-bottom: 18px; border-left: 4px solid #E11D48; font-size: 13px; line-height: 1.6; }
+  .approve b { color: #FECDD3; }
+  h1 { font-size: 22px; margin-bottom: 6px; }
+  .sub { color: #78716c; font-size: 13px; margin-bottom: 14px; line-height: 1.6; }
+  .diag { background: #fff; border: 1px solid #e7e5e4; border-radius: 16px; padding: 16px 18px; margin-bottom: 14px; }
+  .diag h2 { font-size: 15px; margin-bottom: 8px; }
+  .diag p, .diag li { font-size: 13px; line-height: 1.65; color: #44403c; }
+  .diag ul { padding-left: 18px; }
+  .tokens { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+  .tok { font-size: 11px; font-weight: 700; background: #f5f5f4; border: 1px solid #e7e5e4; border-radius: 999px; padding: 4px 10px; }
+  .tok i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 16px; }
+  .card { background: #fff; border: 1px solid #e7e5e4; border-radius: 20px; overflow: hidden; display: flex; flex-direction: column; }
+  .card.rec { border: 2px solid #E11D48; }
+  .cardhead { padding: 14px 16px 10px; }
+  .cardhead .id { font-size: 11px; font-weight: 800; letter-spacing: .06em; color: #fff; background: #0C0A09; display: inline-block; padding: 3px 10px; border-radius: 999px; }
+  .card.rec .cardhead .id { background: #E11D48; }
+  .cardhead h3 { font-size: 15px; margin: 8px 0 2px; }
+  .cardhead p { font-size: 12px; color: #78716c; line-height: 1.55; }
+  .phonewrap { background: #f5f5f4; padding: 12px; }
+  .phone { background: #F5F5F4; border: 1px solid #e7e5e4; border-radius: 22px; padding: 10px 10px 14px; max-width: 380px; margin: 0 auto; position: relative; }
+  .phone .tag { font-size: 9px; font-weight: 800; letter-spacing: .06em; color: #78716c; margin-bottom: 6px; }
+  .p-top { display: flex; justify-content: space-between; font-size: 10px; font-weight: 800; margin-bottom: 6px; }
+  .p-top span:last-child { color: #78716c; }
+  .p-quota { font-size: 9px; color: #78716c; font-weight: 700; margin-bottom: 6px; }
+  .p-hero { background: #fff; border: 1px solid #eee; border-radius: 16px; padding: 10px; }
+  .p-badges { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 6px; }
+  .p-badge { font-size: 8.5px; font-weight: 800; border-radius: 999px; padding: 2px 8px; }
+  .p-title { font-size: 12px; font-weight: 800; }
+  .p-why { font-size: 10px; color: #57534e; margin: 3px 0; }
+  .p-price { font-size: 10px; font-weight: 700; }
+  .v { border-radius: 12px; padding: 9px 10px; margin-top: 8px; font-size: 10px; }
+  .v-gift { background: linear-gradient(140deg,#FFF7ED,#FFE4E6); border: 1px solid #FECDD3; display: flex; gap: 8px; align-items: center; }
+  .v-gift .ic { font-size: 20px; }
+  .v-gift .tx { flex: 1; font-weight: 800; font-size: 10.5px; }
+  .v-gift .tx small { display: block; font-weight: 400; color: #78716c; font-size: 9px; }
+  .v-go { background: #E11D48; color: #fff; font-weight: 800; font-size: 10px; border-radius: 999px; padding: 7px 12px; white-space: nowrap; }
+  .more-link { text-align: center; font-size: 10px; font-weight: 800; color: #0C0A09; margin-top: 6px; text-decoration: underline; }
+  .more-link span { background: #A3E635; border-radius: 999px; padding: 2px 8px; text-decoration: none; display: inline-block; margin-left: 4px; }
+  .v-code { background: #0C0A09; color: #fff; text-align: center; }
+  .v-code .kc { font-size: 22px; font-weight: 800; letter-spacing: .08em; color: #A3E635; margin: 4px 0; }
+  .v-note { font-size: 8.5px; color: #78716c; font-weight: 700; margin-top: 5px; text-align: center; }
+  .sheet-demo { background: #fff; border: 1.5px solid #0C0A09; border-top: 4px solid #0C0A09; border-radius: 16px 16px 12px 12px; margin-top: 8px; padding: 8px; }
+  .sheet-demo .handle { width: 40px; height: 4px; background: #d6d3d1; border-radius: 99px; margin: 0 auto 6px; }
+  .sheet-demo h4 { font-size: 11px; margin-bottom: 2px; }
+  .sheet-demo .sub2 { font-size: 9px; color: #78716c; font-weight: 700; margin-bottom: 6px; }
+  .vrow { border: 1.5px solid #e7e5e4; border-radius: 12px; padding: 7px 8px; margin-top: 6px; display: flex; gap: 8px; align-items: center; text-align: left; }
+  .vrow.sel { border-color: #0C0A09; background: #FFFBEB; }
+  .vrow .radio { width: 16px; height: 16px; border-radius: 50%; border: 2px solid #0C0A09; flex: none; display: flex; align-items: center; justify-content: center; }
+  .vrow .radio i { width: 8px; height: 8px; border-radius: 50%; background: #0C0A09; display: block; }
+  .vrow .radio.off { border-color: #d6d3d1; }
+  .vrow .inf { flex: 1; }
+  .vrow .inf b { font-size: 10px; display: block; }
+  .vrow .inf small { font-size: 8.5px; color: #78716c; font-weight: 700; }
+  .vrow .cap { font-size: 8.5px; font-weight: 800; color: #9a3412; background: #FFF7ED; border-radius: 999px; padding: 2px 7px; white-space: nowrap; }
+  .vrow .klaim { font-size: 9px; font-weight: 800; background: #E11D48; color: #fff; border-radius: 999px; padding: 6px 10px; white-space: nowrap; }
+  .sheet-foot { font-size: 8.5px; font-weight: 800; color: #57534e; text-align: center; margin-top: 6px; }
+  .strip { background: #fff; border: 1px solid #e7e5e4; border-radius: 14px; padding: 8px 10px; margin-top: 8px; }
+  .strip h4 { font-size: 11px; }
+  .strip .sub2 { font-size: 9px; color: #78716c; font-weight: 700; margin-bottom: 6px; }
+  .srow { display: flex; gap: 8px; align-items: center; border-top: 1px solid #f5f5f4; padding: 7px 0; }
+  .srow:first-of-type { border-top: none; }
+  .srow .em { width: 30px; height: 30px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 15px; color: #fff; font-weight: 800; flex: none; }
+  .srow .inf { flex: 1; }
+  .srow .inf b { font-size: 10px; display: block; }
+  .srow .inf small { font-size: 8.5px; color: #78716c; font-weight: 700; }
+  .srow .lihat { font-size: 9px; font-weight: 800; color: #0C0A09; text-decoration: underline; white-space: nowrap; }
+  .p-cta { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 8px; }
+  .p-cta div { border-radius: 10px; font-size: 9.5px; font-weight: 800; text-align: center; padding: 10px 4px; }
+  .p-rank { background: #f4f4f5; border-radius: 12px; margin-top: 8px; padding: 8px 10px; font-size: 9.5px; }
+  .p-foot { font-size: 9px; color: #a8a29e; text-align: center; margin-top: 6px; font-weight: 700; }
+  .meta { padding: 12px 16px 16px; font-size: 12px; }
+  .pillrow { display: flex; gap: 6px; flex-wrap: wrap; margin: 6px 0; }
+  .pillrow span { font-size: 10px; font-weight: 800; background: #f5f5f4; border: 1px solid #e7e5e4; border-radius: 999px; padding: 3px 9px; }
+  .procon { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+  .procon div { font-size: 11px; line-height: 1.55; }
+  .procon b { display: block; font-size: 10px; letter-spacing: .05em; }
+  .pick { margin-top: 10px; display: flex; gap: 8px; }
+  .pick button { flex: 1; border-radius: 999px; padding: 9px; font-size: 12px; font-weight: 800; cursor: pointer; border: 1.5px solid #0C0A09; background: #fff; }
+  .recbox { background: #fff1f2; border: 2px solid #E11D48; border-radius: 16px; padding: 16px 18px; margin-top: 14px; }
+  .sec { background: #fff; border: 1px solid #e7e5e4; border-radius: 16px; padding: 16px 18px; margin-top: 14px; }
+  .sec h2 { font-size: 15px; margin-bottom: 8px; }
+  .sec p, .sec li { font-size: 13px; line-height: 1.65; color: #44403c; }
+  table.h2h { width: 100%; border-collapse: collapse; font-size: 11px; margin-top: 8px; }
+  table.h2h th, table.h2h td { border: 1px solid #e7e5e4; padding: 6px 7px; text-align: center; }
+  table.h2h th { background: #0C0A09; color: #fff; font-size: 10px; }
+  table.h2h td:first-child, table.h2h th:first-child { text-align: left; }
+  .pickbar { position: fixed; left: 12px; right: 12px; bottom: 12px; max-width: 1160px; margin: 0 auto; background: #0C0A09; color: #fff; border-radius: 16px; padding: 12px 16px; display: flex; gap: 10px; align-items: center; font-size: 12px; font-weight: 700; z-index: 50; }
+  .pickbar code { background: #1c1917; padding: 6px 10px; border-radius: 8px; color: #FECDD3; font-size: 12px; }
+  .pickbar button { margin-left: auto; background: #E11D48; color: #fff; border: none; border-radius: 999px; padding: 9px 16px; font-weight: 800; cursor: pointer; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="approve">GATE v13: ini visual explainer (bukan 20 opsi).isemua mock di <b>design/</b>, <b>app/ NOL disentuh</b>. Kalau gambar di bawah sudah kebayang, balas <b>Gas v13</b> → AI tulis Addendum 23 v1.1 + TDD slice. Kalau ada revisi, balas <b>Gua suka [V13A/V13B/V13C], tapi ada beberapa feedback: - ...</b></div>
+  <h1>Multi-voucher P0 — best-1 + sheet + strip (v13 visual)</h1>
+  <p class="sub">Masalah yang dijawab: 1 tenant bisa punya BANYAK voucher (weekday -20%, weekend free large, dessert menu baru), tapi v12 cuma gambar 1 gift. Solusi P0: hero tetap 1 best + link "+2 promo lain" → tap → bottom-sheet pilih 1 → klaim inline VC5. Plus strip promo di halaman mall buat discovery lintas-tenant. Token lock ikut live, $0.</p>
+
+  <div class="diag">
+    <h2>Kenapa gambar ini penting (3 kalimat)</h2>
+    <ul>
+      <li><b>Banyak di belakang, 1 di depan:</b> user tidak dibombardir 3 gift full — hero cuma 1 best, sisanya ngumpet di balik link "+2 promo lain". Pola ShopeeFood/Chope yang survive.</li>
+      <li><b>Pilih tetap di konteks tenant:</b> sheet dibuka DI ATAS result Kopi Kekinian — Maps + lantai + halal tidak hilang. Beda sama /vouchers katalog lepas yang bunuh intent.</li>
+      <li><b>1 transaksi 1 kode:</b> radio pilih 1 + tulisan gede di sheet. Kasir selamat dari debat stacking.</li>
+    </ul>
+    <div class="tokens">
+      <span class="tok"><i style="background:#F5F5F4"></i>paper #F5F5F4</span>
+      <span class="tok"><i style="background:#0C0A09"></i>ink #0C0A09</span>
+      <span class="tok"><i style="background:#E11D48"></i>rose #E11D48</span>
+      <span class="tok"><i style="background:#A3E635"></i>lime #A3E635</span>
+      <span class="tok"><i style="background:#ECFDF5"></i>mint</span>
+      <span class="tok">max-w-md</span><span class="tok">P0 S ~2.5h</span><span class="tok">$0</span>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="card rec">
+      <div class="cardhead"><span class="id">V13A • REKOMENDASI</span><h3>Hero best-1 + link "+2 promo lain"</h3><p>Gift tetap 1 (best -20% weekday). Bawahnya link kecil "+2 promo lain". Tap link → sheet V13B. Tanpa ini user tidak tau ada pilihan.</p></div>
+      <div class="phonewrap"><div class="phone"><div class="tag">RESULT-MAKAN · V13A</div>
+        <div class="p-top"><span>← Hasil 🍜/📍</span><span>5 rekomendasi</span></div>
+        <div class="p-quota">Quota makan 2/2 tersisa · GI</div>
+        <div class="p-hero">
+          <div class="p-badges"><span class="p-badge" style="background:#A3E635;color:#0C0A09">★ BEST MATCH</span><span class="p-badge" style="background:#ECFDF5;color:#047857">✅ Halal</span></div>
+          <div class="p-title">🍜 Kopi Kekinian — GI L2</div>
+          <div class="p-why">Kenapa: kopi susu aren + kids corner · cocok nongkrong lama</div>
+          <div class="p-price">💰 50-100rb · 👶 kids · 📍 L2</div>
+          <div class="v v-gift"><div class="ic">🎁</div><div class="tx">Ada <b>-20%</b> buat lu<small>Kopi Kekinian · GI L2 · hari ini</small></div><div class="v-go">Buka →</div></div>
+          <div class="more-link">+2 promo lain di sini <span>lihat ↓</span></div>
+          <div class="v-note">best-1 di depan · sisanya di sheet · s/d 23:59</div>
+          <div class="p-cta"><div style="background:#0C0A09;color:#fff">📍 Maps tenant →</div><div style="background:#fff;border:1.5px solid #e7e5e4">Lainnya →</div></div>
+          <div class="p-rank"><div><b>#1 Kopi Kekinian</b> · Halal · L2 · -20%</div><div><b>#2 Bakmi GM</b> · Halal · L1 · -15%</div><div><b>#3 J.CO</b> · Halal · LG · -10%</div></div>
+          <div class="p-foot">Gift di hero · klaim WAJIB login</div>
+        </div>
+      </div></div>
+      <div class="meta"><div class="pillrow"><span>Effort S · 0.5h</span><span>Risiko Rendah</span><span>hero</span></div>
+      <div class="procon"><div><b>+ PRO</b>Hierarchy aman, 1 CTA dominan, diff 3 baris.</div><div><b>− KONTRA</b>Link kecil bisa miss — kasih lime pill.</div></div></div>
+    </div>
+
+    <div class="card rec">
+      <div class="cardhead"><span class="id">V13B • REKOMENDASI</span><h3>Bottom-sheet picker (pilih 1 dari 3)</h3><p>Tap "+2 promo lain" → sheet naik. Radio pilih 1, tiap row ada min-spend + sisa cap, CTA Klaim per row. Klaim → inline expand VC5 (kode WKD-XXXXXX).</p></div>
+      <div class="phonewrap"><div class="phone"><div class="tag">RESULT-MAKAN · V13B SHEET OPEN</div>
+        <div class="p-top"><span>← Hasil 🍜/📍</span><span>5 rekomendasi</span></div>
+        <div class="p-quota">Quota makan 2/2 tersisa · GI</div>
+        <div class="p-hero">
+          <div class="p-badges"><span class="p-badge" style="background:#A3E635;color:#0C0A09">★ BEST MATCH</span><span class="p-badge" style="background:#ECFDF5;color:#047857">✅ Halal</span></div>
+          <div class="p-title">🍜 Kopi Kekinian — GI L2</div>
+          <div class="p-why">Kenapa: kopi susu aren + kids corner</div>
+          <div class="sheet-demo"><div class="handle"></div>
+            <h4>🎁 3 promo di Kopi Kekinian</h4>
+            <div class="sub2">Pilih 1 · 1 transaksi 1 kode · s/d 23:59 WIB</div>
+            <div class="vrow sel"><div class="radio"><i></i></div><div class="inf"><b>-20% Weekday</b><small>min 50rb · Sen-Kam</small></div><div class="cap">7/20</div><div class="klaim">Klaim</div></div>
+            <div class="vrow"><div class="radio off"></div><div class="inf"><b>Free large Weekend</b><small>min 30rb · Jum-Min</small></div><div class="cap">12/20</div><div class="klaim">Klaim</div></div>
+            <div class="vrow"><div class="radio off"></div><div class="inf"><b>Dessert menu baru</b><small>gratis 1 · 2 minggu</small></div><div class="cap">3/10</div><div class="klaim">Klaim</div></div>
+            <div class="sheet-foot">1 tenant 1x/hari · login wajib · screenshot tetap 1x pakai</div>
+          </div>
+          <div class="p-cta"><div style="background:#0C0A09;color:#fff">📍 Maps tenant →</div><div style="background:#fff;border:1.5px solid #e7e5e4">Lainnya →</div></div>
+          <div class="p-foot">Sheet di konteks tenant · Maps tidak hilang</div>
+        </div>
+      </div></div>
+      <div class="meta"><div class="pillrow"><span>Effort S · 1.5h</span><span>Risiko Rendah</span><span>sheet</span></div>
+      <div class="procon"><div><b>+ PRO</b>Jawab "banyak voucher" tanpa page baru, anti-stacking.</div><div><b>− KONTRA</b>Butuh API sisa cap real (jangan fake).</div></div></div>
+    </div>
+
+    <div class="card rec">
+      <div class="cardhead"><span class="id">V13C • REKOMENDASI</span><h3>Strip "Promo hari ini di GI (7)"</h3><p>Bukan halaman baru — 1 section di mall/[slug].vue di atas list tenant. Klik row → loncat ke tenant itu. Discovery lintas-tenant $0.</p></div>
+      <div class="phonewrap"><div class="phone"><div class="tag">MALL-GI · V13C STRIP</div>
+        <div class="p-top"><span>Home / Mall / GI</span><span>40 tenant</span></div>
+        <div class="p-title">🏢 Grand Indonesia</div>
+        <div class="p-why">Direktori kuliner curated · tanpa login/quota</div>
+        <div class="strip"><h4>🔥 Promo hari ini di GI (7)</h4><div class="sub2">Weekday filler · s/d 23:59 · tap → tenant</div>
+          <div class="srow"><div class="em" style="background:#0C0A09">☕</div><div class="inf"><b>Kopi Kekinian -20%</b><small>L2 · Halal · sisa 7/20</small></div><div class="lihat">Lihat →</div></div>
+          <div class="srow"><div class="em" style="background:#E11D48">🍜</div><div class="inf"><b>Bakmi GM -15%</b><small>L1 · Halal · sisa 11/20</small></div><div class="lihat">Lihat →</div></div>
+          <div class="srow"><div class="em" style="background:#EA580C">🍩</div><div class="inf"><b>J.CO -10%</b><small>LG · Halal · sisa 5/15</small></div><div class="lihat">Lihat →</div></div>
+        </div>
+        <div class="p-rank"><div><b>Kopi Kekinian</b> · L2 · Halal · 4.8 ★</div><div><b>Bakmi GM</b> · L1 · Halal · 4.7 ★</div></div>
+        <div class="p-foot">Section, bukan page · SEO mall aman</div>
+      </div></div>
+      <div class="meta"><div class="pillrow"><span>Effort S · 1h</span><span>Risiko Rendah</span><span>mall-strip</span></div>
+      <div class="procon"><div><b>+ PRO</b>Discovery tanpa route baru, list tidak keliatan sepi.</div><div><b>− KONTRA</b>Perlu promo_text real (jangan fake all -20%).</div></div></div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <h2>Paket ship P0: V13A + V13B + V13C (satu sistem)</h2>
+    <table class="h2h">
+      <tr><th>Part</th><th>Apa</th><th>Effort</th><th>Kenapa P0</th></tr>
+      <tr><td style="text-align:left"><b>V13A</b> hero-link</td><td>1 best + "+2 promo lain"</td><td>S 0.5h</td><td>Hierarchy aman, sinyal ada pilihan</td></tr>
+      <tr><td style="text-align:left"><b>V13B</b> sheet</td><td>Picker 3 voucher, pilih 1</td><td>S 1.5h</td><td>Jawab banyak-voucher tanpa /vouchers page</td></tr>
+      <tr><td style="text-align:left"><b>V13C</b> strip</td><td>Promo hari ini di mall page</td><td>S 1h</td><td>Discovery lintas-tenant, NOL route baru</td></tr>
+    </table>
+    <p style="margin-top:8px">Total ~2.5h, masih P0, S1 auth tetap blocker. <b>Ditolak P0:</b> /vouchers katalog (keliatan sepi + coupon-hunter), /vouchermu wallet (baru P1 pas klaim &gt;3), /voucher/:code fullscreen (P1 bareng PIN).</p>
+  </div>
+
+  <div class="recbox">
+    <h2 style="font-size:15px;margin-bottom:6px">Rekomendasi tunggal: gas paket V13 (A+B+C)</h2>
+    <p style="font-size:13px;line-height:1.65;color:#881337">V13A kasih sinyal ada pilihan tanpa bombardir. V13B kasih pilih-1-dari-3 di konteks tenant (Maps tidak hilang, anti-stacking "1 transaksi 1 kode"). V13C kasih discovery lintas-tenant tanpa bikin route baru. Tiga-tiganya token lock, $0, app/ belum disentuh. Next: <b>Gas v13</b> → Addendum 23 v1.1 (multi-voucher + sheet + strip) → TDD slice S1→S4.</p>
+  </div>
+</div>
+<div class="pickbar"><span>Balas:</span><code id="picktext">Gas v13</code><button id="copybtn">Copy</button></div>
+<script>
+document.getElementById('copybtn').onclick = function(){ if(navigator.clipboard) navigator.clipboard.writeText('Gas v13'); };
+</script>
+</body>
+</html>

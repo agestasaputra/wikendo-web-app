@@ -17,6 +17,7 @@
 
 
 ### 🔥 NOW (lagi dikerjain)
+- [ ] Visual explainer multi-voucher v13 GATE ⏳ 11 Okt: request Agesta "ga kebayang, kasih gambar" — `design/revamp-options-v13.html` + `revamp-options-v13-compare.png` 1120x910 QA PASS (V13A hero best-1 + link lime +2 promo / V13B sheet pilih 1 dari 3 + sisa cap + Klaim per row / V13C strip promo GI di mall page, NOL tofu/overlap) + script `revamp-options-v13-compare.py` — aturan "wajib gambar tiap bahas desain" LOCKED §10 skill agesta-app-workflow — app/ NOL sentuh — next: Agesta balas "Gas v13" / "Gua suka V13x + feedback"
 - [ ] Board 20 opsi voucher-claim v12 GATE ⏳ 11 Okt: request Agesta "20 rekomendasi, gua pilih" — `design/revamp-options-v12.html` + `revamp-options-v12-compare.png` QA PASS (20 panel VC1-VC20 readable, NOL tofu/overlap, VC5 distinct border merah) + script `revamp-options-v12-compare.py` — diagnosis: gift = banner (NOL kode/expiry/urgensi) + CTA berebut 4 aksi + wall buta value + NOL cara pakai — rekom tunggal VC5 code-expand in-place (S 1.5h, risiko rendah, P0 on-track) — app/ NOL sentuh — next: Agesta balas "Gua suka VCx"
 - [x] Flowchart alur klik Buka DONE ✅ 11 Okt: request Agesta — PNG `design/voucher-buka-flow-2026-10-11.png` QA PASS (title readable, 7 box + diamond urut, BELUM/SUDAH + loop-back benar) + script `voucher-buka-flow.py` — push `3367942` ✅
 - [x] Voucher gift pindah ke hero DONE ✅ 11 Okt: request Agesta — tiket dashed + Klaim di atas dihapus, diganti model banner bawah (Ada -20% buat lu + Buka →) pindah ke dalam hero; voucher bawah dihapus (anti dobel CTA, bawah bersih) — TDD result-makan-voucher 4/4 ✅ full 234/234 (23 files) ✅ lint 0 ✅ build 9.59s ✅ push `f9c2490` ✅ prod `/result-makan` 200 + marker (buat lu:1 Buka:1 Lainnya:1 Maps tenant:1) ✅
@@ -109,6 +110,13 @@
 ---
 
 ## 🧾 LOG (newest first)
+
+## 2026-10-11 — Visual explainer multi-voucher v13 GATE ⏳ (request Agesta: ga kebayang, kasih gambar)
+- **Kenapa:** brainstorming lock tenant-funded + 1-tenant-banyak-voucher + tolak /vouchers P0 → v12 asumsi 1-voucher kedaluwarsa parsial; Agesta minta tiap jelasin desain WAJIB gambar.
+- **Dikerjain:** `design/revamp-options-v13.html` (3 panel V13A hero best-1+link lime +2 promo / V13B sheet pilih 1 dari 3 + sisa cap + Klaim per row / V13C strip promo GI di mall page + H2H paket ship P0 ~2.5h + gate Gas v13, app/ NOL sentuh) + `design/revamp-options-v13-compare.py` (3 kolom PIL ASCII-only) + `design/revamp-options-v13-compare.png` 1120x910 QA PASS (3 panel distinct, NOL tofu/overlap) + LOCK §10 skill agesta-app-workflow (aturan visual wajib) + BOARD NOW file ini.
+- **Verifikasi:** vision_analyze QA lolos NOL revisi blocking; design-only → NOL test/build; git status app/ bersih (cuma design/ + docs).
+- **File:** `design/revamp-options-v13.html` + `design/revamp-options-v13-compare.py` + `design/revamp-options-v13-compare.png` + `docs/08-PROGRESS.md`.
+- **Next:** Agesta balas "Gas v13" / "Gua suka V13x + feedback" → Addendum 23 v1.1 (multi+sheet+strip) → TDD slice S1→S4.
 
 ## 2026-10-11 — Board 20 opsi voucher-claim v12 GATE ⏳ (request Agesta: UI adjustment + 20 rekomendasi)
 - **Kenapa:** gift live = banner (NOL kode/expiry/urgensi) + 1 kartu 4 aksi berebut (Buka rose vs Lainnya rose) + wall buta value (note generik, NOL janji kode) + NOL cara pakai/bukti → pull failure, klaim sepi walau S1-S3 siap.
