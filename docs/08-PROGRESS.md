@@ -13,10 +13,10 @@
 
 ---
 
-## 📌 BOARD — posisi per 9 Okt 2026 (custom domain wikendo.id LIVE ✅, next slice auth)
-
+## 📌 BOARD — posisi per 13 Okt 2026 (Gas v13 wiring DONE lokal ✅, next push-deploy-audit prod)
 
 ### 🔥 NOW (lagi dikerjain)
+- [x] Gas v13 wiring S1→S4 DONE lokal ✅ 13 Okt: `claim.post.ts` fix skema real (claim_date WIB + dual-write date/code lama + UNIQUE user+tenant+claim_date→409 + 23505→409 + rate 3/hari 429 + countdown 23:59 WIB) + `useVoucher.ts` BARU (1 sumber claimVoucher Bearer browser, service key server-only) + `result-makan.vue` wiring V13A hero best-1 Buka→sheet + V13B sheet 3 row seed GI + Klaim per row + spinner + disabled + guard + `mall/[slug].vue` V13C strip Promo hari ini + `promoStrip` computed filter tenantPromo — TDD file-assert 44/44 (4 file) ✅ full 257/257 (25 files) ✅ lint 0 ✅ build 14.1s ✅ SCAN bersih ✅ — next: push + deploy + audit prod 200/401/409/429 + E2E + audit UI/UX
 - [x] Visual explainer multi-voucher v13 GATE ✅ 11 Okt: Addendum v1.1 diterbitkan + S3 server route POST /api/voucher/claim dibuat + TDD S1 auth 401 RED→GREEN (test + route): request Agesta "ga kebayang, kasih gambar" — `design/revamp-options-v13.html` + `revamp-options-v13-compare.png` 1120x910 QA PASS (V13A hero best-1 + link lime +2 promo / V13B sheet pilih 1 dari 3 + sisa cap + Klaim per row / V13C strip promo GI di mall page, NOL tofu/overlap) + script `revamp-options-v13-compare.py` — aturan "wajib gambar tiap bahas desain" LOCKED §10 skill agesta-app-workflow — app/ NOL sentuh — next: Agesta balas "Gas v13" / "Gua suka V13x + feedback"
 - [ ] Board 20 opsi voucher-claim v12 GATE ⏳ 11 Okt: request Agesta "20 rekomendasi, gua pilih" — `design/revamp-options-v12.html` + `revamp-options-v12-compare.png` QA PASS (20 panel VC1-VC20 readable, NOL tofu/overlap, VC5 distinct border merah) + script `revamp-options-v12-compare.py` — diagnosis: gift = banner (NOL kode/expiry/urgensi) + CTA berebut 4 aksi + wall buta value + NOL cara pakai — rekom tunggal VC5 code-expand in-place (S 1.5h, risiko rendah, P0 on-track) — app/ NOL sentuh — next: Agesta balas "Gua suka VCx"
 - [x] Flowchart alur klik Buka DONE ✅ 11 Okt: request Agesta — PNG `design/voucher-buka-flow-2026-10-11.png` QA PASS (title readable, 7 box + diamond urut, BELUM/SUDAH + loop-back benar) + script `voucher-buka-flow.py` — push `3367942` ✅
@@ -110,6 +110,13 @@
 ---
 
 ## 🧾 LOG (newest first)
+
+## 2026-10-13 — Gas v13 wiring S1→S4 DONE lokal ✅ (request Agesta: lanjut eksekusi → deploy prod → e2e + audit ui/ux)
+- **Kenapa:** backend claim lama insert kolom baru saja (voucher_id/claim_code/claimed_at) → code NULL 500 + cek eq(claimed_at, midnight) NOL pernah match → 409 bocor; V13A/B/C UI belum wiring ke API.
+- **Dikerjain:** `app/server/api/voucher/claim.post.ts` (claim_date WIB + dual-write date/code + UNIQUE(user,tenant,claim_date) + 23505→409 + 429 max 3/hari + expiry 23:59 WIB) + `app/composables/useVoucher.ts` BARU + `app/pages/result-makan.vue` (V13A Buka→sheet + V13B sheet 3 row WKD seed GI + Klaim/guard) + `app/pages/mall/[slug].vue` (V13C strip + promoStrip) + `app/tests/voucher-claims.test.ts` + `app/tests/voucher-sheet-strip.test.ts` BARU + `docs/08-PROGRESS.md` (BOARD 13 Okt + LOG ini).
+- **Verifikasi:** TDD file-assert 44/44 (4 file) ✅ full 257/257 (25 files) ✅ lint 0 ✅ build 14.1s ✅ SCAN bersih ✅ (branch main, belum push).
+- **File:** `claim.post.ts` + `useVoucher.ts` + `result-makan.vue` + `mall/[slug].vue` + 2 test + `08-PROGRESS.md`.
+- **Next:** push + deploy Vercel + audit prod 200/401/409/429 + E2E claim real + audit UI/UX.
 
 ## 2026-10-11 — Visual explainer multi-voucher v13 GATE ⏳ (request Agesta: ga kebayang, kasih gambar)
 - **Kenapa:** brainstorming lock tenant-funded + 1-tenant-banyak-voucher + tolak /vouchers P0 → v12 asumsi 1-voucher kedaluwarsa parsial; Agesta minta tiap jelasin desain WAJIB gambar.

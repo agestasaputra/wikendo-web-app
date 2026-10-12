@@ -30,13 +30,32 @@ Contoh: hero Kopi Kekinian — GI L2 Halal 50-100rb kids → gift Buka lalu Maps
         <p class="text-[12.5px]">💰 {{ hero.price }} · {{ hero.kids }} · 📍 L{{ hero.floor }}</p>
 
         <!-- Voucher gift di dalam hero (pindahan dari bawah, 11 Okt 2026): banner Ada -20% + Buka, model lama atas dihapus -->
+        <!-- V13A best-1 + link +2 promo lain → sheet V13B (Addendum 23 v1.1). 1 CTA dominan, sisanya di sheet. -->
         <div class="rounded-[14px] p-3 flex gap-2 items-center mt-3" :style="{ background: vGift.bg, border: '1px solid ' + vGift.border }">
           <div class="text-[26px]">🎁</div>
           <div class="flex-1 text-[13px] font-bold">Ada <b>-20%</b> buat lu<br><small class="font-normal text-gray-500">{{ hero.name }} · {{ mallLabel }} L{{ hero.floor }} · hari ini</small></div>
-          <button class="font-extrabold text-[13px] rounded-full px-[14px] py-2 cursor-pointer" :style="{ background: vGift.goBg, color: vGift.goColor }" @click="claim()">Buka →</button>
+          <button class="font-extrabold text-[13px] rounded-full px-[14px] py-2 cursor-pointer disabled:opacity-60" :style="{ background: vGift.goBg, color: vGift.goColor }" :disabled="claiming" @click="showSheet = true">Buka →</button>
         </div>
-        <p v-if="claimed" class="text-xs text-center mt-2" style="color:#047857">🎟️ Voucher: {{ claimed }}</p>
+        <button class="w-full text-center text-[12px] font-extrabold mt-1.5 underline" @click="showSheet = true">+2 promo lain di sini <span class="inline-block rounded-full px-2 py-0.5 no-underline" style="background:#A3E635">lihat ↓</span></button>
+        <p v-if="claimed" class="text-xs text-center mt-2" style="color:#047857">🎟️ Kode: {{ claimed }} · s/d 23:59 WIB · 1 transaksi 1 kode</p>
         <p v-else-if="claimNote" class="text-xs text-center mt-2" style="color:#c2410c">{{ claimNote }}</p>
+
+        <!-- V13B sheet picker di atas result: Pilih 1 dari 3 + sisa cap + Klaim per row -->
+        <div v-if="showSheet" class="rounded-2xl p-3 mt-2 bg-white" style="border:1.5px solid #0C0A09;border-top:4px solid #0C0A09">
+          <div class="w-10 h-1 rounded-full mx-auto mb-1.5" style="background:#d6d3d1" />
+          <p class="font-extrabold text-[13px]">🎁 3 promo di {{ hero.name }}</p>
+          <p class="text-[11px] font-bold text-gray-500 mb-1">Pilih 1 · 1 transaksi 1 kode · s/d 23:59 WIB</p>
+          <div v-for="v in vouchers" :key="v.code" class="rounded-xl p-2 mt-1.5 flex gap-2 items-center bg-white" style="border:1.5px solid #e7e5e4">
+            <div class="flex-1 text-[12px]"><b>{{ v.name }}</b><br><small class="text-gray-500 font-bold">{{ v.min }} · sisa {{ v.left }}/{{ v.cap }}</small></div>
+            <span class="text-[10px] font-extrabold rounded-full px-2 py-0.5" style="background:#FFF7ED;color:#9a3412">{{ v.left }}/{{ v.cap }}</span>
+            <button class="text-[12px] font-extrabold rounded-full px-3 py-1.5 text-white disabled:opacity-60 flex items-center gap-1" style="background:#E11D48" :disabled="claiming" @click="claimRow(v.code)">
+              <svg v-if="claiming && claimingCode === v.code" class="animate-spin w-3.5 h-3.5" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" opacity="0.25"/><path d="M22 12a10 10 0 0 0-10-10" stroke="currentColor" stroke-width="4" stroke-linecap="round"/></svg>
+              Klaim
+            </button>
+          </div>
+          <p class="text-[10.5px] font-bold text-gray-500 text-center mt-1.5">1 tenant 1x/hari · login wajib · kode WKD-7X2K9A / WKD-4Y5B3C / WKD-L8M2N1</p>
+          <button class="w-full text-center text-[12px] font-bold mt-1 underline" @click="showSheet = false">Tutup</button>
+        </div>
 
         <div class="flex gap-2.5 mt-3">
           <a :href="hero.maps" target="_blank" class="flex-1 text-center text-white p-[15px] rounded-2xl font-extrabold text-sm" :style="{ background: meta.ticketBg }">📍 Maps tenant →</a>
@@ -72,6 +91,7 @@ Contoh: hero Kopi Kekinian — GI L2 Halal 50-100rb kids → gift Buka lalu Maps
 <script setup lang="ts">
 import type { TenantRecommendation } from '~/types'
 import { getMallShortLabel, getResultMakanMeta, getVoucherCardMeta } from '~/utils/quiz-logic'
+import { useVoucher } from '~/composables/useVoucher'
 const route = useRoute()
 const { data, pending, error, refresh } = await useFetch<{ recommendations: TenantRecommendation[], quota_remaining?: number }>('/api/makan/recommend', {
   method: 'POST',
@@ -103,8 +123,32 @@ const rankItems = computed(() => list.value.slice(0, 3).map(r => ({
   tags: `${r.halal === true ? 'Halal' : r.halal === false ? 'Non-halal' : '❓'} · L${(r as { lantai?: string }).lantai || '?'} · -20% · ${(r.reason || '').slice(0, 28)}`
 })))
 function next() { if (list.value.length) idx.value = (idx.value + 1) % list.value.length }
+// V13A/B wiring (Addendum 23 v1.1): hero best-1 + link +2 promo → sheet 3 row.
+// KENAPA composable: 1 sumber kebenaran POST /api/voucher/claim (Bearer user),
+// bukan duplikat $fetch per row. Endpoint: /api/voucher/claim via $fetch + Bearer access_token getSession.
+const { claiming, claimError, claimVoucher } = useVoucher()
+const showSheet = ref(false)
+const claimingCode = ref('')
+// 3 promo seed GI (WKD-7X2K9A / WKD-4Y5B3C / WKD-L8M2N1) + sisa cap per row.
+const vouchers = ref([
+  { code: 'WKD-7X2K9A', name: 'Kopi Weekday -20%', min: 'Min. 50rb', left: 17, cap: 20 },
+  { code: 'WKD-4Y5B3C', name: 'Free Upsize Large', min: 'Min. 35rb', left: 12, cap: 20 },
+  { code: 'WKD-L8M2N1', name: 'Dessert 35rb', min: 'Min. 100rb', left: 8, cap: 20 },
+])
 // F1b ticket-based claim: solid Klaim, anon → wall login (anti-farming).
-async function claim() {
-  claimNote.value = '🔒 Login 10 detik untuk klaim voucher — anti-farming, gratis.'
+async function claimRow(code: string) {
+  // UX lock: early-return guard anti double-klik (keyboard Enter bypass :disabled).
+  if (claiming.value) return
+  claimingCode.value = code
+  try {
+    const res = await claimVoucher(code)
+    claimed.value = res.claim_code
+    claimNote.value = ''
+    showSheet.value = false
+  } catch {
+    claimNote.value = claimError.value || 'Gagal klaim. Coba lagi.'
+  } finally {
+    claimingCode.value = ''
+  }
 }
 </script>

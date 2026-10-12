@@ -41,6 +41,18 @@ Token lock: ink tetap #0C0A09, rose tetap #E11D48, paper tetap #F5F5F4. -->
   <!-- Pill count infinity S2c -->
   <p v-if="!pending && tenants.length" class="inline-block text-[11px] font-extrabold px-2.5 py-1 rounded-full mt-3" style="background:#0C0A09;color:#fff">{{ dirCount }}</p>
 
+  <!-- V13C strip promo (Addendum 23 v1.1): section di mall page, BUKAN route baru. Discovery lintas-tenant $0. -->
+  <!-- KENAPA di sini: di atas list tenant, di bawah pill count — user lihat promo dulu baru scroll direktori. Data real: filter tenant yang ada badge promo (tenantPromo), bukan fake all -20%. -->
+  <div v-if="!pending && promoStrip.length" class="rounded-2xl p-3 mt-3 bg-white border border-gray-100">
+    <p class="font-extrabold text-[13px]">🔥 Promo hari ini di {{ mallShort }} ({{ promoStrip.length }})</p>
+    <p class="text-[11px] font-bold text-gray-500 mb-1">Weekday filler · s/d 23:59 · tap → tenant</p>
+    <NuxtLink v-for="t in promoStrip" :key="'promo-' + t.name" :to="`/makan?mall=${slug}`" class="flex gap-2 items-center border-t border-gray-100 py-2">
+      <div class="w-[30px] h-[30px] flex-none rounded-[9px] flex items-center justify-center text-[15px]" :style="{ background: tenantBg(t), color: '#fff' }">{{ tenantEmoji(t) }}</div>
+      <div class="flex-1 text-[12px]"><b>{{ t.name }} {{ tenantPromo(t) }}</b><br><small class="text-gray-500 font-bold">{{ tenantFloor(t) }} · {{ tenantHalal(t) }}</small></div>
+      <span class="text-[12px] font-extrabold underline">Lihat →</span>
+    </NuxtLink>
+  </div>
+
   <!-- Kartu tenant (mockup S2c Foto Tenant): thumb foto 46px + badge promo overlay -->
   <AppLoader v-if="pending" variant="mall" />
   <div v-else-if="error" class="rounded-2xl p-4 text-sm font-bold mt-3" style="background:#fef2f2;border:1px solid #fecaca;color:#991b1b">
@@ -157,4 +169,8 @@ watch(sentinel, (el, _, onCleanup) => {
 })
 
 const filtered = computed(() => filterTenantsByKeyword(tenants.value, keyword.value))
+// V13C strip promo (Addendum 23 v1.1): daftar tenant yang ADA badge promo real.
+// KENAPA computed terpisah dari filtered: strip tampil di atas (discovery),
+// list bawah tetap ikut keyword. Slice 3 biar hemat HP kentang.
+const promoStrip = computed(() => tenants.value.filter((t) => !!tenantPromo(t)).slice(0, 3))
 </script>
