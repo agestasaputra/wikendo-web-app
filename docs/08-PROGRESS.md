@@ -796,3 +796,10 @@
 - **Dikerjain:** file baru `supabase/migration-v13-voucher.sql` (5,791 bytes): CREATE TABLE `vouchers` + patch kolom `voucher_claims` (voucher_id/claim_code/claimed_at/redeemed_at/redeem_code/claim_date) + backfill baris lama + UNIQUE index anti-farming + RLS public-read aktif + seed 3 voucher contoh GI (WKD-7X2K9A/4Y5B3C/L8M2N1) + SELECT verifikasi. Secrets scan: bersih (NOL key).
 - **Verifikasi:** write_file verified:true; idempotent (IF NOT EXISTS semua, aman re-run); lint skipped (no linter .sql).
 - **Next:** Agesta run di Supabase Dashboard (cara di bawah) → bilang "gas fix V13" buat slice backend+UI → push → auto-deploy → audit ulang.
+
+## 2026-10-12 — Fix migrasi v13: semicolon line 30 🔧
+
+- **Kenapa:** Agesta run migrasi → `ERROR 42601 syntax error at or near "CREATE" LINE 33`. Root cause: line 30 `COMMENT ON COLUMN vouchers.code ...` NOL semicolon `;`, parser nyambung ke `CREATE INDEX` berikut → 42601.
+- **Dikerjain:** patch 1 char `supabase/migration-v13-voucher.sql` line 30 tambah `;`. Audit sisa file: semua statement lain sudah `;` (CREATE TABLE/INDEX/ALTER/UPDATE/POLICY/SEED/SELECT OK).
+- **Verifikasi:** grep COMMENT ON → 2 baris dua-duanya `;`. Partial-run aman: CREATE TABLE IF NOT EXISTS → re-run full file aman.
+- **Next:** Agesta re-copy SELURUH file versi baru → SQL Editor → New query → Run.

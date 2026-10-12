@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS vouchers (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 COMMENT ON TABLE vouchers IS 'Multi-voucher per tenant (Gas v13 Addendum 23 v1.1). P0: 1 claim per user per tenant per hari, expiry 23:59 WIB.';
-COMMENT ON COLUMN vouchers.code IS 'Kode claim WKD-XXXXXX, UNIQUE.'
+COMMENT ON COLUMN vouchers.code IS 'Kode claim WKD-XXXXXX, UNIQUE.';
 
 -- Index: lookup promo aktif per tenant yang belum expired (dipakai sheet V13B + strip V13C)
 CREATE INDEX IF NOT EXISTS idx_vouchers_tenant_active
