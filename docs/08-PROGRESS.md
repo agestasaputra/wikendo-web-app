@@ -777,3 +777,15 @@
   - `docs/08-PROGRESS.md` — update Gas v13 S2-S3-S4 complete
 
 - **Next:** Pantau prod 200 + E2E test claim voucher login +-agesta follow-up.
+
+## 2026-10-12 — Audit prod V13 (deploy LIVE, S1 PASS, gap S2-S4 ketemu) ⚠️
+
+- **Kenapa:** Agesta tanya "klik apa lagi" di dashboard Vercel (screenshot: Production Deployment Ready 1d ago, commit Gas v13 S1-S4, domain www.wikendo.id + wikendo-web-app.vercel.app). Jawab + pastikan audit fitur works di prod.
+- **Dikerjain:** curl audit prod dua domain + baca `app/server/api/voucher/claim.post.ts` (169 baris) + `result-makan.vue` + `mall/[slug].vue` + `supabase/migration-base.sql` + `migration.sql` + `seed.sql` + Addendum 23 v1.1.
+- **Verifikasi (real output):**
+  * Deploy: `wikendo-web-app.vercel.app → 200 (0.37s)`, `www.wikendo.id → 200 (1.09s)` — commit prod = lokal `cc75ab8` ✅ auto-deploy GitHub→Vercel JALAN, NOL perlu klik Create New / manual deploy.
+  * S1: `POST /api/voucher/claim` tanpa token → **401** "Login dulu sebelum claim voucher" di DUA domain ✅.
+  * DB env: `GET /api/malls → 200` (5 mall, total_tenant 40) ✅ env Supabase prod OK.
+  * GAP S2-S4 (backend): route query tabel `vouchers` — tabel ini NOL di `migration.sql`/`seed.sql` (cuma ada di docs/23 sebagai rencana). Insert pakai kolom `voucher_id/claim_code/claimed_at/redeemed_at` — DB real cuma punya `tenant_id/date/code/redeemed/created_at` (migration-base.sql). Akibat: claim dgn token valid bakal 404/500, S2-S4 BELUM works.
+  * GAP V13 UI: `claim()` di result-makan.vue cuma set note (NOL fetch ke claim API), NOL link `+2 promo lain`, NOL sheet V13B, NOL strip V13C di mall/[slug].vue (V13 masih design-only di `design/`).
+- **Next:** (1) Agesta run migrasi SQL `vouchers` + selaraskan kolom `voucher_claims` di Supabase Dashboard → (2) AI slice fix: selaraskan claim.post.ts ke skema real + TDD S2-S4 GREEN + wiring UI V13 → (3) push → auto-deploy → audit ulang sampai 200/401/409/429 beneran.
