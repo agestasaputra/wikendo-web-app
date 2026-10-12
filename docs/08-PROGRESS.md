@@ -789,3 +789,10 @@
   * GAP S2-S4 (backend): route query tabel `vouchers` — tabel ini NOL di `migration.sql`/`seed.sql` (cuma ada di docs/23 sebagai rencana). Insert pakai kolom `voucher_id/claim_code/claimed_at/redeemed_at` — DB real cuma punya `tenant_id/date/code/redeemed/created_at` (migration-base.sql). Akibat: claim dgn token valid bakal 404/500, S2-S4 BELUM works.
   * GAP V13 UI: `claim()` di result-makan.vue cuma set note (NOL fetch ke claim API), NOL link `+2 promo lain`, NOL sheet V13B, NOL strip V13C di mall/[slug].vue (V13 masih design-only di `design/`).
 - **Next:** (1) Agesta run migrasi SQL `vouchers` + selaraskan kolom `voucher_claims` di Supabase Dashboard → (2) AI slice fix: selaraskan claim.post.ts ke skema real + TDD S2-S4 GREEN + wiring UI V13 → (3) push → auto-deploy → audit ulang sampai 200/401/409/429 beneran.
+
+## 2026-10-12 — Migrasi v13 siap di-run Agesta (file baru) 📄
+
+- **Kenapa:** Agesta mau run migrasi tabel voucher. Audit prod 12 Okt ketemu gap: route claim baca tabel `vouchers` (belum ada) + kolom insert beda dari tabel real.
+- **Dikerjain:** file baru `supabase/migration-v13-voucher.sql` (5,791 bytes): CREATE TABLE `vouchers` + patch kolom `voucher_claims` (voucher_id/claim_code/claimed_at/redeemed_at/redeem_code/claim_date) + backfill baris lama + UNIQUE index anti-farming + RLS public-read aktif + seed 3 voucher contoh GI (WKD-7X2K9A/4Y5B3C/L8M2N1) + SELECT verifikasi. Secrets scan: bersih (NOL key).
+- **Verifikasi:** write_file verified:true; idempotent (IF NOT EXISTS semua, aman re-run); lint skipped (no linter .sql).
+- **Next:** Agesta run di Supabase Dashboard (cara di bawah) → bilang "gas fix V13" buat slice backend+UI → push → auto-deploy → audit ulang.
