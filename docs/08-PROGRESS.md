@@ -803,3 +803,10 @@
 - **Dikerjain:** patch 1 char `supabase/migration-v13-voucher.sql` line 30 tambah `;`. Audit sisa file: semua statement lain sudah `;` (CREATE TABLE/INDEX/ALTER/UPDATE/POLICY/SEED/SELECT OK).
 - **Verifikasi:** grep COMMENT ON → 2 baris dua-duanya `;`. Partial-run aman: CREATE TABLE IF NOT EXISTS → re-run full file aman.
 - **Next:** Agesta re-copy SELURUH file versi baru → SQL Editor → New query → Run.
+
+## 2026-10-12 — Migrasi v13 SUKSES di-run Agesta ✅
+
+- **Kenapa:** Agesta run ulang `migration-v13-voucher.sql` versi fix (`95ebc59`) di Supabase SQL Editor.
+- **Dikerjain:** Agesta run full file di Dashboard (AI cuma fix semicolon line 30).
+- **Verifikasi (real output Agesta):** `vouchers → 3` ✅ (WKD-7X2K9A/4Y5B3C/L8M2N1) + `voucher_claims → 0` ✅ (ekspektasi: tabel kosong, belum ada user claim — bukan error).
+- **Next:** "gas fix V13" — AI slice backend (selaraskan claim.post.ts ke skema real) + UI V13A/B/C → TDD GREEN → push → auto-deploy → audit ulang 200/401/409/429.
