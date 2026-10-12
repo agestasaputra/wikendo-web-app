@@ -13,10 +13,10 @@
 
 ---
 
-## 📌 BOARD — posisi per 13 Okt 2026 (Gas v13 wiring DONE lokal ✅, next push-deploy-audit prod)
+## 📌 BOARD — posisi per 13 Okt 2026 (Gas v13 DONE prod ✅ — wiring + E2E + audit UI/UX hijau)
 
 ### 🔥 NOW (lagi dikerjain)
-- [x] Gas v13 wiring S1→S4 DONE lokal ✅ 13 Okt: `claim.post.ts` fix skema real (claim_date WIB + dual-write date/code lama + UNIQUE user+tenant+claim_date→409 + 23505→409 + rate 3/hari 429 + countdown 23:59 WIB) + `useVoucher.ts` BARU (1 sumber claimVoucher Bearer browser, service key server-only) + `result-makan.vue` wiring V13A hero best-1 Buka→sheet + V13B sheet 3 row seed GI + Klaim per row + spinner + disabled + guard + `mall/[slug].vue` V13C strip Promo hari ini + `promoStrip` computed filter tenantPromo — TDD file-assert 44/44 (4 file) ✅ full 257/257 (25 files) ✅ lint 0 ✅ build 14.1s ✅ SCAN bersih ✅ — next: push + deploy + audit prod 200/401/409/429 + E2E + audit UI/UX
+- [x] Gas v13 wiring S1→S4 DONE prod ✅ 13 Okt: `claim.post.ts` fix skema real (claim_date WIB + dual-write date/code lama + UNIQUE user+tenant+claim_date→409 + 23505→409 + rate 3/hari 429 + countdown 23:59 WIB) + `useVoucher.ts` BARU (1 sumber claimVoucher Bearer browser, service key server-only) + `result-makan.vue` wiring V13A hero best-1 Buka→sheet + V13B sheet 3 row seed GI + Klaim per row + spinner + disabled + guard + `mall/[slug].vue` V13C strip Promo hari ini + `promoStrip` computed filter tenantPromo — TDD 257/257 ✅ lint 0 ✅ build 12.9s ✅ push `7cd1502` sinkron remote ✅ prod `/`+`/result-makan`+`/mall/grand-indonesia` 200 ✅ E2E claim: anon 401 ✅ kode ngawur 404 ✅ token invalid 401 ✅ marker prod V13A (Buka:1 +2:1 Maps:1) + V13C (strip:1 filler:1 Lihat:1 23:59:1) ✅ — next: kirim MEDIA PROGRESS
 - [x] Visual explainer multi-voucher v13 GATE ✅ 11 Okt: Addendum v1.1 diterbitkan + S3 server route POST /api/voucher/claim dibuat + TDD S1 auth 401 RED→GREEN (test + route): request Agesta "ga kebayang, kasih gambar" — `design/revamp-options-v13.html` + `revamp-options-v13-compare.png` 1120x910 QA PASS (V13A hero best-1 + link lime +2 promo / V13B sheet pilih 1 dari 3 + sisa cap + Klaim per row / V13C strip promo GI di mall page, NOL tofu/overlap) + script `revamp-options-v13-compare.py` — aturan "wajib gambar tiap bahas desain" LOCKED §10 skill agesta-app-workflow — app/ NOL sentuh — next: Agesta balas "Gas v13" / "Gua suka V13x + feedback"
 - [ ] Board 20 opsi voucher-claim v12 GATE ⏳ 11 Okt: request Agesta "20 rekomendasi, gua pilih" — `design/revamp-options-v12.html` + `revamp-options-v12-compare.png` QA PASS (20 panel VC1-VC20 readable, NOL tofu/overlap, VC5 distinct border merah) + script `revamp-options-v12-compare.py` — diagnosis: gift = banner (NOL kode/expiry/urgensi) + CTA berebut 4 aksi + wall buta value + NOL cara pakai — rekom tunggal VC5 code-expand in-place (S 1.5h, risiko rendah, P0 on-track) — app/ NOL sentuh — next: Agesta balas "Gua suka VCx"
 - [x] Flowchart alur klik Buka DONE ✅ 11 Okt: request Agesta — PNG `design/voucher-buka-flow-2026-10-11.png` QA PASS (title readable, 7 box + diamond urut, BELUM/SUDAH + loop-back benar) + script `voucher-buka-flow.py` — push `3367942` ✅
@@ -110,6 +110,13 @@
 ---
 
 ## 🧾 LOG (newest first)
+
+## 2026-10-13 — Gas v13 DONE prod ✅ (request Agesta: lanjut eksekusi → deploy prod → e2e + audit ui/ux)
+- **Kenapa:** v13 sudah push `7cd1502` sinkron remote, perlu bukti hijau lengkap sampai prod sebelum DONE.
+- **Dikerjain:** verifikasi ulang penuh + update `docs/08-PROGRESS.md` BOARD 13 Okt DONE prod (LOG ini).
+- **Verifikasi:** vitest 257/257 ✅ lint 0 ✅ build 12.9s ✅ push `7cd1502` sinkron remote ✅ prod `www`+`result-makan`+`mall/grand-indonesia` 200 ✅ E2E claim: no-token 401 ✅ bad-code 404 ✅ invalid-token 401 ✅ empty-code 401 ✅ marker prod V13A (Buka:1 +2:1 Maps:1) + V13C (strip:1 filler:1 Lihat:1 23:59:1) ✅ audit source: V13A hero Buka+gBuka→sheet + V13B `vouchers` WKD 3 + `claimRow` guard + spinner scoped + V13C `promoStrip` slice-3 + mobile `max-w-md` di 2 page + UX lock `if (claiming)` di 2 file ✅.
+- **File:** `docs/08-PROGRESS.md`.
+- **Next:** commit + push board + kirim MEDIA PROGRESS → v13 DONE total.
 
 ## 2026-10-13 — Gas v13 wiring S1→S4 DONE lokal ✅ (request Agesta: lanjut eksekusi → deploy prod → e2e + audit ui/ux)
 - **Kenapa:** backend claim lama insert kolom baru saja (voucher_id/claim_code/claimed_at) → code NULL 500 + cek eq(claimed_at, midnight) NOL pernah match → 409 bocor; V13A/B/C UI belum wiring ke API.
