@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wikendo v14 — bottom navigation 20 opsi (BN1-BN20)</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Plus Jakarta Sans',system-ui,-apple-system,sans-serif;background:#fafaf9;color:#1c1917;padding:20px 16px 140px}
+.wrap{max-width:1220px;margin:0 auto}
+.approve{background:#0C0A09;color:#fff;border-radius:16px;padding:16px 18px;margin-bottom:18px;border-left:4px solid #A3E635;font-size:13px;line-height:1.6}
+.approve b{color:#D9F99D}
+h1{font-size:22px;margin-bottom:6px}
+.sub{color:#78716c;font-size:13px;margin-bottom:14px;line-height:1.6}
+.diag{background:#fff;border:1px solid #e7e5e4;border-radius:16px;padding:16px 18px;margin-bottom:14px}
+.diag h2{font-size:15px;margin-bottom:8px}
+.diag p,.diag li{font-size:13px;line-height:1.65;color:#44403c}
+.diag ul{padding-left:18px}
+.tokens{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.tok{font-size:11px;font-weight:700;background:#f5f5f4;border:1px solid #e7e5e4;border-radius:999px;padding:4px 10px}
+.tok i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.filters button{border:1.5px solid #0C0A09;background:#fff;border-radius:999px;padding:7px 14px;font-size:12px;font-weight:800;cursor:pointer}
+.filters button.on{background:#0C0A09;color:#fff}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:16px}
+.card{background:#fff;border:1px solid #e7e5e4;border-radius:20px;overflow:hidden;display:flex;flex-direction:column}
+.card.rec{border:2px solid #E11D48}
+.cardhead{padding:14px 16px 10px}
+.cardhead .id{font-size:11px;font-weight:800;letter-spacing:.06em;color:#fff;background:#0C0A09;display:inline-block;padding:3px 10px;border-radius:999px}
+.card.rec .cardhead .id{background:#E11D48}
+.cardhead h3{font-size:15px;margin:8px 0 2px}
+.cardhead p{font-size:12px;color:#78716c;line-height:1.55}
+.phonewrap{background:#f5f5f4;padding:12px}
+.phone{background:#F5F5F4;border:1px solid #e7e5e4;border-radius:22px;padding:10px 10px 0;max-width:380px;margin:0 auto;position:relative;overflow:hidden}
+.phone .tag{font-size:9px;font-weight:800;letter-spacing:.06em;color:#78716c;margin-bottom:6px}
+.p-top{display:flex;justify-content:space-between;font-size:10px;font-weight:800;margin-bottom:6px}
+.p-top span:last-child{color:#78716c}
+.p-hero{background:#0C0A09;color:#fff;border-radius:14px;padding:10px;border-left:5px solid #EA580C}
+.p-hero .q{font-size:9px;font-weight:800;opacity:.75;letter-spacing:.05em}
+.p-hero .n{font-size:18px;font-weight:800;color:#D9F99D}
+.p-hero .s{font-size:9px;font-weight:700;opacity:.8}
+.p-cta{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}
+.p-cta div{border-radius:10px;font-size:9.5px;font-weight:800;text-align:center;padding:9px 4px;background:#0C0A09;color:#fff}
+.p-cta div:last-child{background:#fff;color:#0C0A09;border:1.5px solid #e7e5e4}
+.p-icons{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-top:8px;font-size:8.5px;font-weight:800;text-align:center}
+.p-icons span{background:#fff;border-radius:10px;padding:6px 2px;box-shadow:0 1px 2px rgba(0,0,0,.06)}
+.bnav{display:flex;align-items:center;justify-content:space-around;margin:10px -10px 0;padding:8px 6px calc(10px + env(safe-area-inset-bottom));font-size:8.5px;font-weight:800}
+.bnav .it{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:52px;padding:6px 4px;border-radius:12px;color:#78716c}
+.bnav .it .ic{font-size:17px;line-height:1}
+.bnav .it.act{color:#0C0A09}
+.bnav.solid{background:#0C0A09;color:#a8a29e}
+.bnav.solid .it{color:#a8a29e}
+.bnav.solid .it.act{color:#A3E635}
+.bnav.white{background:#fff;border-top:1px solid #e7e5e4;box-shadow:0 -4px 16px rgba(0,0,0,.06)}
+.bnav.float{background:#fff;border:1.5px solid #0C0A09;border-radius:18px;margin:10px 2px 10px;box-shadow:0 6px 18px rgba(0,0,0,.10)}
+.bnav.pillwrap{background:transparent}
+.bnav .pill{background:#0C0A09;color:#fff;border-radius:999px;padding:7px 12px;display:flex;gap:8px;align-items:center}
+.bnav .fab{width:52px;height:52px;border-radius:50%;background:#E11D48;color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;margin-top:-26px;border:3px solid #fff;box-shadow:0 4px 12px rgba(0,0,0,.2)}
+.bnav .fab.ink{background:#0C0A09}
+.bnav .fab.lime{background:#A3E635;color:#0C0A09}
+.bnav .dot{width:5px;height:5px;border-radius:50%;background:#A3E635}
+.bnav .bdg{background:#E11D48;color:#fff;font-size:8px;border-radius:999px;padding:1px 6px;margin-left:3px}
+.bnav .av{width:22px;height:22px;border-radius:50%;background:#0C0A09;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800}
+.meta{padding:12px 16px 16px;font-size:12px}
+.pillrow{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}
+.pillrow span{font-size:10px;font-weight:800;background:#f5f5f4;border:1px solid #e7e5e4;border-radius:999px;padding:3px 9px}
+.procon{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.procon div{font-size:11px;line-height:1.55}
+.procon b{display:block;font-size:10px;letter-spacing:.05em}
+.pick{margin-top:10px;display:flex;gap:8px}
+.pick button{flex:1;border-radius:999px;padding:9px;font-size:12px;font-weight:800;cursor:pointer;border:1.5px solid #0C0A09;background:#fff}
+.pick button.shortlisted{background:#0C0A09;color:#fff}
+.recbox{background:#fff1f2;border:2px solid #E11D48;border-radius:16px;padding:16px 18px;margin-top:14px}
+.sec{background:#fff;border:1px solid #e7e5e4;border-radius:16px;padding:16px 18px;margin-top:14px}
+.sec h2{font-size:15px;margin-bottom:8px}
+.sec p,.sec li{font-size:13px;line-height:1.65;color:#44403c}
+table.h2h{width:100%;border-collapse:collapse;font-size:11px;margin-top:8px}
+table.h2h th,table.h2h td{border:1px solid #e7e5e4;padding:6px 7px;text-align:center}
+table.h2h th{background:#0C0A09;color:#fff;font-size:10px}
+table.h2h td:first-child,table.h2h th:first-child{text-align:left}
+.pickbar{position:fixed;left:12px;right:12px;bottom:12px;max-width:1180px;margin:0 auto;background:#0C0A09;color:#fff;border-radius:16px;padding:12px 16px;display:flex;gap:10px;align-items:center;font-size:12px;font-weight:700;z-index:50}
+.pickbar code{background:#1c1917;padding:6px 10px;border-radius:8px;color:#D9F99D;font-size:12px}
+.pickbar button{margin-left:auto;background:#A3E635;color:#0C0A09;border:none;border-radius:999px;padding:9px 16px;font-weight:800;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="approve">GATE v14: board 20 opsi bottom-nav. Semua mock di <b>design/</b>, <b>app/ NOL disentuh</b>. Pilih fixation: balas <b>Gua suka [BNx]</b> (= lock final) atau <b>Gua suka [BNx], tapi ada beberapa feedback: - ...</b>. Tanpa ID = belum eksekusi.</div>
+<h1>Bottom navigation 20 opsi — BN1 s/d BN20</h1>
+<p class="sub">Masalah: Wikendo belum punya navigasi bawah ala mobile app — user pindah Home / quiz tempat / quiz makan / mall / akun cuma via header + CTA. Solusi P0: sticky bottom-nav max-w-md, thumb-zone min 56px, ikut token live (paper/ink/lime/ember/rose), hormati split tempat vs makan (tidak dicampur), hormati header 2-state AS6. Mock di bawah = Home live + nav varian.</p>
+<div class="diag">
+<h2>Kenapa bottom-nav penting (3 kalimat)</h2>
+<ul>
+<li><b>Jempol tidak sampai header:</b> 80% tap HP di zona bawah — pindah quiz/mall dari nav bawah menaikkan landing-ke-quiz.</li>
+<li><b>Split tetap jelas:</b> Tempat dan Makan dua tab eksplisit — tidak dicampur, tidak disembunyikan di balik satu FAB ambigu.</li>
+<li><b>Akun konsisten header:</b> nav Akun cerminan header AS6 (anon = Login, login = avatar) — tidak bikin pintu ganda.</li>
+</ul>
+<div class="tokens">
+<span class="tok"><i style="background:#F5F5F4"></i>paper #F5F5F4</span>
+<span class="tok"><i style="background:#0C0A09"></i>ink #0C0A09</span>
+<span class="tok"><i style="background:#A3E635"></i>lime #A3E635</span>
+<span class="tok"><i style="background:#EA580C"></i>ember #EA580C</span>
+<span class="tok"><i style="background:#E11D48"></i>rose #E11D48</span>
+<span class="tok">max-w-md</span><span class="tok">P0 S ~2h</span><span class="tok">$0</span>
+</div>
+<div class="filters" id="filters">
+<button data-f="all" class="on">Semua 20</button>
+<button data-f="classic">Classic</button>
+<button data-f="fab">FAB-center</button>
+<button data-f="minimal">Minimal</button>
+<button data-f="badge">Badge/quota</button>
+<button data-f="auth">Auth-aware</button>
+</div>
+</div>
+<div class="grid" id="grid">
+
+<div class="card rec" data-cat="classic" data-id="BN1">
+<div class="cardhead"><span class="id">BN1 • REKOMENDASI</span><h3>Ink solid 5-tab classic</h3><p>Bar ink penuh, 5 tab: Beranda Tempat Makan Mall Akun. Aktif = lime + dot. Paling jelas, P0 tercepat.</p></div>
+<div class="phonewrap"><div class="phone"><div class="tag">HOME · BN1</div>
+<div class="p-top"><span>Halo, teman Wikendo</span><span>Login</span></div>
+<div class="p-hero"><div class="q">QUOTA HARI INI</div><div class="n">1 • 2</div><div class="s">Gratis hari ini — login buka 2 + 5</div></div>
+<div class="p-cta"><div>Cari Tempat</div><div>Cari Makan</div></div>
+<div class="p-icons"><span>Mall</span><span>Promo</span><span>Wishlist</span><span>Riwayat</span></div>
+<div class="bnav solid"><div class="it act"><span class="ic">⌂</span>Beranda<span class="dot"></span></div><div class="it"><span class="ic">🗺</span>Tempat</div><div class="it"><span class="ic">🍜</span>Makan</div><div class="it"><span class="ic">🏬</span>Mall</div><div class="it"><span class="ic">👤</span>Akun</div></div>
+</div></div>
+<div class="meta"><div class="pillrow"><span>Effort S · 2h</span><span>Risiko Rendah</span><span>classic</span></div>
+<div class="procon"><div><b>+ PRO</b>5 tujuan eksplisit, kontras ink-lime kuat, slicing app.vue 1 file.</div><div><b>− KONTRA</b>Terlihat standar — tapi standar = tidak perlu belajar.</div></div>
+<div class="pick"><button onclick="shortlist('BN1',this)">Shortlist BN1</button></div></div>
+</div>
+
+<div class="card" data-cat="classic" data-id="BN2">
+<div class="cardhead"><span class="id">BN2</span><h3>White floating 5-tab</h3><p>Bar putih mengambang rounded + shadow. Aktif = ink bold + dot lime.</p></div>
+<div class="phonewrap"><div class="phone"><div class="tag">HOME · BN2</div>
+<div class="p-top"><span>Halo, teman Wikendo</span><span>Login</span></div>
+<div class="p-hero"><div class="q">QUOTA HARI INI</div><div class="n">1 • 2</div><div class="s">Gratis hari ini — login buka 2 + 5</div></div>
+<div class="p-cta"><div>Cari Tempat</div><div>Cari Makan</div></div>
+<div class="bnav float"><div class="it act"><span class="ic">⌂</span>Beranda</div><div class="it"><span class="ic">🗺</span>Tempat</div><div class="it"><span class="ic">🍜</span>Makan</div><div class="it"><span class="ic">🏬</span>Mall</div><div class="it"><span class="ic">👤</span>Akun</div></div>
+</div></div>
+<div class="meta"><div class="pillrow"><span>Effort S · 2h</span><span>Risiko Rendah</span><span>classic</span></div>
+<div class="procon"><div><b>+ PRO</b>Ringan, konten tetap napas di bawahnya.</div><div><b>− KONTRA</b>Shadow numpuk footer — perlu padding bawah.</div></div>
+<div class="pick"><button onclick="shortlist('BN2',this)">Shortlist BN2</button></div></div>
+</div>
+
+<div class="card" data-cat="minimal" data-id="BN3">
+<div class="cardhead"><span class="id">BN3</span><h3>4-tab + Cari sheet</h3><p>Beranda Cari Mall Akun. Tap Cari → sheet pilih Tempat / Makan. Hemat 1 slot.</p></div>
+<div class="phonewrap"><div class="phone"><div class="tag">HOME · BN3</div>
+<div class="p-top"><span>Halo, teman Wikendo</span><span>Login</span></div>
+<div class="p-hero"><div class="q">QUOTA HARI INI</div><div class="n">1 • 2</div><div class="s">Gratis hari ini — login buka 2 + 5</div></div>
+<div class="p-cta"><div>Cari Tempat</div><div>Cari Makan</div></div>
+<div class="bnav white"><div class="it act"><span class="ic">⌂</span>Beranda</div><div class="it"><span class="ic">🔍</span>Cari</div><div class="it"><span class="ic">🏬</span>Mall</div><div class="it"><span class="ic">👤</span>Akun</div></div>
+</div></div>
+<div class="meta"><div class="pillrow"><span>Effort M · 3h</span><span>Risiko Sedang</span><span>minimal</span></div>
+<div class="procon"><div><b>+ PRO</b>Minimal, 1 tap ekstra terkontrol via sheet.</div><div><b>− KONTRA</b>Split tempat/makan ngumpet — langgar eksplisit P0.</div></div>
+<div class="pick"><button onclick="shortlist('BN3',this)">Shortlist BN3</button></div></div>
+</div>
+
+<div class="card" data-cat="fab" data-id="BN4">
+<div class="cardhead"><span class="id">BN4</span><h3>FAB Quiz center ink</h3><p>4 tab + tombol bulat Quiz menonjol di tengah. Khas superapp.</p></div>
+<div class="phonewrap"><div class="phone"><div class="tag">HOME · BN4</div>
+<div class="p-top"><span>Halo, teman Wikendo</span><span>Login</span></div>
+<div class="p-hero"><div class="q">QUOTA HARI INI</div><div class="n">1 • 2</div><div class="s">Gratis hari ini — login buka 2 + 5</div></div>
+<div class="bnav white"><div class="it act"><span class="ic">⌂</span>Beranda</div><div class="it"><span class="ic">🍜</span>Makan</div><div class="it"><span class="fab ink">▶</span></div><div class="it"><span class="ic">🏬</span>Mall</div><div class="it"><span class="ic">👤</span>Akun</div></div>
+</div></div>
+<div class="meta"><div class="pillrow"><span>Effort M · 3h</span><span>Risiko Sedang</span><span>fab</span></div>
+<div class="procon"><div><b>+ PRO</b>CTA quiz paling menonjol, CTR naik.</div><div><b>− KONTRA</b>FAB ambigu tempat vs makan — perlu sheet lagi.</div></div>
+<div class="pick"><button onclick="shortlist('BN4',this)">Shortlist BN4</button></div></div>
+</div>
+
+<div class="card" data-cat="fab" data-id="BN5">
+<div class="cardhead"><span class="id">BN5</span><h3>FAB Makan lime center</h3><p>FAB lime khas Wikendo di tengah untuk Cari Makan (aliran duit voucher).</p></div>
+<div class="phonewrap"><div class="phone"><div class="tag">HOME · BN5</div>
+<div class="p-top"><span>Halo, teman Wikendo</span><span>Login</span></div>
+<div class="p-hero"><div class="q">QUOTA HARI INI</div><div class="n">1 • 2</div><div class="s">Gratis hari ini — login buka 2 + 5</div></div>
+<div class="bnav white"><div class="it act"><span class="ic">⌂</span>Beranda</div><div class="it"><span class="ic">🗺</span>Tempat</div><div class="it"><span class="fab lime">🍜</span></div><div class="it"><span class="ic">🏬</span>Mall</div><div class="it"><span class="ic">👤</span>Akun</div></div>
+</div></div>
+<div class="meta"><div class="pillrow"><span>Effort M · 3h</span><span>Risiko Sedang</span><span>fab</span></div>
+<div class="procon"><div><b>+ PRO</b>Dorong aliran makan + voucher langsung.</div><div><b>− KONTRA</b>Anak-tirikan Tempat — split tidak seimbang.</div></div>
+<div class="pick"><button onclick="shortlist('BN5',this)">Shortlist BN5</button></div></div>
+</div>
+
+<div class="card" data-cat="minimal" data-id="BN6">
+<div class="cardhead"><span class="id">BN6</span><h3>Pill mengambang tengah</h3><p>Nav jadi pil ink mengambang — gaya modern, 4 ikon + label ringkas.</p></div>
+<div class="phonewrap"><div class="phone"><div class="tag">HOME · BN6</div>
+<div class="p-top"><span>Halo, teman Wikendo</span><span>Login</span></div>
+<div class="p-hero"><div class="q">QUOTA HARI INI</div><div class="n">1 • 2</div><div class="s">Gratis hari ini — login buka 2 + 5</div></div>
+<div class="bnav pillwrap"><div class="pill"><span>⌂</span><span>🗺</span><span>🍜</span><span>🏬</span><span>👤</span></div></div>
+</div></div>
+<div class="meta"><div class="pillrow"><span>Effort S · 2h</span><span>Risiko Rendah</span><span>minimal</span></div>
+<div class="procon"><div><b>+ PRO</b>Ringan, tidak makan tinggi layar.</div><div><b>− KONTRA</b>Tanpa label — user baru bingung.</div></div>
+<div class="pick"><button onclick="shortlist('BN6',this)">Shortlist BN6</button></div></div>
+</div>
+
+<div class="card" data-cat="minimal" data-id="BN7">
+<div class="cardhead"><span class="id">BN7</span><h3>Ikon saja tanpa label</h3><p>Native paling hemat: 5 ikon, aktif = ink, sisanya grey.</p></div>
+<div class="phonewrap"><div class="phone"><div class="tag">HOME · BN7</div>
+<div class="p-top"><span>Halo, teman Wikendo</span><span>Login</span></div>
+<div class="p-hero"><div class="q">QUOTA HARI INI</div><div class="n">1 • 2</div><div class="s">Gratis hari ini — login buka 2 + 5</div></div>
+<div class="bnav white"><div class="it act"><span class="ic">⌂</span></div><div class="it"><span class="ic">🗺</span></div><div class="it"><span class="ic">🍜</span></div><div class="it"><span class="ic">🏬</span></div><div class="it"><span class="ic">👤</span></div></div>
+</div></div>
+<div class="meta"><div class="pillrow"><span>Effort S · 1.5h</span><span>Risiko Rendah</span><span>minimal</span></div>
+<div class="procon"><div><b>+ PRO</b>Bersih, tinggi minimal.</div><div><b>− KONTRA</b>Aksesibilitas turun — label penting P0.</div></div>
+<div class="pick"><button onclick="shortlist('BN7',this)">Shortlist BN7</button></div></div>
+</div>
+
+<div class="card" data-cat="classic" data-id="BN8">
+<div class="cardhead"><span class="id">BN8</span><h3>Active pill lime</h3><p>Tab aktif jadi pil lime — status posisi paling jelas dari jauh.</p></div>
+<div class="phonewrap"><div class="phone"><div class="tag">HOME · BN8</div>
+<div class="p-top"><span>Halo, teman Wikendo</span><span>Login</span></div>
+<div class="p-hero"><div class="q">QUOTA HARI INI</div><div class="n">1 • 2</div><div class="s">Gratis hari ini — login buka 2 + 5</div></div>
+<div class="bnav white"><div class="it act" style="background:#A3E635;border-radius:999px;padding:6px 12px"><span class="ic">⌂</span>Beranda</div><div class="it"><span class="ic">🗺</span>Tempat</div><div class="it"><span class="ic">🍜</span>Makan</div><div class="it"><span class="ic">🏬</span>Mall</div></div>
+</div></div>
+<div class="meta"><div class="pillrow"><span>Effort S · 2h</span><span>Risiko Rendah</span><span>classic</span></div>
+<div class="procon"><div><b>+ PRO</b>Wayfinding terbaik — aktif terlihat 3m.</div><div><b>− KONTRA</b>Lime sering dipakai CTA — perlu disiplin token.</div></div>
+<div class="pick"><button onclick="shortlist('BN8',this)">Shortlist BN8</button></div></div>
+</div>
+
+<div class="card" data-cat="badge" data-id="BN9">
+<div class="cardhead"><span class="id">BN9</span><h3>Badge quota jujur</h3><p>Tab Makan bawa badge sisa quota (2/2 → 0). Scarcity jujur ikut /api/quota.</p></div>
+<div class="phonewrap"><div class="phone"><div class="tag">HOME · BN9</div>
+<div class="p-top"><span>Halo, teman Wikendo</span><span>Login</span></div>
+<div class="p-hero"><div class="q">QUOTA HARI INI</div><div class="n">1 • 2</div><div class="s">Gratis hari ini — login buka 2 + 5</div></div>
+<div class="bnav solid"><div class="it act"><span class="ic">⌂</span>Beranda<span class="dot"></span></div><div class="it"><span class="ic">🗺</span>Tempat</div><div class="it"><span class="ic">🍜</span>Makan<span class="bdg">2</span></div><div class="it"><span class="ic">🏬</span>Mall</div><div class="it"><span class="ic">👤</span>Akun</div></div>
+</div></div>
+<div class="meta"><div class="pillrow"><span>Effort M · 3h</span><span>Risiko Rendah</span><span>badge</span></div>
+<div class="procon"><div><b>+ PRO</b>Dorong pakai quota sebelum reset 00.00.</div><div><b>− KONTRA</b>Perlu wire /api/quota — jangan angka bohong.</div></div>
+<div class="pick"><button onclick="shortlist('BN9',this)">Shortlist BN9</button></div></div>
+</div>
+
+<div class="card" data-cat="auth" data-id="BN10">
+<div class="cardhead"><span class="id">BN10</span><h3>Auth-aware cermin header</h3><p>Anon = tab Masuk; login = avatar initial S. Satu pintu, tidak ganda.</p></div>
+<div class="phonewrap"><div class="phone"><div class="tag">HOME · BN10 LOGIN</div>
+<div class="p-top"><span>Halo, Siska</span><span>S hurdle</span></div>
+<div class="p-hero"><div class="q">SISA KAMU</div><div class="n">2 • 5</div><div class="s">Sisa kamu hari ini — reset 00.00</div></div>
+<div class="bnav white"><div class="it act"><span class="ic">⌂</span>Beranda</div><div class="it"><span class="ic">🗺</span>Tempat</div><div class="it"><span class="ic">🍜</span>Makan</div><div class="it"><span class="ic">🏬</span>Mall</div><div class="it"><span class="av">S</span>Akun</div></div>
+</div></div>
+<div class="meta"><div class="pillrow"><span>Effort S · 2h</span><span>Risiko Rendah</span><span>auth</span></div>
+<div class="procon"><div><b>+ PRO</b>Konsisten AS6 — login/logout satu state.</div><div><b>− KONTRA</b>Perlu useAuth di shell — uji anon/login.</div></div>
+<div class="pick"><button onclick="shortlist('BN10',this)">Shortlist BN10</button></div></div>
+</div>
+
+<div class="card" data-cat="badge" data-id="BN11">
+<div class="cardhead"><span class="id">BN11</span><h3>Promo center rose</h3><p>Tab tengah = Promo gift rose (voucher). Cocok fase voucher v13.</p></div>
+<div class="phonewrap"><div class="phone"><div class="tag">HOME · BN11</div>
+<div class="p-top"><span>Halo, teman Wikendo</span><span>Login</span></div>
+<div class="p-hero"><div class="q">QUOTA HARI INI</div><div class="n">1 • 2</div><div class="s">Gratis hari ini — login buka 2 + 5</div></div>
+<div class="bnav white"><div class="it act"><span class="ic">⌂</span>Beranda</div><div class="it"><span class="ic">🗺</span>Tempat</div><div class="it"><span class="fab">🎁</span></div><div class="it"><span class="ic">🏬</span>Mall</div><div class="it"><span class="ic">👤</span>Akun</div></div>
+</div></div>
+<div class="meta"><div class="pillrow"><span>Effort M · 3h</span><span>Risiko Sedang</span><span>badge</span></div>
+<div class="procon"><div><b>+ PRO</b>Voucher selalu 1 tap — monetisasi.</div><div><b>− KONTRA</b>Promo bukan tujuan harian — center terlalu gede.</div></div>
+<div class="pick"><button onclick="shortlist('BN11',this)">Shortlist BN11</button></div></div>
+</div>
+
+<div class="card" data-cat="classic" data-id="BN12">
+<div class="cardhead"><span class="id">BN12</span><h3>Mall center direktori</h3><p>Tab tengah = Mall (5 mall 200 tenant). Kuatkan entri direktori M3.</p></div>
+<div class="phonewrap"><div class="phone"><div class="tag">HOME · BN12</div>
+<div class="p-top"><span>Halo, teman Wikendo</span><span>Login</span></div>
+<div class="p-hero"><div class="q">QUOTA HARI INI</div><div class="n">1 • 2</div><div class="s">Gratis hari ini — login buka 2 + 5</div></div>
+<div class="bnav white"><div class="it act"><span class="ic">⌂</span>Beranda</div><div class="it"><span class="ic">🗺</span>Tempat</div><div class="it"><span class="ic">🍜</span>Makan</div><div class="it"><span class="ic">🏬</span>Mall</div><div class="it"><span class="ic">👤</span>Akun</div></div>
+</div></div>
+<div class="meta"><div class="pillrow"><span>Effort S · 2h</span><span>Risiko Rendah</span><span>classic</span></div>
+<div class="procon"><div><b>+ PRO</b>Direktori tanpa login selalu dekat.</div><div><b>− KONTRA</b>Urutan tengah lemahkan split quiz.</div></div>
+<div class="pick"><button onclick="shortlist('BN12',this)">Shortlist BN12</button></div></div>
+</div>
+
+<div class="card" data-cat="minimal" data-id="BN13">
+<div class="cardhead"><span class="id">BN13</span><h3>Blur ink transparan</h3><p>Bar ink blur di atas konten — premium, konten tembus samar.</p></div>
+<div class="phonewrap"><div class="phone"><div class="tag">HOME · BN13</div>
+<div class="p-top"><span>Halo, teman Wikendo</span><span>Login</span></div>
+<div class="p-hero"><div class="q">QUOTA HARI INI</div><div class="n">1 • 2</div><div class="s">Gratis hari ini — login buka 2 + 5</div></div>
+<div class="bnav solid" style="opacity:.92"><div class="it act"><span class="ic">⌂</span>Beranda<span class="dot"></span></div><div class="it"><span class="ic">🗺</span>Tempat</div><div class="it"><span class="ic">🍜</span>Makan</div><div class="it"><span class="ic">🏬</span>Mall</div><div class="it"><span class="ic">👤</span>Akun</div></div>
+</div></div>
+<div class="meta"><div class="pillrow"><span>Effort S · 2h</span><span>Risiko Rendah</span><span>minimal</span></div>
+<div class="procon"><div><b>+ PRO</b>Terasa app store-grade.</div><div><b>− KONTRA</b>Blur + kontras perlu uji HP kentang.</div></div>
+<div class="pick"><button onclick="shortlist('BN13',this)">Shortlist BN13</button></div></div>
+</div>
+
+<div class="card" data-cat="minimal" data-id="BN14">
+<div class="cardhead"><span class="id">BN14</span><h3>Native iOS border-top</h3><p>Putih + garis atas tipis, tanpa shadow — paling native, paling ringan.</p></div>
+<div class="phonewrap"><div class="phone"><div class="tag">HOME · BN14</div>
+<div class="p-top"><span>Halo, teman Wikendo</span><span>Login</span></div>
+<div class="p-hero"><div class="q">QUOTA HARI INI</div><div class="n">1 • 2</div><div class="s">Gratis hari ini — login buka 2 + 5</div></div>
+<div class="bnav white"><div class="it act"><span class="ic">⌂</span>Beranda</div><div class="it"><span class="ic">🗺</span>Tempat</div><div class="it"><span class="ic">🍜</span>Makan</div><div class="it"><span class="ic">🏬</span>Mall</div><div class="it"><span class="ic">👤</span>Akun</div></div>
+</div></div>
+<div class="meta"><div class="pillrow"><span>Effort S · 1.5h</span><span>Risiko Rendah</span><span>minimal</span></div>
+<div class="procon"><div><b>+ PRO</b>Ringan, tidak mencuri perhatian konten.</div><div><b>− KONTRA</b>Terlalu polos — aktif harus tegas.</div></div>
+<div class="pick"><button onclick="shortlist('BN14',this)">Shortlist BN14</button></div></div>
+</div>
+
+<div class="card" data-cat="fab" data-id="BN15">
+<div class="cardhead"><span class="id">BN15</span><h3>Sheet-handle + FAB</h3><p>Nav + handle sheet di atasnya — isyarat bisa swipe-up ke semua voucher.</p></div>
+<div class="phonewrap"><div class="phone"><div class="tag">HOME · BN15</div>
+<div class="p-top"><span>Halo, teman Wikendo</span><span>Login</span></div>
+<div class="p-hero"><div class="q">QUOTA HARI INI</div><div class="n">1 • 2</div><div class="s">Gratis hari ini — login buka 2 + 5</div></div>
+<div class="bnav white"><div class="it act"><span class="ic">⌂</span>Beranda</div><div class="it"><span class="ic">🗺</span>Tempat</div><div class="it"><span class="fab ink">↑</span></div><div class="it"><span class="ic">🏬</span>Mall</div><div class="it"><span class="ic">👤</span>Akun</div></div>
+</div></div>
+<div class="meta"><div class="pillrow"><span>Effort M · 3.5h</span><span>Risiko Sedang</span><span>fab</span></div>
+<div class="procon"><div><b>+ PRO</b>Satu gesture ke voucher/sheet global.</div><div><b>− KONTRA</b>Over-engineering P0 — sheet global P1.</div></div>
+<div class="pick"><button onclick="shortlist('BN15',this)">Shortlist BN15</button></div></div>
+</div>
+
+<div class="card" data-cat="classic" data-id="BN16">
+<div class="cardhead"><span class="id">BN16</span><h3>Split kiri-kanan quiz</h3><p>Kiri Home+Mall, kanan Tempat+Makan — penekanan dual-entry di kanan jempol.</p></div>
+<div class="phonewrap"><div class="phone"><div class="tag">HOME · BN16</div>
+<div class="p-top"><span>Halo, teman Wikendo</span><span>Login</span></div>
+<div class="p-hero"><div class="q">QUOTA HARI INI</div><div class="n">1 • 2</div><div class="s">Gratis hari ini — login buka 2 + 5</div></div>
+<div class="bnav solid"><div class="it act"><span class="ic">⌂</span>Home<span class="dot"></span></div><div class="it"><span class="ic">🏬</span>Mall</div><div class="it"><span class="ic">🗺</span>Tempat</div><div class="it"><span class="ic">🍜</span>Makan</div><div class="it"><span class="ic">👤</span>Akun</div></div>
+</div></div>
+<div class="meta"><div class="pillrow"><span>Effort S · 2h</span><span>Risiko Rendah</span><span>classic</span></div>
+<div class="procon"><div><b>+ PRO</b>Quiz di kanan = jempol kanan dominan.</div><div><b>− KONTRA</b>Urutan tak standar — perlu adaptasi.</div></div>
+<div class="pick"><button onclick="shortlist('BN16',this)">Shortlist BN16</button></div></div>
+</div>
+
+<div class="card" data-cat="badge" data-id="BN17">
+<div class="cardhead"><span class="id">BN17</span><h3>Wishlist P1 slot</h3><p>Slot ke-4 = Wishlist hati (Segera). Siapkan P1 tanpa bongkar nav.</p></div>
+<div class="phonewrap"><div class="phone"><div class="tag">HOME · BN17</div>
+<div class="p-top"><span>Halo, teman Wikendo</span><span>Login</span></div>
+<div class="p-hero"><div class="q">QUOTA HARI INI</div><div class="n">1 • 2</div><div class="s">Gratis hari ini — login buka 2 + 5</div></div>
+<div class="bnav white"><div class="it act"><span class="ic">⌂</span>Beranda</div><div class="it"><span class="ic">🗺</span>Tempat</div><div class="it"><span class="ic">🍜</span>Makan</div><div class="it"><span class="ic">❤</span>Wishlist</div><div class="it"><span class="ic">👤</span>Akun</div></div>
+</div></div>
+<div class="meta"><div class="pillrow"><span>Effort S · 2h</span><span>Risiko Rendah</span><span>badge</span></div>
+<div class="procon"><div><b>+ PRO</b>Future-proof P1 wishlist.</div><div><b>− KONTRA</b>Hari ini wishlist Segera — slot mati kecewakan.</div></div>
+<div class="pick"><button onclick="shortlist('BN17',this)">Shortlist BN17</button></div></div>
+</div>
+
+<div class="card" data-cat="badge" data-id="BN18">
+<div class="cardhead"><span class="id">BN18</span><h3>Riwayat slot real</h3><p>Slot = Riwayat (punya data real Terakhir dilihat). Tidak ada slot mati.</p></div>
+<div class="phonewrap"><div class="phone"><div class="tag">HOME · BN18</div>
+<div class="p-top"><span>Halo, teman Wikendo</span><span>Login</span></div>
+<div class="p-hero"><div class="q">QUOTA HARI INI</div><div class="n">1 • 2</div><div class="s">Gratis hari ini — login buka 2 + 5</div></div>
+<div class="bnav white"><div class="it act"><span class="ic">⌂</span>Beranda</div><div class="it"><span class="ic">🗺</span>Tempat</div><div class="it"><span class="ic">🍜</span>Makan</div><div class="it"><span class="ic">🕒</span>Riwayat</div><div class="it"><span class="ic">👤</span>Akun</div></div>
+</div></div>
+<div class="meta"><div class="pillrow"><span>Effort S · 2h</span><span>Risiko Rendah</span><span>badge</span></div>
+<div class="procon"><div><b>+ PRO</b>Semua slot hidup hari ini.</div><div><b>− KONTRA</b>Mall hilang — direktori butuh pintu.</div></div>
+<div class="pick"><button onclick="shortlist('BN18',this)">Shortlist BN18</button></div></div>
+</div>
+
+<div class="card" data-cat="minimal" data-id="BN19">
+<div class="cardhead"><span class="id">BN19</span><h3>Ultra-minimal 3-tab</h3><p>Beranda Cari Mall saja. Akun tetap di header. Paling ramping.</p></div>
+<div class="phonewrap"><div class="phone"><div class="tag">HOME · BN19</div>
+<div class="p-top"><span>Halo, teman Wikendo</span><span>Login</span></div>
+<div class="p-hero"><div class="q">QUOTA HARI INI</div><div class="n">1 • 2</div><div class="s">Gratis hari ini — login buka 2 + 5</div></div>
+<div class="bnav white"><div class="it act"><span class="ic">⌂</span>Beranda</div><div class="it"><span class="ic">🔍</span>Cari</div><div class="it"><span class="ic">🏬</span>Mall</div></div>
+</div></div>
+<div class="meta"><div class="pillrow"><span>Effort S · 1.5h</span><span>Risiko Rendah</span><span>minimal</span></div>
+<div class="procon"><div><b>+ PRO</b>Jempol super gampang, 3 target.</div><div><b>− KONTRA</b>Cari ambigu + akun tidak di nav.</div></div>
+<div class="pick"><button onclick="shortlist('BN19',this)">Shortlist BN19</button></div></div>
+</div>
+
+<div class="card" data-cat="fab" data-id="BN20">
+<div class="cardhead"><span class="id">BN20</span><h3>Superapp AI center</h3><p>Tengah = Wikendo AI (asisten mood). Home Quiz AI Mall Akun — gaya superapp.</p></div>
+<div class="phonewrap"><div class="phone"><div class="tag">HOME · BN20</div>
+<div class="p-top"><span>Halo, teman Wikendo</span><span>Login</span></div>
+<div class="p-hero"><div class="q">QUOTA HARI INI</div><div class="n">1 • 2</div><div class="s">Gratis hari ini — login buka 2 + 5</div></div>
+<div class="bnav white"><div class="it act"><span class="ic">⌂</span>Home</div><div class="it"><span class="ic">🔍</span>Quiz</div><div class="it"><span class="fab ink">🤖</span></div><div class="it"><span class="ic">🏬</span>Mall</div><div class="it"><span class="ic">👤</span>Akun</div></div>
+</div></div>
+<div class="meta"><div class="pillrow"><span>Effort M · 4h</span><span>Risiko Sedang</span><span>fab</span></div>
+<div class="procon"><div><b>+ PRO</b>AI jadi identitas superapp.</div><div><b>− KONTRA</b>AI belum P0 — center untuk fitur mentah.</div></div>
+<div class="pick"><button onclick="shortlist('BN20',this)">Shortlist BN20</button></div></div>
+</div>
+
+</div>
+<div class="sec">
+<h2>Head-to-head vs North Star (landing → quiz &gt;40%)</h2>
+<table class="h2h">
+<tr><th>Opsi</th><th>Quiz 1-tap</th><th>Split jelas</th><th>Beban kognitif</th><th>Effort</th></tr>
+<tr><td style="text-align:left"><b>BN1 ink 5-tab</b></td><td>Ya (2 tab)</td><td>Ya</td><td>Rendah</td><td>S 2h</td></tr>
+<tr><td style="text-align:left"><b>BN8 pill lime</b></td><td>Ya</td><td>Ya</td><td>Rendah</td><td>S 2h</td></tr>
+<tr><td style="text-align:left">BN4 FAB Quiz</td><td>Ya (ambigu)</td><td>Tidak</td><td>Sedang</td><td>M 3h</td></tr>
+<tr><td style="text-align:left">BN3/BN19 Cari</td><td>Tidak (2-tap)</td><td>Tidak</td><td>Sedang</td><td>S-M</td></tr>
+<tr><td style="text-align:left">BN11/BN20 center non-quiz</td><td>Tidak</td><td>Ya</td><td>Tinggi</td><td>M 3-4h</td></tr>
+</table>
+<p style="margin-top:8px">FAB tunggal selalu kalah di split tempat-vs-makan — satu tombol tidak bisa bawa dua intent quota berbeda (2/hari vs 5/hari). 5-tab eksplisit menang P0.</p>
+</div>
+<div class="recbox">
+<h2 style="font-size:15px;margin-bottom:6px">Rekomendasi tunggal: BN1 ink solid 5-tab (+ badge BN9 menyusul P1)</h2>
+<p style="font-size:13px;line-height:1.65;color:#881337">BN1 menang bisnis: 5 tujuan eksplisit (Beranda Tempat Makan Mall Akun), kontras ink-lime, slicing 1 file app.vue, NOL route baru, NOL ambiguitas split. BN8 runner-up bila wayfinding pil lime dirasa perlu. BN9 (badge quota) tempel ke BN1 sebagai P1 begitu /api/quota di-wire. Next: <b>Gua suka BN1</b> → Addendum 24 (bottom-nav) → TDD slice → push + deploy.</p>
+</div>
+</div>
+<div class="pickbar"><span>Shortlist:</span><code id="picktext">—</code><button id="copybtn">Copy</button></div>
+<script>
+var KEY='wikendo-v14-shortlist';
+function get(){try{return JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){return[]}}
+function set(v){localStorage.setItem(KEY,JSON.stringify(v))}
+function render(){var v=get();document.getElementById('picktext').textContent=v.length?('Gua suka '+v.join(', ')):'—';document.querySelectorAll('.pick button').forEach(function(b){var id=b.textContent.replace('Shortlist ','').trim();if(v.indexOf(id)>=0){b.classList.add('shortlisted');b.textContent='✓ '+id}else{b.classList.remove('shortlisted');b.textContent='Shortlist '+id}})}
+function shortlist(id,btn){var v=get();var i=v.indexOf(id);if(i>=0)v.splice(i,1);else v.push(id);set(v);render()}
+document.getElementById('copybtn').onclick=function(){var t=document.getElementById('picktext').textContent;if(navigator.clipboard&&t!=='—')navigator.clipboard.writeText(t)};
+document.querySelectorAll('#filters button').forEach(function(b){b.onclick=function(){document.querySelectorAll('#filters button').forEach(function(x){x.classList.remove('on')});b.classList.add('on');var f=b.getAttribute('data-f');document.querySelectorAll('#grid .card').forEach(function(c){c.style.display=(f==='all'||c.getAttribute('data-cat')===f)?'':'none'})}});
+render();
+</script>
+</body>
+</html>
