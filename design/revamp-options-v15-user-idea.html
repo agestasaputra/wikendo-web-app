@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wikendo v15 — evaluasi ide bottom-nav Agesta (U1 vs E1 vs E2)</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Plus Jakarta Sans',system-ui,-apple-system,sans-serif;background:#fafaf9;color:#1c1917;padding:20px 16px 140px}
+.wrap{max-width:1180px;margin:0 auto}
+.approve{background:#0C0A09;color:#fff;border-radius:16px;padding:16px 18px;margin-bottom:18px;border-left:4px solid #A3E635;font-size:13px;line-height:1.6}
+.approve b{color:#D9F99D}
+h1{font-size:22px;margin-bottom:6px}
+.sub{color:#78716c;font-size:13px;margin-bottom:14px;line-height:1.6}
+.diag{background:#fff;border:1px solid #e7e5e4;border-radius:16px;padding:16px 18px;margin-bottom:14px}
+.diag h2{font-size:15px;margin-bottom:8px}
+.diag p,.diag li{font-size:13px;line-height:1.65;color:#44403c}
+.diag ul{padding-left:18px}
+.tokens{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.tok{font-size:11px;font-weight:700;background:#f5f5f4;border:1px solid #e7e5e4;border-radius:999px;padding:4px 10px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:16px}
+.card{background:#fff;border:1px solid #e7e5e4;border-radius:20px;overflow:hidden;display:flex;flex-direction:column}
+.card.rec{border:2px solid #E11D48}
+.cardhead{padding:14px 16px 10px}
+.cardhead .id{font-size:11px;font-weight:800;letter-spacing:.06em;color:#fff;background:#0C0A09;display:inline-block;padding:3px 10px;border-radius:999px}
+.card.rec .cardhead .id{background:#E11D48}
+.cardhead h3{font-size:15px;margin:8px 0 2px}
+.cardhead p{font-size:12px;color:#78716c;line-height:1.55}
+.phonewrap{background:#f5f5f4;padding:12px}
+.phone{background:#F5F5F4;border:1px solid #e7e5e4;border-radius:22px;padding:10px 10px 0;max-width:360px;margin:0 auto;overflow:hidden}
+.phone .tag{font-size:9px;font-weight:800;letter-spacing:.06em;color:#78716c;margin-bottom:6px}
+.p-top{display:flex;justify-content:space-between;font-size:10px;font-weight:800;margin-bottom:6px}
+.p-hero{background:#0C0A09;color:#fff;border-radius:14px;padding:10px;border-left:5px solid #EA580C}
+.p-hero .q{font-size:9px;font-weight:800;opacity:.75;letter-spacing:.05em}
+.p-hero .n{font-size:18px;font-weight:800;color:#D9F99D}
+.p-cta{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}
+.p-cta div{border-radius:10px;font-size:9.5px;font-weight:800;text-align:center;padding:9px 4px;background:#0C0A09;color:#fff}
+.p-cta div:last-child{background:#fff;color:#0C0A09;border:1.5px solid #e7e5e4}
+.p-sheet{background:#fff;border:1.5px dashed #0C0A09;border-radius:12px;margin-top:8px;padding:8px;font-size:9.5px;font-weight:800}
+.p-sheet div{border-radius:8px;padding:8px;margin-top:6px;text-align:center;background:#f5f5f4;border:1px solid #e7e5e4}
+.p-sheet div:first-of-type{background:#0C0A09;color:#fff}
+.p-acc{background:#fff;border-radius:12px;margin-top:8px;padding:8px;font-size:9.5px;font-weight:800}
+.p-acc div{padding:7px 8px;border-bottom:1px solid #f5f5f4;display:flex;justify-content:space-between}
+.p-acc div:last-child{border:none}
+.p-acc .dim{color:#a8a29e}
+.p-empty{background:#fff;border:1px dashed #d6d3d1;border-radius:12px;margin-top:8px;padding:10px;font-size:9px;color:#78716c;text-align:center;line-height:1.6}
+.bnav{display:flex;align-items:flex-end;justify-content:space-around;margin:10px -10px 0;padding:8px 6px 12px;font-size:8.5px;font-weight:800}
+.bnav .it{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:52px;padding:6px 4px;color:#78716c}
+.bnav .it .ic{font-size:17px;line-height:1}
+.bnav .it.act{color:#0C0A09}
+.bnav.white{background:#fff;border-top:1px solid #e7e5e4}
+.bnav.solid{background:#0C0A09;color:#a8a29e}
+.bnav.solid .it{color:#a8a29e}
+.bnav.solid .it.act{color:#A3E635}
+.bnav .fab{width:52px;height:52px;border-radius:50%;background:#0C0A09;color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;margin-top:-26px;border:3px solid #fff;box-shadow:0 4px 12px rgba(0,0,0,.2)}
+.bnav .dot{width:5px;height:5px;border-radius:50%;background:#A3E635}
+.bnav .bdg{background:#E11D48;color:#fff;font-size:8px;border-radius:999px;padding:1px 6px;margin-left:3px}
+.warn{font-size:10px;font-weight:800;color:#E11D48;margin-top:6px;line-height:1.5}
+.ok{font-size:10px;font-weight:800;color:#15803d;margin-top:6px;line-height:1.5}
+.meta{padding:12px 16px 16px;font-size:12px}
+.pillrow{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}
+.pillrow span{font-size:10px;font-weight:800;background:#f5f5f4;border:1px solid #e7e5e4;border-radius:999px;padding:3px 9px}
+.procon{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.procon div{font-size:11px;line-height:1.55}
+.procon b{display:block;font-size:10px;letter-spacing:.05em}
+.pick{margin-top:10px;display:flex;gap:8px}
+.pick button{flex:1;border-radius:999px;padding:9px;font-size:12px;font-weight:800;cursor:pointer;border:1.5px solid #0C0A09;background:#fff}
+.pick button.shortlisted{background:#0C0A09;color:#fff}
+.sec{background:#fff;border:1px solid #e7e5e4;border-radius:16px;padding:16px 18px;margin-top:14px}
+.sec h2{font-size:15px;margin-bottom:8px}
+.sec p,.sec li{font-size:13px;line-height:1.65;color:#44403c}
+table.h2h{width:100%;border-collapse:collapse;font-size:11px;margin-top:8px}
+table.h2h th,table.h2h td{border:1px solid #e7e5e4;padding:6px 7px;text-align:center}
+table.h2h th{background:#0C0A09;color:#fff;font-size:10px}
+table.h2h td:first-child,table.h2h th:first-child{text-align:left}
+.recbox{background:#fff1f2;border:2px solid #E11D48;border-radius:16px;padding:16px 18px;margin-top:14px}
+.pickbar{position:fixed;left:12px;right:12px;bottom:12px;max-width:1140px;margin:0 auto;background:#0C0A09;color:#fff;border-radius:16px;padding:12px 16px;display:flex;gap:10px;align-items:center;font-size:12px;font-weight:700;z-index:50}
+.pickbar code{background:#1c1917;padding:6px 10px;border-radius:8px;color:#D9F99D;font-size:12px}
+.pickbar button{margin-left:auto;background:#A3E635;color:#0C0A09;border:none;border-radius:999px;padding:9px 16px;font-weight:800;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="approve">GATE v15: evaluasi ide Agesta. Semua mock di <b>design/</b>, <b>app/ NOL disentuh</b>. Pilih: balas <b>Gua suka [U1/E1/E2]</b> (= lock final) atau <b>Gua suka [Ex], tapi ada beberapa feedback: - ...</b>. Tanpa ID = belum eksekusi.</div>
+<h1>Ide Agesta vs adaptasi expert — U1 / E1 / E2</h1>
+<p class="sub">Ide Agesta: bottom Home - History - Add Quiz - Notification - Account; Add buka sheet Tempat/Makan; Account = menu Login, Wishlist, Contact us, About us. Di bawah gue jujur bedah: yang tepat dipertahankan, yang bikin tab kosong diadaptasi.</p>
+<div class="diag">
+<h2>Realita hari ini (fakta repo, bukan teori)</h2>
+<ul>
+<li><b>Ada:</b> / (home), /quiz + /makan, /result + /result-makan, /mall + /mall/[slug], /login + /register; header 2-state (anon Login/Register, login avatar + Bell); dropdown ada Riwayat (tombol) + Wishlist Segera.</li>
+<li><b>Belum ada:</b> halaman History, halaman Notifikasi + backend notif, halaman Account, halaman Wishlist real, halaman Contact, halaman About. Bell cuma untuk login, tanpa badge.</li>
+<li><b>Aturan locked:</b> split Tempat vs Makan tidak dicampur (quota 2/hari vs 5/hari); North Star landing-ke-quiz &gt;40%; tiap tab harus hidup hari ini (no dead tab).</li>
+</ul>
+<div class="tokens"><span class="tok">max-w-md</span><span class="tok">token paper/ink/lime/ember/rose</span><span class="tok">no dead tab P0</span><span class="tok">$0</span></div>
+</div>
+<div class="grid" id="grid">
+
+<div class="card" data-id="U1">
+<div class="cardhead"><span class="id">U1 • IDE AGESTA AS-IS</span><h3>Home - History - Add - Notif - Account</h3><p>Persis ide lu. Add center buka sheet Tempat/Makan. Account = menu list 4 item.</p></div>
+<div class="phonewrap"><div class="phone"><div class="tag">HOME · U1</div>
+<div class="p-top"><span>Halo, teman Wikendo</span><span>Login</span></div>
+<div class="p-hero"><div class="q">QUOTA HARI INI</div><div class="n">1 • 2</div></div>
+<div class="p-sheet">+ ADD → sheet<div>Cari Tempat (2/hari)</div><div>Cari Makan (5/hari)</div></div>
+<div class="p-acc"><div>Login <span>→</span></div><div>Wishlist <span class="dim">Segera</span></div><div>Contact us <span>→</span></div><div>About us <span>→</span></div></div>
+<div class="p-empty">History: butuh halaman baru · Notif anon: kosong (Bell hari ini login-only)</div>
+<div class="bnav white"><div class="it act"><span class="ic">⌂</span>Home</div><div class="it"><span class="ic">🕒</span>History</div><div class="it"><span class="fab">+</span></div><div class="it"><span class="ic">🔔</span>Notif</div><div class="it"><span class="ic">👤</span>Account</div></div>
+</div></div>
+<div class="meta"><div class="pillrow"><span>Effort M-L · 6-10h</span><span>4 page baru</span><span>2 tab kosong P0</span></div>
+<div class="warn">Butuh History + Notif (+backend) + Contact + About baru sebelum nav hidup.</div>
+<div class="procon"><div><b>+ PRO</b>Pattern familiar (Shopee/IG), Add center dorong quiz, Account hub scalable.</div><div><b>− KONTRA</b>Notif tanpa backend = tab mati; Mall hilang dari nav; quiz 2-tap (−15-30% konversi).</div></div>
+<div class="pick"><button onclick="shortlist('U1',this)">Shortlist U1</button></div></div>
+</div>
+
+<div class="card rec" data-id="E1">
+<div class="cardhead"><span class="id">E1 • ADAPTASI EXPERT (REKOMENDASI P0)</span><h3>Home - Mall - Quiz+ - Riwayat - Akun</h3><p>Skeleton lu dipertahankan (termasuk Add center + Account hub). 1 slot digeser: Notif → Mall. Notif tetap Bell header.</p></div>
+<div class="phonewrap"><div class="phone"><div class="tag">HOME · E1</div>
+<div class="p-top"><span>Halo, teman Wikendo</span><span>Login · 🔔</span></div>
+<div class="p-hero"><div class="q">QUOTA HARI INI</div><div class="n">1 • 2</div></div>
+<div class="p-sheet">+ QUIZ → sheet<div>Cari Tempat (2/hari)</div><div>Cari Makan (5/hari)</div></div>
+<div class="p-acc"><div>Login / Daftar <span>→</span></div><div>Riwayat <span>→</span></div><div>Wishlist <span class="dim">Segera</span></div><div>Hubungi (WA) <span>→</span></div><div>Tentang <span>→</span></div></div>
+<div class="bnav solid"><div class="it act"><span class="ic">⌂</span>Home<span class="dot"></span></div><div class="it"><span class="ic">🏬</span>Mall</div><div class="it"><span class="fab">+</span></div><div class="it"><span class="ic">🕒</span>Riwayat</div><div class="it"><span class="ic">👤</span>Akun</div></div>
+</div></div>
+<div class="meta"><div class="pillrow"><span>Effort S-M · 3-4h</span><span>0 page mati</span><span>1 hub Account</span></div>
+<div class="ok">Semua tab hidup hari ini: Riwayat = localStorage real, Mall = /mall real, WA link tanpa page baru.</div>
+<div class="procon"><div><b>+ PRO</b>80% ide lu utuh; NOL tab mati; Mall (pembeda) tetap 1-tap; Account hub siap P1.</div><div><b>− KONTRA</b>Quiz tetap 2-tap via sheet (kompromi) — terima karena center familiar.</div></div>
+<div class="pick"><button onclick="shortlist('E1',this)">Shortlist E1</button></div></div>
+</div>
+
+<div class="card" data-id="E2">
+<div class="cardhead"><span class="id">E2 • FULL P1 (NANTI)</span><h3>Home - Riwayat - Quiz - Notif - Akun</h3><p>Ide lu 100% + backend notif + History login-sync + Contact/About statis. Dijadwalkan setelah sistem ada.</p></div>
+<div class="phonewrap"><div class="phone"><div class="tag">HOME · E2 P1</div>
+<div class="p-top"><span>Halo, Siska</span><span>S · 🔔2</span></div>
+<div class="p-hero"><div class="q">SISA KAMU</div><div class="n">2 • 5</div></div>
+<div class="p-empty">Notif: promo GI −20% · voucher diklaim (butuh tabel notif + badge)</div>
+<div class="p-acc"><div>Siska (keluar) <span>→</span></div><div>Wishlist real <span>→</span></div><div>Contact <span>→</span></div><div>About <span>→</span></div></div>
+<div class="bnav white"><div class="it act"><span class="ic">⌂</span>Home</div><div class="it"><span class="ic">🕒</span>Riwayat</div><div class="it"><span class="fab">+</span></div><div class="it"><span class="ic">🔔</span>Notif<span class="bdg">2</span></div><div class="it"><span class="ic">👤</span>Akun</div></div>
+</div></div>
+<div class="meta"><div class="pillrow"><span>Effort L · 8-12h</span><span>butuh backend</span><span>P1 BACKLOG</span></div>
+<div class="procon"><div><b>+ PRO</b>Superapp lengkap saat waktunya tiba.</div><div><b>− KONTRA</b>Hari ini backend NOL — bangun sekarang = bakar sprint.</div></div>
+<div class="pick"><button onclick="shortlist('E2',this)">Shortlist E2</button></div></div>
+</div>
+
+</div>
+<div class="sec">
+<h2>Head-to-head vs North Star + kejujuran tab</h2>
+<table class="h2h">
+<tr><th>Opsi</th><th>Quiz tap</th><th>Tab mati P0</th><th>Mall 1-tap</th><th>Effort</th></tr>
+<tr><td style="text-align:left"><b>U1 as-is</b></td><td>2-tap</td><td>2 (History, Notif)</td><td>Tidak</td><td>M-L</td></tr>
+<tr><td style="text-align:left"><b>E1 adaptasi P0</b></td><td>2-tap</td><td>0</td><td>Ya</td><td>S-M</td></tr>
+<tr><td style="text-align:left"><b>E2 full P1</b></td><td>2-tap</td><td>0 (nanti)</td><td>Via Home</td><td>L</td></tr>
+</table>
+<p style="margin-top:8px">FAB center selalu 2-tap ke quiz (sheet dulu) vs 2 tab quiz eksplisit 1-tap — biaya ±15-30% konversi. E1 terima biaya ini karena pattern familiar + semua tab jujur hidup. U1 bayar biaya yang sama TAPI plus 2 tab mati + Mall hilang — itu yang gue adaptasi.</p>
+</div>
+<div class="recbox">
+<h2 style="font-size:15px;margin-bottom:6px">Rekomendasi tunggal: E1 (ide lu, 1 slot digeser)</h2>
+<p style="font-size:13px;line-height:1.65;color:#881337">Setuju 80%: skeleton 5 slot + Add center + Account hub = pola benar, familiar, scalable. Geser 1 slot P0: <b>Notif → Mall</b> (notif tetap Bell header sampai backend ada); Riwayat = localStorage "Terakhir dilihat" (real tanpa backend); Account hub anon = Login CTA, login = avatar + Keluar, Wishlist Segera disabled, Hubungi = link WA (tanpa page), Tentang = anchor footer (tanpa page). U1 naik kelas jadi E2 saat tabel notif + wishlist real ada. Next: <b>Gua suka E1</b> → Addendum 24 → TDD → push + deploy.</p>
+</div>
+</div>
+<div class="pickbar"><span>Shortlist:</span><code id="picktext">—</code><button id="copybtn">Copy</button></div>
+<script>
+var KEY='wikendo-v15-shortlist';
+function get(){try{return JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){return[]}}
+function set(v){localStorage.setItem(KEY,JSON.stringify(v))}
+function render(){var v=get();document.getElementById('picktext').textContent=v.length?('Gua suka '+v.join(', ')):'—';document.querySelectorAll('.pick button').forEach(function(b){var id=b.textContent.replace('Shortlist ','').replace('✓ ','').trim();if(v.indexOf(id)>=0){b.classList.add('shortlisted');b.textContent='✓ '+id}else{b.classList.remove('shortlisted');b.textContent='Shortlist '+id}})}
+function shortlist(id,btn){var v=get();var i=v.indexOf(id);if(i>=0)v.splice(i,1);else v.push(id);set(v);render()}
+document.getElementById('copybtn').onclick=function(){var t=document.getElementById('picktext').textContent;if(navigator.clipboard&&t!=='—')navigator.clipboard.writeText(t)};
+render();
+</script>
+</body>
+</html>
