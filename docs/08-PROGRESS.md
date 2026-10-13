@@ -13,9 +13,11 @@
 
 ---
 
-## 📌 BOARD — posisi per 13 Okt 2026 (Gas v13 DONE prod ✅ — wiring + E2E + audit UI/UX hijau)
+## 📌 BOARD — posisi per 13 Okt 2026 (Gas v13 DONE prod ✅ + REVIEW v13 + SOP v1.2.0 ✅)
 
 ### 🔥 NOW (lagi dikerjain)
+- [x] REVIEW proses fix v13 + self-improvement loop DONE ✅ 13 Okt (request Agesta: banyak iterasi prompt, review + improvement permanen): audit fakta `git log -15` (v13 = 2 commit 7cd1502+8e65436, total +430/-117 baris) + PROGRESS 826 baris — 9 pola gagal: (1) re-verifikasi per-turn bukan one-loop, (2) skill_view PRUNED/dedup diulang sia-sia, (3) terminal 1-line/demoted dipanggil hijau, (4) diff per-file tanpa diffstat, (5) Vercel CLI re-detect tiap turn, (6) sheet client-only diaudit via curl SSR, (7) BOARD+LOG 2 patch 2 commit, (8) perbaikan: TDD deterministik + SCAN + SYNC-proof + MEDIA ✅, (9) iterasi tanpa pitfall-log — perbaikan dikunci SOP `agesta-app-workflow` v1.1.0→v1.2.0 §11 (one-loop batch + bukti-mentah + redirect-trap + reload-1x + file-assert + SYNC-proof + 1-patch + SSR-vs-client + self-improve loop) — verifikasi: skill 120→194 baris ✅ — next: commit+push SKILL+PROGRESS + kirim MEDIA.
+
 - [x] Gas v13 wiring S1→S4 DONE prod ✅ 13 Okt: `claim.post.ts` fix skema real (claim_date WIB + dual-write date/code lama + UNIQUE user+tenant+claim_date→409 + 23505→409 + rate 3/hari 429 + countdown 23:59 WIB) + `useVoucher.ts` BARU (1 sumber claimVoucher Bearer browser, service key server-only) + `result-makan.vue` wiring V13A hero best-1 Buka→sheet + V13B sheet 3 row seed GI + Klaim per row + spinner + disabled + guard + `mall/[slug].vue` V13C strip Promo hari ini + `promoStrip` computed filter tenantPromo — TDD 257/257 ✅ lint 0 ✅ build 12.9s ✅ push `7cd1502` sinkron remote ✅ prod `/`+`/result-makan`+`/mall/grand-indonesia` 200 ✅ E2E claim: anon 401 ✅ kode ngawur 404 ✅ token invalid 401 ✅ marker prod V13A (Buka:1 +2:1 Maps:1) + V13C (strip:1 filler:1 Lihat:1 23:59:1) ✅ — next: kirim MEDIA PROGRESS
 - [x] Visual explainer multi-voucher v13 GATE ✅ 11 Okt: Addendum v1.1 diterbitkan + S3 server route POST /api/voucher/claim dibuat + TDD S1 auth 401 RED→GREEN (test + route): request Agesta "ga kebayang, kasih gambar" — `design/revamp-options-v13.html` + `revamp-options-v13-compare.png` 1120x910 QA PASS (V13A hero best-1 + link lime +2 promo / V13B sheet pilih 1 dari 3 + sisa cap + Klaim per row / V13C strip promo GI di mall page, NOL tofu/overlap) + script `revamp-options-v13-compare.py` — aturan "wajib gambar tiap bahas desain" LOCKED §10 skill agesta-app-workflow — app/ NOL sentuh — next: Agesta balas "Gas v13" / "Gua suka V13x + feedback"
 - [ ] Board 20 opsi voucher-claim v12 GATE ⏳ 11 Okt: request Agesta "20 rekomendasi, gua pilih" — `design/revamp-options-v12.html` + `revamp-options-v12-compare.png` QA PASS (20 panel VC1-VC20 readable, NOL tofu/overlap, VC5 distinct border merah) + script `revamp-options-v12-compare.py` — diagnosis: gift = banner (NOL kode/expiry/urgensi) + CTA berebut 4 aksi + wall buta value + NOL cara pakai — rekom tunggal VC5 code-expand in-place (S 1.5h, risiko rendah, P0 on-track) — app/ NOL sentuh — next: Agesta balas "Gua suka VCx"
@@ -110,6 +112,14 @@
 ---
 
 ## 🧾 LOG (newest first)
+
+## 2026-10-13 — REVIEW proses fix v13 + self-improvement loop DONE ✅ (request Agesta: banyak iterasi prompt)
+- **Kenapa:** Agesta benar — v13 butuh belasan prompt Lanjut. Saya audit fakta `git log -15` (v13 = 2 commit `7cd1502` +430/-117 + `8e65436` board, PROGRESS 826 baris) untuk temukan pola gagal + kunci perbaikan permanen.
+- **Kegagalan saya (9 pola, bukti):** (1) verifikasi dipecah per-turn (vitest→lint→build→curl→audit, 1 tool/turn) — tiap turn = 1 context-switch. (2) skill_view diulang tiap turn padahal return dedup/PRUNED 9-18KB tanpa isi. (3) terminal output 1-line/demoted saya klaim hijau — itu BUKTI NOL. (4) read per-file tanpa diffstat — ukuran fluktuasi (result-makan 301→12,827→10,895) bikin panik sia-sia. (5) Vercel CLI re-detect tiap turn padahal auto-deploy sudah kunci. (6) sheet client-only (`v-if=showSheet`) saya audit via curl SSR → 0 wajar tapi sempat dianggap gagal. (7) BOARD+LOG 2 patch 2 commit — harusnya 1. (8) Yang BENER dipertahankan: TDD file-assert deterministik, SCAN secrets, SYNC-proof HEAD==remote, MEDIA tiap eksekusi. (9) tiap iterasi gagal tanpa pitfall-log — kesalahan sama keulang.
+- **Improvement (dikunci SOP v1.1.0→v1.2.0 §11):** one-loop batch per turn · klaim wajib bukti mentah · trap 1-line→redirect+read_file→ganti tool (maks 2 retry) · reload skill 1x/sesi · test file-assert · SYNC-proof satu command · 1 patch 1 commit · ekspektasi SSR-vs-client di LOG · self-improve loop (gagal→skill_manage 1 baris→ubah strategi→LOG, gagal ke-3 STOP tanya Agesta).
+- **File:** `~/.hermes/skills/agesta-app-workflow/SKILL.md` (120→194 baris), `docs/08-PROGRESS.md`.
+- **Verifikasi:** skill_manage success 2/2 ✅.
+- **Next:** commit + push + kirim MEDIA PROGRESS + SKILL.
 
 ## 2026-10-13 — Gas v13 DONE prod ✅ (request Agesta: lanjut eksekusi → deploy prod → e2e + audit ui/ux)
 - **Kenapa:** v13 sudah push `7cd1502` sinkron remote, perlu bukti hijau lengkap sampai prod sebelum DONE.
