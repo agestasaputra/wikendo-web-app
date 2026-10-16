@@ -2,11 +2,38 @@
 APA: header sticky + <NuxtPage/> + footer id tentang + BottomNav 5-tab fixed dalam max-w-md thumb-zone, pb-24 anti-ketutup.
 KENAPA 1 layout dipakai 6 pages → konsisten + hemat. BottomNav global: jempol tak sampai header → nav thumb-zone; E1 5-tab Home-Mall-Quiz+-Riwayat-Akun NOL tab mati; Quiz+ buka sheet (bukan route) karena 1 tombol tak bisa bawa 2 intent quota beda.
 Contoh: footer id tentang → Akun/Tentang anchor #tentang scroll; pb-24 cegah konten ketutup nav fixed. -->
+<script setup lang="ts">
+// Header 2-state AS6 wallet-card (Addendum 22 APPROVED): anon = Login/Register, login = avatar initial + Bell + dropdown.
+import { useAuth } from '~/composables/useAuth'
+
+const { isLoggedIn, email, displayName, initial, signOut } = useAuth()
+const router = useRouter()
+const showMenu = ref(false)
+const loggingOut = ref(false)
+
+function toggleMenu() {
+  showMenu.value = !showMenu.value
+}
+
+// Logout real: signOut Supabase → tutup menu → balik / sebagai anon. Guard anti double-klik + spinner Keluar.
+async function handleLogout() {
+  if (loggingOut.value) return
+  loggingOut.value = true
+  try {
+    await signOut()
+    showMenu.value = false
+    router.push('/')
+  } finally {
+    loggingOut.value = false
+  }
+}
+</script>
+
 <template>
   <div class="min-h-screen bg-base text-ink pb-24" style="font-family:'Plus Jakarta Sans',system-ui,sans-serif">
     <header class="bg-white sticky top-0 z-40 shadow-sm relative">
       <div class="container mx-auto px-4 py-3 flex justify-between items-center max-w-md">
-        <NuxtLink to="/" class="flex items-center" aria-label="Wikendo — beranda"><img src="/brand-icon-day.png" alt="Wikendo" width="32" height="32" class="rounded-lg" /></NuxtLink>
+        <NuxtLink to="/" class="flex items-center" aria-label="Wikendo — beranda"><img src="/brand-icon-day.png" alt="Wikendo" width="32" height="32" class="rounded-lg"></NuxtLink>
         <div v-if="!isLoggedIn" class="flex gap-3 items-center">
           <button type="button" aria-label="Login" class="text-sm font-bold leading-none text-red-600 hover:text-orange-500" @click="$router.push('/login')">Login</button>
           <button type="button" aria-label="Register" class="text-sm font-bold leading-none text-orange-600 hover:text-red-500" @click="$router.push('/register')">Register</button>
@@ -33,29 +60,3 @@ Contoh: footer id tentang → Akun/Tentang anchor #tentang scroll; pb-24 cegah k
     <BottomNav />
   </div>
 </template>
-
-<script setup lang="ts">
-// Header 2-state AS6 wallet-card (Addendum 22 APPROVED): anon = Login/Register, login = avatar initial + Bell + dropdown.
-import { useAuth } from '~/composables/useAuth'
-const { isLoggedIn, email, displayName, initial, signOut } = useAuth()
-const router = useRouter()
-const showMenu = ref(false)
-const loggingOut = ref(false)
-
-function toggleMenu() {
-  showMenu.value = !showMenu.value
-}
-
-// Logout real: signOut Supabase → tutup menu → balik / sebagai anon. Guard anti double-klik + spinner Keluar.
-async function handleLogout() {
-  if (loggingOut.value) return
-  loggingOut.value = true
-  try {
-    await signOut()
-    showMenu.value = false
-    router.push('/')
-  } finally {
-    loggingOut.value = false
-  }
-}
-</script>

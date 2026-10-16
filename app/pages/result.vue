@@ -2,6 +2,72 @@
 APA: header Hasil + 5 rekomendasi + hero photo + badge BEST lime + strip ember + Navigasi ink/Simpan/Share + chips + rank #1-3 + quota note. Base paper #F5F5F4, kartu 24px.
 KENAPA R3b 1:1: lime=nilai (best/rating) + ember=strip + ink=aksi (footnote spec), token lock via getResultTempatMeta (1 sumber, tested). Lock Split: TEMPAT saja, 0 tenant. Simpan = login wall momen #2.
 Contoh: hero Rooftop Senayan — Senayan 4.8 sunset+live music → Navigasi → chips Lainnya geser deck 1→5 tanpa fetch ulang. -->
+<script setup lang="ts">
+import type { TempatRecommendation } from '~/types'
+import { getResultTempatMeta } from '~/utils/quiz-logic'
+
+const route = useRoute()
+const { data, pending, error, refresh } = await useFetch<{ recommendations: TempatRecommendation[], quota_remaining?: number }>('/api/tempat/recommend', {
+  method: 'POST',
+  body: route.query
+})
+const list = computed(() => data.value?.recommendations || [])
+const idx = ref(0)
+const wallNote = ref(false)
+const errorMessage = computed(() => getErrorMessage(error.value, 'Gagal generate.'))
+const isWall = computed(() => /login/i.test(errorMessage.value) || getErrorStatus(error.value) === 403)
+// Quota real: sisa dari response POST (quota_remaining). Anon limit tempat 1x → sukses = 0/1 (habis hari ini, jujur).
+const quotaLeft = computed(() => data.value?.quota_remaining)
+const quotaLabel = computed(() => isWall.value ? '1/1 habis 🔒' : (quotaLeft.value ?? 1) + '/1')
+// R3b token lock (tested): strip ember + best lime + aksi ink + Lainnya ink/lime.
+const meta = getResultTempatMeta()
+const hero = computed(() => {
+  const r = list.value[idx.value] || ({} as TempatRecommendation)
+  const area = (r as { location_area?: string }).location_area || '—'
+  const short = area.split(',')[0].split(' ')[0].replace(/[^A-Za-z]/g, '').toUpperCase() || 'JKT'
+  return { name: r.name || '—', category: r.category || 'tempat', reason: r.reason || '—', cost: (r as { estimated_cost?: string }).estimated_cost || '—', area, areaLabel: short, time: (r as { best_time?: string }).best_time || '—', rating: '4.8', vibe: (r.reason || 'sunset + live music').slice(0, 24), emoji: ['🌇', '☕', '🌳', '🎡', '🌊'][idx.value % 5], bg: ['linear-gradient(140deg,#ffedd5,#fdba74)', 'linear-gradient(140deg,#fef3c7,#fcd34d)', 'linear-gradient(140deg,#dcfce7,#86efac)', 'linear-gradient(140deg,#e0e7ff,#a5b4fc)', 'linear-gradient(140deg,#cffafe,#67e8f9)'][idx.value % 5] }
+})
+const minis = computed(() => list.value.slice(1, 3).map(r => ((r.name || '').slice(0, 6).trim() + '...')))
+const rankTop3 = computed(() => list.value.slice(0, 3))
+const mapsUrl = computed(() => 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent((hero.value.name || '') + ' Jakarta'))
+function next() {
+  if (list.value.length) idx.value = (idx.value + 1) % list.value.length
+}
+function share() {
+  const t = hero.value.name + ' via Wikendo'
+  if (navigator.share) navigator.share({ title: t, text: t, url: location.href }).catch(() => {})
+  else {
+    navigator.clipboard?.writeText(location.href)
+    wallNote.value = true
+  }
+}
+
+// E1 riwayat: tulis 1 entry ke wikendo_history pas data sukses (guard window + cap 20 + dedupe)
+type HistEntryTempat = { kind: 'tempat' | 'makan', title: string, sub: string, at: number }
+function pushHistoryTempat() {
+  if (typeof window === 'undefined') return
+  try {
+    const r = list.value[0] as unknown as Record<string, unknown>
+    if (!r) return
+    const title = String((r as { name?: unknown }).name || '—')
+    const sub = String((r as { location_area?: unknown }).location_area || (r as { category?: unknown }).category || '')
+    const raw = window.localStorage.getItem('wikendo_history')
+    let arr: HistEntryTempat[] = []
+    try {
+      arr = raw ? (JSON.parse(raw) as HistEntryTempat[]) : []
+    } catch { /* ignore parse */ }
+    if (!Array.isArray(arr)) arr = []
+    if (arr.some(x => x.title === title)) return
+    arr.unshift({ kind: 'tempat', title, sub, at: Date.now() })
+    if (arr.length > 20) arr = arr.slice(0, 20)
+    window.localStorage.setItem('wikendo_history', JSON.stringify(arr))
+  } catch { /* ignore storage */ }
+}
+watch(() => list.value.length, (n) => {
+  if (n) pushHistoryTempat()
+})
+</script>
+
 <template>
   <div class="max-w-md mx-auto px-4 pb-10" :style="{ background: meta.pageBg }">
     <div class="flex justify-between items-center font-bold text-[13px] py-3">
@@ -60,60 +126,3 @@ Contoh: hero Rooftop Senayan — Senayan 4.8 sunset+live music → Navigasi → 
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-import type { TempatRecommendation } from '~/types'
-import { getResultTempatMeta } from '~/utils/quiz-logic'
-const route = useRoute()
-const { data, pending, error, refresh } = await useFetch<{ recommendations: TempatRecommendation[], quota_remaining?: number }>('/api/tempat/recommend', {
-  method: 'POST',
-  body: route.query
-})
-const list = computed(() => data.value?.recommendations || [])
-const idx = ref(0)
-const wallNote = ref(false)
-const errMsg = computed(() => (error.value as unknown as { data?: { message?: string }, message?: string })?.data?.message || (error.value as unknown as { message?: string })?.message || 'Gagal generate.')
-const errorMessage = computed(() => String(errMsg.value))
-const isWall = computed(() => /login/i.test(errorMessage.value) || (error.value as unknown as { statusCode?: number })?.statusCode === 403)
-// Quota real: sisa dari response POST (quota_remaining). Anon limit tempat 1x → sukses = 0/1 (habis hari ini, jujur).
-const quotaLeft = computed(() => data.value?.quota_remaining)
-const quotaLabel = computed(() => isWall.value ? '1/1 habis 🔒' : (quotaLeft.value ?? 1) + '/1')
-// R3b token lock (tested): strip ember + best lime + aksi ink + Lainnya ink/lime.
-const meta = getResultTempatMeta()
-const hero = computed(() => {
-  const r = list.value[idx.value] || ({} as TempatRecommendation)
-  const area = (r as { location_area?: string }).location_area || '—'
-  const short = area.split(',')[0].split(' ')[0].replace(/[^A-Za-z]/g, '').toUpperCase() || 'JKT'
-  return { name: r.name || '—', category: r.category || 'tempat', reason: r.reason || '—', cost: (r as { estimated_cost?: string }).estimated_cost || '—', area, areaLabel: short, time: (r as { best_time?: string }).best_time || '—', rating: '4.8', vibe: (r.reason || 'sunset + live music').slice(0, 24), emoji: ['🌇', '☕', '🌳', '🎡', '🌊'][idx.value % 5], bg: ['linear-gradient(140deg,#ffedd5,#fdba74)', 'linear-gradient(140deg,#fef3c7,#fcd34d)', 'linear-gradient(140deg,#dcfce7,#86efac)', 'linear-gradient(140deg,#e0e7ff,#a5b4fc)', 'linear-gradient(140deg,#cffafe,#67e8f9)'][idx.value % 5] }
-})
-const minis = computed(() => list.value.slice(1, 3).map(r => ((r.name || '').slice(0, 6).trim() + '...')))
-const rankTop3 = computed(() => list.value.slice(0, 3))
-const mapsUrl = computed(() => 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent((hero.value.name || '') + ' Jakarta'))
-function next() { if (list.value.length) idx.value = (idx.value + 1) % list.value.length }
-function share() {
-  const t = hero.value.name + ' via Wikendo'
-  if (navigator.share) navigator.share({ title: t, text: t, url: location.href }).catch(() => {})
-  else { navigator.clipboard?.writeText(location.href); wallNote.value = true }
-}
-
-// E1 riwayat: tulis 1 entry ke wikendo_history pas data sukses (guard window + cap 20 + dedupe)
-type HistEntryTempat = { kind: 'tempat' | 'makan'; title: string; sub: string; at: number }
-function pushHistoryTempat() {
-  if (typeof window === 'undefined') return
-  try {
-    const r = list.value[0] as unknown as Record<string, unknown>
-    if (!r) return
-    const title = String((r as { name?: unknown }).name || '—')
-    const sub = String((r as { location_area?: unknown }).location_area || (r as { category?: unknown }).category || '')
-    const raw = window.localStorage.getItem('wikendo_history')
-    let arr: HistEntryTempat[] = []
-    try { arr = raw ? (JSON.parse(raw) as HistEntryTempat[]) : [] } catch { /* ignore parse */ }
-    if (!Array.isArray(arr)) arr = []
-    if (arr.some((x) => x.title === title)) return
-    arr.unshift({ kind: 'tempat', title, sub, at: Date.now() })
-    if (arr.length > 20) arr = arr.slice(0, 20)
-    window.localStorage.setItem('wikendo_history', JSON.stringify(arr))
-  } catch { /* ignore storage */ }
-}
-watch(() => list.value.length, (n) => { if (n) pushHistoryTempat() })
-</script>

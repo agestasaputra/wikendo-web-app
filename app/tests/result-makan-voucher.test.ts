@@ -31,7 +31,7 @@ describe('result-makan voucher — tiket atas dihapus', () => {
     expect(S).toContain('buat lu')
     expect(S).toContain('Buka →')
     expect(S).toContain('vGift')
-    expect(S).toContain("getVoucherCardMeta('gift')")
+    expect(S).toContain('getVoucherCardMeta(\'gift\')')
   })
 
   it('HANYA 1 voucher: Buka → muncul tepat 1x (bawah bersih)', () => {

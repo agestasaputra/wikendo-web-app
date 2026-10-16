@@ -49,7 +49,7 @@ describe('register revamp 100% image — struktur + teks persis', () => {
     const s = readRegister()
     expect(s).not.toContain('placeholder="Nama"')
     expect(s).not.toContain('👤')
-    expect(s).not.toContain("nama = ref('')")
+    expect(s).not.toContain('nama = ref(\'\')')
     expect(s).not.toContain('nama:')
     expect(s).toContain('placeholder="Email"')
     expect(s).toContain('placeholder="Password"')

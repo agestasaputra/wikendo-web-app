@@ -25,7 +25,7 @@ describe('Google Auth satu pintu — label netral sama', () => {
     it(`${f}: label lama hilang (Daftar via / Lanjut dengan)`, () => {
       const s = readPage(f)
       expect(s).not.toContain('Daftar via Google')
-      expect(s).not.toContain("'Lanjut dengan Google'")
+      expect(s).not.toContain('\'Lanjut dengan Google\'')
     })
   }
 })

@@ -38,14 +38,14 @@ export function filterTenantsByKeyword<T extends { name: string }>(
   keyword: string
 ): T[] {
   const kw = keyword.toLowerCase()
-  return tenants.filter((t) => t.name.toLowerCase().includes(kw))
+  return tenants.filter(t => t.name.toLowerCase().includes(kw))
 }
 
 /** Bikin link Google Maps buat 1 tenant. Dipakai di recommend.post.ts. */
 export function buildMapsUrl(tenantName: string, mallSlug: string): string {
   return (
-    'https://www.google.com/maps/search/' +
-    encodeURIComponent(`${tenantName} ${mallSlug}`)
+    'https://www.google.com/maps/search/'
+    + encodeURIComponent(`${tenantName} ${mallSlug}`)
   )
 }
 
@@ -318,7 +318,7 @@ export const INFINITE_MAX_LIMIT = 50
 export function parsePaginationParams(
   query: Record<string, unknown>,
   defaultLimit: number = INFINITE_DEFAULT_LIMIT
-): { limit: number; offset: number } {
+): { limit: number, offset: number } {
   const rawLimit = Array.isArray(query.limit) ? query.limit[0] : query.limit
   const rawOffset = Array.isArray(query.offset) ? query.offset[0] : query.offset
   let limit = parseInt(String(rawLimit ?? ''), 10)
@@ -399,7 +399,7 @@ export function getResultMakanMeta(): ResultMakanMeta {
 /** Area full → pendek 1:1 D1: segmen '/' terpendek (Thamrin, Grogol). Kosong → ''. */
 export function shortArea(area: string | undefined): string {
   if (!area) return ''
-  const segs = area.split('/').map((s) => s.trim()).filter(Boolean)
+  const segs = area.split('/').map(s => s.trim()).filter(Boolean)
   if (!segs.length) return ''
   let out = segs[0]
   for (const s of segs) {

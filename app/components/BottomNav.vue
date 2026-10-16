@@ -2,6 +2,32 @@
 APA: 5 tab max-w-md fixed bottom (aktif lime #A3E635 + dot) + Quiz+ center BUKAN route → sheet 2 intent quota jujur.
 KENAPA: jempol tak sampai header; 1 tombol tak bisa bawa 2 intent quota beda (tempat 2/hari vs makan 5/hari) tanpa bohong → cost 2-tap diterima.
 Contoh: tap + → sheet → Cari Tempat (sisa 1/1) → /quiz; habis → disabled Besok lagi 00.00. -->
+<script setup lang="ts">
+import type { QuotaStatus } from '~/types'
+import { buildQuotaStatus } from '~/utils/quiz-logic'
+
+const route = useRoute()
+const showSheet = ref(false)
+
+// Quota ikut GET /api/quota yang sudah ada (pola SAMA kayak index.vue). Gagal = fallback anon fresh 1 • 2, bukan angka bohong.
+const { data: quotaData } = await useFetch<QuotaStatus>('/api/quota')
+const quotaStatus = computed(() => quotaData.value || buildQuotaStatus({ tempatUsed: 0, makanUsed: 0, isLoggedIn: false }))
+const tempatLeft = computed(() => quotaStatus.value.tempat.remaining)
+const tempatLimit = computed(() => quotaStatus.value.tempat.limit)
+const makanLeft = computed(() => quotaStatus.value.makan.remaining)
+const makanLimit = computed(() => quotaStatus.value.makan.limit)
+
+function isActive(p: string) {
+  if (p === '/') return route.path === '/'
+  return route.path === p || route.path.startsWith(p + '/')
+}
+
+function go(p: string) {
+  showSheet.value = false
+  navigateTo(p)
+}
+</script>
+
 <template>
   <nav aria-label="Pilih jenis quiz dan navigasi" class="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-stone-200">
     <div class="max-w-md mx-auto px-2 pt-1.5 flex items-end justify-between" style="padding-bottom:calc(10px + env(safe-area-inset-bottom))">
@@ -55,29 +81,3 @@ Contoh: tap + → sheet → Cari Tempat (sisa 1/1) → /quiz; habis → disabled
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-import type { QuotaStatus } from '~/types'
-import { buildQuotaStatus } from '~/utils/quiz-logic'
-
-const route = useRoute()
-const showSheet = ref(false)
-
-// Quota ikut GET /api/quota yang sudah ada (pola SAMA kayak index.vue). Gagal = fallback anon fresh 1 • 2, bukan angka bohong.
-const { data: quotaData } = await useFetch<QuotaStatus>('/api/quota')
-const quotaStatus = computed(() => quotaData.value || buildQuotaStatus({ tempatUsed: 0, makanUsed: 0, isLoggedIn: false }))
-const tempatLeft = computed(() => quotaStatus.value.tempat.remaining)
-const tempatLimit = computed(() => quotaStatus.value.tempat.limit)
-const makanLeft = computed(() => quotaStatus.value.makan.remaining)
-const makanLimit = computed(() => quotaStatus.value.makan.limit)
-
-function isActive(p: string) {
-  if (p === '/') return route.path === '/'
-  return route.path === p || route.path.startsWith(p + '/')
-}
-
-function go(p: string) {
-  showSheet.value = false
-  navigateTo(p)
-}
-</script>

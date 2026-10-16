@@ -28,7 +28,7 @@ export async function callLLM(system: string, user: string): Promise<string> {
   const apiKey = provider.kind === 'cf' ? (config.cfApiToken as string) : (config.hermesApiKey as string)
   const res = await $fetch<LLMChatResponse>(provider.url, {
     method: 'POST',
-    headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+    headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
     body: { model: provider.model, messages: [{ role: 'system', content: system }, { role: 'user', content: user }], temperature: 0.7, max_tokens: 2000 },
     timeout: 15000
   })

@@ -8,7 +8,7 @@ import {
 } from '../utils/quiz-logic'
 
 describe('parseAnonTempatUsed (cookie quota_used → 0|1)', () => {
-  it("'1' = 1 (jatah anon tempat habis)", () => {
+  it('\'1\' = 1 (jatah anon tempat habis)', () => {
     expect(parseAnonTempatUsed('1')).toBe(1)
   })
 
@@ -16,7 +16,7 @@ describe('parseAnonTempatUsed (cookie quota_used → 0|1)', () => {
     expect(parseAnonTempatUsed(undefined)).toBe(0)
   })
 
-  it("'0' = 0", () => {
+  it('\'0\' = 0', () => {
     expect(parseAnonTempatUsed('0')).toBe(0)
   })
 
@@ -30,15 +30,15 @@ describe('parseAnonMakanUsed (cookie makan_quota_used → 0|1|2)', () => {
     expect(parseAnonMakanUsed(undefined)).toBe(0)
   })
 
-  it("'1' = 1", () => {
+  it('\'1\' = 1', () => {
     expect(parseAnonMakanUsed('1')).toBe(1)
   })
 
-  it("'2' = 2 (jatah anon makan habis)", () => {
+  it('\'2\' = 2 (jatah anon makan habis)', () => {
     expect(parseAnonMakanUsed('2')).toBe(2)
   })
 
-  it("'99' dijepit ke 2 (clamp, anti-curang cookie)", () => {
+  it('\'99\' dijepit ke 2 (clamp, anti-curang cookie)', () => {
     expect(parseAnonMakanUsed('99')).toBe(2)
   })
 

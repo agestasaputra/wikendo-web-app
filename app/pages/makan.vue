@@ -2,6 +2,56 @@
   APA: engine swipe SAMA kayak quiz tempat, Q beda (mall wajib → misi → budget → rombongan+toggle), aksen Merah #ee2c4b.
   KENAPA: codebase 1x, bukan 2x (reuse engine ~10 jam hemat). Q1 mall wajib biar hasil murni tenant situ (Split PRD).
   Contoh: dibuka dari direktori (/makan?mall=gi) → Q1 di-skip otomatis via getMakanStartStep. -->
+<script setup lang="ts">
+import { isLastStep, getMakanStartStep, getQuizHeaderMeta, getQuizSegState, getMallShortLabel } from '~/utils/quiz-logic'
+
+const route = useRoute()
+const questions = [
+  { id: 'mall_slug', question: 'Makan di mall mana? 📍', options: [
+    { icon: '🏬', label: 'Grand Indonesia', desc: '40 tenant • Thamrin', value: 'grand-indonesia' },
+    { icon: '🏬', label: 'Central Park', desc: 'Grogol, Jakbar', value: 'central-park' },
+    { icon: '🏬', label: 'Kota Kasablanka', desc: 'Tebet, Jaksel', value: 'kota-kasablanka' },
+    { icon: '🏬', label: 'Pondok Indah Mall', desc: 'PIM, Jaksel', value: 'pondok-indah-mall' },
+    { icon: '🏬', label: 'Aeon BSD', desc: 'BSD, Tangerang', value: 'aeon-bsd' }
+  ] },
+  { id: 'mission', question: 'Misi makan kali ini? 🎯', options: [
+    { icon: '⚡', label: 'Makan Cepat', desc: 'Laper, langsung makan', value: 'makan_cepat' },
+    { icon: '☕', label: 'Nongkrong Lama', desc: 'Ngobrol, kerja, kopi', value: 'nongkrong_lama' },
+    { icon: '👨‍👩‍👧', label: 'Keluarga', desc: 'Ajak anak / rame', value: 'keluarga' },
+    { icon: '🧘', label: 'Healing', desc: 'Me time, santai', value: 'healing' }
+  ] },
+  { id: 'budget_tier', question: 'Budget per orang? 💰', options: [
+    { icon: '💰', label: 'Hemat', desc: '< Rp 50.000', value: 'hemat' },
+    { icon: '💰💰', label: 'Menengah', desc: 'Rp 50-150rb', value: 'menengah' },
+    { icon: '💰💰💰', label: 'Leluasa', desc: '> Rp 150.000', value: 'leluasa' }
+  ] },
+  { id: 'companion', question: 'Rombongan + pantangan? 👥', toggles: true, options: [
+    { icon: '🧘', label: 'Sendiri', desc: 'Me time', value: 'sendiri' },
+    { icon: '💑', label: 'Berdua', desc: 'Pasangan / teman', value: 'berdua' },
+    { icon: '👥', label: 'Rame-rame', desc: '3+ orang', value: 'rame' }
+  ] }
+]
+const validSlugs = questions[0].options.map(o => o.value)
+const startStep = getMakanStartStep(route.query.mall as string | undefined, validSlugs)
+const step = ref(startStep)
+const answers = reactive<Record<string, string>>(
+  route.query.mall ? { mall_slug: route.query.mall as string } : {}
+)
+const halalOnly = ref(false)
+const kidsFriendly = ref(false)
+const q = computed(() => questions[step.value])
+// M3d: header ink + label putih + dot rose, segmen blok lime + chip mall (helper tested).
+const headMeta = getQuizHeaderMeta('makan')
+const segState = computed(() => getQuizSegState(step.value, questions.length))
+const mallShort = computed(() => answers.mall_slug ? getMallShortLabel(answers.mall_slug) : '')
+const router = useRouter()
+function select(v: string) {
+  answers[questions[step.value].id] = v
+  if (!isLastStep(step.value, questions.length)) step.value++
+  else router.push({ path: '/result-makan', query: { ...answers, halal_only: String(halalOnly.value), kids_friendly: String(kidsFriendly.value) } })
+}
+</script>
+
 <template>
   <div class="max-w-md mx-auto px-4 pb-10 min-h-[80vh] flex flex-col" style="background:#F5F5F4">
     <div class="flex justify-between items-center font-bold text-[13px] py-3">
@@ -29,7 +79,7 @@
         :style="answers.mall_slug === o.value || (!answers.mall_slug && o.value === 'grand-indonesia') ? 'background:#ee2c4b;color:#fff;border-color:#ee2c4b' : 'border-color:#e4e4e7'"
         @click="select(o.value)"
       >
-        {{ o.label.replace('Grand Indonesia','GI').replace('Central Park','CP').replace('Kota Kasablanka','Kokas').replace('Pondok Indah Mall','PIM').replace('Aeon BSD','Aeon') }}
+        {{ o.label.replace('Grand Indonesia', 'GI').replace('Central Park', 'CP').replace('Kota Kasablanka', 'Kokas').replace('Pondok Indah Mall', 'PIM').replace('Aeon BSD', 'Aeon') }}
       </button>
     </div>
 
@@ -58,52 +108,3 @@
     <button v-if="step > startStep" class="mt-2 text-gray-500 text-sm" @click="step--">← Kembali</button>
   </div>
 </template>
-
-<script setup lang="ts">
-import { isLastStep, getMakanStartStep, getQuizHeaderMeta, getQuizSegState, getMallShortLabel } from '~/utils/quiz-logic'
-const route = useRoute()
-const questions = [
-  { id: 'mall_slug', question: 'Makan di mall mana? 📍', options: [
-    { icon: '🏬', label: 'Grand Indonesia', desc: '40 tenant • Thamrin', value: 'grand-indonesia' },
-    { icon: '🏬', label: 'Central Park', desc: 'Grogol, Jakbar', value: 'central-park' },
-    { icon: '🏬', label: 'Kota Kasablanka', desc: 'Tebet, Jaksel', value: 'kota-kasablanka' },
-    { icon: '🏬', label: 'Pondok Indah Mall', desc: 'PIM, Jaksel', value: 'pondok-indah-mall' },
-    { icon: '🏬', label: 'Aeon BSD', desc: 'BSD, Tangerang', value: 'aeon-bsd' }
-  ]},
-  { id: 'mission', question: 'Misi makan kali ini? 🎯', options: [
-    { icon: '⚡', label: 'Makan Cepat', desc: 'Laper, langsung makan', value: 'makan_cepat' },
-    { icon: '☕', label: 'Nongkrong Lama', desc: 'Ngobrol, kerja, kopi', value: 'nongkrong_lama' },
-    { icon: '👨‍👩‍👧', label: 'Keluarga', desc: 'Ajak anak / rame', value: 'keluarga' },
-    { icon: '🧘', label: 'Healing', desc: 'Me time, santai', value: 'healing' }
-  ]},
-  { id: 'budget_tier', question: 'Budget per orang? 💰', options: [
-    { icon: '💰', label: 'Hemat', desc: '< Rp 50.000', value: 'hemat' },
-    { icon: '💰💰', label: 'Menengah', desc: 'Rp 50-150rb', value: 'menengah' },
-    { icon: '💰💰💰', label: 'Leluasa', desc: '> Rp 150.000', value: 'leluasa' }
-  ]},
-  { id: 'companion', question: 'Rombongan + pantangan? 👥', toggles: true, options: [
-    { icon: '🧘', label: 'Sendiri', desc: 'Me time', value: 'sendiri' },
-    { icon: '💑', label: 'Berdua', desc: 'Pasangan / teman', value: 'berdua' },
-    { icon: '👥', label: 'Rame-rame', desc: '3+ orang', value: 'rame' }
-  ]}
-]
-const validSlugs = questions[0].options.map(o => o.value)
-const startStep = getMakanStartStep(route.query.mall as string | undefined, validSlugs)
-const step = ref(startStep)
-const answers = reactive<Record<string, string>>(
-  route.query.mall ? { mall_slug: route.query.mall as string } : {}
-)
-const halalOnly = ref(false)
-const kidsFriendly = ref(false)
-const q = computed(() => questions[step.value])
-// M3d: header ink + label putih + dot rose, segmen blok lime + chip mall (helper tested).
-const headMeta = getQuizHeaderMeta('makan')
-const segState = computed(() => getQuizSegState(step.value, questions.length))
-const mallShort = computed(() => answers.mall_slug ? getMallShortLabel(answers.mall_slug) : '')
-const router = useRouter()
-function select(v: string) {
-  answers[questions[step.value].id] = v
-  if (!isLastStep(step.value, questions.length)) step.value++
-  else router.push({ path: '/result-makan', query: { ...answers, halal_only: String(halalOnly.value), kids_friendly: String(kidsFriendly.value) } })
-}
-</script>

@@ -46,7 +46,7 @@ export default defineEventHandler(async (event) => {
       reason: r.reason,
       maps_url: buildMapsUrl(t.name, body.mall_slug),
       data_source: t.data_source || 'curated',
-      needs_survey: t.needs_survey ?? (t.halal == null || t.kids_friendly == null || t.hype_tiktok == null),
+      needs_survey: t.needs_survey ?? (t.halal == null || t.kids_friendly == null || t.hype_tiktok == null)
     }
   })
 

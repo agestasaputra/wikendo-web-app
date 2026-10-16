@@ -15,8 +15,8 @@ export interface VoucherClaimResult {
   status: string
   claim_code: string
   expires_at: string
-  voucher: { name: string; discount_percent: number }
-  time_remaining: { hours: number; minutes: number; expired: boolean }
+  voucher: { name: string, discount_percent: number }
+  time_remaining: { hours: number, minutes: number, expired: boolean }
 }
 
 export function useVoucher() {
@@ -36,13 +36,12 @@ export function useVoucher() {
       const res = await $fetch<VoucherClaimResult>('/api/voucher/claim', {
         method: 'POST',
         body: { voucher_code: code },
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
+        headers: token ? { Authorization: `Bearer ${token}` } : {}
       })
       claimedCode.value = res.claim_code
       return res
     } catch (e: unknown) {
-      const msg = (e as { data?: { message?: string }; message?: string })?.data?.message || (e as { message?: string })?.message || 'Gagal klaim. Coba lagi.'
-      claimError.value = String(msg)
+      claimError.value = getErrorMessage(e, 'Gagal klaim. Coba lagi.')
       throw e
     } finally {
       claiming.value = false

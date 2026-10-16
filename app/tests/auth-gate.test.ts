@@ -15,15 +15,15 @@ describe('normalizePhone (API §register: trim, kosong → null)', () => {
     expect(normalizePhone(undefined)).toBeNull()
   })
 
-  it("'' → null", () => {
+  it('\'\' → null', () => {
     expect(normalizePhone('')).toBeNull()
   })
 
-  it("'   ' → null", () => {
+  it('\'   \' → null', () => {
     expect(normalizePhone('   ')).toBeNull()
   })
 
-  it("' +628123456789 ' → trimmed", () => {
+  it('\' +628123456789 \' → trimmed', () => {
     expect(normalizePhone(' +628123456789 ')).toBe('+628123456789')
   })
 })
@@ -37,37 +37,37 @@ describe('isPhoneValid (Schema CHECK: NULL lolos, isi wajib +62)', () => {
     expect(isPhoneValid(undefined)).toBe(true)
   })
 
-  it("'' → true (kosong = skip)", () => {
+  it('\'\' → true (kosong = skip)', () => {
     expect(isPhoneValid('')).toBe(true)
   })
 
-  it("'+628123456789' → true", () => {
+  it('\'+628123456789\' → true', () => {
     expect(isPhoneValid('+628123456789')).toBe(true)
   })
 
-  it("'08123456789' → false (tanpa +62)", () => {
+  it('\'08123456789\' → false (tanpa +62)', () => {
     expect(isPhoneValid('08123456789')).toBe(false)
   })
 
-  it("'+62abc' → false", () => {
+  it('\'+62abc\' → false', () => {
     expect(isPhoneValid('+62abc')).toBe(false)
   })
 
-  it("'+62123' → false (kependekan)", () => {
+  it('\'+62123\' → false (kependekan)', () => {
     expect(isPhoneValid('+62123')).toBe(false)
   })
 
-  it("'+62 + 14 digit' → false (kepanjangan)", () => {
+  it('\'+62 + 14 digit\' → false (kepanjangan)', () => {
     expect(isPhoneValid('+6212345678901234')).toBe(false)
   })
 })
 
 describe('voucher code WIK-XXXXX (API §16 claim)', () => {
-  it("'WIK-HB7K2' → valid (contoh spek)", () => {
+  it('\'WIK-HB7K2\' → valid (contoh spek)', () => {
     expect(isVoucherCodeValid('WIK-HB7K2')).toBe(true)
   })
 
-  it("'WIK-12345' → valid (digit semua)", () => {
+  it('\'WIK-12345\' → valid (digit semua)', () => {
     expect(isVoucherCodeValid('WIK-12345')).toBe(true)
   })
 
@@ -75,15 +75,15 @@ describe('voucher code WIK-XXXXX (API §16 claim)', () => {
     expect(isVoucherCodeValid(undefined)).toBe(false)
   })
 
-  it("'wik-hb7k2' → false (lowercase)", () => {
+  it('\'wik-hb7k2\' → false (lowercase)', () => {
     expect(isVoucherCodeValid('wik-hb7k2')).toBe(false)
   })
 
-  it("'WIK-HB72' → false (cuma 4 char)", () => {
+  it('\'WIK-HB72\' → false (cuma 4 char)', () => {
     expect(isVoucherCodeValid('WIK-HB72')).toBe(false)
   })
 
-  it("generateVoucherCode() → format valid + prefix WIK-", () => {
+  it('generateVoucherCode() → format valid + prefix WIK-', () => {
     const code = generateVoucherCode()
     expect(code.startsWith('WIK-')).toBe(true)
     expect(code).toHaveLength(9)

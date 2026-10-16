@@ -65,7 +65,7 @@ describe('auth-state-home — header 2-state (avatar + dropdown, max-w-md tetap)
   it('logout real: signOut + balik ke /', () => {
     const s = readSafe(APP_VUE)
     expect(s).toContain('signOut')
-    expect(s).toContain("push('/')")
+    expect(s).toContain('push(\'/\')')
   })
 })
 

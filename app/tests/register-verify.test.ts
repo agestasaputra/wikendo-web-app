@@ -63,7 +63,7 @@ describe('opsi B magic-link — halaman /check-email', () => {
     const s = readCheck()
     expect(s).toContain('Kirim ulang')
     expect(s).toContain('resend')
-    expect(s).toContain("'signup'")
+    expect(s).toContain('\'signup\'')
     expect(s).toContain('errorMsg')
     expect(s).toContain('successMsg')
   })

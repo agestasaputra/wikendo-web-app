@@ -41,7 +41,7 @@ export default defineEventHandler(async (event) => {
     throw createError({
       statusCode: 401,
       statusMessage: 'UNAUTHORIZED',
-      data: { message: 'Login dulu sebelum claim voucher' },
+      data: { message: 'Login dulu sebelum claim voucher' }
     })
   }
 
@@ -53,7 +53,7 @@ export default defineEventHandler(async (event) => {
     throw createError({
       statusCode: 400,
       statusMessage: 'VOUCHER_CODE_REQUIRED',
-      data: { message: 'voucher_code wajib diisi (contoh: WKD-7X2K9A)' },
+      data: { message: 'voucher_code wajib diisi (contoh: WKD-7X2K9A)' }
     })
   }
 
@@ -69,7 +69,7 @@ export default defineEventHandler(async (event) => {
     throw createError({
       statusCode: 404,
       statusMessage: 'VOUCHER_NOT_FOUND',
-      data: { message: 'Voucher tidak ditemukan' },
+      data: { message: 'Voucher tidak ditemukan' }
     })
   }
 
@@ -78,7 +78,7 @@ export default defineEventHandler(async (event) => {
     throw createError({
       statusCode: 400,
       statusMessage: 'VOUCHER_INACTIVE',
-      data: { message: 'Promo ini lagi nonaktif. Coba promo lain.' },
+      data: { message: 'Promo ini lagi nonaktif. Coba promo lain.' }
     })
   }
 
@@ -90,7 +90,7 @@ export default defineEventHandler(async (event) => {
     throw createError({
       statusCode: 400,
       statusMessage: 'VOUCHER_NOT_ACTIVE',
-      data: { message: 'Voucher belum aktif. Coba lagi nanti.' },
+      data: { message: 'Voucher belum aktif. Coba lagi nanti.' }
     })
   }
 
@@ -98,7 +98,7 @@ export default defineEventHandler(async (event) => {
     throw createError({
       statusCode: 400,
       statusMessage: 'VOUCHER_EXPIRED',
-      data: { message: 'Voucher sudah kadaluarsa.' },
+      data: { message: 'Voucher sudah kadaluarsa.' }
     })
   }
 
@@ -109,7 +109,7 @@ export default defineEventHandler(async (event) => {
     throw createError({
       statusCode: 401,
       statusMessage: 'UNAUTHORIZED',
-      data: { message: 'User token tidak valid. Login ulang ya.' },
+      data: { message: 'User token tidak valid. Login ulang ya.' }
     })
   }
 
@@ -128,7 +128,7 @@ export default defineEventHandler(async (event) => {
     throw createError({
       statusCode: 500,
       statusMessage: 'DB_COUNT_FAILED',
-      data: { message: 'Gagal cek quota harian. Coba lagi.' },
+      data: { message: 'Gagal cek quota harian. Coba lagi.' }
     })
   }
 
@@ -136,7 +136,7 @@ export default defineEventHandler(async (event) => {
     throw createError({
       statusCode: 429,
       statusMessage: 'RATE_LIMIT_EXCEEDED',
-      data: { message: 'Batas maksimal 3 voucher per hari. Balik besok ya.' },
+      data: { message: 'Batas maksimal 3 voucher per hari. Balik besok ya.' }
     })
   }
 
@@ -153,7 +153,7 @@ export default defineEventHandler(async (event) => {
     throw createError({
       statusCode: 500,
       statusMessage: 'DB_LOOKUP_FAILED',
-      data: { message: 'Gagal cek claim. Coba lagi.' },
+      data: { message: 'Gagal cek claim. Coba lagi.' }
     })
   }
 
@@ -161,7 +161,7 @@ export default defineEventHandler(async (event) => {
     throw createError({
       statusCode: 409,
       statusMessage: 'ALREADY_CLAIMED',
-      data: { message: 'Anda sudah mengklaim voucher tenant ini hari ini. Kembali besok.' },
+      data: { message: 'Anda sudah mengklaim voucher tenant ini hari ini. Kembali besok.' }
     })
   }
 
@@ -177,7 +177,7 @@ export default defineEventHandler(async (event) => {
     claim_code: voucher.code,
     claimed_at: nowIso,
     redeemed: false,
-    redeemed_at: null,
+    redeemed_at: null
   })
 
   if (claimError) {
@@ -186,13 +186,13 @@ export default defineEventHandler(async (event) => {
       throw createError({
         statusCode: 409,
         statusMessage: 'ALREADY_CLAIMED',
-        data: { message: 'Anda sudah mengklaim voucher tenant ini hari ini. Kembali besok.' },
+        data: { message: 'Anda sudah mengklaim voucher tenant ini hari ini. Kembali besok.' }
       })
     }
     throw createError({
       statusCode: 500,
       statusMessage: 'DB_INSERT_FAILED',
-      data: { message: 'Gagal simpan claim. Coba lagi.' },
+      data: { message: 'Gagal simpan claim. Coba lagi.' }
     })
   }
 
@@ -208,12 +208,12 @@ export default defineEventHandler(async (event) => {
     expires_at: expiry.toISOString(),
     voucher: {
       name: voucher.promo_text,
-      discount_percent: voucher.discount_percent,
+      discount_percent: voucher.discount_percent
     },
     time_remaining: {
       hours,
       minutes,
-      expired: diffMs <= 0,
-    },
+      expired: diffMs <= 0
+    }
   }
 })
