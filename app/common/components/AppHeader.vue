@@ -32,7 +32,7 @@ async function handleLogout(): Promise<void> {
 </script>
 
 <template>
-  <header class="bg-white sticky top-0 z-40 shadow-sm relative">
+  <header class="bg-white sticky top-0 z-40 shadow-sm">
     <div
       class="container mx-auto px-4 py-3 flex justify-between items-center max-w-md"
     >

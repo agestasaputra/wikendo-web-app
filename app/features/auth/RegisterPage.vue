@@ -82,7 +82,10 @@ async function handleGoogle(): Promise<void> {
     class="max-w-md mx-auto px-4 pb-10 min-h-screen"
     style="
       background: #f5f5f4;
-      font-family: &quot;Plus Jakarta Sans&quot;, system-ui, sans-serif;
+      font-family:
+        Plus Jakarta Sans,
+        system-ui,
+        sans-serif;
     "
   >
     <!-- 1. Banner hitam promo — 1:1 image (strip ember + radius 12 + angka lime-muda) -->

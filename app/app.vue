@@ -15,7 +15,12 @@ onMounted(() => auth.init());
 <template>
   <div
     class="min-h-screen bg-base text-ink pb-24"
-    style="font-family: &quot;Plus Jakarta Sans&quot;, system-ui, sans-serif"
+    style="
+      font-family:
+        Plus Jakarta Sans,
+        system-ui,
+        sans-serif;
+    "
   >
     <AppHeader />
     <NuxtPage />

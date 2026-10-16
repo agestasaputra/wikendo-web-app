@@ -89,7 +89,10 @@ async function handleForgot(): Promise<void> {
     class="max-w-md mx-auto px-4 pb-10 min-h-screen"
     style="
       background: #f2f2f2;
-      font-family: &quot;Plus Jakarta Sans&quot;, system-ui, sans-serif;
+      font-family:
+        Plus Jakarta Sans,
+        system-ui,
+        sans-serif;
     "
   >
     <!-- 1. Banner hitam quota — 1:1 L1 EMBER HERO (strip ember + radius 12 + angka lime-muda) -->
