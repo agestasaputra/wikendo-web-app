@@ -151,4 +151,26 @@ async function claimRow(code: string) {
     claimingCode.value = ''
   }
 }
+
+// E1 riwayat: tulis 1 entry ke wikendo_history pas data sukses (guard window + cap 20 + dedupe)
+type HistEntryMakan = { kind: 'tempat' | 'makan'; title: string; sub: string; at: number }
+function pushHistoryMakan() {
+  if (typeof window === 'undefined') return
+  try {
+    const r = list.value[0] as unknown as Record<string, unknown>
+    if (!r) return
+    const title = String((r as { name?: unknown }).name || '—')
+    const lantai = String((r as { lantai?: unknown }).lantai || '')
+    const sub = (lantai ? 'L' + lantai : '') + (mallLabel.value ? ' · ' + mallLabel.value : '')
+    const raw = window.localStorage.getItem('wikendo_history')
+    let arr: HistEntryMakan[] = []
+    try { arr = raw ? (JSON.parse(raw) as HistEntryMakan[]) : [] } catch { /* ignore parse */ }
+    if (!Array.isArray(arr)) arr = []
+    if (arr.some((x) => x.title === title)) return
+    arr.unshift({ kind: 'makan', title, sub, at: Date.now() })
+    if (arr.length > 20) arr = arr.slice(0, 20)
+    window.localStorage.setItem('wikendo_history', JSON.stringify(arr))
+  } catch { /* ignore storage */ }
+}
+watch(() => list.value.length, (n) => { if (n) pushHistoryMakan() })
 </script>

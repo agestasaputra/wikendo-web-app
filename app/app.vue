@@ -1,9 +1,9 @@
-<!-- app.vue — Layout GLOBAL kombo 5+10+15 (Addendum 09 v1.3 APPROVED).
-  APA: header sticky + <NuxtPage/> + footer, base hangat #fffdf9 + font Plus Jakarta Sans.
-  KENAPA: 1 layout dipakai 6 pages (Home, 2 quiz, 2 result, direktori) → konsisten + hemat.
-  Contoh: mau ubah navbar/footer global? Edit file ini aja. -->
+<!-- app.vue — Layout GLOBAL kombo 5+10+15 + E1 BottomNav (Addendum 09 v1.3 + 24 E1 APPROVED).
+APA: header sticky + <NuxtPage/> + footer id tentang + BottomNav 5-tab fixed dalam max-w-md thumb-zone, pb-24 anti-ketutup.
+KENAPA 1 layout dipakai 6 pages → konsisten + hemat. BottomNav global: jempol tak sampai header → nav thumb-zone; E1 5-tab Home-Mall-Quiz+-Riwayat-Akun NOL tab mati; Quiz+ buka sheet (bukan route) karena 1 tombol tak bisa bawa 2 intent quota beda.
+Contoh: footer id tentang → Akun/Tentang anchor #tentang scroll; pb-24 cegah konten ketutup nav fixed. -->
 <template>
-  <div class="min-h-screen bg-base text-ink" style="font-family:'Plus Jakarta Sans',system-ui,sans-serif">
+  <div class="min-h-screen bg-base text-ink pb-24" style="font-family:'Plus Jakarta Sans',system-ui,sans-serif">
     <header class="bg-white sticky top-0 z-40 shadow-sm relative">
       <div class="container mx-auto px-4 py-3 flex justify-between items-center max-w-md">
         <NuxtLink to="/" class="flex items-center" aria-label="Wikendo — beranda"><img src="/brand-icon-day.png" alt="Wikendo" width="32" height="32" class="rounded-lg" /></NuxtLink>
@@ -27,9 +27,10 @@
       </div>
     </header>
     <NuxtPage />
-    <footer class="text-center text-xs text-gray-400 py-8">
-      Wikendo MVP • $0/month • Nuxt 4 + Supabase + Hermes-combo
+    <footer id="tentang" class="text-center text-xs text-gray-400 py-8">
+      Wikendo MVP • $0/month • Nuxt 4 + Supabase + Hermes-combo — <a href="#tentang" class="underline">Tentang</a>
     </footer>
+    <BottomNav />
   </div>
 </template>
 

@@ -95,4 +95,25 @@ function share() {
   if (navigator.share) navigator.share({ title: t, text: t, url: location.href }).catch(() => {})
   else { navigator.clipboard?.writeText(location.href); wallNote.value = true }
 }
+
+// E1 riwayat: tulis 1 entry ke wikendo_history pas data sukses (guard window + cap 20 + dedupe)
+type HistEntryTempat = { kind: 'tempat' | 'makan'; title: string; sub: string; at: number }
+function pushHistoryTempat() {
+  if (typeof window === 'undefined') return
+  try {
+    const r = list.value[0] as unknown as Record<string, unknown>
+    if (!r) return
+    const title = String((r as { name?: unknown }).name || '—')
+    const sub = String((r as { location_area?: unknown }).location_area || (r as { category?: unknown }).category || '')
+    const raw = window.localStorage.getItem('wikendo_history')
+    let arr: HistEntryTempat[] = []
+    try { arr = raw ? (JSON.parse(raw) as HistEntryTempat[]) : [] } catch { /* ignore parse */ }
+    if (!Array.isArray(arr)) arr = []
+    if (arr.some((x) => x.title === title)) return
+    arr.unshift({ kind: 'tempat', title, sub, at: Date.now() })
+    if (arr.length > 20) arr = arr.slice(0, 20)
+    window.localStorage.setItem('wikendo_history', JSON.stringify(arr))
+  } catch { /* ignore storage */ }
+}
+watch(() => list.value.length, (n) => { if (n) pushHistoryTempat() })
 </script>
