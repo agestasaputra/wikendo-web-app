@@ -40,6 +40,7 @@ pnpm build      # verifikasi production (WAJIB EXIT:0 sebelum PR)
 ```
 
 Urutan verifikasi setiap ubah kode: `test` → `lint` → `build`.
+Setelah clone: `pnpm install && pnpm hooks:install` (aktifkan git hook, lihat Bab 11). CI GitHub menjalankan urutan yang sama.
 
 ---
 
@@ -165,3 +166,30 @@ Mapping env → runtimeConfig ada di `nuxt.config.ts`.
 
 README manusia (16 bab, panduan setup + troubleshooting panjang): `README.md`.
 Kalau kode dan dokumen beda, **kode yang menang** — lalu update dokumen ini + README.
+
+---
+
+## 11. Konvensi Otomatis (dipaksa mesin)
+
+Aturan di bawah dicek `pnpm lint` (`eslint.config.mjs` + `nuxt.config.ts → eslint.config.stylistic`),
+git hook, dan CI. Kalau lint merah, ikuti lint — bukan selera.
+
+| Area | Aturan |
+|------|--------|
+| Format | 2 spasi, LF, tanpa semicolon, single quote, tanpa trailing comma, brace `1tbs`. Lebar baris 120 (warn). `.editorconfig` di root repo |
+| Komponen | `<script setup lang="ts">` saja. Urutan blok: script → template → style. Macro: defineOptions → Props → Emits → Slots |
+| Penamaan | File: komponen `PascalCase.vue`, page `kebab-case.vue`, composable `useXxx.ts`, server `nama.method.ts`. Kode: `camelCase`, konstanta `UPPER_SNAKE`, type/interface `PascalCase`. Field JSON API/DB tetap `snake_case` (`claim_code`) |
+| TypeScript | `strict` (default Nuxt). Tanpa `any` — pakai `unknown` + narrowing. Error dari `catch`/`useFetch`: `getErrorMessage()` / `getErrorStatus()` di `utils/error.ts`, jangan cast manual |
+| Batas client/server | `app.vue`, `pages/`, `components/`, `composables/` dilarang import dari `server/` (secret management) |
+| Komentar | Header file: APA + KENAPA + CONTOH (3–5 baris). Komentar inline jelaskan *kenapa*, bukan *apa* |
+| Test | `tests/<fitur>.test.ts`. Fungsi pure: tulis test MERAH dulu |
+| Commit | Conventional Commits: `type(scope): subject`. Tipe: feat fix docs design refactor test chore perf style ci build revert |
+
+**Git hook** (`../.githooks`, aktifkan `pnpm hooks:install`):
+`pre-commit` = ESLint file staged (error → commit ditolak, warning lolos); `commit-msg` = cek format Conventional Commits.
+Bypass darurat: `git commit --no-verify` (jangan jadi kebiasaan; CI tetap menangkap).
+
+**CI** (`../.github/workflows/ci.yml`): `pnpm test` → `pnpm lint` → `pnpm build` di setiap push ke `main` dan PR.
+
+**Utang yang diketahui:** ±200 warning `max-len` (template Tailwind padat) — rapikan bertahap saat menyentuh file.
+Beberapa `as unknown as` tersisa di `pages/login.vue`, `result.vue`, `result-makan.vue` — ganti dengan type di `types/`.

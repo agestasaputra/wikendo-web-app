@@ -1,0 +1,15 @@
+#!/bin/sh
+# pre-commit — ESLint file staged di app/ (ts/vue/mjs). Error = commit ditolak; warning lolos.
+# KENAPA: aturan konvensi (AGENTS.md Bab 11) dipaksa mesin sebelum masuk git. Aktifkan: pnpm hooks:install.
+# Bypass darurat (jangan kebiasaan): git commit --no-verify
+set -e
+ROOT=$(git rev-parse --show-toplevel)
+FILES=$(git diff --cached --name-only --diff-filter=ACM -- 'app/*.vue' 'app/*.ts' 'app/*.mjs' | sed 's#^app/##')
+[ -z "$FILES" ] && exit 0
+cd "$ROOT/app"
+echo "pre-commit: eslint $(echo "$FILES" | wc -l | tr -d ' ') file staged…"
+# shellcheck disable=SC2086
+pnpm exec eslint $FILES || {
+  echo "✖ ESLint gagal. Perbaiki, atau jalankan: pnpm lint:fix (lalu git add lagi)."
+  exit 1
+}
