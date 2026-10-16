@@ -17,7 +17,7 @@ wikendo-web-app/
 │   ├── 08-PROGRESS.md                  # Board + log eksekusi (sumber "udah sampai mana?")
 │   ├── 09-PRD-Addendum-Revamp-Combo-Auth.md  # Kombo 5+10+15 + progressive login (APPROVED)
 │   ├── 10-App-Guide.md                 # MIRROR dari app/README.md (jangan edit, re-sync)
-│   ├── 11-AGENTS-App.md                # MIRROR dari app/AGENTS.md (jangan edit, re-sync)
+│   ├── 11-AGENTS-App.md                # POINTER ke /AGENTS.md (isi lama dipindah)
 │   ├── 12-Supabase-Guide.md            # MIRROR dari supabase/README.md
 │   ├── 13-Data-Audit-Tenant-V1.md      # MIRROR dari supabase/AUDIT.md
 │   ├── 14-Prototype-Guide.md           # MIRROR dari design/prototype/README.md
