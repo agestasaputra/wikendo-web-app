@@ -8,19 +8,19 @@ export default {
     extend: {
       colors: {
         primary: {
-          DEFAULT: '#0891b2',
-          700: '#0e7490'
+          DEFAULT: "#0891b2",
+          700: "#0e7490",
         },
         accent: {
-          DEFAULT: '#f97316'
+          DEFAULT: "#f97316",
         },
-        base: '#fffdf9',
-        tempat: '#f97316',
-        makan: '#ee2c4b',
-        wallet: '#0e7490',
-        ink: '#18181b'
-      }
-    }
+        base: "#fffdf9",
+        tempat: "#f97316",
+        makan: "#ee2c4b",
+        wallet: "#0e7490",
+        ink: "#18181b",
+      },
+    },
   },
-  plugins: []
-}
+  plugins: [],
+};

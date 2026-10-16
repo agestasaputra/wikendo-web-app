@@ -1,0 +1,219 @@
+<!-- features/mall/MallDetailPage.vue → GET /mall/:slug (Direktori SEO, S2c Foto Tenant + S2b infinity).
+APA: search + filter chip (halal/budget/misi) + kartu tenant foto + CTA quiz pre-filled, thumb 46px + badge promo overlay, bg paper #F5F5F4 + infinity 10/page (sentinel + skeleton 2 row + sticky count "10/40").
+KENAPA: S2b infinity — 40 tenant sekaligus berat di HP kentang → 10/page, SSR page-1 tetap (SEO aman), lanjut client. CTA quiz + search + chips STICKY biar nggak kelempar scroll. Filter server-side (reset page); keyword client-side di atas item termuat (spec S2b: filtered = keyword(client) + page(server)).
+Token lock: ink tetap #0C0A09, rose tetap #E11D48, paper tetap #F5F5F4. -->
+<script setup lang="ts">
+import AppLoader from "~/common/components/AppLoader.vue";
+import { useInfiniteList } from "~/common/composables/useInfiniteList";
+import { useSentinelObserver } from "~/common/composables/useSentinelObserver";
+import type { InfiniteFetchPage } from "~/common/types/pagination";
+import { getMallName, getMallShortLabel } from "~/common/utils/mall";
+import type { DirectoryFilters, TenantItem } from "~/features/mall/@types/mall";
+import PromoStrip from "~/features/mall/components/PromoStrip.vue";
+import TenantCard from "~/features/mall/components/TenantCard.vue";
+import {
+  buildDirCountLabel,
+  buildTenantQuery,
+  filterTenantsByKeyword,
+} from "~/features/mall/utils/directory";
+import { getTenantPromo } from "~/features/mall/utils/tenantCard";
+
+// Filter chip (S2c 1:1 = 3 chip): halal + budget + nongkrong. Server-side via query, ganti filter = reset page.
+const FILTER_CHIPS: { key: keyof DirectoryFilters; label: string }[] = [
+  { key: "halal", label: "✅ Halal" },
+  { key: "budget", label: "💰 50-100rb" },
+  { key: "mission", label: "☕ Nongkrong" },
+];
+
+const route = useRoute();
+const slug = route.params.slug as string;
+const mallName = computed(() => getMallName(slug));
+// S2c 1:1: breadcrumb short label (GI), bukan slug mentah.
+const mallShort = computed(() => getMallShortLabel(slug));
+const keyword = ref("");
+const filters = reactive<DirectoryFilters>({
+  halal: false,
+  budget: false,
+  mission: false,
+});
+
+// SEO direktori: title + description per-mall (funnel Google → tenant → quiz).
+useHead({
+  title: `Direktori Kuliner ${mallName.value} — Wikendo`,
+  meta: [
+    {
+      name: "description",
+      content: `List tenant ${mallName.value} curated: halal, budget, kids-friendly. Males scroll? Quiz 20 detik → 5 tenant + voucher.`,
+    },
+  ],
+});
+
+// S2b infinity: filter server-side (reset page), keyword client-side (spec: keyword(client) + page(server)).
+const list = useInfiniteList<TenantItem>({
+  pageSize: 10,
+  keyOf: (t) => t.name,
+  fetchPage: (limit, offset) =>
+    $fetch<InfiniteFetchPage<TenantItem>>(`/api/malls/${slug}/tenants`, {
+      params: { limit, offset, ...buildTenantQuery(filters) },
+    }),
+});
+await list.start();
+const { items: tenants, total, hasMore, pending, loadingMore, error } = list;
+const sentinel = useSentinelObserver(() => list.loadMore());
+
+function toggleFilter(key: keyof DirectoryFilters): void {
+  filters[key] = !filters[key];
+  list.reset();
+}
+
+// Pill infinity S2c 1:1 (tested): 🟢 loaded/total tenant · scroll ↓
+const dirCount = computed(() =>
+  buildDirCountLabel(tenants.value.length, total.value || tenants.value.length),
+);
+const filtered = computed(() =>
+  filterTenantsByKeyword(tenants.value, keyword.value),
+);
+// V13C strip promo (Addendum 23 v1.1): tenant yang ADA badge promo real, di atas list; slice 3 biar hemat HP kentang.
+const promoStrip = computed(() =>
+  tenants.value.filter((t) => !!getTenantPromo(t)).slice(0, 3),
+);
+</script>
+
+<template>
+  <div class="max-w-md mx-auto px-4 pb-10" style="background: #f5f5f4">
+    <p class="text-xs text-gray-500 pt-3 mb-1">Home / Mall / {{ mallShort }}</p>
+    <div class="flex justify-between items-center">
+      <h1 class="text-xl font-extrabold">🏢 {{ mallName }}</h1>
+      <span class="text-xs font-bold text-gray-500">{{
+        pending ? "…" : `${total || tenants.length} tenant`
+      }}</span>
+    </div>
+
+    <p class="text-[13px] text-gray-500">
+      Direktori kuliner curated · tanpa login/quota
+    </p>
+
+    <!-- Sticky: search + chips + CTA (S2b spec: nggak kelempar scroll) -->
+    <div class="sticky top-0 pt-2 pb-2" style="background: #f5f5f4">
+      <div
+        class="bg-white border border-[#e4e4e7] rounded-xl px-3.5 py-2.5 text-[13px] text-gray-500 flex gap-2 items-center"
+      >
+        🔍
+        <input
+          v-model="keyword"
+          placeholder="Cari tenant... mis. kopi, ramen"
+          class="bg-transparent outline-none flex-1 text-ink placeholder:text-gray-400"
+        />
+      </div>
+
+      <div class="flex gap-1.5 flex-wrap my-2.5">
+        <button
+          v-for="chip in FILTER_CHIPS"
+          :key="chip.key"
+          :disabled="pending"
+          class="text-[11.5px] font-bold rounded-full px-3 py-1.5 bg-white border-[1.5px] disabled:opacity-60"
+          :style="
+            filters[chip.key]
+              ? 'background:#18181b;color:#fff;border-color:#18181b'
+              : 'border-color:#e4e4e7'
+          "
+          @click="toggleFilter(chip.key)"
+        >
+          {{ chip.label }}
+        </button>
+      </div>
+
+      <!-- CTA jembatan direktori → quiz (S2c KARTU ASISTEN: strip lime + avatar ink-lime + 2 baris + panah) -->
+      <NuxtLink
+        :to="`/makan?mall=${slug}`"
+        class="block rounded-[14px] p-3.5 bg-white border border-gray-100 mt-1"
+        style="border-left: 4px solid #a3e635"
+      >
+        <div class="flex gap-2.5 items-center">
+          <div
+            class="w-9 h-9 flex-none rounded-full flex items-center justify-center text-[16px]"
+            style="background: #0c0a09"
+          >
+            🤖
+          </div>
+          <div class="flex-1 text-[13px] leading-snug">
+            <b>Ceritain mau makan apa →</b><br />
+            <small class="text-gray-500"
+              >quiz 20 dtk · tanpa login · hasil murni {{ mallShort }}</small
+            >
+          </div>
+          <div class="font-extrabold">→</div>
+        </div>
+      </NuxtLink>
+    </div>
+
+    <!-- Pill count infinity S2c -->
+    <p
+      v-if="!pending && tenants.length"
+      class="inline-block text-[11px] font-extrabold px-2.5 py-1 rounded-full mt-3"
+      style="background: #0c0a09; color: #fff"
+    >
+      {{ dirCount }}
+    </p>
+
+    <PromoStrip
+      v-if="!pending && promoStrip.length"
+      :tenants="promoStrip"
+      :slug="slug"
+      :mall-short="mallShort"
+    />
+
+    <!-- Kartu tenant (mockup S2c Foto Tenant): thumb foto 46px + badge promo overlay -->
+    <AppLoader v-if="pending" variant="mall" />
+    <div
+      v-else-if="error"
+      class="rounded-2xl p-4 text-sm font-bold mt-3"
+      style="background: #fef2f2; border: 1px solid #fecaca; color: #991b1b"
+    >
+      Gagal muat tenant.<br /><button
+        class="underline mt-1 disabled:opacity-60"
+        :disabled="pending"
+        @click="list.reset()"
+      >
+        Coba lagi →
+      </button>
+    </div>
+    <div v-else class="flex flex-col gap-2.5 mt-3">
+      <TenantCard v-for="t in filtered" :key="t.name" :tenant="t" />
+      <p v-if="!filtered.length" class="text-center text-sm text-gray-500 py-8">
+        Tidak ada tenant cocok. Coba ubah filter.
+      </p>
+      <!-- Skeleton 2 row pas nambah page (S2b spec) -->
+      <div v-if="loadingMore" class="flex flex-col gap-2.5" aria-live="polite">
+        <div
+          v-for="i in 2"
+          :key="i"
+          class="border border-gray-100 rounded-2xl p-2.5 bg-white flex gap-2.5 items-center animate-pulse"
+        >
+          <div
+            class="w-[46px] h-[46px] flex-none rounded-xl"
+            style="background: #f5f5f4"
+          />
+          <div class="flex-1">
+            <div class="h-4 rounded w-2/3" style="background: #f5f5f4" />
+            <div class="h-3 rounded w-1/3 mt-1.5" style="background: #f5f5f4" />
+          </div>
+        </div>
+      </div>
+      <!-- Sentinel infinity scroll -->
+      <div
+        v-if="hasMore"
+        ref="sentinel"
+        class="text-center text-xs text-gray-400 py-3"
+      >
+        Muat tenant berikut… ({{ tenants.length }}/{{ total }})
+      </div>
+      <p
+        v-else-if="tenants.length"
+        class="text-center text-xs text-gray-400 py-2"
+      >
+        Semua {{ total }} tenant tampil ✅
+      </p>
+    </div>
+  </div>
+</template>

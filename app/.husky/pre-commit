@@ -1,0 +1,17 @@
+# pre-commit — gerbang kualitas (pola hub-chat): lint-staged → type-check → test:related.
+# Berhenti di kegagalan pertama. JANGAN pakai `git commit --no-verify`: perbaiki akar masalahnya.
+# Hook dijalankan dari root repo; kode ada di app/.
+cd app || exit 1
+
+# 1. ESLint --fix + Prettier hanya untuk file staged (config: package.json → lint-staged)
+pnpm lint-staged
+
+# 2. vue-tsc di SELURUH project (type error di mana pun memblokir commit)
+pnpm type-check
+
+# 3. Test yang terkait file staged saja (cepat; coverage penuh tidak di commit)
+FILES=$(git diff --cached --name-only --diff-filter=ACMR -- 'app/*.ts' 'app/*.vue' | sed 's#^app/##')
+if [ -n "$FILES" ]; then
+  # shellcheck disable=SC2086
+  pnpm exec vitest related --run --passWithNoTests $FILES
+fi

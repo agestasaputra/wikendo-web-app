@@ -3,3 +3,6 @@ node_modules/
 .output/
 dist/
 .env
+
+# Vitest JSON report (dibuat wrapper CLI lokal)
+.vitest/

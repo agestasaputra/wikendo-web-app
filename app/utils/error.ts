@@ -8,24 +8,24 @@
  *   getErrorStatus({ statusCode: 403 }) // 403
  */
 interface ErrorLike {
-  data?: { message?: unknown }
-  message?: unknown
-  statusCode?: unknown
+  data?: { message?: unknown };
+  message?: unknown;
+  statusCode?: unknown;
 }
 
 function asErrorLike(e: unknown): ErrorLike {
-  return typeof e === 'object' && e !== null ? (e as ErrorLike) : {}
+  return typeof e === "object" && e !== null ? (e as ErrorLike) : {};
 }
 
 /** Pesan error untuk UI: data.message → message → fallback. */
 export function getErrorMessage(e: unknown, fallback: string): string {
-  const { data, message } = asErrorLike(e)
-  const picked = data?.message || message
-  return typeof picked === 'string' && picked ? picked : fallback
+  const { data, message } = asErrorLike(e);
+  const picked = data?.message || message;
+  return typeof picked === "string" && picked ? picked : fallback;
 }
 
 /** HTTP status dari error (statusCode), atau undefined kalau tidak ada. */
 export function getErrorStatus(e: unknown): number | undefined {
-  const { statusCode } = asErrorLike(e)
-  return typeof statusCode === 'number' ? statusCode : undefined
+  const { statusCode } = asErrorLike(e);
+  return typeof statusCode === "number" ? statusCode : undefined;
 }
