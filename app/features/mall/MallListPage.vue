@@ -32,7 +32,8 @@ const list = useInfiniteList<MallItem>({
       params: { limit, offset },
     }),
 });
-await list.start();
+if (import.meta.server) await list.start();
+else void list.start();
 const { items: malls, hasMore, pending, loadingMore, error } = list;
 const sentinel = useSentinelObserver(() => list.loadMore());
 

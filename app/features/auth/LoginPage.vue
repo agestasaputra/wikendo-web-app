@@ -15,7 +15,10 @@ import { useGoogleSignIn } from "~/features/auth/composables/useGoogleSignIn";
 import { getRedirectQuery } from "~/features/auth/utils/redirect";
 
 // Quota real: GET /api/quota (cookie anon). Gagal fetch = fallback anon habis 0 • 0 kayak image.
-const { data: quotaData } = await useFetch<QuotaStatus>("/api/quota");
+const { data: quotaData } = await useFetch<QuotaStatus>("/api/quota", {
+  key: "quota",
+  lazy: true,
+});
 const tempatSisa = computed(() => quotaData.value?.tempat.remaining ?? 0);
 const makanSisa = computed(() => quotaData.value?.makan.remaining ?? 0);
 

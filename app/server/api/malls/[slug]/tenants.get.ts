@@ -23,6 +23,11 @@ import {
 export default defineEventHandler(async (event) => {
   const slug = getRouterParam(event, "slug") as string;
   const query = getQuery(event);
+  setHeader(
+    event,
+    "Cache-Control",
+    "public, s-maxage=60, stale-while-revalidate=300",
+  );
   const db = supabaseAdmin();
 
   const { data: mall } = await db

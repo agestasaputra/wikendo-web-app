@@ -27,7 +27,10 @@ const RIGHT_TABS: NavTab[] = [
 const route = useRoute();
 const showSheet = ref(false);
 
-const { data: quotaData } = await useFetch<QuotaStatus>("/api/quota");
+const { data: quotaData } = await useFetch<QuotaStatus>("/api/quota", {
+  key: "quota",
+  lazy: true,
+});
 const quotaStatus = computed(
   () =>
     quotaData.value ||

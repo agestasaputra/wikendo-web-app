@@ -57,7 +57,8 @@ const list = useInfiniteList<TenantItem>({
       params: { limit, offset, ...buildTenantQuery(filters) },
     }),
 });
-await list.start();
+if (import.meta.server) await list.start();
+else void list.start();
 const { items: tenants, total, hasMore, pending, loadingMore, error } = list;
 const sentinel = useSentinelObserver(() => list.loadMore());
 
