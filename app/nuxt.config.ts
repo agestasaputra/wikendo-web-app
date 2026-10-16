@@ -56,6 +56,9 @@ export default defineNuxtConfig({
       gaId: process.env.NUXT_PUBLIC_GA_ID || "",
     },
   },
+  // Tidak ada CSS nesting di project ini (hanya utility Tailwind di template). Plugin bawaan modul
+  // `tailwindcss/nesting` dimatikan: resolver Nuxt tidak bisa me-resolve-nya di pnpm (warning B5010/B7007).
+  postcss: { plugins: { "tailwindcss/nesting": false } },
   tailwindcss: {
     configPath: "tailwind.config",
   },

@@ -17,21 +17,21 @@ Pinia (setup syntax, `@pinia/nuxt`) untuk state yang dipakai banyak file/feature
 
 ## Decision Guide
 
-| Situasi                                                | Pakai                                  |
-| ------------------------------------------------------ | -------------------------------------- |
-| Dipakai ≥2 file / lintas feature / seluruh app         | Pinia store (`common/store` atau `features/<f>/store`) |
-| Hanya 1 halaman/komponen                               | `ref`/`reactive` lokal                 |
-| Logic stateful dipakai ≥2 halaman, tanpa persistensi   | Composable (`common/composables`)      |
-| Data GET yang dirender SSR (mis. quota)                | `useFetch`                             |
-| Jawaban quiz                                           | state lokal → query string → result    |
+| Situasi                                              | Pakai                                                  |
+| ---------------------------------------------------- | ------------------------------------------------------ |
+| Dipakai ≥2 file / lintas feature / seluruh app       | Pinia store (`common/store` atau `features/<f>/store`) |
+| Hanya 1 halaman/komponen                             | `ref`/`reactive` lokal                                 |
+| Logic stateful dipakai ≥2 halaman, tanpa persistensi | Composable (`common/composables`)                      |
+| Data GET yang dirender SSR (mis. quota)              | `useFetch`                                             |
+| Jawaban quiz                                         | state lokal → query string → result                    |
 
 ## Stores
 
-| Store          | File                                    | State                                     | Persistensi            |
-| -------------- | --------------------------------------- | ----------------------------------------- | ---------------------- |
-| `AuthStore`    | `app/common/store/AuthStore.ts`         | isLoggedIn, email, displayName, initial   | Supabase session       |
-| `HistoryStore` | `app/common/store/HistoryStore.ts`      | items (max 20)                            | localStorage           |
-| `VoucherStore` | `app/features/makan/store/VoucherStore.ts` | claiming, claimedCode, claimError      | — (per sesi)           |
+| Store          | File                                       | State                                   | Persistensi      |
+| -------------- | ------------------------------------------ | --------------------------------------- | ---------------- |
+| `AuthStore`    | `app/common/store/AuthStore.ts`            | isLoggedIn, email, displayName, initial | Supabase session |
+| `HistoryStore` | `app/common/store/HistoryStore.ts`         | items (max 20)                          | localStorage     |
+| `VoucherStore` | `app/features/makan/store/VoucherStore.ts` | claiming, claimedCode, claimError       | — (per sesi)     |
 
 ## Rules
 

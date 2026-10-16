@@ -39,7 +39,14 @@ sequenceDiagram
 ## Data
 
 ```json
-[{ "kind": "makan", "title": "Kopi Kekinian", "sub": "L2 · GI", "at": 1760600000000 }]
+[
+  {
+    "kind": "makan",
+    "title": "Kopi Kekinian",
+    "sub": "L2 · GI",
+    "at": 1760600000000
+  }
+]
 ```
 
 ## Failure & State

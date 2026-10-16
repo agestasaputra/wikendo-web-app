@@ -54,13 +54,13 @@ sequenceDiagram
 
 ## Failure & State
 
-| Status | Penyebab                                   |
-| ------ | ------------------------------------------ |
-| 400    | kode kosong / promo nonaktif / belum aktif / kadaluarsa |
-| 401    | tanpa Bearer / token tidak valid           |
-| 404    | voucher tidak ditemukan                    |
+| Status | Penyebab                                                       |
+| ------ | -------------------------------------------------------------- |
+| 400    | kode kosong / promo nonaktif / belum aktif / kadaluarsa        |
+| 401    | tanpa Bearer / token tidak valid                               |
+| 404    | voucher tidak ditemukan                                        |
 | 409    | sudah klaim tenant ini hari ini (termasuk race UNIQUE `23505`) |
-| 429    | lebih dari 3 klaim/hari                    |
+| 429    | lebih dari 3 klaim/hari                                        |
 
 - Dual-write kolom lama (`date`, `code`) + baru (`claim_date`, `claim_code`) menghindari 500 di skema produksi.
 - Klien: `claiming` mencegah double-klik; klaim kedua saat berjalan mengembalikan `status: "busy"` tanpa request.

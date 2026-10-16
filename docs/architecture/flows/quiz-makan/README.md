@@ -58,13 +58,13 @@ sequenceDiagram
 
 ## Key Components
 
-| Component                | File                                              | Role                                              |
-| ------------------------ | ------------------------------------------------- | ------------------------------------------------- |
-| `MAKAN_QUESTIONS`        | `app/features/makan/constants/questions.ts`       | Data pertanyaan + promo seed + slug valid         |
-| `fetchMakanCandidates`   | `app/server/utils/makanCandidates.ts`             | Kandidat tenant (404 kalau mall/tenant kosong)    |
-| `buildMakanEqFilters`    | `app/server/utils/tenantFilters.ts`               | Body → kondisi eq (pure, tested)                  |
-| `buildMakanHero/Chips`   | `app/features/makan/utils/resultHero.ts`          | Data hero, chips, rank #1–3                       |
-| `VoucherSheet`           | `app/features/makan/components/VoucherSheet.vue`  | Picker 3 promo + Klaim per row                    |
+| Component              | File                                             | Role                                           |
+| ---------------------- | ------------------------------------------------ | ---------------------------------------------- |
+| `MAKAN_QUESTIONS`      | `app/features/makan/constants/questions.ts`      | Data pertanyaan + promo seed + slug valid      |
+| `fetchMakanCandidates` | `app/server/utils/makanCandidates.ts`            | Kandidat tenant (404 kalau mall/tenant kosong) |
+| `buildMakanEqFilters`  | `app/server/utils/tenantFilters.ts`              | Body → kondisi eq (pure, tested)               |
+| `buildMakanHero/Chips` | `app/features/makan/utils/resultHero.ts`         | Data hero, chips, rank #1–3                    |
+| `VoucherSheet`         | `app/features/makan/components/VoucherSheet.vue` | Picker 3 promo + Klaim per row                 |
 
 ## Data
 

@@ -55,13 +55,13 @@ sequenceDiagram
 
 ## Key Components
 
-| Component              | File                                                | Role                                              |
-| ---------------------- | --------------------------------------------------- | ------------------------------------------------- |
-| `TEMPAT_QUESTIONS`     | `app/features/tempat/constants/questions.ts`        | Data 5 pertanyaan                                 |
-| `QuizHeader`           | `app/common/components/QuizHeader.vue`              | Header ink + segmen lime (dipakai juga Makan)     |
-| `QuizOptionList`       | `app/common/components/QuizOptionList.vue`          | Opsi jawaban                                      |
-| `buildTempatHero`      | `app/features/tempat/utils/resultHero.ts`           | Rekomendasi → data hero (pure, tested)            |
-| `ResultError`          | `app/common/components/ResultError.vue`             | Wall quota vs error + Coba lagi                   |
+| Component          | File                                         | Role                                          |
+| ------------------ | -------------------------------------------- | --------------------------------------------- |
+| `TEMPAT_QUESTIONS` | `app/features/tempat/constants/questions.ts` | Data 5 pertanyaan                             |
+| `QuizHeader`       | `app/common/components/QuizHeader.vue`       | Header ink + segmen lime (dipakai juga Makan) |
+| `QuizOptionList`   | `app/common/components/QuizOptionList.vue`   | Opsi jawaban                                  |
+| `buildTempatHero`  | `app/features/tempat/utils/resultHero.ts`    | Rekomendasi → data hero (pure, tested)        |
+| `ResultError`      | `app/common/components/ResultError.vue`      | Wall quota vs error + Coba lagi               |
 
 ## Data
 

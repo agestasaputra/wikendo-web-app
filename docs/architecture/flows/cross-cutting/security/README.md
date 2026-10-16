@@ -19,18 +19,18 @@ Secret hanya hidup di server (`runtimeConfig` non-public + `server/utils/db.ts`)
 
 ## Controls
 
-| Area                  | Kontrol                                                                                   | Ditegakkan oleh                          |
-| --------------------- | ----------------------------------------------------------------------------------------- | ---------------------------------------- |
-| Secrets management    | `supabaseServiceKey`, `cfApiToken`, `hermesApiKey` hanya di `runtimeConfig` server        | `no-restricted-imports` (client ↔ `server/`) |
-| Env di client         | Wajib `useRuntimeConfig()`; `process.env` dilarang di kode client                         | `no-restricted-properties`               |
-| XSS / injection       | `v-html` dilarang; pakai `v-dompurify-html`                                               | `vue/no-v-html` + plugin dompurify       |
-| Eval / dynamic code   | `eval`, `new Function`, implied eval dilarang                                             | ESLint                                   |
-| Logging               | `console.log` dilarang (hanya `warn`/`error`); token tidak pernah di-log                  | `no-console`                             |
-| AuthN klaim voucher   | Bearer token diverifikasi `db.auth.getUser`; 401 tanpa token                              | `server/utils/voucherClaim.ts`           |
-| Anti-abuse            | Rate-limit 3 klaim/hari; UNIQUE user+tenant+hari; limit paging max 50; quota cookie       | server                                   |
-| Input validation      | `parseVoucherCode`, `parsePaginationParams`, `coerceBool`, validasi hasil LLM             | utils pure + tests                       |
-| Secret scan           | gitleaks di CI (riwayat penuh)                                                            | `.github/workflows/ci.yml`               |
-| Dependency audit      | `pnpm audit --prod` (non-blocking, lihat Known Debt)                                      | CI                                       |
+| Area                | Kontrol                                                                             | Ditegakkan oleh                              |
+| ------------------- | ----------------------------------------------------------------------------------- | -------------------------------------------- |
+| Secrets management  | `supabaseServiceKey`, `cfApiToken`, `hermesApiKey` hanya di `runtimeConfig` server  | `no-restricted-imports` (client ↔ `server/`) |
+| Env di client       | Wajib `useRuntimeConfig()`; `process.env` dilarang di kode client                   | `no-restricted-properties`                   |
+| XSS / injection     | `v-html` dilarang; pakai `v-dompurify-html`                                         | `vue/no-v-html` + plugin dompurify           |
+| Eval / dynamic code | `eval`, `new Function`, implied eval dilarang                                       | ESLint                                       |
+| Logging             | `console.log` dilarang (hanya `warn`/`error`); token tidak pernah di-log            | `no-console`                                 |
+| AuthN klaim voucher | Bearer token diverifikasi `db.auth.getUser`; 401 tanpa token                        | `server/utils/voucherClaim.ts`               |
+| Anti-abuse          | Rate-limit 3 klaim/hari; UNIQUE user+tenant+hari; limit paging max 50; quota cookie | server                                       |
+| Input validation    | `parseVoucherCode`, `parsePaginationParams`, `coerceBool`, validasi hasil LLM       | utils pure + tests                           |
+| Secret scan         | gitleaks di CI (riwayat penuh)                                                      | `.github/workflows/ci.yml`                   |
+| Dependency audit    | `pnpm audit --prod` (non-blocking, lihat Known Debt)                                | CI                                           |
 
 ## Review Checklist (sebelum DONE)
 

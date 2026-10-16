@@ -20,12 +20,12 @@ Vitest + happy-dom, test co-located di `__tests__/*.spec.ts`. Ada 3 jenis: unit 
 
 ## Test Types
 
-| Jenis             | Lokasi                                  | Isolasi                                                |
-| ----------------- | --------------------------------------- | ------------------------------------------------------ |
-| Unit — utility    | `*/utils/__tests__/*.spec.ts`           | Tanpa mock                                             |
-| Unit — store      | `*/store/__tests__/*.spec.ts`           | `vi.hoisted` + `vi.mock` untuk Supabase, `vi.stubGlobal("$fetch")` |
-| Unit — composable | `common/composables/__tests__/*.spec.ts`| Fetch mock                                             |
-| File-assert       | `*/__tests__/*Page.spec.ts` dll.        | `readSource()` dari `app/test/utils.ts` (hex lowercase + whitespace dipadatkan agar tahan Prettier) |
+| Jenis             | Lokasi                                   | Isolasi                                                                                             |
+| ----------------- | ---------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| Unit — utility    | `*/utils/__tests__/*.spec.ts`            | Tanpa mock                                                                                          |
+| Unit — store      | `*/store/__tests__/*.spec.ts`            | `vi.hoisted` + `vi.mock` untuk Supabase, `vi.stubGlobal("$fetch")`                                  |
+| Unit — composable | `common/composables/__tests__/*.spec.ts` | Fetch mock                                                                                          |
+| File-assert       | `*/__tests__/*Page.spec.ts` dll.         | `readSource()` dari `app/test/utils.ts` (hex lowercase + whitespace dipadatkan agar tahan Prettier) |
 
 ## Gates
 

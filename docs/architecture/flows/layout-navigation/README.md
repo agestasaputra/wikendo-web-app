@@ -37,12 +37,12 @@ sequenceDiagram
 
 ## Key Components
 
-| Component        | File                                        | Role                                              |
-| ---------------- | ------------------------------------------- | ------------------------------------------------- |
-| `AppHeader`      | `app/common/components/AppHeader.vue`       | Anon: Login/Register; login: avatar + dropdown   |
-| `BottomNav`      | `app/common/components/BottomNav.vue`       | 5 tab, aktif lime + dot                           |
-| `QuizPlusSheet`  | `app/common/components/QuizPlusSheet.vue`   | 2 kartu intent; habis → "Besok lagi 00.00"        |
-| `isNavActive`    | `app/common/utils/nav.ts`                   | Penentu tab aktif (pure, tested)                  |
+| Component       | File                                      | Role                                           |
+| --------------- | ----------------------------------------- | ---------------------------------------------- |
+| `AppHeader`     | `app/common/components/AppHeader.vue`     | Anon: Login/Register; login: avatar + dropdown |
+| `BottomNav`     | `app/common/components/BottomNav.vue`     | 5 tab, aktif lime + dot                        |
+| `QuizPlusSheet` | `app/common/components/QuizPlusSheet.vue` | 2 kartu intent; habis → "Besok lagi 00.00"     |
+| `isNavActive`   | `app/common/utils/nav.ts`                 | Penentu tab aktif (pure, tested)               |
 
 ## See Also
 

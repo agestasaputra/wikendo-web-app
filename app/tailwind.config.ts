@@ -3,7 +3,13 @@
 // Pakai sebagai class (bg-base, bg-tempat, bg-makan, bg-wallet, text-ink). Font Plus Jakarta Sans via nuxt.config head.
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: [],
+  // Template hidup di features/ + common/ (bukan folder default Nuxt) → WAJIB didaftarkan,
+  // kalau tidak Tailwind membuang semua class di sana (desain polos tanpa style).
+  content: [
+    "./features/**/*.{vue,ts}",
+    "./common/**/*.{vue,ts}",
+    "./utils/**/*.ts",
+  ],
   theme: {
     extend: {
       colors: {

@@ -52,18 +52,29 @@ sequenceDiagram
 
 ## Key Components
 
-| Component            | File                                               | Role                                   |
-| -------------------- | -------------------------------------------------- | -------------------------------------- |
-| `useInfiniteList`    | `app/common/composables/useInfiniteList.ts`        | start / loadMore / reset + state       |
-| `useSentinelObserver`| `app/common/composables/useSentinelObserver.ts`    | IntersectionObserver sentinel          |
-| `applyInfinitePage`  | `app/utils/pagination.ts`                          | Gabung page + dedupe (pure)            |
-| `TenantCard`         | `app/features/mall/components/TenantCard.vue`      | Kartu tenant S2c                       |
-| `PromoStrip`         | `app/features/mall/components/PromoStrip.vue`      | Strip promo V13C (maks 3)              |
+| Component             | File                                            | Role                             |
+| --------------------- | ----------------------------------------------- | -------------------------------- |
+| `useInfiniteList`     | `app/common/composables/useInfiniteList.ts`     | start / loadMore / reset + state |
+| `useSentinelObserver` | `app/common/composables/useSentinelObserver.ts` | IntersectionObserver sentinel    |
+| `applyInfinitePage`   | `app/utils/pagination.ts`                       | Gabung page + dedupe (pure)      |
+| `TenantCard`          | `app/features/mall/components/TenantCard.vue`   | Kartu tenant S2c                 |
+| `PromoStrip`          | `app/features/mall/components/PromoStrip.vue`   | Strip promo V13C (maks 3)        |
 
 ## Data
 
 ```json
-{ "items": [{ "name": "Kopi Kekinian", "category": "kopi", "lantai": "2", "halal": true }], "total": 40, "hasMore": true }
+{
+  "items": [
+    {
+      "name": "Kopi Kekinian",
+      "category": "kopi",
+      "lantai": "2",
+      "halal": true
+    }
+  ],
+  "total": 40,
+  "hasMore": true
+}
 ```
 
 ## Failure & State

@@ -93,19 +93,19 @@ Husky (`app/.husky/pre-commit`) menjalankan 3 cek berurutan dan berhenti di kega
 
 ## Naming conventions
 
-| Artefak                    | Pola                                                   | Contoh                                     |
-| -------------------------- | ------------------------------------------------------ | ------------------------------------------ |
-| Halaman feature            | `PascalCase + Page.vue` di root feature                | `TempatQuizPage.vue`, `MallListPage.vue`   |
-| Route Nuxt                 | kebab-case, **tipis** (render 1 `XPage`)               | `pages/result-makan.vue`                   |
-| Komponen                   | `PascalCase.vue`                                       | `TenantCard.vue`, `AppSpinner.vue`         |
-| Composable (file + fungsi) | `use` + PascalCase → `useCamelCase.ts`                 | `useInfiniteList.ts` → `useInfiniteList()` |
-| Pinia store                | file `XStore.ts`, fungsi `useXStore()`                 | `AuthStore.ts` → `useAuthStore()`          |
-| Type / interface           | PascalCase di `@types/` (feature) / `common/types/`    | `TenantRow`, `QuotaStatus`                 |
-| Konstanta                  | `SCREAMING_SNAKE_CASE`                                 | `MALL_NAMES`, `HISTORY_MAX_ENTRIES`        |
-| Util (pure)                | camelCase di `utils/`                                  | `buildQuotaStatus()`                       |
-| Server route               | `nama.method.ts`                                       | `quota.get.ts`, `recommend.post.ts`        |
-| Test                       | `{nama}.spec.ts` di `__tests__/` sibling               | `utils/__tests__/pagination.spec.ts`       |
-| Field JSON API / DB        | `snake_case`                                           | `claim_code`, `mall_slug`                  |
+| Artefak                    | Pola                                                | Contoh                                     |
+| -------------------------- | --------------------------------------------------- | ------------------------------------------ |
+| Halaman feature            | `PascalCase + Page.vue` di root feature             | `TempatQuizPage.vue`, `MallListPage.vue`   |
+| Route Nuxt                 | kebab-case, **tipis** (render 1 `XPage`)            | `pages/result-makan.vue`                   |
+| Komponen                   | `PascalCase.vue`                                    | `TenantCard.vue`, `AppSpinner.vue`         |
+| Composable (file + fungsi) | `use` + PascalCase → `useCamelCase.ts`              | `useInfiniteList.ts` → `useInfiniteList()` |
+| Pinia store                | file `XStore.ts`, fungsi `useXStore()`              | `AuthStore.ts` → `useAuthStore()`          |
+| Type / interface           | PascalCase di `@types/` (feature) / `common/types/` | `TenantRow`, `QuotaStatus`                 |
+| Konstanta                  | `SCREAMING_SNAKE_CASE`                              | `MALL_NAMES`, `HISTORY_MAX_ENTRIES`        |
+| Util (pure)                | camelCase di `utils/`                               | `buildQuotaStatus()`                       |
+| Server route               | `nama.method.ts`                                    | `quota.get.ts`, `recommend.post.ts`        |
+| Test                       | `{nama}.spec.ts` di `__tests__/` sibling            | `utils/__tests__/pagination.spec.ts`       |
+| Field JSON API / DB        | `snake_case`                                        | `claim_code`, `mall_slug`                  |
 
 ---
 
@@ -124,14 +124,14 @@ Husky (`app/.husky/pre-commit`) menjalankan 3 cek berurutan dan berhenti di kega
 
 ### Layers
 
-| Layer         | Folder          | Tanggung jawab                                                                                         | Hard constraint                                       |
-| ------------- | --------------- | ------------------------------------------------------------------------------------------------------ | ----------------------------------------------------- |
-| Pages         | `pages/`        | Route Nuxt file-based                                                                                  | Tanpa business logic; render `features/<f>/XPage.vue` |
+| Layer         | Folder          | Tanggung jawab                                                                                        | Hard constraint                                       |
+| ------------- | --------------- | ----------------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
+| Pages         | `pages/`        | Route Nuxt file-based                                                                                 | Tanpa business logic; render `features/<f>/XPage.vue` |
 | Feature slice | `features/<f>/` | Vertical slice: `XPage.vue`, `components/`, `utils/`, `constants/`, `@types/`, `store/`, `__tests__/` | Tidak boleh import slice lain (ESLint error)          |
-| Common        | `common/`       | Components, composables, store, utils, constants, types bersama                                        | Tidak boleh import `features/`                        |
-| Utils         | `utils/`        | Fungsi pure app-wide (error, pagination, url, boolean)                                                 | Tanpa side effect, tanpa store                        |
-| Server        | `server/`       | API + Supabase admin + LLM                                                                             | Secret hanya di sini                                  |
-| Plugins       | `plugins/`      | Wiring boot (`v-dompurify-html`)                                                                       | Tanpa state komponen                                  |
+| Common        | `common/`       | Components, composables, store, utils, constants, types bersama                                       | Tidak boleh import `features/`                        |
+| Utils         | `utils/`        | Fungsi pure app-wide (error, pagination, url, boolean)                                                | Tanpa side effect, tanpa store                        |
+| Server        | `server/`       | API + Supabase admin + LLM                                                                            | Secret hanya di sini                                  |
+| Plugins       | `plugins/`      | Wiring boot (`v-dompurify-html`)                                                                      | Tanpa state komponen                                  |
 
 ### Cross-feature communication
 
@@ -201,6 +201,7 @@ Set `status: stale` kalau kode berubah tapi tidak sempat update. Cek integritas:
 - `?mall=` di `/makan` hanya skip Q1 kalau slug valid (`MAKAN_MALL_SLUGS`).
 - Server route memakai **import relatif** untuk file di luar `server/`.
 - Tombol yang request API wajib spinner + `:disabled` + early-return guard (anti double-submit).
+- Template (`.vue`) di folder baru di luar default Nuxt (`components`, `layouts`, `pages`, `plugins`, `composables`, `utils`) **wajib didaftarkan** di `app/tailwind.config.ts → content`, kalau tidak Tailwind membuang class-nya (desain polos). Ada test penjaga: `common/__tests__/tailwindContent.spec.ts`.
 - Prod Vercel tidak bisa ke `localhost:20128`: butuh `CLOUDFLARE_*` agar LLM jalan.
 
 ---
@@ -256,14 +257,14 @@ Kontrol lengkap + Known Debt: `docs/architecture/flows/cross-cutting/security/RE
 
 ## Troubleshooting cepat
 
-| Gejala                                               | Cek                                                                                 |
-| ---------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| Result 500                                           | Env LLM ada? Dev: `curl http://127.0.0.1:20128/v1/models`; prod: `CLOUDFLARE_*`     |
-| Result 403 `LOGIN_REQUIRED` / `MAKAN_QUOTA_EXCEEDED` | Normal (quota habis) — incognito / hapus cookie                                     |
+| Gejala                                               | Cek                                                                                           |
+| ---------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| Result 500                                           | Env LLM ada? Dev: `curl http://127.0.0.1:20128/v1/models`; prod: `CLOUDFLARE_*`               |
+| Result 403 `LOGIN_REQUIRED` / `MAKAN_QUOTA_EXCEEDED` | Normal (quota habis) — incognito / hapus cookie                                               |
 | `/mall/:slug` kosong / 404                           | Tabel `malls`/`tenants` belum di-seed (`data/tenants-seed.csv`); slug harus salah satu dari 5 |
-| `pnpm lint` gagal import                             | Lihat pesan `no-restricted-imports` (lintas feature / client→server)                |
-| Page blank setelah build                             | `NUXT_PUBLIC_*` belum diisi di `.env` / Vercel env                                  |
-| Hook commit gagal                                    | Baca outputnya; perbaiki (jangan `--no-verify`)                                     |
+| `pnpm lint` gagal import                             | Lihat pesan `no-restricted-imports` (lintas feature / client→server)                          |
+| Page blank setelah build                             | `NUXT_PUBLIC_*` belum diisi di `.env` / Vercel env                                            |
+| Hook commit gagal                                    | Baca outputnya; perbaiki (jangan `--no-verify`)                                               |
 
 README manusia (setup panjang): `app/README.md`. Kalau kode dan dokumen beda, **kode yang menang** — lalu update dokumen ini + spoke terkait.
 

@@ -50,14 +50,14 @@ Solid arrows = synchronous HTTP. Dashed = pilihan provider berdasarkan env.
 
 ## Layers
 
-| Layer          | Folder           | Responsibility                                          | Hard constraint                                      |
-| -------------- | ---------------- | ------------------------------------------------------- | ---------------------------------------------------- |
-| Pages          | `app/pages/`     | Route Nuxt (file-based) — render 1 `XPage.vue`          | Tanpa business logic                                 |
-| Feature slice  | `app/features/`  | Vertical slice per domain                               | Tidak boleh import slice lain (ESLint error)         |
-| Common         | `app/common/`    | Components, composables, store, utils, constants, types | Tidak boleh import `features/`                       |
-| Utils          | `app/utils/`     | Fungsi pure app-wide (error, pagination, url, boolean)  | Tanpa side effect, tanpa store                       |
-| Server         | `app/server/`    | API + akses DB/LLM                                      | Secret hanya di sini; client dilarang import         |
-| Plugins        | `app/plugins/`   | Wiring boot (`v-dompurify-html`)                        | Tanpa state komponen                                 |
+| Layer         | Folder          | Responsibility                                          | Hard constraint                              |
+| ------------- | --------------- | ------------------------------------------------------- | -------------------------------------------- |
+| Pages         | `app/pages/`    | Route Nuxt (file-based) — render 1 `XPage.vue`          | Tanpa business logic                         |
+| Feature slice | `app/features/` | Vertical slice per domain                               | Tidak boleh import slice lain (ESLint error) |
+| Common        | `app/common/`   | Components, composables, store, utils, constants, types | Tidak boleh import `features/`               |
+| Utils         | `app/utils/`    | Fungsi pure app-wide (error, pagination, url, boolean)  | Tanpa side effect, tanpa store               |
+| Server        | `app/server/`   | API + akses DB/LLM                                      | Secret hanya di sini; client dilarang import |
+| Plugins       | `app/plugins/`  | Wiring boot (`v-dompurify-html`)                        | Tanpa state komponen                         |
 
 ## Folder Structure
 
@@ -98,30 +98,30 @@ Quiz tidak fetch; jawaban dikirim lewat query string. Result membaca `route.quer
 
 ## Topic Index
 
-| Topic                                                              | Cakupan                                                          |
-| ------------------------------------------------------------------ | ---------------------------------------------------------------- |
-| [home](./flows/home/README.md)                                     | Landing + wallet quota + entrypoint mall                         |
-| [quiz-tempat](./flows/quiz-tempat/README.md)                       | Quiz 5 tanya + result tempat (LLM)                               |
-| [quiz-makan](./flows/quiz-makan/README.md)                         | Quiz 4 tanya + result tenant + voucher gift                      |
-| [mall-directory](./flows/mall-directory/README.md)                 | `/mall`, `/mall/:slug`, infinity scroll, filter, promo strip     |
-| [auth](./flows/auth/README.md)                                     | Login, register, check-email, Google, AuthStore, Akun            |
-| [quota](./flows/quota/README.md)                                   | Quota anon (cookie), `GET /api/quota`, wall                      |
-| [voucher-claim](./flows/voucher-claim/README.md)                   | Klaim voucher: VoucherStore + `POST /api/voucher/claim`          |
-| [history](./flows/history/README.md)                               | Riwayat localStorage                                             |
-| [layout-navigation](./flows/layout-navigation/README.md)           | `app.vue`, AppHeader, BottomNav, QuizPlusSheet                   |
-| [llm](./flows/llm/README.md)                                       | Provider CF vs hermes, retry, validasi, fallback                 |
-| [state-management](./flows/cross-cutting/state-management/README.md) | Kapan Pinia vs composable vs `useFetch`                       |
-| [security](./flows/cross-cutting/security/README.md)               | Secrets, XSS, auth, rate-limit, scan                             |
-| [testing-ci](./flows/cross-cutting/testing-ci/README.md)           | Strategi test, Husky, CI                                         |
-| [shared-ui](./flows/cross-cutting/shared-ui/README.md)             | Komponen & composable di `common/`                               |
+| Topic                                                                | Cakupan                                                      |
+| -------------------------------------------------------------------- | ------------------------------------------------------------ |
+| [home](./flows/home/README.md)                                       | Landing + wallet quota + entrypoint mall                     |
+| [quiz-tempat](./flows/quiz-tempat/README.md)                         | Quiz 5 tanya + result tempat (LLM)                           |
+| [quiz-makan](./flows/quiz-makan/README.md)                           | Quiz 4 tanya + result tenant + voucher gift                  |
+| [mall-directory](./flows/mall-directory/README.md)                   | `/mall`, `/mall/:slug`, infinity scroll, filter, promo strip |
+| [auth](./flows/auth/README.md)                                       | Login, register, check-email, Google, AuthStore, Akun        |
+| [quota](./flows/quota/README.md)                                     | Quota anon (cookie), `GET /api/quota`, wall                  |
+| [voucher-claim](./flows/voucher-claim/README.md)                     | Klaim voucher: VoucherStore + `POST /api/voucher/claim`      |
+| [history](./flows/history/README.md)                                 | Riwayat localStorage                                         |
+| [layout-navigation](./flows/layout-navigation/README.md)             | `app.vue`, AppHeader, BottomNav, QuizPlusSheet               |
+| [llm](./flows/llm/README.md)                                         | Provider CF vs hermes, retry, validasi, fallback             |
+| [state-management](./flows/cross-cutting/state-management/README.md) | Kapan Pinia vs composable vs `useFetch`                      |
+| [security](./flows/cross-cutting/security/README.md)                 | Secrets, XSS, auth, rate-limit, scan                         |
+| [testing-ci](./flows/cross-cutting/testing-ci/README.md)             | Strategi test, Husky, CI                                     |
+| [shared-ui](./flows/cross-cutting/shared-ui/README.md)               | Komponen & composable di `common/`                           |
 
 ## Explicit Exclusions
 
-| Item                              | Alasan                                                                          |
-| --------------------------------- | ------------------------------------------------------------------------------- |
-| `supabase/` (migrasi, seed, test) | Skema DB didokumentasikan di `docs/04-Database-Schema.md`; bukan kode Nuxt.     |
-| `design/`, `data/`                | Board desain & CSV seed — bukan kode.                                           |
-| `docs/01…24` (PRD, ADR, addendum) | Dokumen produk historis; arsitektur kode ada di folder ini.                     |
+| Item                              | Alasan                                                                      |
+| --------------------------------- | --------------------------------------------------------------------------- |
+| `supabase/` (migrasi, seed, test) | Skema DB didokumentasikan di `docs/04-Database-Schema.md`; bukan kode Nuxt. |
+| `design/`, `data/`                | Board desain & CSV seed — bukan kode.                                       |
+| `docs/01…24` (PRD, ADR, addendum) | Dokumen produk historis; arsitektur kode ada di folder ini.                 |
 
 ## Not Covered (future work)
 

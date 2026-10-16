@@ -40,10 +40,10 @@ sequenceDiagram
 
 ## Key Components
 
-| Component         | File                                     | Role                                          |
-| ----------------- | ---------------------------------------- | --------------------------------------------- |
-| `HomePage`        | `app/features/home/HomePage.vue`         | Hero, CTA, ikon cepat, kartu mall             |
-| `getHomeHeroMeta` | `app/features/home/utils/homeHero.ts`    | Token warna hero (pure, tested)               |
+| Component         | File                                  | Role                              |
+| ----------------- | ------------------------------------- | --------------------------------- |
+| `HomePage`        | `app/features/home/HomePage.vue`      | Hero, CTA, ikon cepat, kartu mall |
+| `getHomeHeroMeta` | `app/features/home/utils/homeHero.ts` | Token warna hero (pure, tested)   |
 
 ## See Also
 

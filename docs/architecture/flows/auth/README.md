@@ -52,12 +52,12 @@ sequenceDiagram
 
 ## Key Components
 
-| Component          | File                                              | Role                                          |
-| ------------------ | ------------------------------------------------- | --------------------------------------------- |
-| `AuthStore`        | `app/common/store/AuthStore.ts`                   | Session sumber kebenaran (Pinia setup store)  |
-| `useSupabaseBrowser`| `app/common/composables/useSupabaseBrowser.ts`   | Singleton client browser (anon key)           |
-| `useGoogleSignIn`  | `app/features/auth/composables/useGoogleSignIn.ts`| OAuth 1-klik + state loading                  |
-| `PasswordField`, `GoogleButton`, `AuthBanner` | `app/features/auth/components/` | UI bersama login/register         |
+| Component                                     | File                                               | Role                                         |
+| --------------------------------------------- | -------------------------------------------------- | -------------------------------------------- |
+| `AuthStore`                                   | `app/common/store/AuthStore.ts`                    | Session sumber kebenaran (Pinia setup store) |
+| `useSupabaseBrowser`                          | `app/common/composables/useSupabaseBrowser.ts`     | Singleton client browser (anon key)          |
+| `useGoogleSignIn`                             | `app/features/auth/composables/useGoogleSignIn.ts` | OAuth 1-klik + state loading                 |
+| `PasswordField`, `GoogleButton`, `AuthBanner` | `app/features/auth/components/`                    | UI bersama login/register                    |
 
 ## Failure & State
 
