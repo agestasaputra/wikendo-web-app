@@ -1,0 +1,14 @@
+# Build output & dependencies
+node_modules
+.nuxt
+.output
+dist
+coverage
+
+# Generated / lockfile
+pnpm-lock.yaml
+auto-imports.d.ts
+
+# Static assets
+public
+.vitest

@@ -1,0 +1,90 @@
+<!-- common/components/QuizPlusSheet.vue → Sheet Quiz+ 2 intent eksplisit (Addendum docs/24 E1).
+APA: backdrop + dialog 2 kartu (Cari Tempat → /quiz, Cari Makan → /makan) dengan sisa quota jujur; habis = disabled "Besok lagi 00.00".
+KENAPA: 1 tombol + tak bisa bawa 2 intent quota beda (tempat 2/hari vs makan 5/hari) tanpa bohong → cost 2-tap diterima. NOL API baru.
+Contoh: <QuizPlusSheet :tempat-left="1" :tempat-limit="1" :makan-left="2" :makan-limit="2" @go="go" @close="close" /> -->
+<script setup lang="ts">
+defineProps<{
+  tempatLeft: number;
+  tempatLimit: number;
+  makanLeft: number;
+  makanLimit: number;
+}>();
+const emit = defineEmits<{ go: [path: string]; close: [] }>();
+</script>
+
+<template>
+  <div class="fixed inset-0 z-50">
+    <div class="absolute inset-0 bg-black/50" @click="emit('close')" />
+    <div
+      role="dialog"
+      aria-label="Pilih quiz tempat atau makan"
+      class="absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl"
+      style="border-top: 4px solid #0c0a09"
+    >
+      <div class="max-w-md mx-auto px-4 pt-2 pb-6">
+        <div
+          class="w-10 h-1 rounded-full mx-auto mb-1.5"
+          style="background: #d6d3d1"
+        />
+        <div class="flex justify-between items-center">
+          <p class="font-extrabold text-[14px]">Mau cari apa? 🎲</p>
+          <button
+            type="button"
+            aria-label="Tutup sheet pilihan quiz"
+            class="text-gray-500 font-extrabold px-2 py-1"
+            @click="emit('close')"
+          >
+            ✕
+          </button>
+        </div>
+        <p class="text-[11px] font-bold text-gray-500 mb-2">
+          Tempat ya tempat, makan ya makan — quota beda, reset 00.00
+        </p>
+        <div class="flex flex-col gap-2">
+          <button
+            type="button"
+            :disabled="tempatLeft <= 0"
+            class="rounded-xl p-3 flex gap-2 items-center bg-white text-left disabled:opacity-60"
+            style="border: 1.5px solid #e7e5e4"
+            @click="emit('go', '/quiz')"
+          >
+            <span class="text-2xl">🗺️</span>
+            <span class="flex-1 text-[13px] font-extrabold">
+              Cari Tempat<br />
+              <small class="font-bold text-gray-500">
+                Quiz 30 dtk · 2/hari · sisa {{ tempatLeft }}/{{ tempatLimit }}
+              </small>
+            </span>
+            <span
+              class="text-[12px] font-extrabold rounded-full px-3 py-1.5 text-white"
+              style="background: #0c0a09"
+            >
+              {{ tempatLeft <= 0 ? "Besok lagi 00.00" : "Mulai →" }}
+            </span>
+          </button>
+          <button
+            type="button"
+            :disabled="makanLeft <= 0"
+            class="rounded-xl p-3 flex gap-2 items-center bg-white text-left disabled:opacity-60"
+            style="border: 1.5px solid #e7e5e4"
+            @click="emit('go', '/makan')"
+          >
+            <span class="text-2xl">🍜</span>
+            <span class="flex-1 text-[13px] font-extrabold">
+              Cari Makan<br />
+              <small class="font-bold text-gray-500">
+                Quiz 20 dtk · 5/hari · sisa {{ makanLeft }}/{{ makanLimit }}
+              </small>
+            </span>
+            <span
+              class="text-[12px] font-extrabold rounded-full px-3 py-1.5 text-white"
+              style="background: #e11d48"
+            >
+              {{ makanLeft <= 0 ? "Besok lagi 00.00" : "Mulai →" }}
+            </span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
