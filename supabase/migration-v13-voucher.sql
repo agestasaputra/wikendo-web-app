@@ -1,16 +1,16 @@
--- migration-v13-voucher.sql — Tabel `vouchers` + patch `voucher_claims` (Gas v13, Addendum 23 v1.1).
+-- migration-v13-voucher.sql — `vouchers` table + `voucher_claims` patch (Gas v13, Addendum 23 v1.1).
 --
--- APA: bikin 1 tabel baru `vouchers` (multi-voucher per tenant) + tambah kolom yang
---   dipakai `app/server/api/voucher/claim.post.ts` ke `voucher_claims` yang SUDAH ADA.
--- KENAPA file terpisah: `migration-base.sql` (§6 voucher_claims lama: user_id/tenant_id/
---   date/code/redeemed) vs route claim.post.ts butuh (voucher_id/claim_code/claimed_at/
---   redeemed_at). Tanpa patch ini claim pakai token valid bakal 404/500 (temuan audit prod 12 Okt 2026).
--- Cara pakai: buka Supabase Dashboard → SQL Editor → New query → paste SELURUH file ini → Run.
--- Idempotent: semua pakai IF NOT EXISTS / ADD COLUMN IF NOT EXISTS / ON CONFLICT — aman di-run ulang.
--- Urutan: JALANKAN SETELAH migration-base.sql + migration.sql (butuh tabel tenants + voucher_claims ada).
--- Sumber: docs/23-PRD-Addendum-Voucher-Claim.md v1.1 §2 (schema multi-voucher).
+-- WHAT: creates 1 new table `vouchers` (multi-voucher per tenant) + adds the columns
+--   used by `app/server/api/voucher/claim.post.ts` to the EXISTING `voucher_claims`.
+-- WHY a separate file: `migration-base.sql` (§6 old voucher_claims: user_id/tenant_id/
+--   date/code/redeemed) vs the claim.post.ts route, which needs (voucher_id/claim_code/claimed_at/
+--   redeemed_at). Without this patch a claim with a valid token would 404/500 (prod audit finding 12 Oct 2026).
+-- Usage: open Supabase Dashboard → SQL Editor → New query → paste this ENTIRE file → Run.
+-- Idempotent: everything uses IF NOT EXISTS / ADD COLUMN IF NOT EXISTS / ON CONFLICT — safe to re-run.
+-- Order: RUN AFTER migration-base.sql + migration.sql (needs the tenants + voucher_claims tables to exist).
+-- Source: docs/23-PRD-Addendum-Voucher-Claim.md v1.1 §2 (multi-voucher schema).
 
--- 1. Tabel vouchers (1 tenant bisa punya BANYAK promo aktif, P0: 1 claim/tenant/hari)
+-- 1. vouchers table (1 tenant can have MANY active promos, P0: 1 claim/tenant/day)
 CREATE TABLE IF NOT EXISTS vouchers (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
@@ -27,14 +27,14 @@ CREATE TABLE IF NOT EXISTS vouchers (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 COMMENT ON TABLE vouchers IS 'Multi-voucher per tenant (Gas v13 Addendum 23 v1.1). P0: 1 claim per user per tenant per hari, expiry 23:59 WIB.';
-COMMENT ON COLUMN vouchers.code IS 'Kode claim WKD-XXXXXX, UNIQUE.';
+COMMENT ON COLUMN vouchers.code IS 'Claim code WKD-XXXXXX, UNIQUE.';
 
--- Index: lookup promo aktif per tenant yang belum expired (dipakai sheet V13B + strip V13C)
+-- Index: lookup of active, non-expired promos per tenant (used by the V13B sheet + V13C strip)
 CREATE INDEX IF NOT EXISTS idx_vouchers_tenant_active
   ON vouchers(tenant_id, promo_active, valid_until);
 
--- 2. Patch voucher_claims (tabel LAMA dari migration-base.sql §6) biar nyambung ke claim.post.ts
--- Kolom lama tetap dipakai (date/code/redeemed) — kolom baru nambah, NOL hapus data.
+-- 2. Patch voucher_claims (OLD table from migration-base.sql §6) so it fits claim.post.ts
+-- Old columns are still used (date/code/redeemed) — new columns are added, ZERO data deleted.
 ALTER TABLE voucher_claims ADD COLUMN IF NOT EXISTS voucher_id UUID;
 ALTER TABLE voucher_claims ADD COLUMN IF NOT EXISTS claim_code TEXT;
 ALTER TABLE voucher_claims ADD COLUMN IF NOT EXISTS claimed_at TIMESTAMPTZ DEFAULT NOW();
@@ -42,7 +42,7 @@ ALTER TABLE voucher_claims ADD COLUMN IF NOT EXISTS redeemed_at TIMESTAMPTZ;
 ALTER TABLE voucher_claims ADD COLUMN IF NOT EXISTS redeem_code TEXT;
 ALTER TABLE voucher_claims ADD COLUMN IF NOT EXISTS claim_date DATE DEFAULT CURRENT_DATE;
 
--- FK voucher_claims → vouchers (pakai DO block biar aman di-run ulang)
+-- FK voucher_claims → vouchers (uses a DO block so it is safe to re-run)
 DO $$ BEGIN
   IF NOT EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE constraint_name = 'voucher_claims_voucher_id_fkey') THEN
     ALTER TABLE voucher_claims ADD CONSTRAINT voucher_claims_voucher_id_fkey
@@ -50,30 +50,30 @@ DO $$ BEGIN
   END IF;
 END $$;
 
--- Backfill baris lama (kalau tabel sudah ada isinya): isi kolom baru dari kolom lama
+-- Backfill old rows (if the table already has data): fill the new columns from the old ones
 UPDATE voucher_claims SET claim_date = date WHERE claim_date IS NULL;
 UPDATE voucher_claims SET claimed_at = created_at WHERE claimed_at IS NULL;
 UPDATE voucher_claims SET claim_code = code WHERE claim_code IS NULL;
 
--- UNIQUE anti-farming versi claim_date (pelengkap UNIQUE lama user_id+tenant_id+date).
--- KENAPA index, bukan CONSTRAINT: tabel lama sudah punya UNIQUE(date), constraint ganda bisa tabrakan nama.
+-- UNIQUE anti-farming, claim_date version (complements the old UNIQUE user_id+tenant_id+date).
+-- WHY an index, not a CONSTRAINT: the old table already has UNIQUE(date), a duplicate constraint could clash on name.
 CREATE UNIQUE INDEX IF NOT EXISTS idx_voucher_claims_user_tenant_day
   ON voucher_claims(user_id, tenant_id, claim_date);
 CREATE INDEX IF NOT EXISTS idx_voucher_claims_voucher_day
   ON voucher_claims(voucher_id, claimed_at DESC);
 
--- 3. RLS vouchers: publik boleh BACA promo aktif (sheet/strip tanpa login OK),
--- tulis/hapus hanya service role (via supabaseAdmin di server route).
+-- 3. vouchers RLS: the public may READ active promos (sheet/strip works without login),
+-- write/delete only by the service role (via supabaseAdmin in the server route).
 ALTER TABLE vouchers ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Public read active vouchers" ON vouchers;
 CREATE POLICY "Public read active vouchers" ON vouchers FOR SELECT USING (promo_active = true);
 DROP POLICY IF EXISTS "Service manage vouchers" ON vouchers;
 CREATE POLICY "Service manage vouchers" ON vouchers FOR ALL USING (true) WITH CHECK (true);
 
--- 4. Seed CONTOH 3 voucher aktif (idempotent, ON CONFLICT DO UPDATE).
--- KENAPA perlu: sheet V13B butuh "Pilih promo 1 dari 3" + S2-S4 butuh kode buat dites claim.
--- Tenant contoh: tenant PERTAMA Grand Indonesia (kalau seed.sql sudah di-run).
--- Kode contoh: WKD-7X2K9A / WKD-4Y5B3C / WKD-L8M2N1 (sama kayak Addendum 23 §3).
+-- 4. SAMPLE seed of 3 active vouchers (idempotent, ON CONFLICT DO UPDATE).
+-- WHY needed: the V13B sheet needs "Pick 1 of 3 promos" + S2-S4 need codes to test claiming.
+-- Sample tenant: the FIRST Grand Indonesia tenant (if seed.sql has been run).
+-- Sample codes: WKD-7X2K9A / WKD-4Y5B3C / WKD-L8M2N1 (same as Addendum 23 §3).
 WITH gi_tenant AS (
   SELECT t.id AS tid FROM tenants t
   JOIN malls m ON m.id = t.mall_id
@@ -95,6 +95,6 @@ ON CONFLICT (code) DO UPDATE SET
   valid_until = EXCLUDED.valid_until,
   updated_at = NOW();
 
--- 5. Verifikasi otomatis (harus keluar 2 baris COUNT tanpa error merah)
-SELECT 'vouchers' AS tabel, COUNT(*) FROM vouchers
+-- 5. Automatic verification (must return 2 COUNT rows, no red errors)
+SELECT 'vouchers' AS table_name, COUNT(*) FROM vouchers
 UNION ALL SELECT 'voucher_claims', COUNT(*) FROM voucher_claims;

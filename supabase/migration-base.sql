@@ -1,16 +1,16 @@
--- migration-base.sql — Skema DASAR Wikendo (INTERPRETASI LANGSUNG dari docs/04-Database-Schema.md v1.1).
+-- migration-base.sql — Wikendo BASE schema (DIRECT INTERPRETATION of docs/04-Database-Schema.md v1.1).
 --
--- APA: bikin 6 tabel dasar (user_profiles, user_quota, generations, favorites,
+-- WHAT: creates the 6 base tables (user_profiles, user_quota, generations, favorites,
 --   analytics_events, voucher_claims) + index + RLS + 4 functions.
--- KENAPA file terpisah dari migration.sql: skema dasar (quiz tempat + auth + voucher)
---   vs migration.sql (mall F&B Phase 8.1). Run file INI DULU, baru migration.sql, baru seed.sql.
--- Cara pakai: paste SELURUH file ini di Supabase Dashboard → SQL Editor → New query → Run.
--- Idempotent: semua pakai IF NOT EXISTS / DROP IF EXISTS / ON CONFLICT — aman di-run ulang.
--- Sumber: docs/04-Database-Schema.md (§ user_profiles, user_quota, generations,
+-- WHY a separate file from migration.sql: base schema (place quiz + auth + voucher)
+--   vs migration.sql (mall F&B Phase 8.1). Run THIS file FIRST, then migration.sql, then seed.sql.
+-- Usage: paste this ENTIRE file into Supabase Dashboard → SQL Editor → New query → Run.
+-- Idempotent: everything uses IF NOT EXISTS / DROP IF EXISTS / ON CONFLICT — safe to re-run.
+-- Source: docs/04-Database-Schema.md (§ user_profiles, user_quota, generations,
 --   favorites, analytics_events, functions, voucher_claims Addendum 09 v1.3).
--- Patch Addendum 09 v1.3 (7 Okt 2026): phone OPTIONAL (NULL = user skip, valid).
+-- Patch Addendum 09 v1.3 (7 Oct 2026): phone OPTIONAL (NULL = user skipped, valid).
 
--- 1. user_profiles (phone OPTIONAL sejak Addendum 09 v1.3)
+-- 1. user_profiles (phone OPTIONAL since Addendum 09 v1.3)
 CREATE TABLE IF NOT EXISTS user_profiles (
   user_id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   phone TEXT DEFAULT NULL,
@@ -30,7 +30,7 @@ END $$;
 COMMENT ON TABLE user_profiles IS 'Extended user profile data';
 COMMENT ON COLUMN user_profiles.phone IS 'OPTIONAL since Addendum 09 v1.3 (was mandatory). +62 format if filled, NULL if skipped. Phase 2: broadcast promo.';
 
--- 2. user_quota (quota TEMPAT login: 2/hari. Makan pakai mall_search_quota di migration.sql)
+-- 2. user_quota (PLACE quota for logged-in users: 2/day. Food uses mall_search_quota in migration.sql)
 CREATE TABLE IF NOT EXISTS user_quota (
   user_id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   quota_used INT DEFAULT 0 CHECK (quota_used >= 0),
@@ -39,11 +39,11 @@ CREATE TABLE IF NOT EXISTS user_quota (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 CREATE INDEX IF NOT EXISTS idx_user_quota_last_reset ON user_quota(last_reset_at);
-COMMENT ON TABLE user_quota IS 'Daily generation quota tracking (TEMPAT 2/hari)';
+COMMENT ON TABLE user_quota IS 'Daily generation quota tracking (PLACE 2/day)';
 COMMENT ON COLUMN user_quota.quota_used IS 'Number of generations used today (0-2)';
 COMMENT ON COLUMN user_quota.quota_limit IS 'Max generations per day (default 2)';
 
--- 3. generations (dipakai API recommend tempat + makan buat nyimpen hasil)
+-- 3. generations (used by the place + food recommend APIs to store results)
 CREATE TABLE IF NOT EXISTS generations (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,
@@ -59,10 +59,10 @@ CREATE INDEX IF NOT EXISTS idx_generations_user_created ON generations(user_id, 
 COMMENT ON TABLE generations IS 'All recommendation generation records';
 COMMENT ON COLUMN generations.user_id IS 'NULL for anonymous users';
 COMMENT ON COLUMN generations.session_id IS 'Anonymous tracking via cookie';
-COMMENT ON COLUMN generations.quiz_input IS 'JSON: {mood, companion, budget, radius, city, time} atau QuizMakanInput + type';
+COMMENT ON COLUMN generations.quiz_input IS 'JSON: {mood, companion, budget, location, time} or QuizFoodInput + type';
 COMMENT ON COLUMN generations.recommendations IS 'JSON array: [{name, category, reason, cost, location, time, confidence}]';
 
--- 4. favorites (Post-MVP, wishlist user login)
+-- 4. favorites (Post-MVP, wishlist for logged-in users)
 CREATE TABLE IF NOT EXISTS favorites (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
@@ -77,7 +77,7 @@ CREATE INDEX IF NOT EXISTS idx_favorites_created_at ON favorites(created_at DESC
 CREATE UNIQUE INDEX IF NOT EXISTS idx_favorites_unique ON favorites(user_id, generation_id, recommendation_index);
 COMMENT ON TABLE favorites IS 'User-saved favorite recommendations';
 
--- 5. analytics_events (internal tracking cost/usage)
+-- 5. analytics_events (internal cost/usage tracking)
 CREATE TABLE IF NOT EXISTS analytics_events (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   event_type TEXT NOT NULL,
@@ -91,9 +91,9 @@ CREATE INDEX IF NOT EXISTS idx_analytics_created_at ON analytics_events(created_
 CREATE INDEX IF NOT EXISTS idx_analytics_user_id ON analytics_events(user_id);
 COMMENT ON TABLE analytics_events IS 'Internal analytics and cost tracking';
 
--- 6. voucher_claims (BARU Addendum 09 v1.3: klaim voucher WAJIB login, anti-farming)
--- CATATAN URUTAN: FK ke tenants DITAMBAH TERPISAH (lihat §8b) karena tabel tenants
--- dibuat di migration.sql (Phase 8.1). File ini tetap bisa di-run DULUAN tanpa error.
+-- 6. voucher_claims (NEW in Addendum 09 v1.3: claiming a voucher REQUIRES login, anti-farming)
+-- ORDER NOTE: the FK to tenants is ADDED SEPARATELY (see §8b) because the tenants table
+-- is created in migration.sql (Phase 8.1). This file can still be run FIRST without errors.
 CREATE TABLE IF NOT EXISTS voucher_claims (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
@@ -106,7 +106,7 @@ CREATE TABLE IF NOT EXISTS voucher_claims (
 );
 CREATE INDEX IF NOT EXISTS idx_voucher_claims_user ON voucher_claims(user_id, date DESC);
 CREATE INDEX IF NOT EXISTS idx_voucher_claims_tenant ON voucher_claims(tenant_id, date DESC);
-COMMENT ON TABLE voucher_claims IS 'Klaim voucher makan: 1 user = 1x per tenant per hari (WAJIB login, anti-farming)';
+COMMENT ON TABLE voucher_claims IS 'Food voucher claims: 1 user = 1x per tenant per day (login REQUIRED, anti-farming)';
 
 -- 7. RLS (Row-Level Security)
 ALTER TABLE user_profiles ENABLE ROW LEVEL SECURITY;
@@ -166,7 +166,7 @@ BEGIN
   ON CONFLICT (user_id, date) DO NOTHING;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
-COMMENT ON FUNCTION initialize_new_user IS 'Set up new user profile and quota (tempat 2 + makan 5). Phone optional since Addendum 09 v1.3';
+COMMENT ON FUNCTION initialize_new_user IS 'Set up new user profile and quota (place 2 + food 5). Phone optional since Addendum 09 v1.3';
 
 CREATE OR REPLACE FUNCTION check_and_increment_quota(p_user_id UUID)
 RETURNS TABLE(allowed BOOLEAN, remaining INT, reset_at TIMESTAMPTZ) AS $$
@@ -220,9 +220,9 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 COMMENT ON FUNCTION get_user_history IS 'Get paginated generation history for user';
 
--- 8b. FK voucher_claims → tenants (DITAMBAH SETELAH migration.sql di-run).
--- KENAPA dipisah: tabel tenants dibuat di migration.sql (Phase 8.1).
--- Kalau migration.sql sudah di-run, Jalankan blok ini sekali (aman di-run ulang).
+-- 8b. FK voucher_claims → tenants (ADDED AFTER migration.sql has been run).
+-- WHY separate: the tenants table is created in migration.sql (Phase 8.1).
+-- Once migration.sql has been run, run this block once (safe to re-run).
 DO $$ BEGIN
   IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'tenants')
      AND NOT EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE constraint_name = 'voucher_claims_tenant_id_fkey') THEN
@@ -231,8 +231,8 @@ DO $$ BEGIN
   END IF;
 END $$;
 
--- 9. Verifikasi otomatis (harus keluar 6 baris COUNT, semua angka ≥ 0 tanpa error merah)
-SELECT 'user_profiles' AS tabel, COUNT(*) FROM user_profiles
+-- 9. Automatic verification (must return 6 COUNT rows, all numbers ≥ 0, no red errors)
+SELECT 'user_profiles' AS table_name, COUNT(*) FROM user_profiles
 UNION ALL SELECT 'user_quota', COUNT(*) FROM user_quota
 UNION ALL SELECT 'generations', COUNT(*) FROM generations
 UNION ALL SELECT 'favorites', COUNT(*) FROM favorites

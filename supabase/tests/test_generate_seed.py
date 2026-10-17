@@ -1,22 +1,30 @@
-"""Unit test buat supabase/generate_seed.py (TDD: RED dulu, GREEN setelah generator jadi).
+"""Unit tests for supabase/generate_seed.py (TDD: RED first, GREEN once the generator exists).
 
-APA: ngetes fungsi murni konversi CSV → SQL (parse mission, escape quote, bool, meta mall).
-KENAPA: 1 quote lolos (McDonald's) = seed gagal total di Supabase. Test ini yang jagain.
-Cara jalan: cd supabase && python3 -m pytest tests/ -q  (atau: npm run test:seed dari app/)
+WHAT: tests the pure CSV → SQL conversion functions (parse mission, escape quote, bool, mall meta).
+WHY: one unescaped quote (McDonald's) = the whole seed fails in Supabase. These tests guard that.
+Run: cd supabase && python3 -m pytest tests/ -q  (or: npm run test:seed from app/)
 """
 import os
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from generate_seed import parse_mission, sql_escape, to_bool, to_bool_nullable, tenant_to_sql, MALL_META
+from generate_seed import (
+    MALL_META,
+    parse_mission,
+    parse_price,
+    sql_escape,
+    tenant_to_sql,
+    to_bool,
+    to_bool_nullable,
+)
 
 
 def test_parse_mission_single():
-    assert parse_mission("keluarga") == ["keluarga"]
+    assert parse_mission("family") == ["family"]
 
 
 def test_parse_mission_pipe():
-    assert parse_mission("makan_cepat|keluarga") == ["makan_cepat", "keluarga"]
+    assert parse_mission("quick_bite|family") == ["quick_bite", "family"]
 
 
 def test_parse_mission_empty():
@@ -24,8 +32,8 @@ def test_parse_mission_empty():
 
 
 def test_sql_escape_quote():
-    # McDonald's & Roti'O ada di CSV — 1 quote lolos = INSERT fail semua
-    # McDonald's cuma punya 1 apostrof → escape jadi McDonald''s (2 quote = 1 literal)
+    # McDonald's & Roti'O are in the CSV — one unescaped quote = every INSERT fails
+    # McDonald's has just 1 apostrophe → escaped to McDonald''s (2 quotes = 1 literal)
     assert sql_escape("McDonald's") == "McDonald''s"
     assert sql_escape("Roti'O") == "Roti''O"
 
@@ -40,8 +48,8 @@ def test_to_bool():
 
 
 def test_to_bool_nullable_empty_is_none():
-    # Aturan baru (approved): field belum riset → NULL, bukan FALSE.
-    # Kosong/"unknown"/"-" dari scrape|deep-research = belum tau, bukan non-halal.
+    # New rule (approved): a field not researched yet → NULL, not FALSE.
+    # Empty/"unknown"/"-" from scrape|deep-research = unknown, not non-halal.
     assert to_bool_nullable("") is None
     assert to_bool_nullable("unknown") is None
     assert to_bool_nullable("-") is None
@@ -50,18 +58,19 @@ def test_to_bool_nullable_empty_is_none():
 
 
 def test_tenant_to_sql_null_halal_sets_needs_survey():
-    # Tenant hasil scrape tanpa info halal → halal NULL + needs_survey TRUE,
-    # supaya masuk antrian survey manual & di-exclude dari filter halal-only.
+    # A scraped tenant without halal info → halal NULL + needs_survey TRUE,
+    # so it enters the manual survey queue & is excluded from the halal-only filter.
     row = {
         "mall_slug": "grand-indonesia",
         "tenant_name": "Tenant Baru X",
-        "category": "kopi",
-        "lantai": "LG",
+        "category": "coffee",
+        "floor": "LG",
         "halal": "",
-        "budget_tier": "hemat",
-        "price_range": "",
+        "budget_tier": "budget",
+        "price_min": "",
+        "price_max": "",
         "kids_friendly": "",
-        "mission": "nongkrong_lama",
+        "mission": "long_hangout",
         "hype_tiktok": "",
         "is_open": "true",
     }
@@ -88,16 +97,80 @@ def test_tenant_to_sql_uses_mission_array():
         "mall_slug": "grand-indonesia",
         "tenant_name": "McDonald's",
         "category": "fastfood",
-        "lantai": "LG",
+        "floor": "LG",
         "halal": "true",
-        "budget_tier": "hemat",
-        "price_range": "Rp 30-70rb",
+        "budget_tier": "budget",
+        "price_min": "30000",
+        "price_max": "70000",
         "kids_friendly": "true",
-        "mission": "makan_cepat|keluarga",
+        "mission": "quick_bite|family",
         "hype_tiktok": "false",
         "is_open": "true",
     }
     sql = tenant_to_sql(row)
     assert "McDonald''s" in sql
-    assert "ARRAY['makan_cepat','keluarga']" in sql
+    assert "ARRAY['quick_bite','family']" in sql
     assert "WHERE slug='grand-indonesia'" in sql
+
+
+def test_parse_price_integer_rupiah():
+    assert parse_price("30000") == 30000
+    assert parse_price(" 150000 ") == 150000
+
+
+def test_parse_price_empty_is_none():
+    # Unknown price → NULL (same tri-state idea as halal/kids/hype)
+    assert parse_price("") is None
+    assert parse_price(None) is None
+
+
+def test_parse_price_rejects_bad_values():
+    for bad in ("Rp 30-70rb", "30.5", "-1", "abc"):
+        try:
+            parse_price(bad)
+        except ValueError:
+            continue
+        raise AssertionError("expected ValueError for %r" % bad)
+
+
+def test_tenant_to_sql_writes_integer_price_columns():
+    row = {
+        "mall_slug": "grand-indonesia",
+        "tenant_name": "HokBen",
+        "category": "japanese",
+        "floor": "3A",
+        "halal": "true",
+        "budget_tier": "budget",
+        "price_min": "30000",
+        "price_max": "80000",
+        "kids_friendly": "true",
+        "mission": "quick_bite",
+        "hype_tiktok": "false",
+        "is_open": "true",
+    }
+    sql = tenant_to_sql(row)
+    assert "price_min, price_max" in sql
+    assert "30000, 80000" in sql
+    assert "price_range" not in sql
+
+
+def test_tenant_to_sql_min_above_max_raises():
+    row = {
+        "mall_slug": "grand-indonesia",
+        "tenant_name": "X",
+        "category": "coffee",
+        "floor": "1",
+        "halal": "true",
+        "budget_tier": "mid",
+        "price_min": "90000",
+        "price_max": "30000",
+        "kids_friendly": "true",
+        "mission": "family",
+        "hype_tiktok": "false",
+        "is_open": "true",
+    }
+    try:
+        tenant_to_sql(row)
+    except ValueError:
+        return
+    raise AssertionError("expected ValueError when price_min > price_max")

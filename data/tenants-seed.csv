@@ -1,201 +1,201 @@
-mall_slug,mall_name,tenant_name,category,lantai,halal,budget_tier,price_range,kids_friendly,mission,hype_tiktok,is_open
-grand-indonesia,Grand Indonesia,HokBen,japanese,3A,true,hemat,Rp 30-80rb,true,makan_cepat|keluarga,false,true
-grand-indonesia,Grand Indonesia,Marugame Udon,japanese,3A,true,hemat,Rp 30-70rb,true,makan_cepat,false,true
-grand-indonesia,Grand Indonesia,Sushi Tei,japanese,3A,true,menengah,Rp 100-200rb,true,keluarga,false,true
-grand-indonesia,Grand Indonesia,Genki Sushi,japanese,LG,true,menengah,Rp 80-150rb,true,makan_cepat,true,true
-grand-indonesia,Grand Indonesia,IPPUDO,japanese,3A,false,menengah,Rp 80-150rb,false,nongkrong_lama,false,true
-grand-indonesia,Grand Indonesia,Coco Ichibanya,japanese,3A,true,menengah,Rp 60-120rb,true,makan_cepat,false,true
-grand-indonesia,Grand Indonesia,Shaburi & Kintan Buffet,japanese,5,true,leluasa,Rp 200-350rb,true,keluarga,true,true
-grand-indonesia,Grand Indonesia,Haidilao,chinese,3A,true,leluasa,Rp 200-350rb,true,keluarga|healing,true,true
-grand-indonesia,Grand Indonesia,Din Tai Fung,chinese,3A,true,leluasa,Rp 150-300rb,true,keluarga,false,true
-grand-indonesia,Grand Indonesia,Ta Wan,chinese,3A,true,menengah,Rp 60-120rb,true,keluarga,false,true
-grand-indonesia,Grand Indonesia,Bakmi GM,indonesia,3A,true,hemat,Rp 30-70rb,true,makan_cepat|keluarga,false,true
-grand-indonesia,Grand Indonesia,Sate Khas Senayan,indonesia,3A,true,menengah,Rp 60-150rb,true,keluarga,false,true
-grand-indonesia,Grand Indonesia,Dapur Solo,indonesia,LG,true,hemat,Rp 30-80rb,true,keluarga,false,true
-grand-indonesia,Grand Indonesia,Solaria,indonesia,LG,true,hemat,Rp 30-70rb,true,keluarga,false,true
-grand-indonesia,Grand Indonesia,Abuba Steak,western,3A,true,menengah,Rp 80-150rb,true,keluarga,false,true
-grand-indonesia,Grand Indonesia,Holycow Steak,western,LG,true,menengah,Rp 80-180rb,false,nongkrong_lama,true,true
-grand-indonesia,Grand Indonesia,AW Kitchen,western,1,true,leluasa,Rp 150-300rb,false,healing,false,true
-grand-indonesia,Grand Indonesia,Paul Bakery,bakery,1,false,leluasa,Rp 100-250rb,false,nongkrong_lama|healing,false,true
-grand-indonesia,Grand Indonesia,Union,western,1,true,leluasa,Rp 150-300rb,false,nongkrong_lama,true,true
-grand-indonesia,Grand Indonesia,Burgreens,healthy,LG,true,menengah,Rp 60-120rb,false,healing,true,true
-grand-indonesia,Grand Indonesia,Starbucks Reserve,kopi,1,true,menengah,Rp 50-100rb,false,nongkrong_lama,false,true
-grand-indonesia,Grand Indonesia,% Arabica,kopi,LG,true,menengah,Rp 50-90rb,false,nongkrong_lama,true,true
-grand-indonesia,Grand Indonesia,Fore Coffee,kopi,LG,true,hemat,Rp 25-50rb,false,nongkrong_lama,true,true
-grand-indonesia,Grand Indonesia,Kopi Kenangan,kopi,LG,true,hemat,Rp 20-45rb,false,nongkrong_lama,false,true
-grand-indonesia,Grand Indonesia,J.CO Donuts,dessert,LG,true,hemat,Rp 30-80rb,true,keluarga,false,true
-grand-indonesia,Grand Indonesia,BreadTalk,bakery,LG,true,hemat,Rp 20-60rb,true,makan_cepat,false,true
-grand-indonesia,Grand Indonesia,The Harvest,dessert,LG,true,menengah,Rp 50-150rb,true,keluarga,false,true
-grand-indonesia,Grand Indonesia,Xing Fu Tang,minuman,LG,true,hemat,Rp 25-50rb,false,nongkrong_lama,true,true
-grand-indonesia,Grand Indonesia,Chatime,minuman,LG,true,hemat,Rp 25-45rb,false,makan_cepat,false,true
-grand-indonesia,Grand Indonesia,Koi The,minuman,LG,true,hemat,Rp 25-50rb,false,makan_cepat,false,true
-grand-indonesia,Grand Indonesia,Yoshinoya,fastfood,LG,true,hemat,Rp 30-70rb,true,makan_cepat,false,true
-grand-indonesia,Grand Indonesia,KFC,fastfood,LG,true,hemat,Rp 30-70rb,true,keluarga,false,true
-grand-indonesia,Grand Indonesia,McDonald's,fastfood,LG,true,hemat,Rp 30-70rb,true,keluarga,false,true
-grand-indonesia,Grand Indonesia,Gion Sushi,japanese,Foodprint,true,hemat,Rp 30-80rb,true,makan_cepat,true,true
-grand-indonesia,Grand Indonesia,Cafe Kissa,kopi,G,true,menengah,Rp 50-100rb,false,nongkrong_lama|healing,true,true
-grand-indonesia,Grand Indonesia,Ramen SeiRock-Ya,japanese,3A,false,menengah,Rp 70-130rb,false,makan_cepat,false,true
-grand-indonesia,Grand Indonesia,Sushi Go!,japanese,LG,true,hemat,Rp 30-80rb,true,makan_cepat,true,true
-grand-indonesia,Grand Indonesia,D'Crepes,dessert,LG,true,hemat,Rp 25-50rb,true,makan_cepat,false,true
-grand-indonesia,Grand Indonesia,Roti'O,bakery,LG,true,hemat,Rp 15-30rb,false,makan_cepat,false,true
-grand-indonesia,Grand Indonesia,A&W,fastfood,LG,true,hemat,Rp 30-80rb,true,keluarga,false,true
-central-park,Central Park,Sushiro,japanese,LG,true,menengah,Rp 80-150rb,true,keluarga,true,true
-central-park,Central Park,HokBen,japanese,LG,true,hemat,Rp 30-80rb,true,keluarga,false,true
-central-park,Central Park,Marugame Udon,japanese,LG,true,hemat,Rp 30-70rb,true,makan_cepat,false,true
-central-park,Central Park,Sushi Tei,japanese,1,true,menengah,Rp 100-200rb,true,keluarga,false,true
-central-park,Central Park,Ramen SeiRock-Ya,japanese,LG,true,menengah,Rp 70-130rb,false,makan_cepat,false,true
-central-park,Central Park,IPPUDO,japanese,1,false,menengah,Rp 80-150rb,false,nongkrong_lama,false,true
-central-park,Central Park,Din Tai Fung,chinese,1,true,leluasa,Rp 150-300rb,true,keluarga,false,true
-central-park,Central Park,Ta Wan,chinese,LG,true,menengah,Rp 60-120rb,true,keluarga,false,true
-central-park,Central Park,Imperial Kitchen,chinese,1,true,menengah,Rp 80-150rb,true,keluarga,false,true
-central-park,Central Park,Bakmi GM,indonesia,LG,true,hemat,Rp 30-70rb,true,keluarga,false,true
-central-park,Central Park,Sate Khas Senayan,indonesia,1,true,menengah,Rp 60-150rb,true,keluarga,false,true
-central-park,Central Park,Dapur Solo,indonesia,LG,true,hemat,Rp 30-80rb,true,keluarga,false,true
-central-park,Central Park,Solaria,indonesia,LG,true,hemat,Rp 30-70rb,true,keluarga,false,true
-central-park,Central Park,Gokana Ramen,japanese,LG,true,hemat,Rp 30-70rb,true,makan_cepat,false,true
-central-park,Central Park,RamenYA!,japanese,LG,true,hemat,Rp 40-80rb,true,makan_cepat,false,true
-central-park,Central Park,Yoshinoya,fastfood,LG,true,hemat,Rp 30-70rb,true,makan_cepat,false,true
-central-park,Central Park,KFC,fastfood,LG,true,hemat,Rp 30-70rb,true,keluarga,false,true
-central-park,Central Park,McDonald's,fastfood,Tribeca,true,hemat,Rp 30-70rb,true,keluarga,false,true
-central-park,Central Park,Pizza Hut,western,LG,true,menengah,Rp 60-150rb,true,keluarga,false,true
-central-park,Central Park,Abuba Steak,western,1,true,menengah,Rp 80-150rb,true,keluarga,false,true
-central-park,Central Park,Holycow,western,1,true,menengah,Rp 80-180rb,false,nongkrong_lama,true,true
-central-park,Central Park,Starbucks,kopi,1,true,menengah,Rp 50-100rb,false,nongkrong_lama,false,true
-central-park,Central Park,Fore Coffee,kopi,LG,true,hemat,Rp 25-50rb,false,nongkrong_lama,true,true
-central-park,Central Park,Kopi Kenangan,kopi,LG,true,hemat,Rp 20-45rb,false,nongkrong_lama,false,true
-central-park,Central Park,Janji Jiwa,kopi,LG,true,hemat,Rp 20-40rb,false,nongkrong_lama,false,true
-central-park,Central Park,Excelso,kopi,1,true,menengah,Rp 40-90rb,false,nongkrong_lama,false,true
-central-park,Central Park,J.CO,dessert,LG,true,hemat,Rp 30-80rb,true,keluarga,false,true
-central-park,Central Park,Chatime,minuman,LG,true,hemat,Rp 25-45rb,false,makan_cepat,false,true
-central-park,Central Park,Koi The,minuman,LG,true,hemat,Rp 25-50rb,false,makan_cepat,false,true
-central-park,Central Park,Xing Fu Tang,minuman,LG,true,hemat,Rp 25-50rb,false,nongkrong_lama,true,true
-central-park,Central Park,BreadTalk,bakery,LG,true,hemat,Rp 20-60rb,true,makan_cepat,false,true
-central-park,Central Park,Roti'O,bakery,LG,true,hemat,Rp 15-30rb,false,makan_cepat,false,true
-central-park,Central Park,The Harvest,dessert,LG,true,menengah,Rp 50-150rb,true,keluarga,false,true
-central-park,Central Park,Haidilao,chinese,1,true,leluasa,Rp 200-350rb,true,keluarga,true,true
-central-park,Central Park,Shaburi,japanese,1,true,leluasa,Rp 200-300rb,true,keluarga,false,true
-central-park,Central Park,Kintan Buffet,japanese,1,true,leluasa,Rp 200-300rb,true,keluarga,false,true
-central-park,Central Park,CFC,fastfood,LG,true,hemat,Rp 25-60rb,true,keluarga,false,true
-central-park,Central Park,D'Crepes,dessert,LG,true,hemat,Rp 25-50rb,true,makan_cepat,false,true
-central-park,Central Park,Burgreens,healthy,Tribeca,true,menengah,Rp 60-120rb,false,healing,true,true
-central-park,Central Park,Sushi Go!,japanese,LG,true,hemat,Rp 30-80rb,true,makan_cepat,true,true
-kota-kasablanka,Kota Kasablanka,HokBen,japanese,LG,true,hemat,Rp 30-80rb,true,keluarga,false,true
-kota-kasablanka,Kota Kasablanka,Sushi Tei,japanese,UG,true,menengah,Rp 100-200rb,true,keluarga,false,true
-kota-kasablanka,Kota Kasablanka,Marugame Udon,japanese,LG,true,hemat,Rp 30-70rb,true,makan_cepat,false,true
-kota-kasablanka,Kota Kasablanka,Gokana,japanese,LG,true,hemat,Rp 30-70rb,true,makan_cepat,false,true
-kota-kasablanka,Kota Kasablanka,RamenYA!,japanese,LG,true,hemat,Rp 40-80rb,true,makan_cepat,false,true
-kota-kasablanka,Kota Kasablanka,Din Tai Fung,chinese,UG,true,leluasa,Rp 150-300rb,true,keluarga,false,true
-kota-kasablanka,Kota Kasablanka,Ta Wan,chinese,LG,true,menengah,Rp 60-120rb,true,keluarga,false,true
-kota-kasablanka,Kota Kasablanka,Imperial Kitchen,chinese,UG,true,menengah,Rp 80-150rb,true,keluarga,false,true
-kota-kasablanka,Kota Kasablanka,Bakmi GM,indonesia,LG,true,hemat,Rp 30-70rb,true,keluarga,false,true
-kota-kasablanka,Kota Kasablanka,Sate Khas Senayan,indonesia,UG,true,menengah,Rp 60-150rb,true,keluarga,false,true
-kota-kasablanka,Kota Kasablanka,Dapur Solo,indonesia,LG,true,hemat,Rp 30-80rb,true,keluarga,false,true
-kota-kasablanka,Kota Kasablanka,Solaria,indonesia,LG,true,hemat,Rp 30-70rb,true,keluarga,false,true
-kota-kasablanka,Kota Kasablanka,Yoshinoya,fastfood,LG,true,hemat,Rp 30-70rb,true,makan_cepat,false,true
-kota-kasablanka,Kota Kasablanka,KFC,fastfood,LG,true,hemat,Rp 30-70rb,true,keluarga,false,true
-kota-kasablanka,Kota Kasablanka,McDonald's,fastfood,GF,true,hemat,Rp 30-70rb,true,keluarga,false,true
-kota-kasablanka,Kota Kasablanka,CFC,fastfood,LG,true,hemat,Rp 25-60rb,true,keluarga,false,true
-kota-kasablanka,Kota Kasablanka,Pizza Hut,western,UG,true,menengah,Rp 60-150rb,true,keluarga,false,true
-kota-kasablanka,Kota Kasablanka,Abuba Steak,western,UG,true,menengah,Rp 80-150rb,true,keluarga,false,true
-kota-kasablanka,Kota Kasablanka,Starbucks,kopi,GF,true,menengah,Rp 50-100rb,false,nongkrong_lama,false,true
-kota-kasablanka,Kota Kasablanka,Fore Coffee,kopi,LG,true,hemat,Rp 25-50rb,false,nongkrong_lama,true,true
-kota-kasablanka,Kota Kasablanka,Kopi Kenangan,kopi,LG,true,hemat,Rp 20-45rb,false,nongkrong_lama,false,true
-kota-kasablanka,Kota Kasablanka,Janji Jiwa,kopi,LG,true,hemat,Rp 20-40rb,false,nongkrong_lama,false,true
-kota-kasablanka,Kota Kasablanka,J.CO,dessert,LG,true,hemat,Rp 30-80rb,true,keluarga,false,true
-kota-kasablanka,Kota Kasablanka,BreadTalk,bakery,LG,true,hemat,Rp 20-60rb,true,makan_cepat,false,true
-kota-kasablanka,Kota Kasablanka,Roti'O,bakery,LG,true,hemat,Rp 15-30rb,false,makan_cepat,false,true
-kota-kasablanka,Kota Kasablanka,The Harvest,dessert,UG,true,menengah,Rp 50-150rb,true,keluarga,false,true
-kota-kasablanka,Kota Kasablanka,Chatime,minuman,LG,true,hemat,Rp 25-45rb,false,makan_cepat,false,true
-kota-kasablanka,Kota Kasablanka,Koi The,minuman,LG,true,hemat,Rp 25-50rb,false,makan_cepat,false,true
-kota-kasablanka,Kota Kasablanka,Xing Fu Tang,minuman,LG,true,hemat,Rp 25-50rb,false,nongkrong_lama,true,true
-kota-kasablanka,Kota Kasablanka,Sushi Go!,japanese,LG,true,hemat,Rp 30-80rb,true,makan_cepat,true,true
-kota-kasablanka,Kota Kasablanka,Haidilao,chinese,UG,true,leluasa,Rp 200-350rb,true,keluarga,true,true
-kota-kasablanka,Kota Kasablanka,Shaburi,japanese,UG,true,leluasa,Rp 200-300rb,true,keluarga,false,true
-kota-kasablanka,Kota Kasablanka,D'Crepes,dessert,LG,true,hemat,Rp 25-50rb,true,makan_cepat,false,true
-kota-kasablanka,Kota Kasablanka,Excelso,kopi,UG,true,menengah,Rp 40-90rb,false,nongkrong_lama,false,true
-kota-kasablanka,Kota Kasablanka,Burgreens,healthy,LG,true,menengah,Rp 60-120rb,false,healing,true,true
-kota-kasablanka,Kota Kasablanka,Holycow,western,UG,true,menengah,Rp 80-180rb,false,nongkrong_lama,true,true
-kota-kasablanka,Kota Kasablanka,Sour Sally,dessert,LG,true,hemat,Rp 30-60rb,true,makan_cepat,false,true
-kota-kasablanka,Kota Kasablanka,Kebab Turki Baba Rafi,fastfood,LG,true,hemat,Rp 20-50rb,false,makan_cepat,false,true
-kota-kasablanka,Kota Kasablanka,Es Teler 77,indonesia,LG,true,hemat,Rp 30-70rb,true,keluarga,false,true
-kota-kasablanka,Kota Kasablanka,Dunkin' Donuts,dessert,LG,true,hemat,Rp 20-50rb,true,keluarga,false,true
-pondok-indah-mall,Pondok Indah Mall,Din Tai Fung,chinese,1,true,leluasa,Rp 150-300rb,true,keluarga,false,true
-pondok-indah-mall,Pondok Indah Mall,Paul Bakery,bakery,GF,false,leluasa,Rp 100-250rb,false,nongkrong_lama,false,true
-pondok-indah-mall,Pondok Indah Mall,Union,western,GF,true,leluasa,Rp 150-300rb,false,nongkrong_lama,true,true
-pondok-indah-mall,Pondok Indah Mall,AW Kitchen,western,1,true,leluasa,Rp 150-300rb,false,healing,false,true
-pondok-indah-mall,Pondok Indah Mall,Haidilao,chinese,3,true,leluasa,Rp 200-350rb,true,keluarga,true,true
-pondok-indah-mall,Pondok Indah Mall,Shaburi,japanese,3,true,leluasa,Rp 200-300rb,true,keluarga,false,true
-pondok-indah-mall,Pondok Indah Mall,Kintan Buffet,japanese,3,true,leluasa,Rp 200-300rb,true,keluarga,false,true
-pondok-indah-mall,Pondok Indah Mall,Sushi Tei,japanese,3,true,menengah,Rp 100-200rb,true,keluarga,false,true
-pondok-indah-mall,Pondok Indah Mall,HokBen,japanese,3,true,hemat,Rp 30-80rb,true,keluarga,false,true
-pondok-indah-mall,Pondok Indah Mall,Marugame Udon,japanese,3,true,hemat,Rp 30-70rb,true,makan_cepat,false,true
-pondok-indah-mall,Pondok Indah Mall,IPPUDO,japanese,1,false,menengah,Rp 80-150rb,false,nongkrong_lama,false,true
-pondok-indah-mall,Pondok Indah Mall,Sushi Hiro,japanese,3,true,menengah,Rp 80-150rb,true,keluarga,true,true
-pondok-indah-mall,Pondok Indah Mall,Genki Sushi,japanese,3,true,menengah,Rp 80-150rb,true,makan_cepat,true,true
-pondok-indah-mall,Pondok Indah Mall,Ta Wan,chinese,3,true,menengah,Rp 60-120rb,true,keluarga,false,true
-pondok-indah-mall,Pondok Indah Mall,Imperial Kitchen,chinese,3,true,menengah,Rp 80-150rb,true,keluarga,false,true
-pondok-indah-mall,Pondok Indah Mall,Bakmi GM,indonesia,3,true,hemat,Rp 30-70rb,true,keluarga,false,true
-pondok-indah-mall,Pondok Indah Mall,Sate Khas Senayan,indonesia,3,true,menengah,Rp 60-150rb,true,keluarga,false,true
-pondok-indah-mall,Pondok Indah Mall,Dapur Solo,indonesia,3,true,hemat,Rp 30-80rb,true,keluarga,false,true
-pondok-indah-mall,Pondok Indah Mall,Solaria,indonesia,3,true,hemat,Rp 30-70rb,true,keluarga,false,true
-pondok-indah-mall,Pondok Indah Mall,Abuba Steak,western,3,true,menengah,Rp 80-150rb,true,keluarga,false,true
-pondok-indah-mall,Pondok Indah Mall,Holycow,western,3,true,menengah,Rp 80-180rb,false,nongkrong_lama,true,true
-pondok-indah-mall,Pondok Indah Mall,Starbucks,kopi,GF,true,menengah,Rp 50-100rb,false,nongkrong_lama,false,true
-pondok-indah-mall,Pondok Indah Mall,% Arabica,kopi,GF,true,menengah,Rp 50-90rb,false,nongkrong_lama,true,true
-pondok-indah-mall,Pondok Indah Mall,Fore Coffee,kopi,LG,true,hemat,Rp 25-50rb,false,nongkrong_lama,true,true
-pondok-indah-mall,Pondok Indah Mall,Kopi Kenangan,kopi,LG,true,hemat,Rp 20-45rb,false,nongkrong_lama,false,true
-pondok-indah-mall,Pondok Indah Mall,TWG Tea,minuman,GF,true,leluasa,Rp 80-150rb,false,nongkrong_lama|healing,false,true
-pondok-indah-mall,Pondok Indah Mall,J.CO,dessert,LG,true,hemat,Rp 30-80rb,true,keluarga,false,true
-pondok-indah-mall,Pondok Indah Mall,The Harvest,dessert,LG,true,menengah,Rp 50-150rb,true,keluarga,false,true
-pondok-indah-mall,Pondok Indah Mall,BreadTalk,bakery,LG,true,hemat,Rp 20-60rb,true,makan_cepat,false,true
-pondok-indah-mall,Pondok Indah Mall,Chatime,minuman,LG,true,hemat,Rp 25-45rb,false,makan_cepat,false,true
-pondok-indah-mall,Pondok Indah Mall,Koi The,minuman,LG,true,hemat,Rp 25-50rb,false,makan_cepat,false,true
-pondok-indah-mall,Pondok Indah Mall,Xing Fu Tang,minuman,LG,true,hemat,Rp 25-50rb,false,nongkrong_lama,true,true
-pondok-indah-mall,Pondok Indah Mall,Yoshinoya,fastfood,LG,true,hemat,Rp 30-70rb,true,makan_cepat,false,true
-pondok-indah-mall,Pondok Indah Mall,McDonald's,fastfood,LG,true,hemat,Rp 30-70rb,true,keluarga,false,true
-pondok-indah-mall,Pondok Indah Mall,Burgreens,healthy,1,true,menengah,Rp 60-120rb,false,healing,true,true
-pondok-indah-mall,Pondok Indah Mall,Sour Sally,dessert,LG,true,hemat,Rp 30-60rb,true,makan_cepat,false,true
-pondok-indah-mall,Pondok Indah Mall,Roti'O,bakery,LG,true,hemat,Rp 15-30rb,false,makan_cepat,false,true
-pondok-indah-mall,Pondok Indah Mall,D'Crepes,dessert,LG,true,hemat,Rp 25-50rb,true,makan_cepat,false,true
-pondok-indah-mall,Pondok Indah Mall,Gokana,japanese,LG,true,hemat,Rp 30-70rb,true,makan_cepat,false,true
-pondok-indah-mall,Pondok Indah Mall,Sushi Go!,japanese,LG,true,hemat,Rp 30-80rb,true,makan_cepat,true,true
-aeon-bsd,Aeon Mall BSD City,Ichiban Sushi,japanese,GF,true,menengah,Rp 80-150rb,true,keluarga,false,true
-aeon-bsd,Aeon Mall BSD City,HokBen,japanese,GF,true,hemat,Rp 30-80rb,true,keluarga,false,true
-aeon-bsd,Aeon Mall BSD City,Marugame Udon,japanese,GF,true,hemat,Rp 30-70rb,true,makan_cepat,false,true
-aeon-bsd,Aeon Mall BSD City,Saizeriya,western,GF,true,hemat,Rp 30-80rb,true,keluarga,false,true
-aeon-bsd,Aeon Mall BSD City,Sushi Tei,japanese,1,true,menengah,Rp 100-200rb,true,keluarga,false,true
-aeon-bsd,Aeon Mall BSD City,Genki Sushi,japanese,GF,true,menengah,Rp 80-150rb,true,makan_cepat,true,true
-aeon-bsd,Aeon Mall BSD City,Gokana,japanese,GF,true,hemat,Rp 30-70rb,true,makan_cepat,false,true
-aeon-bsd,Aeon Mall BSD City,RamenYA!,japanese,GF,true,hemat,Rp 40-80rb,true,makan_cepat,false,true
-aeon-bsd,Aeon Mall BSD City,Ta Wan,chinese,GF,true,menengah,Rp 60-120rb,true,keluarga,false,true
-aeon-bsd,Aeon Mall BSD City,Din Tai Fung,chinese,1,true,leluasa,Rp 150-300rb,true,keluarga,false,true
-aeon-bsd,Aeon Mall BSD City,Bakmi GM,indonesia,GF,true,hemat,Rp 30-70rb,true,keluarga,false,true
-aeon-bsd,Aeon Mall BSD City,Sate Khas Senayan,indonesia,1,true,menengah,Rp 60-150rb,true,keluarga,false,true
-aeon-bsd,Aeon Mall BSD City,Dapur Solo,indonesia,GF,true,hemat,Rp 30-80rb,true,keluarga,false,true
-aeon-bsd,Aeon Mall BSD City,Solaria,indonesia,GF,true,hemat,Rp 30-70rb,true,keluarga,false,true
-aeon-bsd,Aeon Mall BSD City,Es Teler 77,indonesia,GF,true,hemat,Rp 30-70rb,true,keluarga,false,true
-aeon-bsd,Aeon Mall BSD City,Yoshinoya,fastfood,GF,true,hemat,Rp 30-70rb,true,makan_cepat,false,true
-aeon-bsd,Aeon Mall BSD City,KFC,fastfood,GF,true,hemat,Rp 30-70rb,true,keluarga,false,true
-aeon-bsd,Aeon Mall BSD City,McDonald's,fastfood,GF,true,hemat,Rp 30-70rb,true,keluarga,false,true
-aeon-bsd,Aeon Mall BSD City,CFC,fastfood,GF,true,hemat,Rp 25-60rb,true,keluarga,false,true
-aeon-bsd,Aeon Mall BSD City,Pizza Hut,western,1,true,menengah,Rp 60-150rb,true,keluarga,false,true
-aeon-bsd,Aeon Mall BSD City,Abuba Steak,western,1,true,menengah,Rp 80-150rb,true,keluarga,false,true
-aeon-bsd,Aeon Mall BSD City,Starbucks,kopi,GF,true,menengah,Rp 50-100rb,false,nongkrong_lama,false,true
-aeon-bsd,Aeon Mall BSD City,Fore Coffee,kopi,GF,true,hemat,Rp 25-50rb,false,nongkrong_lama,true,true
-aeon-bsd,Aeon Mall BSD City,Kopi Kenangan,kopi,GF,true,hemat,Rp 20-45rb,false,nongkrong_lama,false,true
-aeon-bsd,Aeon Mall BSD City,Janji Jiwa,kopi,GF,true,hemat,Rp 20-40rb,false,nongkrong_lama,false,true
-aeon-bsd,Aeon Mall BSD City,Excelso,kopi,1,true,menengah,Rp 40-90rb,false,nongkrong_lama,false,true
-aeon-bsd,Aeon Mall BSD City,J.CO,dessert,GF,true,hemat,Rp 30-80rb,true,keluarga,false,true
-aeon-bsd,Aeon Mall BSD City,Beard Papa's,dessert,GF,true,hemat,Rp 25-50rb,true,makan_cepat,false,true
-aeon-bsd,Aeon Mall BSD City,BreadTalk,bakery,GF,true,hemat,Rp 20-60rb,true,makan_cepat,false,true
-aeon-bsd,Aeon Mall BSD City,Roti'O,bakery,GF,true,hemat,Rp 15-30rb,false,makan_cepat,false,true
-aeon-bsd,Aeon Mall BSD City,The Harvest,dessert,1,true,menengah,Rp 50-150rb,true,keluarga,false,true
-aeon-bsd,Aeon Mall BSD City,Chatime,minuman,GF,true,hemat,Rp 25-45rb,false,makan_cepat,false,true
-aeon-bsd,Aeon Mall BSD City,Koi The,minuman,GF,true,hemat,Rp 25-50rb,false,makan_cepat,false,true
-aeon-bsd,Aeon Mall BSD City,Xing Fu Tang,minuman,GF,true,hemat,Rp 25-50rb,false,nongkrong_lama,true,true
-aeon-bsd,Aeon Mall BSD City,Sushi Go!,japanese,GF,true,hemat,Rp 30-80rb,true,makan_cepat,true,true
-aeon-bsd,Aeon Mall BSD City,Haidilao,chinese,1,true,leluasa,Rp 200-350rb,true,keluarga,true,true
-aeon-bsd,Aeon Mall BSD City,Shaburi,japanese,1,true,leluasa,Rp 200-300rb,true,keluarga,false,true
-aeon-bsd,Aeon Mall BSD City,D'Crepes,dessert,GF,true,hemat,Rp 25-50rb,true,makan_cepat,false,true
-aeon-bsd,Aeon Mall BSD City,Burgreens,healthy,1,true,menengah,Rp 60-120rb,false,healing,true,true
-aeon-bsd,Aeon Mall BSD City,Kebab Turki Baba Rafi,fastfood,GF,true,hemat,Rp 20-50rb,false,makan_cepat,false,true
+mall_slug,mall_name,tenant_name,category,floor,halal,budget_tier,price_min,price_max,kids_friendly,mission,hype_tiktok,is_open
+grand-indonesia,Grand Indonesia,HokBen,japanese,3A,true,budget,30000,80000,true,quick_bite|family,false,true
+grand-indonesia,Grand Indonesia,Marugame Udon,japanese,3A,true,budget,30000,70000,true,quick_bite,false,true
+grand-indonesia,Grand Indonesia,Sushi Tei,japanese,3A,true,mid,100000,200000,true,family,false,true
+grand-indonesia,Grand Indonesia,Genki Sushi,japanese,LG,true,mid,80000,150000,true,quick_bite,true,true
+grand-indonesia,Grand Indonesia,IPPUDO,japanese,3A,false,mid,80000,150000,false,long_hangout,false,true
+grand-indonesia,Grand Indonesia,Coco Ichibanya,japanese,3A,true,mid,60000,120000,true,quick_bite,false,true
+grand-indonesia,Grand Indonesia,Shaburi & Kintan Buffet,japanese,5,true,splurge,200000,350000,true,family,true,true
+grand-indonesia,Grand Indonesia,Haidilao,chinese,3A,true,splurge,200000,350000,true,family|healing,true,true
+grand-indonesia,Grand Indonesia,Din Tai Fung,chinese,3A,true,splurge,150000,300000,true,family,false,true
+grand-indonesia,Grand Indonesia,Ta Wan,chinese,3A,true,mid,60000,120000,true,family,false,true
+grand-indonesia,Grand Indonesia,Bakmi GM,indonesian,3A,true,budget,30000,70000,true,quick_bite|family,false,true
+grand-indonesia,Grand Indonesia,Sate Khas Senayan,indonesian,3A,true,mid,60000,150000,true,family,false,true
+grand-indonesia,Grand Indonesia,Dapur Solo,indonesian,LG,true,budget,30000,80000,true,family,false,true
+grand-indonesia,Grand Indonesia,Solaria,indonesian,LG,true,budget,30000,70000,true,family,false,true
+grand-indonesia,Grand Indonesia,Abuba Steak,western,3A,true,mid,80000,150000,true,family,false,true
+grand-indonesia,Grand Indonesia,Holycow Steak,western,LG,true,mid,80000,180000,false,long_hangout,true,true
+grand-indonesia,Grand Indonesia,AW Kitchen,western,1,true,splurge,150000,300000,false,healing,false,true
+grand-indonesia,Grand Indonesia,Paul Bakery,bakery,1,false,splurge,100000,250000,false,long_hangout|healing,false,true
+grand-indonesia,Grand Indonesia,Union,western,1,true,splurge,150000,300000,false,long_hangout,true,true
+grand-indonesia,Grand Indonesia,Burgreens,healthy,LG,true,mid,60000,120000,false,healing,true,true
+grand-indonesia,Grand Indonesia,Starbucks Reserve,coffee,1,true,mid,50000,100000,false,long_hangout,false,true
+grand-indonesia,Grand Indonesia,% Arabica,coffee,LG,true,mid,50000,90000,false,long_hangout,true,true
+grand-indonesia,Grand Indonesia,Fore Coffee,coffee,LG,true,budget,25000,50000,false,long_hangout,true,true
+grand-indonesia,Grand Indonesia,Kopi Kenangan,coffee,LG,true,budget,20000,45000,false,long_hangout,false,true
+grand-indonesia,Grand Indonesia,J.CO Donuts,dessert,LG,true,budget,30000,80000,true,family,false,true
+grand-indonesia,Grand Indonesia,BreadTalk,bakery,LG,true,budget,20000,60000,true,quick_bite,false,true
+grand-indonesia,Grand Indonesia,The Harvest,dessert,LG,true,mid,50000,150000,true,family,false,true
+grand-indonesia,Grand Indonesia,Xing Fu Tang,drinks,LG,true,budget,25000,50000,false,long_hangout,true,true
+grand-indonesia,Grand Indonesia,Chatime,drinks,LG,true,budget,25000,45000,false,quick_bite,false,true
+grand-indonesia,Grand Indonesia,Koi The,drinks,LG,true,budget,25000,50000,false,quick_bite,false,true
+grand-indonesia,Grand Indonesia,Yoshinoya,fastfood,LG,true,budget,30000,70000,true,quick_bite,false,true
+grand-indonesia,Grand Indonesia,KFC,fastfood,LG,true,budget,30000,70000,true,family,false,true
+grand-indonesia,Grand Indonesia,McDonald's,fastfood,LG,true,budget,30000,70000,true,family,false,true
+grand-indonesia,Grand Indonesia,Gion Sushi,japanese,Foodprint,true,budget,30000,80000,true,quick_bite,true,true
+grand-indonesia,Grand Indonesia,Cafe Kissa,coffee,G,true,mid,50000,100000,false,long_hangout|healing,true,true
+grand-indonesia,Grand Indonesia,Ramen SeiRock-Ya,japanese,3A,false,mid,70000,130000,false,quick_bite,false,true
+grand-indonesia,Grand Indonesia,Sushi Go!,japanese,LG,true,budget,30000,80000,true,quick_bite,true,true
+grand-indonesia,Grand Indonesia,D'Crepes,dessert,LG,true,budget,25000,50000,true,quick_bite,false,true
+grand-indonesia,Grand Indonesia,Roti'O,bakery,LG,true,budget,15000,30000,false,quick_bite,false,true
+grand-indonesia,Grand Indonesia,A&W,fastfood,LG,true,budget,30000,80000,true,family,false,true
+central-park,Central Park,Sushiro,japanese,LG,true,mid,80000,150000,true,family,true,true
+central-park,Central Park,HokBen,japanese,LG,true,budget,30000,80000,true,family,false,true
+central-park,Central Park,Marugame Udon,japanese,LG,true,budget,30000,70000,true,quick_bite,false,true
+central-park,Central Park,Sushi Tei,japanese,1,true,mid,100000,200000,true,family,false,true
+central-park,Central Park,Ramen SeiRock-Ya,japanese,LG,true,mid,70000,130000,false,quick_bite,false,true
+central-park,Central Park,IPPUDO,japanese,1,false,mid,80000,150000,false,long_hangout,false,true
+central-park,Central Park,Din Tai Fung,chinese,1,true,splurge,150000,300000,true,family,false,true
+central-park,Central Park,Ta Wan,chinese,LG,true,mid,60000,120000,true,family,false,true
+central-park,Central Park,Imperial Kitchen,chinese,1,true,mid,80000,150000,true,family,false,true
+central-park,Central Park,Bakmi GM,indonesian,LG,true,budget,30000,70000,true,family,false,true
+central-park,Central Park,Sate Khas Senayan,indonesian,1,true,mid,60000,150000,true,family,false,true
+central-park,Central Park,Dapur Solo,indonesian,LG,true,budget,30000,80000,true,family,false,true
+central-park,Central Park,Solaria,indonesian,LG,true,budget,30000,70000,true,family,false,true
+central-park,Central Park,Gokana Ramen,japanese,LG,true,budget,30000,70000,true,quick_bite,false,true
+central-park,Central Park,RamenYA!,japanese,LG,true,budget,40000,80000,true,quick_bite,false,true
+central-park,Central Park,Yoshinoya,fastfood,LG,true,budget,30000,70000,true,quick_bite,false,true
+central-park,Central Park,KFC,fastfood,LG,true,budget,30000,70000,true,family,false,true
+central-park,Central Park,McDonald's,fastfood,Tribeca,true,budget,30000,70000,true,family,false,true
+central-park,Central Park,Pizza Hut,western,LG,true,mid,60000,150000,true,family,false,true
+central-park,Central Park,Abuba Steak,western,1,true,mid,80000,150000,true,family,false,true
+central-park,Central Park,Holycow,western,1,true,mid,80000,180000,false,long_hangout,true,true
+central-park,Central Park,Starbucks,coffee,1,true,mid,50000,100000,false,long_hangout,false,true
+central-park,Central Park,Fore Coffee,coffee,LG,true,budget,25000,50000,false,long_hangout,true,true
+central-park,Central Park,Kopi Kenangan,coffee,LG,true,budget,20000,45000,false,long_hangout,false,true
+central-park,Central Park,Janji Jiwa,coffee,LG,true,budget,20000,40000,false,long_hangout,false,true
+central-park,Central Park,Excelso,coffee,1,true,mid,40000,90000,false,long_hangout,false,true
+central-park,Central Park,J.CO,dessert,LG,true,budget,30000,80000,true,family,false,true
+central-park,Central Park,Chatime,drinks,LG,true,budget,25000,45000,false,quick_bite,false,true
+central-park,Central Park,Koi The,drinks,LG,true,budget,25000,50000,false,quick_bite,false,true
+central-park,Central Park,Xing Fu Tang,drinks,LG,true,budget,25000,50000,false,long_hangout,true,true
+central-park,Central Park,BreadTalk,bakery,LG,true,budget,20000,60000,true,quick_bite,false,true
+central-park,Central Park,Roti'O,bakery,LG,true,budget,15000,30000,false,quick_bite,false,true
+central-park,Central Park,The Harvest,dessert,LG,true,mid,50000,150000,true,family,false,true
+central-park,Central Park,Haidilao,chinese,1,true,splurge,200000,350000,true,family,true,true
+central-park,Central Park,Shaburi,japanese,1,true,splurge,200000,300000,true,family,false,true
+central-park,Central Park,Kintan Buffet,japanese,1,true,splurge,200000,300000,true,family,false,true
+central-park,Central Park,CFC,fastfood,LG,true,budget,25000,60000,true,family,false,true
+central-park,Central Park,D'Crepes,dessert,LG,true,budget,25000,50000,true,quick_bite,false,true
+central-park,Central Park,Burgreens,healthy,Tribeca,true,mid,60000,120000,false,healing,true,true
+central-park,Central Park,Sushi Go!,japanese,LG,true,budget,30000,80000,true,quick_bite,true,true
+kota-kasablanka,Kota Kasablanka,HokBen,japanese,LG,true,budget,30000,80000,true,family,false,true
+kota-kasablanka,Kota Kasablanka,Sushi Tei,japanese,UG,true,mid,100000,200000,true,family,false,true
+kota-kasablanka,Kota Kasablanka,Marugame Udon,japanese,LG,true,budget,30000,70000,true,quick_bite,false,true
+kota-kasablanka,Kota Kasablanka,Gokana,japanese,LG,true,budget,30000,70000,true,quick_bite,false,true
+kota-kasablanka,Kota Kasablanka,RamenYA!,japanese,LG,true,budget,40000,80000,true,quick_bite,false,true
+kota-kasablanka,Kota Kasablanka,Din Tai Fung,chinese,UG,true,splurge,150000,300000,true,family,false,true
+kota-kasablanka,Kota Kasablanka,Ta Wan,chinese,LG,true,mid,60000,120000,true,family,false,true
+kota-kasablanka,Kota Kasablanka,Imperial Kitchen,chinese,UG,true,mid,80000,150000,true,family,false,true
+kota-kasablanka,Kota Kasablanka,Bakmi GM,indonesian,LG,true,budget,30000,70000,true,family,false,true
+kota-kasablanka,Kota Kasablanka,Sate Khas Senayan,indonesian,UG,true,mid,60000,150000,true,family,false,true
+kota-kasablanka,Kota Kasablanka,Dapur Solo,indonesian,LG,true,budget,30000,80000,true,family,false,true
+kota-kasablanka,Kota Kasablanka,Solaria,indonesian,LG,true,budget,30000,70000,true,family,false,true
+kota-kasablanka,Kota Kasablanka,Yoshinoya,fastfood,LG,true,budget,30000,70000,true,quick_bite,false,true
+kota-kasablanka,Kota Kasablanka,KFC,fastfood,LG,true,budget,30000,70000,true,family,false,true
+kota-kasablanka,Kota Kasablanka,McDonald's,fastfood,GF,true,budget,30000,70000,true,family,false,true
+kota-kasablanka,Kota Kasablanka,CFC,fastfood,LG,true,budget,25000,60000,true,family,false,true
+kota-kasablanka,Kota Kasablanka,Pizza Hut,western,UG,true,mid,60000,150000,true,family,false,true
+kota-kasablanka,Kota Kasablanka,Abuba Steak,western,UG,true,mid,80000,150000,true,family,false,true
+kota-kasablanka,Kota Kasablanka,Starbucks,coffee,GF,true,mid,50000,100000,false,long_hangout,false,true
+kota-kasablanka,Kota Kasablanka,Fore Coffee,coffee,LG,true,budget,25000,50000,false,long_hangout,true,true
+kota-kasablanka,Kota Kasablanka,Kopi Kenangan,coffee,LG,true,budget,20000,45000,false,long_hangout,false,true
+kota-kasablanka,Kota Kasablanka,Janji Jiwa,coffee,LG,true,budget,20000,40000,false,long_hangout,false,true
+kota-kasablanka,Kota Kasablanka,J.CO,dessert,LG,true,budget,30000,80000,true,family,false,true
+kota-kasablanka,Kota Kasablanka,BreadTalk,bakery,LG,true,budget,20000,60000,true,quick_bite,false,true
+kota-kasablanka,Kota Kasablanka,Roti'O,bakery,LG,true,budget,15000,30000,false,quick_bite,false,true
+kota-kasablanka,Kota Kasablanka,The Harvest,dessert,UG,true,mid,50000,150000,true,family,false,true
+kota-kasablanka,Kota Kasablanka,Chatime,drinks,LG,true,budget,25000,45000,false,quick_bite,false,true
+kota-kasablanka,Kota Kasablanka,Koi The,drinks,LG,true,budget,25000,50000,false,quick_bite,false,true
+kota-kasablanka,Kota Kasablanka,Xing Fu Tang,drinks,LG,true,budget,25000,50000,false,long_hangout,true,true
+kota-kasablanka,Kota Kasablanka,Sushi Go!,japanese,LG,true,budget,30000,80000,true,quick_bite,true,true
+kota-kasablanka,Kota Kasablanka,Haidilao,chinese,UG,true,splurge,200000,350000,true,family,true,true
+kota-kasablanka,Kota Kasablanka,Shaburi,japanese,UG,true,splurge,200000,300000,true,family,false,true
+kota-kasablanka,Kota Kasablanka,D'Crepes,dessert,LG,true,budget,25000,50000,true,quick_bite,false,true
+kota-kasablanka,Kota Kasablanka,Excelso,coffee,UG,true,mid,40000,90000,false,long_hangout,false,true
+kota-kasablanka,Kota Kasablanka,Burgreens,healthy,LG,true,mid,60000,120000,false,healing,true,true
+kota-kasablanka,Kota Kasablanka,Holycow,western,UG,true,mid,80000,180000,false,long_hangout,true,true
+kota-kasablanka,Kota Kasablanka,Sour Sally,dessert,LG,true,budget,30000,60000,true,quick_bite,false,true
+kota-kasablanka,Kota Kasablanka,Kebab Turki Baba Rafi,fastfood,LG,true,budget,20000,50000,false,quick_bite,false,true
+kota-kasablanka,Kota Kasablanka,Es Teler 77,indonesian,LG,true,budget,30000,70000,true,family,false,true
+kota-kasablanka,Kota Kasablanka,Dunkin' Donuts,dessert,LG,true,budget,20000,50000,true,family,false,true
+pondok-indah-mall,Pondok Indah Mall,Din Tai Fung,chinese,1,true,splurge,150000,300000,true,family,false,true
+pondok-indah-mall,Pondok Indah Mall,Paul Bakery,bakery,GF,false,splurge,100000,250000,false,long_hangout,false,true
+pondok-indah-mall,Pondok Indah Mall,Union,western,GF,true,splurge,150000,300000,false,long_hangout,true,true
+pondok-indah-mall,Pondok Indah Mall,AW Kitchen,western,1,true,splurge,150000,300000,false,healing,false,true
+pondok-indah-mall,Pondok Indah Mall,Haidilao,chinese,3,true,splurge,200000,350000,true,family,true,true
+pondok-indah-mall,Pondok Indah Mall,Shaburi,japanese,3,true,splurge,200000,300000,true,family,false,true
+pondok-indah-mall,Pondok Indah Mall,Kintan Buffet,japanese,3,true,splurge,200000,300000,true,family,false,true
+pondok-indah-mall,Pondok Indah Mall,Sushi Tei,japanese,3,true,mid,100000,200000,true,family,false,true
+pondok-indah-mall,Pondok Indah Mall,HokBen,japanese,3,true,budget,30000,80000,true,family,false,true
+pondok-indah-mall,Pondok Indah Mall,Marugame Udon,japanese,3,true,budget,30000,70000,true,quick_bite,false,true
+pondok-indah-mall,Pondok Indah Mall,IPPUDO,japanese,1,false,mid,80000,150000,false,long_hangout,false,true
+pondok-indah-mall,Pondok Indah Mall,Sushi Hiro,japanese,3,true,mid,80000,150000,true,family,true,true
+pondok-indah-mall,Pondok Indah Mall,Genki Sushi,japanese,3,true,mid,80000,150000,true,quick_bite,true,true
+pondok-indah-mall,Pondok Indah Mall,Ta Wan,chinese,3,true,mid,60000,120000,true,family,false,true
+pondok-indah-mall,Pondok Indah Mall,Imperial Kitchen,chinese,3,true,mid,80000,150000,true,family,false,true
+pondok-indah-mall,Pondok Indah Mall,Bakmi GM,indonesian,3,true,budget,30000,70000,true,family,false,true
+pondok-indah-mall,Pondok Indah Mall,Sate Khas Senayan,indonesian,3,true,mid,60000,150000,true,family,false,true
+pondok-indah-mall,Pondok Indah Mall,Dapur Solo,indonesian,3,true,budget,30000,80000,true,family,false,true
+pondok-indah-mall,Pondok Indah Mall,Solaria,indonesian,3,true,budget,30000,70000,true,family,false,true
+pondok-indah-mall,Pondok Indah Mall,Abuba Steak,western,3,true,mid,80000,150000,true,family,false,true
+pondok-indah-mall,Pondok Indah Mall,Holycow,western,3,true,mid,80000,180000,false,long_hangout,true,true
+pondok-indah-mall,Pondok Indah Mall,Starbucks,coffee,GF,true,mid,50000,100000,false,long_hangout,false,true
+pondok-indah-mall,Pondok Indah Mall,% Arabica,coffee,GF,true,mid,50000,90000,false,long_hangout,true,true
+pondok-indah-mall,Pondok Indah Mall,Fore Coffee,coffee,LG,true,budget,25000,50000,false,long_hangout,true,true
+pondok-indah-mall,Pondok Indah Mall,Kopi Kenangan,coffee,LG,true,budget,20000,45000,false,long_hangout,false,true
+pondok-indah-mall,Pondok Indah Mall,TWG Tea,drinks,GF,true,splurge,80000,150000,false,long_hangout|healing,false,true
+pondok-indah-mall,Pondok Indah Mall,J.CO,dessert,LG,true,budget,30000,80000,true,family,false,true
+pondok-indah-mall,Pondok Indah Mall,The Harvest,dessert,LG,true,mid,50000,150000,true,family,false,true
+pondok-indah-mall,Pondok Indah Mall,BreadTalk,bakery,LG,true,budget,20000,60000,true,quick_bite,false,true
+pondok-indah-mall,Pondok Indah Mall,Chatime,drinks,LG,true,budget,25000,45000,false,quick_bite,false,true
+pondok-indah-mall,Pondok Indah Mall,Koi The,drinks,LG,true,budget,25000,50000,false,quick_bite,false,true
+pondok-indah-mall,Pondok Indah Mall,Xing Fu Tang,drinks,LG,true,budget,25000,50000,false,long_hangout,true,true
+pondok-indah-mall,Pondok Indah Mall,Yoshinoya,fastfood,LG,true,budget,30000,70000,true,quick_bite,false,true
+pondok-indah-mall,Pondok Indah Mall,McDonald's,fastfood,LG,true,budget,30000,70000,true,family,false,true
+pondok-indah-mall,Pondok Indah Mall,Burgreens,healthy,1,true,mid,60000,120000,false,healing,true,true
+pondok-indah-mall,Pondok Indah Mall,Sour Sally,dessert,LG,true,budget,30000,60000,true,quick_bite,false,true
+pondok-indah-mall,Pondok Indah Mall,Roti'O,bakery,LG,true,budget,15000,30000,false,quick_bite,false,true
+pondok-indah-mall,Pondok Indah Mall,D'Crepes,dessert,LG,true,budget,25000,50000,true,quick_bite,false,true
+pondok-indah-mall,Pondok Indah Mall,Gokana,japanese,LG,true,budget,30000,70000,true,quick_bite,false,true
+pondok-indah-mall,Pondok Indah Mall,Sushi Go!,japanese,LG,true,budget,30000,80000,true,quick_bite,true,true
+aeon-bsd,Aeon Mall BSD City,Ichiban Sushi,japanese,GF,true,mid,80000,150000,true,family,false,true
+aeon-bsd,Aeon Mall BSD City,HokBen,japanese,GF,true,budget,30000,80000,true,family,false,true
+aeon-bsd,Aeon Mall BSD City,Marugame Udon,japanese,GF,true,budget,30000,70000,true,quick_bite,false,true
+aeon-bsd,Aeon Mall BSD City,Saizeriya,western,GF,true,budget,30000,80000,true,family,false,true
+aeon-bsd,Aeon Mall BSD City,Sushi Tei,japanese,1,true,mid,100000,200000,true,family,false,true
+aeon-bsd,Aeon Mall BSD City,Genki Sushi,japanese,GF,true,mid,80000,150000,true,quick_bite,true,true
+aeon-bsd,Aeon Mall BSD City,Gokana,japanese,GF,true,budget,30000,70000,true,quick_bite,false,true
+aeon-bsd,Aeon Mall BSD City,RamenYA!,japanese,GF,true,budget,40000,80000,true,quick_bite,false,true
+aeon-bsd,Aeon Mall BSD City,Ta Wan,chinese,GF,true,mid,60000,120000,true,family,false,true
+aeon-bsd,Aeon Mall BSD City,Din Tai Fung,chinese,1,true,splurge,150000,300000,true,family,false,true
+aeon-bsd,Aeon Mall BSD City,Bakmi GM,indonesian,GF,true,budget,30000,70000,true,family,false,true
+aeon-bsd,Aeon Mall BSD City,Sate Khas Senayan,indonesian,1,true,mid,60000,150000,true,family,false,true
+aeon-bsd,Aeon Mall BSD City,Dapur Solo,indonesian,GF,true,budget,30000,80000,true,family,false,true
+aeon-bsd,Aeon Mall BSD City,Solaria,indonesian,GF,true,budget,30000,70000,true,family,false,true
+aeon-bsd,Aeon Mall BSD City,Es Teler 77,indonesian,GF,true,budget,30000,70000,true,family,false,true
+aeon-bsd,Aeon Mall BSD City,Yoshinoya,fastfood,GF,true,budget,30000,70000,true,quick_bite,false,true
+aeon-bsd,Aeon Mall BSD City,KFC,fastfood,GF,true,budget,30000,70000,true,family,false,true
+aeon-bsd,Aeon Mall BSD City,McDonald's,fastfood,GF,true,budget,30000,70000,true,family,false,true
+aeon-bsd,Aeon Mall BSD City,CFC,fastfood,GF,true,budget,25000,60000,true,family,false,true
+aeon-bsd,Aeon Mall BSD City,Pizza Hut,western,1,true,mid,60000,150000,true,family,false,true
+aeon-bsd,Aeon Mall BSD City,Abuba Steak,western,1,true,mid,80000,150000,true,family,false,true
+aeon-bsd,Aeon Mall BSD City,Starbucks,coffee,GF,true,mid,50000,100000,false,long_hangout,false,true
+aeon-bsd,Aeon Mall BSD City,Fore Coffee,coffee,GF,true,budget,25000,50000,false,long_hangout,true,true
+aeon-bsd,Aeon Mall BSD City,Kopi Kenangan,coffee,GF,true,budget,20000,45000,false,long_hangout,false,true
+aeon-bsd,Aeon Mall BSD City,Janji Jiwa,coffee,GF,true,budget,20000,40000,false,long_hangout,false,true
+aeon-bsd,Aeon Mall BSD City,Excelso,coffee,1,true,mid,40000,90000,false,long_hangout,false,true
+aeon-bsd,Aeon Mall BSD City,J.CO,dessert,GF,true,budget,30000,80000,true,family,false,true
+aeon-bsd,Aeon Mall BSD City,Beard Papa's,dessert,GF,true,budget,25000,50000,true,quick_bite,false,true
+aeon-bsd,Aeon Mall BSD City,BreadTalk,bakery,GF,true,budget,20000,60000,true,quick_bite,false,true
+aeon-bsd,Aeon Mall BSD City,Roti'O,bakery,GF,true,budget,15000,30000,false,quick_bite,false,true
+aeon-bsd,Aeon Mall BSD City,The Harvest,dessert,1,true,mid,50000,150000,true,family,false,true
+aeon-bsd,Aeon Mall BSD City,Chatime,drinks,GF,true,budget,25000,45000,false,quick_bite,false,true
+aeon-bsd,Aeon Mall BSD City,Koi The,drinks,GF,true,budget,25000,50000,false,quick_bite,false,true
+aeon-bsd,Aeon Mall BSD City,Xing Fu Tang,drinks,GF,true,budget,25000,50000,false,long_hangout,true,true
+aeon-bsd,Aeon Mall BSD City,Sushi Go!,japanese,GF,true,budget,30000,80000,true,quick_bite,true,true
+aeon-bsd,Aeon Mall BSD City,Haidilao,chinese,1,true,splurge,200000,350000,true,family,true,true
+aeon-bsd,Aeon Mall BSD City,Shaburi,japanese,1,true,splurge,200000,300000,true,family,false,true
+aeon-bsd,Aeon Mall BSD City,D'Crepes,dessert,GF,true,budget,25000,50000,true,quick_bite,false,true
+aeon-bsd,Aeon Mall BSD City,Burgreens,healthy,1,true,mid,60000,120000,false,healing,true,true
+aeon-bsd,Aeon Mall BSD City,Kebab Turki Baba Rafi,fastfood,GF,true,budget,20000,50000,false,quick_bite,false,true
