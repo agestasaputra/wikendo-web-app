@@ -15,7 +15,11 @@ import { useGoogleSignIn } from "~/features/auth/composables/useGoogleSignIn";
 import { getRedirectQuery } from "~/features/auth/utils/redirect";
 
 // Real quota: GET /api/quota (anonymous cookie). Fetch failure = fallback to anonymous exhausted 0 • 0 like the image.
-const { data: quotaData } = await useFetch<QuotaStatus>("/api/quota");
+// key + lazy: same key as the layout's fetch (shared, one request) and never blocks navigation.
+const { data: quotaData } = await useFetch<QuotaStatus>("/api/quota", {
+  key: "quota",
+  lazy: true,
+});
 const placeRemaining = computed(() => quotaData.value?.place.remaining ?? 0);
 const foodRemaining = computed(() => quotaData.value?.food.remaining ?? 0);
 

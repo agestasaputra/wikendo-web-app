@@ -39,7 +39,7 @@ const {
   data: quotaData,
   pending: quotaPending,
   error: quotaError,
-} = await useFetch<QuotaStatus>("/api/quota");
+} = await useFetch<QuotaStatus>("/api/quota", { key: "quota", lazy: true });
 const quotaStatus = computed(
   () =>
     quotaData.value ||

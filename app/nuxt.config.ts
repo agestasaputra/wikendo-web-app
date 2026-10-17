@@ -44,8 +44,21 @@ export default defineNuxtConfig({
       ],
     },
   },
-  // Redirect old URLs (Bahasa) → new (English) — permanent, keeps back-compat + SEO.
+  // Hybrid rendering: ISR (60s) for public SEO pages, client-only (ssr:false) for personal/quiz
+  // pages so navigation is instant. Old Indonesian URLs 301-redirect to the English ones
+  // (back-compat + SEO). The ssr:false rules MUST use the new route names.
   routeRules: {
+    "/": { isr: 60 },
+    "/mall": { isr: 60 },
+    "/mall/**": { isr: 60 },
+    "/history": { ssr: false },
+    "/account": { ssr: false },
+    "/quiz": { ssr: false },
+    "/food": { ssr: false },
+    "/login": { ssr: false },
+    "/register": { ssr: false },
+    "/result": { ssr: false },
+    "/result-food": { ssr: false },
     "/makan": { redirect: { to: "/food", statusCode: 301 } },
     "/result-makan": { redirect: { to: "/result-food", statusCode: 301 } },
     "/riwayat": { redirect: { to: "/history", statusCode: 301 } },

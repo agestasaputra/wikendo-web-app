@@ -11,6 +11,11 @@ import { supabaseAdmin } from "../../utils/db";
 export default defineEventHandler(async (event) => {
   const db = supabaseAdmin();
   const query = getQuery(event);
+  setHeader(
+    event,
+    "Cache-Control",
+    "public, s-maxage=60, stale-while-revalidate=300",
+  );
 
   // Legacy: without ?limit → array of 5 malls (old contract, old pages don't crash).
   if (query.limit === undefined) {
