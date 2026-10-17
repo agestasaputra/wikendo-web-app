@@ -1,9 +1,9 @@
 # Wikendo — Project Repository (`wikendo-web-app`)
 
-**Status:** Planning & Design Phase  
-**Started:** 2026-10-05  
-**Owner:** Agesta  
-**Tech Stack:** Nuxt 3 + Supabase + Hermes-combo  
+**Status:** Planning & Design Phase
+**Started:** 2026-10-05
+**Owner:** Agesta
+**Tech Stack:** Nuxt 3 + Supabase + Hermes-combo
 
 ---
 
@@ -11,19 +11,19 @@
 
 ```
 wikendo-web-app/
-├── docs/                           # Complete documentation (01–09 inti, 10–16 mirror, 17 indeks desain)
-│   ├── 01-PRD.md … 06-MVP-Checklist.md  # Dok inti (PRD, ADR, Journey, Schema, API, Checklist)
-│   ├── 07-PRD-Addendum-Mall-F&B.md      # Scope mall + tenant F&B (quota makan 5/hari)
-│   ├── 08-PROGRESS.md                  # Board + log eksekusi (sumber "udah sampai mana?")
-│   ├── 09-PRD-Addendum-Revamp-Combo-Auth.md  # Kombo 5+10+15 + progressive login (APPROVED)
-│   ├── 10-App-Guide.md                 # MIRROR dari app/README.md (jangan edit, re-sync)
-│   ├── 11-AGENTS-App.md                # POINTER ke /AGENTS.md (isi lama dipindah)
-│   ├── 12-Supabase-Guide.md            # MIRROR dari supabase/README.md
-│   ├── 13-Data-Audit-Tenant-V1.md      # MIRROR dari supabase/AUDIT.md
-│   ├── 14-Prototype-Guide.md           # MIRROR dari design/prototype/README.md
-│   ├── 15-Wireframes.md                # MIRROR dari design/wikendo-wireframes.md
-│   ├── 16-Repo-Overview.md             # MIRROR dari README.md (file ini)
-│   ├── 17-Design-Index.md              # Indeks aset design/ (logo D16 P3 + board revamp)
+├── docs/                           # Complete documentation (01–09 core, 10–16 mirrors, 17 design index)
+│   ├── 01-PRD.md … 06-MVP-Checklist.md  # Core docs (PRD, ADR, Journey, Schema, API, Checklist)
+│   ├── 07-PRD-Addendum-Mall-F&B.md      # Mall + F&B tenant scope (food quota 5/day)
+│   ├── 08-PROGRESS.md                  # Board + execution log (source for "how far along are we?")
+│   ├── 09-PRD-Addendum-Revamp-Combo-Auth.md  # Combo 5+10+15 + progressive login (APPROVED)
+│   ├── 10-App-Guide.md                 # MIRROR of app/README.md (do not edit, re-sync)
+│   ├── 11-AGENTS-App.md                # POINTER to /AGENTS.md (old content moved)
+│   ├── 12-Supabase-Guide.md            # MIRROR of supabase/README.md
+│   ├── 13-Data-Audit-Tenant-V1.md      # MIRROR of supabase/AUDIT.md
+│   ├── 14-Prototype-Guide.md           # MIRROR of design/prototype/README.md
+│   ├── 15-Wireframes.md                # MIRROR of design/wikendo-wireframes.md
+│   ├── 16-Repo-Overview.md             # MIRROR of README.md (this file)
+│   ├── 17-Design-Index.md              # Index of design/ assets (D16 P3 logo + revamp board)
 │   └── wikendo-complete-docs.pdf  # All docs in PDF (161KB)
 │
 ├── design/                         # UI/UX design assets
@@ -41,11 +41,11 @@ wikendo-web-app/
 
 ## 🎯 Project Overview
 
-**Problem:** Decision fatigue saat planning weekend di Jabodetabek  
-**Solution:** Quiz 30 detik → AI generate 5 rekomendasi tempat personal  
+**Problem:** Decision fatigue when planning a weekend in Jabodetabek
+**Solution:** 30-second quiz → AI generates 5 personal place recommendations
 
 **Target Users:**
-- Usia 20-35 tahun
+- Ages 20-35
 - Jabodetabek residents
 - Value convenience over research
 
@@ -91,13 +91,13 @@ wikendo-web-app/
 
 ## 🎨 Design System
 
-**Style:** Modern Indonesian Casual (Gojek + Traveloka vibe)  
+**Style:** Modern Indonesian Casual (Gojek + Traveloka vibe)
 **Colors:**
 - Primary: Teal (#0891b2) - Trust, fresh
 - Accent: Orange (#f97316) - Energy, CTA
 - Neutral: Gray scale
 
-**Components:** Nuxt UI (Tailwind-based)  
+**Components:** Nuxt UI (Tailwind-based)
 **Principles:** Mobile-first, conversion-focused, trust signals
 
 **Prototype Status:** ✅ Approved by Agesta
@@ -257,19 +257,19 @@ Full spec: `docs/05-API-Specification.md`
 
 ## 📞 Contact & Support
 
-**Project Owner:** Agesta  
-**Tech Stack:** Nuxt 3 + Supabase + Hermes-combo  
+**Project Owner:** Agesta
+**Tech Stack:** Nuxt 3 + Supabase + Hermes-combo
 **Repository:** `/home/ubuntu/wikendo-web-app/` (GitHub: `wikendo-web-app`, private)
 
 ---
 
 ## 🎯 Current Phase
 
-**Status:** ✅ Planning & Design Complete  
-**Next:** Start Phase 1 (Setup & Backend)  
+**Status:** ✅ Planning & Design Complete
+**Next:** Start Phase 1 (Setup & Backend)
 **Waiting:** Approval to begin coding
 
 ---
 
-**Last Updated:** 2026-10-05  
+**Last Updated:** 2026-10-05
 **Version:** 1.0

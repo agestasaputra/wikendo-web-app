@@ -1,9 +1,9 @@
 # Architecture Decision Record (ADR)
 # Weekend Planner MVP
 
-**Version:** 2.2 Amended (7 Okt 2026)
-**Date:** October 5, 2026 (asli) + amendment 6 Okt 2026 + amendment 7 Okt 2026 (Addendum 09 v1.3)
-**Status:** Approved for Implementation + amendments tercatat di change log bawah
+**Version:** 2.2 Amended (Oct 7, 2026)
+**Date:** October 5, 2026 (original) + amendment Oct 6, 2026 + amendment Oct 7, 2026 (Addendum 09 v1.3)
+**Status:** Approved for Implementation + amendments recorded in the change log below
 **Authors:** Agesta (Founder) + AI Development Team
 
 ---
@@ -39,8 +39,8 @@ Solo founder building first startup, AI-assisted development, limited budget, gr
 
 ### High-Level Architecture
 
-> **Amendment 6 Okt 2026:** endpoint tunggal `/api/generate` di-split total per Addendum v1.1
-> (Two Entry, Two Quiz). Tidak ada endpoint campur tempat+makan.
+> **Amendment Oct 6, 2026:** the single `/api/generate` endpoint was fully split per Addendum v1.1
+> (Two Entry, Two Quiz). There is no mixed place+food endpoint.
 
 ```
 ┌─────────────────────────────────────────────────┐
@@ -54,8 +54,8 @@ Solo founder building first startup, AI-assisted development, limited budget, gr
 │   │   Nuxt Server Routes (Serverless)   │       │
 │   │  ┌──────────┐    ┌───────────────┐  │       │
 │   │  │ /api/    │    │ SSR Pages     │  │       │
-│   │  │ tempat/  │    │ (Landing)     │  │       │
-│   │  │ makan/   │    └───────────────┘  │       │
+│   │  │ place/   │    │ (Landing)     │  │       │
+│   │  │ food/    │    └───────────────┘  │       │
 │   │  │ malls/   │                       │       │
 │   │  │ auth     │                       │       │
 │   │  │ quota    │                       │       │
@@ -75,25 +75,25 @@ Solo founder building first startup, AI-assisted development, limited budget, gr
 
 ### Request Flow Examples
 
-**Anonymous user generates recommendation (Tempat):**
+**Anonymous user generates recommendation (Place):**
 ```
 1. User → Nuxt page (/quiz) → Submit quiz
-2. Client → POST /api/tempat/recommend → Nuxt server route
-3. Server checks quota tempat (Supabase) → Allow if <1 used
+2. Client → POST /api/place/recommend → Nuxt server route
+3. Server checks place quota (Supabase) → Allow if <1 used
 4. Server → 9router API (Hermes-combo) → Get recommendations
-5. Server saves to DB → Increments quota tempat
+5. Server saves to DB → Increments place quota
 6. Server → Client (JSON response)
 7. Client renders 5 recommendation cards
 ```
 
-**Anonymous user generates recommendation (Makan) — Amendment 6 Okt 2026:**
+**Anonymous user generates recommendation (Food) — Amendment Oct 6, 2026:**
 ```
-1. User → /makan → pilih mall (wajib 1) → misi → budget → rombongan
-2. Client → POST /api/makan/recommend → Nuxt server route
-3. Server filter Supabase (tenants WHERE mall + budget + halal, GRATIS, tanpa LLM)
-4. Server → 9router API (Hermes-combo) → ranking Top 5 + alasan 1 kalimat (~400 token)
-5. Server saves to DB → Increments quota makan (TERPISAH dari quota tempat)
-6. Client renders 5 tenant cards (lantai + halal + budget + misi)
+1. User → /food → select mall (mandatory 1) → mission → budget → group
+2. Client → POST /api/food/recommend → Nuxt server route
+3. Server filters Supabase (tenants WHERE mall + budget + halal, FREE, no LLM)
+4. Server → 9router API (Hermes-combo) → rank Top 5 + one-sentence reason (~400 tokens)
+5. Server saves to DB → Increments food quota (SEPARATE from place quota)
+6. Client renders 5 tenant cards (floor + halal + budget + mission)
 ```
 
 **Registered user logs in:**
@@ -111,10 +111,10 @@ Solo founder building first startup, AI-assisted development, limited budget, gr
 
 ### Decision: Nuxt 4.5.2 (Vue 3) + TypeScript + Tailwind CSS
 
-> **Amendment 6 Okt 2026:** scaffold real pakai **Nuxt 4.5.2** (bukan 3.x seperti rencana awal). Struktur folder real:
+> **Amendment Oct 6, 2026:** the real scaffold uses **Nuxt 4.5.2** (not 3.x as originally planned). Real folder structure:
 > `app/pages/`, `app/server/api/`, `app/server/utils/`, `app/types/`, `app/utils/`.
-> Folder `app/components/`, `app/composables/`, `app/layouts/`, `app/middleware/` BELUM dibuat (UI masih inline di pages).
-> Prettier TIDAK dipakai — cukup ESLint biar 1 tool.
+> The folders `app/components/`, `app/composables/`, `app/layouts/`, `app/middleware/` are NOT created yet (UI is still inline in pages).
+> Prettier is NOT used — ESLint alone is enough, to keep it to 1 tool.
 
 **Rationale:**
 - **Nuxt 3 benefits:**
@@ -172,27 +172,27 @@ Solo founder building first startup, AI-assisted development, limited budget, gr
 - No complex business logic requiring separate service
 - Reduces operational complexity (one deployment)
 
-**Directory Structure (real, Amendment 6 Okt 2026):**
+**Directory Structure (real, Amendment Oct 6, 2026):**
 ```
 app/server/
 ├── api/
-│   ├── tempat/
-│   │   └── recommend.post.ts  # POST /api/tempat/recommend
-│   ├── makan/
-│   │   └── recommend.post.ts  # POST /api/makan/recommend
+│   ├── place/
+│   │   └── recommend.post.ts  # POST /api/place/recommend
+│   ├── food/
+│   │   └── recommend.post.ts  # POST /api/food/recommend
 │   ├── malls/
 │   │   ├── index.get.ts       # GET /api/malls
 │   │   └── [slug]/
 │   │       └── tenants.get.ts # GET /api/malls/:slug/tenants
-│   ├── quota.get.ts           # GET /api/quota (BELUM — auth 0 file)
-│   └── auth/                  # BELUM ADA SAMA SEKALI (blocker)
+│   ├── quota.get.ts           # GET /api/quota (NOT YET — auth 0 files)
+│   └── auth/                  # DOES NOT EXIST AT ALL (blocker)
 ├── utils/
 │   ├── llm.ts                 # Hermes-combo client ✅
 │   └── db.ts                  # Supabase client ✅
-└── middleware/                # BELUM ADA
+└── middleware/                # NOT YET
 ```
-Quota split: `user_quota` + `mall_search_quota(user_id, date, used)` atau kolom `quota_type`.
-Tempat 2/hari, Makan 5/hari, TERPISAH. Anonymous: cookie terpisah per tipe.
+Quota split: `user_quota` + `mall_search_quota(user_id, date, used)` or a `quota_type` column.
+Place 2/day, Food 5/day, SEPARATE. Anonymous: separate cookie per type.
 
 **When to Split Backend:**
 - Admin dashboard with complex operations
@@ -312,18 +312,18 @@ $$ LANGUAGE plpgsql;
 - ⚠️ Free tier limits (500MB, need monitoring)
 - ❌ Vendor dependency (but migration path exists)
 
-### Amendment 6 Okt 2026 — Tabel Mall/F&B + NULL Tri-State + Staging
+### Amendment Oct 6, 2026 — Mall/F&B Tables + NULL Tri-State + Staging
 
-**Keputusan:** field yang belum ada hasil riset = `NULL` (bukan `FALSE`/`""`).
-Alasan: `""`→`FALSE` itu overclaim bahaya (contoh: `halal=FALSE` padahal belum survey = fitnah ke tenant).
-`NULL` = antrian survey + auto-exclude dari filter `.eq(true)` + badge UI ❓.
+**Decision:** fields with no research result yet = `NULL` (not `FALSE`/`""`).
+Reason: `""`→`FALSE` is a dangerous overclaim (e.g. `halal=FALSE` when not yet surveyed = defamation of the tenant).
+`NULL` = survey queue + auto-excluded from the `.eq(true)` filter + ❓ UI badge.
 
-Kolom metadata wajib di `tenants`: `data_source TEXT` (`curated`/`scrape`/`survey`),
-`verified_at TIMESTAMPTZ NULL`, `needs_survey BOOLEAN` (TRUE kalau halal/kids/hype NULL).
+Required metadata columns on `tenants`: `data_source TEXT` (`curated`/`scrape`/`survey`),
+`verified_at TIMESTAMPTZ NULL`, `needs_survey BOOLEAN` (TRUE if halal/kids/hype is NULL).
 
-**Keputusan:** scrape TIDAK langsung ke `tenants` produksi. Wajib lewat staging `raw_scrape`
-(RLS closed, no public-read) + gate Jabodetabek 2 lapis (allowlist target + kolom city reject non-Jabodetabek).
-Mall tanpa tenant = `is_active=false` otomatis hidden. Detail: `docs/04-Database-Schema.md` + `supabase/AUDIT.md`.
+**Decision:** scraping does NOT go straight into production `tenants`. It must go through the `raw_scrape` staging
+(RLS closed, no public-read) + a 2-layer Jabodetabek gate (target allowlist + city column rejecting non-Jabodetabek).
+A mall with no tenants = `is_active=false`, automatically hidden. Details: `docs/04-Database-Schema.md` + `supabase/AUDIT.md`.
 
 ---
 
@@ -337,6 +337,8 @@ Mall tanpa tenant = `is_active=false` otomatis hidden. Detail: `docs/04-Database
 - Remote API simplifies deployment (no self-hosting LLM)
 
 **Integration Pattern:**
+
+> Design-time sketch (Oct 2026). The implemented prompts are `PLACE_SYSTEM` / `FOOD_SYSTEM` in `server/utils/llm.ts`, and the place quiz input there is `{ mood, companion, budget, location, time }` — there is no `radius` or `city`.
 
 ```typescript
 // server/utils/llm.ts
@@ -457,14 +459,14 @@ await supabase.from('llm_logs').insert({
 - ⚠️ Dependency on 9router availability
 - ❌ Need to confirm 9router pricing model
 
-### Amendment 6 Okt 2026 — Pola LLM Makan (hemat, filter-dulu)
+### Amendment Oct 6, 2026 — Food LLM Pattern (cheap, filter-first)
 
-**Keputusan:** untuk quiz makan, LLM TIDAK cari tenant. Alur: filter Supabase dulu
-(`WHERE mall + budget + halal`, GRATIS, tanpa token) → LLM cuma ranking Top 5 + alasan
-1 kalimat dari kandidat yang sudah difilter (~400 token/call, via Cloudflare workers AI gratis).
-Alasan: list tenant statis dari DB (gratis), LLM halu tidak boleh ngarang tenant
-(metrics: tenant halu complaint = 0). System prompt terpisah: `MAKAN_SYSTEM` di `app/server/utils/llm.ts`.
-Quota makan 5/hari TERPISAH dari quota tempat 2/hari (behaviour beda: makan bisa 2-3x sehari).
+**Decision:** for the food quiz, the LLM does NOT find tenants. Flow: filter Supabase first
+(`WHERE mall + budget + halal`, FREE, no tokens) → the LLM only ranks the Top 5 + a one-sentence
+reason from the already-filtered candidates (~400 tokens/call, via free Cloudflare Workers AI).
+Reason: the tenant list is static from the DB (free), and a hallucinating LLM must not make up tenants
+(metric: hallucinated tenant complaints = 0). Separate system prompt: `FOOD_SYSTEM` in `app/server/utils/llm.ts`.
+The food quota of 5/day is SEPARATE from the place quota of 2/day (different behaviour: food can be 2-3x a day).
 
 ---
 
@@ -472,11 +474,11 @@ Quota makan 5/hari TERPISAH dari quota tempat 2/hari (behaviour beda: makan bisa
 
 ### Decision: Supabase Auth (Email/Password + Google OAuth 1-tap primary)
 
-**Amendment Addendum 09 v1.3 (7 Okt 2026 — LOCKED):** Auth PROGRESIF, bukan mandatory login.
-Anon bisa pakai quiz tempat 1x/hari + makan 2x/hari (full result + Maps boleh).
-Login wall cuma di 4 momen high-intent: generate ke-2 tempat / ke-3 makan, tap Simpan/Klaim voucher,
-buka Wishlist/Riwayat, quota habis + countdown. Klaim voucher WAJIB login (anti-farming).
-Google OAuth 1-tap = primary (friksi nol). Email+password = secondary.
+**Amendment Addendum 09 v1.3 (Oct 7, 2026 — LOCKED):** PROGRESSIVE auth, not mandatory login.
+Anonymous users can use the place quiz 1x/day + food 2x/day (full result + Maps allowed).
+The login wall is only at 4 high-intent moments: the 2nd place generate / 3rd food generate, tapping Save/Claim voucher,
+opening Wishlist/History, quota exhausted + countdown. Claiming a voucher REQUIRES login (anti-farming).
+Google OAuth 1-tap = primary (zero friction). Email+password = secondary.
 
 **Rationale:**
 - Built into Supabase (no separate auth service)
@@ -526,12 +528,12 @@ const { data, error } = await supabase.auth.signInWithOAuth({
   }
 })
 
-// After OAuth callback: NO phone modal (Addendum 09 v1.3 — friksi nol).
+// After OAuth callback: NO phone modal (Addendum 09 v1.3 — zero friction).
 // Profile auto-created with phone=NULL via initialize_new_user trigger.
 if (isFirstLogin) {
   await supabase.from('user_profiles').insert({
     user_id: user.id,
-    phone: null // optional, user bisa isi nanti di settings (Phase 2 broadcast)
+    phone: null // optional, user can fill it in later in settings (Phase 2 broadcast)
   })
 }
 ```
@@ -541,12 +543,12 @@ if (isFirstLogin) {
 - Auto-refresh before expiry
 - Logout clears session from client + server
 
-**Phone Number Requirement (Addendum 09 v1.3, 7 Okt 2026 — LOCKED):**
-- OPTIONAL field, NULL-able (DROP mandatory — bunuh conversion + SMS cost)
-- Format validation +62 HANYA kalau diisi; kosong = valid
+**Phone Number Requirement (Addendum 09 v1.3, Oct 7, 2026 — LOCKED):**
+- OPTIONAL field, NULL-able (DROP the mandatory requirement — it kills conversion + adds SMS cost)
+- Format validation +62 ONLY if filled in; empty = valid
 - Not verified in MVP (SMS verification post-MVP)
-- Purpose Phase 2: broadcast promo (optional), bukan accountability
-- Google OAuth TANPA modal "Masukkan nomor HP" (friksi nol, 1-tap langsung masuk)
+- Phase 2 purpose: promo broadcast (optional), not accountability
+- Google OAuth WITHOUT the "Masukkan nomor HP" modal (zero friction, 1-tap straight in)
 
 **Email Verification:**
 - **Decision: Optional for MVP** (reduce friction)
@@ -562,24 +564,24 @@ if (isFirstLogin) {
 - ✅ Battle-tested auth system
 - ✅ Multiple providers (easy to add more)
 - ✅ Zero setup cost
-- ✅ Phone optional → signup conversion NAIK (asumsi lama "phone doesn't hurt" TERBUKTI salah, di-drop 7 Okt 2026)
+- ✅ Phone optional → signup conversion UP (the old assumption "phone doesn't hurt" PROVED wrong, dropped Oct 7, 2026)
 - ❌ Supabase dependency
 
 ---
 
 ## 7. Quota System
 
-### Decision: Dual Quota — Tempat 2/hari + Makan 5/hari, Daily Reset, DB-Enforced (Addendum 07 v1.1 Approved 6 Okt 2026; progresif anon Addendum 09 v1.3 Approved 7 Okt 2026)
+### Decision: Dual Quota — Place 2/day + Food 5/day, Daily Reset, DB-Enforced (Addendum 07 v1.1 Approved Oct 6, 2026; anonymous progressive Addendum 09 v1.3 Approved Oct 7, 2026)
 
-**Rules (Split Quiz — tidak dicampur):**
-- Quiz Tempat (`/quiz` → `/result`): **2 quota/hari** (tetap PRD v2.0). Anonymous 1x (cookie `quota_used`), login 2x.
-- Quiz Makan (`/makan` → `/result-makan`): **5 quota/hari terpisah** (tidak makan quota tempat). Anonymous 2x (cookie `makan_quota_used`), login 5x.
-- Each generate: **5 recommendations** (tempat murni / tenant murni, tidak campur 3+2 — dihapus per feedback Agesta).
+**Rules (Split Quiz — never mixed):**
+- Place Quiz (`/quiz` → `/result`): **2 quota/day** (unchanged from PRD v2.0). Anonymous 1x (cookie `quota_used`), login 2x.
+- Food Quiz (`/food` → `/result-food`): **5 quota/day separate** (does not consume the place quota). Anonymous 2x (cookie `food_quota_used`), login 5x.
+- Each generate: **5 recommendations** (pure place / pure tenant, no mixing 3+2 — removed per Agesta's feedback).
 - Reset: Every day at **00:00 WIB** (UTC+7). Table `user_quota` + `mall_search_quota(user_id, date, used)`.
-- **Login wall 4 momen (Addendum 09 v1.3):** generate ke-2 tempat / ke-3 makan → 403 `LOGIN_REQUIRED`; tap Simpan/Klaim voucher → bottom sheet login; buka Wishlist/Riwayat anon → login prompt; quota register habis → countdown reset 00.00 + tombol login.
-- **Klaim voucher makan WAJIB login** (anti-farming): endpoint voucher return 401 kalau anon.
-- **Anon locked:** Simpan/Wishlist/Riwayat. **Anon boleh:** full result + Maps + Lapor tutup/buka + Vote + share read-only link.
-- Abuse (clear storage = reset quota anon) DITERIMA saat soft launch 30-50 users — growth > strict; kerasin (fingerprint/IP tracking) kalau spike.
+- **Login wall 4 moments (Addendum 09 v1.3):** 2nd place generate / 3rd food generate → 403 `LOGIN_REQUIRED`; tapping Save/Claim voucher → login bottom sheet; opening Wishlist/History as anonymous → login prompt; registered quota exhausted → countdown to the 00.00 reset + login button.
+- **Claiming a food voucher REQUIRES login** (anti-farming): the voucher endpoint returns 401 if anonymous.
+- **Anonymous locked out of:** Save/Wishlist/History. **Anonymous allowed:** full result + Maps + Report closed/open + Vote + share read-only link.
+- Abuse (clearing storage = resetting the anonymous quota) is ACCEPTED during the 30-50 user soft launch — growth > strictness; harden (fingerprint/IP tracking) if there's a spike.
 
 **Implementation:**
 
@@ -762,12 +764,12 @@ gtag('event', 'recommendation_clicked', {
 })
 
 gtag('event', 'login_prompted', {
-  reason: 'quota_limit' // atau 'save_favorite' | 'claim_voucher' | 'open_wishlist' | 'open_history' (Addendum 09 v1.3: 4 momen wall)
+  reason: 'quota_limit' // or 'save_favorite' | 'claim_voucher' | 'open_wishlist' | 'open_history' (Addendum 09 v1.3: 4 wall moments)
 })
 
-gtag('event', 'anon_quota_exhausted', { type: 'tempat' | 'makan' }) // Addendum 09 v1.3
+gtag('event', 'anon_quota_exhausted', { type: 'place' | 'food' }) // Addendum 09 v1.3
 
-gtag('event', 'voucher_claimed', { tenant_id, mall_slug }) // Addendum 09 v1.3 (wajib login)
+gtag('event', 'voucher_claimed', { tenant_id, mall_slug }) // Addendum 09 v1.3 (login required)
 
 gtag('event', 'user_registered', {
   method: 'email' // or 'google'
@@ -970,16 +972,18 @@ export default defineEventHandler(async (event) => {
 ```
 
 ### Input Validation
+
+Target pattern — the implemented routes do not run a schema validator on the body yet (tracked as a gap, see Known Debt in `AGENTS.md`).
+
 ```typescript
 import { z } from 'zod'
 
 const quizSchema = z.object({
-  mood: z.enum(['santai', 'aktif', 'produktif', 'quality-time', 'lainnya']),
-  companion: z.enum(['sendiri', 'pasangan', 'teman', 'keluarga-kecil', 'keluarga-besar']),
-  budget: z.enum(['hemat', 'menengah', 'leluasa']),
-  radius: z.enum(['jabodetabek', 'road-trip', 'lainnya']),
-  city: z.string().max(100).optional(),
-  time: z.enum(['pagi', 'siang', 'seharian']).optional()
+  mood: z.enum(['relax', 'fun', 'foodie', 'nature']),
+  companion: z.enum(['solo', 'couple', 'group', 'family']),
+  budget: z.enum(['budget', 'mid', 'splurge']),
+  location: z.enum(['south-jakarta', 'central-jakarta', 'west-jakarta', 'anywhere']),
+  time: z.enum(['day', 'night', 'flexible']).optional()
 })
 
 export default defineEventHandler(async (event) => {
@@ -1093,22 +1097,22 @@ export default defineNuxtConfig({
 | Backend | Nuxt server routes | Express | No separate backend needed |
 | Database | Supabase | Firebase | Free tier, built-in auth, PostgreSQL |
 | LLM | Hermes-combo | OpenAI GPT-4o-mini | Already available, high quality |
-| Auth | Supabase Auth (Google 1-tap primary, phone optional) | NextAuth | Built-in, zero setup; progresif anon 1+2 (Addendum 09 v1.3) |
-| Quota | Dual: tempat 2/hari + makan 5/hari (Addendum 07 v1.1) | Lifetime quota | Retention > monetization; makan behaviour 2-3x/hari, cost tetap $0 |
+| Auth | Supabase Auth (Google 1-tap primary, phone optional) | NextAuth | Built-in, zero setup; progressive anonymous 1+2 (Addendum 09 v1.3) |
+| Quota | Dual: place 2/day + food 5/day (Addendum 07 v1.1) | Lifetime quota | Retention > monetization; food behaviour 2-3x/day, cost stays $0 |
 | Analytics | Google Analytics 4 | Posthog | Free unlimited, standard tool |
 | Hosting | Vercel | Netlify | Best Nuxt integration |
 | Deployment | Git push → auto | Manual | Fastest iteration |
 
 ---
 
-**Document Status:** APPROVED + Amended v2.2 (7 Okt 2026)
-**Next Action:** Eksekusi Nuxt TDD — auth slice + wallet 2-state + login wall 4 momen + voucher gate (Addendum 09 v1.3 effort ~5-6 jam)
+**Document Status:** APPROVED + Amended v2.2 (Oct 7, 2026)
+**Next Action:** Execute Nuxt TDD — auth slice + 2-state wallet + 4-moment login wall + voucher gate (Addendum 09 v1.3 effort ~5-6 hours)
 
 **Review Schedule:** After soft launch (30 users), review and update based on real data
 
 ---
 
 **Change Log:**
-- v2.2 (7 Okt 2026): amendment Addendum 09 v1.3 — (1) auth progresif anon tempat 1x + makan 2x, voucher WAJIB login, 4 momen login wall, (2) phone DROP mandatory → optional NULL-able + Google OAuth tanpa modal HP, (3) analytics baru `anon_quota_exhausted` + `voucher_claimed` + `login_prompted{reason}` 4 momen. Trigger: approve Agesta "gas kombo 5+10+15 + kejar user sebanyak-banyaknya".
-- v2.1 (6 Okt 2026 malam): 6 amendment — (1) Nuxt 3→4.5.2 + struktur folder real, (2) endpoint `/api/generate` → split tempat/makan/malls, (3) flow makan filter-dulu + LLM ranking, (4) struktur direktori backend real + quota split 2/5, (5) NULL tri-state + metadata + staging `raw_scrape`, (6) pola LLM makan hemat. Trigger: brainstorming split quiz + audit data AI-dummy.
-- v2.0 (5 Okt 2026): Initial approved (monolit Nuxt+Supabase, quota dual via Addendum 07 v1.1).
+- v2.2 (Oct 7, 2026): Addendum 09 v1.3 amendment — (1) progressive auth: anonymous place 1x + food 2x, voucher REQUIRES login, 4 login wall moments, (2) phone DROP mandatory → optional NULL-able + Google OAuth without the phone modal, (3) new analytics `anon_quota_exhausted` + `voucher_claimed` + `login_prompted{reason}` for the 4 moments. Trigger: Agesta's approval "gas kombo 5+10+15 + kejar user sebanyak-banyaknya".
+- v2.1 (Oct 6, 2026 evening): 6 amendments — (1) Nuxt 3→4.5.2 + real folder structure, (2) `/api/generate` endpoint → split into place/food/malls, (3) food flow filter-first + LLM ranking, (4) real backend directory structure + quota split 2/5, (5) NULL tri-state + metadata + `raw_scrape` staging, (6) cheap food LLM pattern. Trigger: brainstorming the quiz split + auditing AI-dummy data.
+- v2.0 (Oct 5, 2026): Initial approval (Nuxt+Supabase monolith, dual quota via Addendum 07 v1.1).

@@ -1,7 +1,7 @@
 # Database Schema - Weekend Planner MVP
 
-**Version:** 1.1 (7 Okt 2026 — patch Addendum 09 v1.3: phone optional + voucher_claims)
-**Date:** October 5, 2026 (asli) + patch 7 Okt 2026
+**Version:** 1.1 (7 Oct 2026 — patch Addendum 09 v1.3: phone optional + voucher_claims)
+**Date:** October 5, 2026 (original) + patch 7 Oct 2026
 **Database:** PostgreSQL (Supabase)  
 **Status:** Ready for Implementation + patch v1.3 LOCKED
 
@@ -81,21 +81,21 @@ This document defines the complete database schema for Weekend Planner MVP, incl
 
 **Purpose:** Extended user information beyond auth (phone optional Phase 2, preferences)
 
-**Schema (patch Addendum 09 v1.3, 7 Okt 2026 — phone DROP mandatory):**
+**Schema (patch Addendum 09 v1.3, 7 Oct 2026 — phone DROP mandatory):**
 ```sql
 CREATE TABLE user_profiles (
   user_id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
-  phone TEXT DEFAULT NULL,              -- OPTIONAL (was NOT NULL). NULL = user skip, valid.
+  phone TEXT DEFAULT NULL,              -- OPTIONAL (was NOT NULL). NULL = user skips, valid.
   phone_verified BOOLEAN DEFAULT FALSE,
   preferences JSONB DEFAULT '{}'::jsonb,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Indexes (partial: cuma index yang terisi, NULL di-skip otomatis)
+-- Indexes (partial: only filled rows are indexed, NULL is skipped automatically)
 CREATE INDEX idx_user_profiles_phone ON user_profiles(phone) WHERE phone IS NOT NULL;
 
--- Constraints: format +62 HANYA kalau diisi (NULL lolos, kosong '' DITOLAK)
+-- Constraints: +62 format ONLY when filled (NULL passes, empty '' REJECTED)
 ALTER TABLE user_profiles
   DROP CONSTRAINT IF EXISTS phone_format_check;
 ALTER TABLE user_profiles
@@ -108,7 +108,7 @@ COMMENT ON COLUMN user_profiles.phone IS 'OPTIONAL since Addendum 09 v1.3 (was m
 COMMENT ON COLUMN user_profiles.preferences IS 'JSON: {favorite_locations: [], notification_enabled: bool}';
 ```
 
-**Migrasi existing (kalau tabel lama sudah ada):**
+**Existing migration (if the old table already exists):**
 ```sql
 ALTER TABLE user_profiles ALTER COLUMN phone DROP NOT NULL;
 ALTER TABLE user_profiles DROP CONSTRAINT IF EXISTS phone_format_check;
@@ -190,7 +190,7 @@ CREATE INDEX idx_generations_user_created ON generations(user_id, created_at DES
 COMMENT ON TABLE generations IS 'All recommendation generation records';
 COMMENT ON COLUMN generations.user_id IS 'NULL for anonymous users';
 COMMENT ON COLUMN generations.session_id IS 'Anonymous tracking via cookie';
-COMMENT ON COLUMN generations.quiz_input IS 'JSON: {mood, companion, budget, radius, city, time}';
+COMMENT ON COLUMN generations.quiz_input IS 'JSON: {mood, companion, budget, location, time} (food: QuizFoodInput) + type';
 COMMENT ON COLUMN generations.recommendations IS 'JSON array: [{name, category, reason, cost, location, time, confidence}]';
 ```
 
@@ -201,12 +201,12 @@ INSERT INTO generations (user_id, session_id, quiz_input, recommendations) VALUE
   '550e8400-e29b-41d4-a716-446655440000',
   NULL,
   '{
-    "mood": "santai",
-    "companion": "pasangan",
-    "budget": "menengah",
-    "radius": "jabodetabek",
-    "city": null,
-    "time": "siang"
+    "mood": "relax",
+    "companion": "couple",
+    "budget": "mid",
+    "location": "south-jakarta",
+    "time": "day",
+    "type": "place"
   }'::jsonb,
   '[
     {
@@ -413,30 +413,30 @@ CREATE OR REPLACE FUNCTION initialize_new_user(
 )
 RETURNS void AS $$
 BEGIN
-  -- Create profile (phone boleh NULL = user skip)
+  -- Create profile (phone may be NULL = user skips)
   INSERT INTO user_profiles (user_id, phone)
   VALUES (p_user_id, NULLIF(TRIM(COALESCE(p_phone, '')), ''))
   ON CONFLICT (user_id) DO NOTHING;
   
-  -- Initialize quota tempat (2/hari, PRD v2.0)
+  -- Initialize place quota (2/day, PRD v2.0)
   INSERT INTO user_quota (user_id, quota_used, quota_limit, last_reset_at)
   VALUES (p_user_id, 0, 2, NOW())
   ON CONFLICT (user_id) DO NOTHING;
 
-  -- Initialize quota makan HARI INI (5/hari, Addendum 07 v1.1)
+  -- Initialize food quota for TODAY (5/day, Addendum 07 v1.1)
   INSERT INTO mall_search_quota (user_id, date, used)
   VALUES (p_user_id, CURRENT_DATE, 0)
   ON CONFLICT (user_id, date) DO NOTHING;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
-COMMENT ON FUNCTION initialize_new_user IS 'Set up new user profile and quota (tempat 2 + makan 5). Phone optional since Addendum 09 v1.3';
+COMMENT ON FUNCTION initialize_new_user IS 'Set up new user profile and quota (place 2 + food 5). Phone optional since Addendum 09 v1.3';
 ```
 
 **Usage:**
 ```sql
-SELECT initialize_new_user('550e8400-e29b-41d4-a716-446655440000', NULL); -- Google OAuth tanpa HP
-SELECT initialize_new_user('550e8400-e29b-41d4-a716-446655440000', '+628123456789'); -- email + HP diisi
+SELECT initialize_new_user('550e8400-e29b-41d4-a716-446655440000', NULL); -- Google OAuth without phone
+SELECT initialize_new_user('550e8400-e29b-41d4-a716-446655440000', '+628123456789'); -- email + phone filled in
 ```
 
 ---
@@ -772,7 +772,7 @@ ORDER BY pg_total_relation_size(relid) DESC;
 
 ---
 
-## Addendum 07 v1.1 (Approved 6 Okt 2026) — Mall F&B Tables
+## Addendum 07 v1.1 (Approved 6 Oct 2026) — Mall F&B Tables
 
 ### 7. `malls`
 ```sql
@@ -796,20 +796,21 @@ CREATE TABLE tenants (
   mall_id UUID NOT NULL REFERENCES malls(id) ON DELETE CASCADE,
   name TEXT NOT NULL,
   category TEXT NOT NULL,
-  lantai TEXT NOT NULL,
+  floor TEXT NOT NULL,
   halal BOOLEAN DEFAULT true,
-  budget_tier TEXT NOT NULL CHECK (budget_tier IN ('hemat','menengah','leluasa')),
-  price_range TEXT,
+  budget_tier TEXT NOT NULL CHECK (budget_tier IN ('budget','mid','splurge')),
+  price_min INT,  -- integer rupiah (UI formats "Rp 30-80rb")
+  price_max INT,
   kids_friendly BOOLEAN DEFAULT false,
   mission TEXT[] DEFAULT '{}',
   hype_tiktok BOOLEAN DEFAULT false,
   is_open BOOLEAN DEFAULT true,
   maps_url TEXT,
-  -- Kolom metadata kualitas data (patch NULL, approved 6 Okt 2026):
+  -- Data quality metadata columns (NULL patch, approved 6 Oct 2026):
   data_source TEXT NOT NULL DEFAULT 'curated'
     CHECK (data_source IN ('curated','scrape','deep_research','manual')),
-  verified_at TIMESTAMPTZ,   -- NULL = belum verifikasi lapangan
-  needs_survey BOOLEAN NOT NULL DEFAULT false,  -- TRUE = ada field NULL, masuk antrian survey
+  verified_at TIMESTAMPTZ,   -- NULL = not yet field-verified
+  needs_survey BOOLEAN NOT NULL DEFAULT false,  -- TRUE = some field is NULL, queued for survey
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -818,29 +819,29 @@ CREATE INDEX idx_tenants_filter ON tenants(mall_id, budget_tier, halal) WHERE is
 CREATE INDEX idx_tenants_needs_survey ON tenants(mall_id) WHERE needs_survey = true;
 ```
 
-**ATURAN NULL / tri-state (approved 6 Okt 2026):** `halal` / `kids_friendly` / `hype_tiktok`
-boleh `NULL` = belum riset (BUKAN `false`). Filter `halal_only` / `kids` pakai `.eq(true)`
-→ row `NULL` otomatis ke-exclude (tidak overclaim). UI tampil badge ketiga
-❓ Belum terverifikasi + 📋 Perlu survey. Detail audit valid-vs-survey: `supabase/AUDIT.md`.
+**NULL / tri-state RULE (approved 6 Oct 2026):** `halal` / `kids_friendly` / `hype_tiktok`
+may be `NULL` = not yet researched (NOT `false`). The `halal_only` / `kids` filters use `.eq(true)`
+→ `NULL` rows are automatically excluded (no overclaiming). The UI shows a third badge
+❓ Not yet verified + 📋 Needs survey. Details of the valid-vs-survey audit: `supabase/AUDIT.md`.
 
-### 8b. `raw_scrape` (staging scrape — patch approved 6 Okt 2026)
+### 8b. `raw_scrape` (staging scrape — patch approved 6 Oct 2026)
 ```sql
--- Penampung mentah SEBELUM masuk tenants. Kotor boleh masuk, tapi WAJIB ada city
--- buat gate Jabodetabek. Alur: scrape → raw_scrape → GATE kota → parser per-mall → tenants.
+-- Raw holding area BEFORE entering tenants. Dirty data may come in, but city is REQUIRED
+-- for the Jabodetabek gate. Flow: scrape → raw_scrape → city GATE → per-mall parser → tenants.
 CREATE TABLE raw_scrape (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   mall_name TEXT NOT NULL,
-  city TEXT NOT NULL,   -- non-Jabodetabek → status='rejected', jangan normalisasi
+  city TEXT NOT NULL,   -- non-Jabodetabek → status='rejected', do not normalize
   tenant_name TEXT NOT NULL,
-  lantai TEXT,
+  floor TEXT,
   category TEXT,
   source_url TEXT,
   scraped_at TIMESTAMPTZ DEFAULT NOW(),
   status TEXT NOT NULL DEFAULT 'pending'
     CHECK (status IN ('pending','approved','rejected'))
 );
--- Scope LOCK: Jakarta (+varian), Bogor, Depok, Tangerang (+Selatan), Bekasi.
--- TIDAK public-read (data kotor staging, hanya service role).
+-- LOCKED scope: Jakarta (+variants), Bogor, Depok, Tangerang (+Selatan), Bekasi.
+-- NOT public-read (dirty staging data, service role only).
 ```
 
 ### 9. `mall_search_quota`
@@ -851,31 +852,31 @@ CREATE TABLE mall_search_quota (
   used INT DEFAULT 0 CHECK (used >= 0),
   PRIMARY KEY (user_id, date)
 );
--- Anonymous: cookie makan_quota_used (max 2). Login: 5/hari.
+-- Anonymous: cookie food_quota_used (max 2). Login: 5/day.
 ```
 
-### 10. `voucher_claims` (BARU — Addendum 09 v1.3, 7 Okt 2026: klaim voucher WAJIB login)
+### 10. `voucher_claims` (NEW — Addendum 09 v1.3, 7 Oct 2026: voucher claim REQUIRES login)
 
-**Purpose:** 1 user = 1x klaim per tenant per hari (anti-farming voucher pakai anon baru).
-KENAPA perlu? Voucher = duit tenant, 1 klaim palsu = rugi beneran. Tabel kecil, cost $0.
+**Purpose:** 1 user = 1 claim per tenant per day (anti-farming of vouchers with fresh anonymous accounts).
+WHY is it needed? A voucher = the tenant's money, 1 fake claim = a real loss. Small table, $0 cost.
 
 ```sql
 CREATE TABLE voucher_claims (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE, -- WAJIB login, no anon
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE, -- login REQUIRED, no anon
   tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
   date DATE NOT NULL DEFAULT CURRENT_DATE,
-  code TEXT NOT NULL,                       -- kode ditunjuk ke kasir, cth "WIK-HB7K2"
-  redeemed BOOLEAN DEFAULT false,           -- TRUE setelah kasir validasi (Phase 2)
+  code TEXT NOT NULL,                       -- code shown to the cashier, e.g. "WKD-7X2K9A"
+  redeemed BOOLEAN DEFAULT false,           -- TRUE after the cashier validates (Phase 2)
   created_at TIMESTAMPTZ DEFAULT NOW(),
-  UNIQUE (user_id, tenant_id, date)          -- anti double-klaim hari yang sama
+  UNIQUE (user_id, tenant_id, date)          -- prevents double-claiming on the same day
 );
 
 CREATE INDEX idx_voucher_claims_user ON voucher_claims(user_id, date DESC);
 CREATE INDEX idx_voucher_claims_tenant ON voucher_claims(tenant_id, date DESC);
 ```
 
-### RLS tambahan
+### Additional RLS
 ```sql
 ALTER TABLE malls ENABLE ROW LEVEL SECURITY;
 ALTER TABLE tenants ENABLE ROW LEVEL SECURITY;
@@ -884,19 +885,19 @@ ALTER TABLE raw_scrape ENABLE ROW LEVEL SECURITY;
 ALTER TABLE voucher_claims ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Public read malls" ON malls FOR SELECT USING (true);
 CREATE POLICY "Public read tenants" ON tenants FOR SELECT USING (true);
-CREATE POLICY "Users view own makan quota" ON mall_search_quota FOR SELECT USING (auth.uid() = user_id);
-CREATE POLICY "Service manage makan quota" ON mall_search_quota FOR ALL USING (true);
+CREATE POLICY "Users view own food quota" ON mall_search_quota FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "Service manage food quota" ON mall_search_quota FOR ALL USING (true);
 CREATE POLICY "Users view own claims" ON voucher_claims FOR SELECT USING (auth.uid() = user_id);
 CREATE POLICY "Service manage claims" ON voucher_claims FOR ALL USING (true);
--- raw_scrape: TIDAK public-read. Hanya service role (bypass RLS via supabaseAdmin).
+-- raw_scrape: NOT public-read. Service role only (bypass RLS via supabaseAdmin).
 CREATE POLICY "No public access raw_scrape" ON raw_scrape FOR SELECT USING (false);
 CREATE POLICY "Service manage raw_scrape" ON raw_scrape FOR ALL USING (true);
 ```
 
 ### Seed
-CSV `data/tenants-seed.csv` 200 rows (5 mall x 40). Generate via
-`cd supabase && python3 generate_seed.py` → `seed.sql` (jangan edit manual).
-Audit valid-vs-survey: `supabase/AUDIT.md`.
+CSV `data/tenants-seed.csv` 200 rows (5 malls x 40). Generate via
+`cd supabase && python3 generate_seed.py` → `seed.sql` (do not edit manually).
+Valid-vs-survey audit: `supabase/AUDIT.md`.
 
 ---
 

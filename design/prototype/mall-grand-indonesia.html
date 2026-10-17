@@ -13,7 +13,7 @@
 <div class="container mx-auto px-4 py-3 flex justify-between items-center max-w-4xl">
 <a href="index.html" class="font-bold">🗓️ Weekend Planner</a>
 <div class="flex gap-3 text-sm font-semibold">
-<a href="makan.html?mall=grand-indonesia" class="text-accent">🍜 Makan</a>
+<a href="food.html?mall=grand-indonesia" class="text-accent">🍜 Makan</a>
 <a href="index.html" class="text-gray-600">Home</a>
 </div></div>
 </header>
@@ -23,7 +23,7 @@
 <p class="text-gray-600 text-sm mt-1">40 tenant curated • Thamrin, Jakpus • <a class="text-primary underline" target="_blank" href="https://www.google.com/maps/search/Grand+Indonesia+Jakarta">📍 Maps Mall</a></p>
 <div class="bg-gradient-to-r from-orange-500 to-amber-500 text-white rounded-2xl p-5 mt-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
 <div><div class="font-bold text-lg">Males scroll 40 tenant?</div><div class="text-white/90 text-sm">Quiz 20 detik → 5 tenant yang cocok buat misi + budget lu.</div></div>
-<a href="makan.html?mall=grand-indonesia" class="bg-white text-gray-900 font-bold px-5 py-3 rounded-xl text-sm whitespace-nowrap">🍜 Cariin yang cocok →</a>
+<a href="food.html?mall=grand-indonesia" class="bg-white text-gray-900 font-bold px-5 py-3 rounded-xl text-sm whitespace-nowrap">🍜 Cariin yang cocok →</a>
 </div>
 <div class="bg-white rounded-2xl border p-4 mt-4 space-y-3">
 <input id="q" oninput="render()" placeholder="🔍 Cari tenant... mis. kopi, ramen, sushi" class="w-full border rounded-xl px-4 py-2.5 text-sm outline-none focus:border-accent">
@@ -79,7 +79,7 @@ function render(){
       <p class="text-xs text-gray-500 mb-3">Cocok: ${t.mission.join(', ').replaceAll('_',' ')}</p>
       <div class="flex gap-2">
         <a href="${maps}" target="_blank" class="flex-1 text-center bg-gray-900 text-white text-xs font-semibold py-2 rounded-lg">📍 Maps</a>
-        <a href="makan.html?mall=grand-indonesia" class="flex-1 text-center border border-accent text-accent text-xs font-semibold py-2 rounded-lg">🍜 Quiz cocok</a>
+        <a href="food.html?mall=grand-indonesia" class="flex-1 text-center border border-accent text-accent text-xs font-semibold py-2 rounded-lg">🍜 Quiz cocok</a>
       </div></div>`;
   }).join('') || '<p class="text-sm text-gray-500 col-span-2 text-center py-8">Nggak ketemu — coba reset filter / kata kunci lain.</p>';
 }

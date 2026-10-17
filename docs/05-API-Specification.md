@@ -1,7 +1,7 @@
 # API Specification - Weekend Planner MVP
 
-**Version:** 1.1 (7 Okt 2026 — patch Addendum 09 v1.3: quota split response + phone optional + voucher claim)
-**Date:** October 5, 2026 (asli) + patch 7 Okt 2026
+**Version:** 1.1 (Oct 7, 2026 — patch Addendum 09 v1.3: quota split response + phone optional + voucher claim)
+**Date:** October 5, 2026 (original) + Oct 7, 2026 patch
 **Base URL:** `https://wikendo-web-app.vercel.app` (Production)  
 **Status:** Final + patch v1.3 LOCKED
 
@@ -41,7 +41,7 @@ export default defineEventHandler(async (event) => {
   const path = event.path
   
   // Public routes (no auth required)
-  const publicRoutes = ['/api/generate', '/api/health']
+  const publicRoutes = ['/api/place/recommend', '/api/health']
   if (publicRoutes.includes(path)) return
   
   // Extract token from cookie
@@ -74,24 +74,26 @@ export default defineEventHandler(async (event) => {
 
 ## Endpoints
 
-### 1. Generate Recommendations
+### 1. Place Recommendations
 
-**Endpoint:** `POST /api/generate`
+**Endpoint:** `POST /api/place/recommend` (original design name: `POST /api/generate`)
 
 **Description:** Generate 5 AI recommendations based on quiz input
 
 **Authentication:** Optional (anonymous allowed for first generation)
 
+> **Implemented today** (`app/server/api/place/recommend.post.ts`): body `{ mood, companion, budget, location, time? }` (values below);
+> success returns `{ recommendations, quota_remaining }`; an exhausted anonymous quota (cookie `quota_used`) returns `403 LOGIN_REQUIRED`.
+> The `success` / `is_logged_in` / `generation_id` fields and the `QUOTA_EXCEEDED` / `GENERATION_FAILED` bodies below are design targets, not yet returned by the code.
+
 **Request Body:**
 ```typescript
 {
-  mood: "santai" | "aktif" | "produktif" | "quality-time" | "lainnya",
-  companion: "sendiri" | "pasangan" | "teman" | "keluarga-kecil" | "keluarga-besar",
-  budget: "hemat" | "menengah" | "leluasa",
-  radius: "jabodetabek" | "road-trip" | "lainnya",
-  city?: string, // Required if radius = "lainnya"
-  time?: "pagi" | "siang" | "seharian",
-  child_age?: "balita" | "sd" | "remaja" | "tidak-ada" // If companion = family
+  mood: "relax" | "fun" | "foodie" | "nature",
+  companion: "solo" | "couple" | "group" | "family",
+  budget: "budget" | "mid" | "splurge",
+  location: "south-jakarta" | "central-jakarta" | "west-jakarta" | "anywhere",
+  time?: "day" | "night" | "flexible"
 }
 ```
 
@@ -156,17 +158,15 @@ export default defineEventHandler(async (event) => {
 
 **Implementation:**
 ```typescript
-// server/api/generate.post.ts
+// server/api/place/recommend.post.ts — TARGET sketch: the implemented route does not schema-validate the body yet
 import { z } from 'zod'
 
 const quizSchema = z.object({
-  mood: z.enum(['santai', 'aktif', 'produktif', 'quality-time', 'lainnya']),
-  companion: z.enum(['sendiri', 'pasangan', 'teman', 'keluarga-kecil', 'keluarga-besar']),
-  budget: z.enum(['hemat', 'menengah', 'leluasa']),
-  radius: z.enum(['jabodetabek', 'road-trip', 'lainnya']),
-  city: z.string().max(100).optional(),
-  time: z.enum(['pagi', 'siang', 'seharian']).optional(),
-  child_age: z.enum(['balita', 'sd', 'remaja', 'tidak-ada']).optional()
+  mood: z.enum(['relax', 'fun', 'foodie', 'nature']),
+  companion: z.enum(['solo', 'couple', 'group', 'family']),
+  budget: z.enum(['budget', 'mid', 'splurge']),
+  location: z.enum(['south-jakarta', 'central-jakarta', 'west-jakarta', 'anywhere']),
+  time: z.enum(['day', 'night', 'flexible']).optional()
 })
 
 export default defineEventHandler(async (event) => {
@@ -245,8 +245,8 @@ export default defineEventHandler(async (event) => {
 
 **Endpoint:** `GET /api/quota`
 
-**Description:** Get current quota status for user — SPLIT tempat+makan (patch Addendum 09 v1.3).
-Dipakai Home wallet 2-state: anon `1 tempat • 2 makan free`, register `2 • 5`.
+**Description:** Get current quota status for user — SPLIT place+food (patch Addendum 09 v1.3).
+Used by the 2-state Home wallet: anonymous `1 place • 2 food free`, registered `2 • 5`.
 
 **Authentication:** Optional
 
@@ -255,10 +255,10 @@ Dipakai Home wallet 2-state: anon `1 tempat • 2 makan free`, register `2 • 5
 **Response (Anonymous):**
 ```typescript
 {
-  tempat: { used: 0|1, limit: 1, remaining: 1|0 },
-  makan: { used: 0|1|2, limit: 2, remaining: 2|1|0 },
+  place: { used: 0|1, limit: 1, remaining: 1|0 },
+  food: { used: 0|1|2, limit: 2, remaining: 2|1|0 },
   is_logged_in: false,
-  reset_at: null, // cookie-based, reset tengah malam browser
+  reset_at: null, // cookie-based, resets at browser midnight
   login_cta: "Login gratis → buka 2 tempat + 5 makan/hari"
 }
 ```
@@ -266,8 +266,8 @@ Dipakai Home wallet 2-state: anon `1 tempat • 2 makan free`, register `2 • 5
 **Response (Registered):**
 ```typescript
 {
-  tempat: { used: 1, limit: 2, remaining: 1 },
-  makan: { used: 3, limit: 5, remaining: 2 },
+  place: { used: 1, limit: 2, remaining: 1 },
+  food: { used: 3, limit: 5, remaining: 2 },
   is_logged_in: true,
   reset_at: "2026-10-08T00:00:00+07:00",
   hours_until_reset: 18.5
@@ -279,31 +279,31 @@ Dipakai Home wallet 2-state: anon `1 tempat • 2 makan free`, register `2 • 5
 
 **Implementation:**
 ```typescript
-// server/api/quota.get.ts (patch Addendum 09 v1.3 — split tempat+makan)
+// server/api/quota.get.ts (patch Addendum 09 v1.3 — split place+food)
 export default defineEventHandler(async (event) => {
   const user = event.context.user
 
   if (!user) {
-    // Anonymous: cookie terpisah (tempat 1x, makan 2x)
-    const tempatUsed = getCookie(event, 'quota_used') === '1' ? 1 : 0
-    const makanUsed = Math.min(parseInt(getCookie(event, 'makan_quota_used') || '0'), 2)
+    // Anonymous: separate cookies (place 1x, food 2x)
+    const placeUsed = getCookie(event, 'quota_used') === '1' ? 1 : 0
+    const foodUsed = Math.min(parseInt(getCookie(event, 'food_quota_used') || '0'), 2)
 
     return {
-      tempat: { used: tempatUsed, limit: 1, remaining: 1 - tempatUsed },
-      makan: { used: makanUsed, limit: 2, remaining: 2 - makanUsed },
+      place: { used: placeUsed, limit: 1, remaining: 1 - placeUsed },
+      food: { used: foodUsed, limit: 2, remaining: 2 - foodUsed },
       is_logged_in: false,
       reset_at: null,
       login_cta: "Login gratis → buka 2 tempat + 5 makan/hari"
     }
   }
 
-  // Registered: user_quota (tempat 2) + mall_search_quota hari ini (makan 5)
+  // Registered: user_quota (place 2) + mall_search_quota today (food 5)
   const tempat = await getQuotaStatus(user.id)
   const makan = await getMakanQuotaStatus(user.id) // mall_search_quota WHERE date=CURRENT_DATE
 
   return {
-    tempat: { used: tempat.quota_used, limit: 2, remaining: 2 - tempat.quota_used },
-    makan: { used: makan.used, limit: 5, remaining: 5 - makan.used },
+    place: { used: tempat.quota_used, limit: 2, remaining: 2 - tempat.quota_used },
+    food: { used: makan.used, limit: 5, remaining: 5 - makan.used },
     is_logged_in: true,
     reset_at: calculateResetTime(tempat.last_reset_at),
     hours_until_reset: calculateHoursUntilReset(tempat.last_reset_at)
@@ -333,11 +333,11 @@ export default defineEventHandler(async (event) => {
     {
       id: "uuid",
       quiz_input: {
-        mood: "santai",
-        companion: "pasangan",
-        budget: "menengah",
-        radius: "jabodetabek",
-        time: "siang"
+        mood: "relax",
+        companion: "couple",
+        budget: "mid",
+        location: "south-jakarta",
+        time: "day"
       },
       recommendations: [...], // Array of 5 recs
       created_at: "2026-10-05T10:30:00Z"
@@ -512,7 +512,7 @@ export default defineEventHandler(async (event) => {
 {
   email: "agesta@example.com",
   password: "SecurePass123!",
-  phone?: "+628123456789" // OPTIONAL — NULL = valid, format +62 divalidasi HANYA kalau diisi
+  phone?: "+628123456789" // OPTIONAL — NULL = valid, +62 format validated ONLY when provided
 }
 ```
 
@@ -563,7 +563,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 409, message: error.message })
   }
 
-  // Initialize user profile & quota (tempat 2 + makan 5 hari ini)
+  // Initialize user profile & quota (place 2 + food 5 today)
   await initializeNewUser(data.user.id, cleanPhone)
   
   // Set session cookie
@@ -746,21 +746,18 @@ export default defineEventHandler(async (event) => {
 
 ```typescript
 // types/quiz.ts
-export type Mood = 'santai' | 'aktif' | 'produktif' | 'quality-time' | 'lainnya'
-export type Companion = 'sendiri' | 'pasangan' | 'teman' | 'keluarga-kecil' | 'keluarga-besar'
-export type Budget = 'hemat' | 'menengah' | 'leluasa'
-export type Radius = 'jabodetabek' | 'road-trip' | 'lainnya'
-export type Time = 'pagi' | 'siang' | 'seharian'
-export type ChildAge = 'balita' | 'sd' | 'remaja' | 'tidak-ada'
+export type Mood = 'relax' | 'fun' | 'foodie' | 'nature'
+export type Companion = 'solo' | 'couple' | 'group' | 'family'
+export type Budget = 'budget' | 'mid' | 'splurge'
+export type Location = 'south-jakarta' | 'central-jakarta' | 'west-jakarta' | 'anywhere'
+export type Time = 'day' | 'night' | 'flexible'
 
 export interface QuizInput {
   mood: Mood
   companion: Companion
   budget: Budget
-  radius: Radius
-  city?: string
+  location: Location
   time?: Time
-  child_age?: ChildAge
 }
 
 export interface Recommendation {
@@ -785,12 +782,12 @@ export interface GenerateResponse {
 }
 
 export interface QuotaStatus {
-  tempat: { used: number; limit: 2 | 1; remaining: number }, // register 2, anon 1
-  makan: { used: number; limit: 5 | 2; remaining: number }, // register 5, anon 2
+  place: { used: number; limit: 2 | 1; remaining: number }, // registered 2, anonymous 1
+  food: { used: number; limit: 5 | 2; remaining: number }, // registered 5, anonymous 2
   is_logged_in: boolean
   reset_at: string | null
   hours_until_reset?: number
-  login_cta?: string // anon only: "Login gratis → buka 2 tempat + 5 makan/hari"
+  login_cta?: string // anonymous only: "Login gratis → buka 2 tempat + 5 makan/hari"
 }
 ```
 
@@ -802,14 +799,14 @@ export interface QuotaStatus {
 
 **Generate Recommendation (Anonymous):**
 ```bash
-curl -X POST https://wikendo-web-app.vercel.app/api/generate \
+curl -X POST https://wikendo-web-app.vercel.app/api/place/recommend \
   -H "Content-Type: application/json" \
   -d '{
-    "mood": "santai",
-    "companion": "pasangan",
-    "budget": "menengah",
-    "radius": "jabodetabek",
-    "time": "siang"
+    "mood": "relax",
+    "companion": "couple",
+    "budget": "mid",
+    "location": "south-jakarta",
+    "time": "day"
   }'
 ```
 
@@ -842,7 +839,7 @@ curl -X POST https://wikendo-web-app.vercel.app/api/auth/register \
 
 ---
 
-## Addendum 07 v1.1 (Approved 6 Okt 2026) — Makan Endpoints (9 endpoint tempat TIDAK berubah)
+## Addendum 07 v1.1 (Approved Oct 6, 2026) — Food Endpoints (9 place endpoints UNCHANGED)
 
 ### 10. List Malls — `GET /api/malls`
 Public. Response: `[{slug, name, city, area, total_tenant, maps_url}]`.
@@ -850,23 +847,23 @@ Public. Response: `[{slug, name, city, area, total_tenant, maps_url}]`.
 ### 11. Mall Detail — `GET /api/malls/:slug`
 Public. Response: mall + stats `{total, halal_count, by_budget}`.
 
-### 12. List Tenants — `GET /api/malls/:slug/tenants?halal=true&budget=hemat&mission=nongkrong_lama&kids=true&search=kopi`
-Public, tanpa quota/LLM. Filter di Supabase. Response: array tenant `{id, name, category, lantai, halal, budget_tier, price_range, kids_friendly, mission, hype_tiktok, is_open, maps_url}`.
+### 12. List Tenants — `GET /api/malls/:slug/tenants?halal=true&budget=budget&mission=long_hangout&kids=true&search=kopi`
+Public, no quota/LLM. Filter in Supabase. Response: tenant array `{id, name, category, floor, halal, budget_tier, price_min, price_max, kids_friendly, mission, hype_tiktok, is_open, maps_url}`.
 
-### 13. Makan Recommend — `POST /api/makan/recommend`
-Body `MakanQuizInput {mall_slug, mission, budget_tier, companion, halal_only?, kids_friendly?}`. Flow: cek quota makan (anon cookie max 2, login 5/hari) → filter Supabase `WHERE mall=slug AND is_open AND budget AND (halal if halal_only)` → LLM ranking Top 5 + reason 1 kalimat → save `generations {type:'makan'}` → increment `mall_search_quota`. Quota habis → 403 `MAKAN_QUOTA_EXCEEDED` (tidak ganggu quota tempat).
+### 13. Food Recommend — `POST /api/food/recommend`
+Body `MakanQuizInput {mall_slug, mission, budget_tier, companion, halal_only?, kids_friendly?}`. Flow: check food quota (anonymous cookie max 2, login 5/day) → filter Supabase `WHERE mall=slug AND is_open AND budget AND (halal if halal_only)` → LLM ranks Top 5 + one-sentence reason → save `generations {type:'food'}` → increment `mall_search_quota`. Quota exhausted → 403 `FOOD_QUOTA_EXCEEDED` (doesn't affect place quota).
 
 ### 14. Vote — `POST /api/vote`
-Body `{generation_id, tenant_id}`. Tanpa login, rate-limit IP 10/menit. Untuk group vote link `/vote/:id`.
+Body `{generation_id, tenant_id}`. No login, IP rate-limit 10/minute. For group voting via link `/vote/:id`.
 
 ### 15. Report Tenant — `POST /api/report-tenant`
-Body `{tenant_id, issue: 'tutup'|'buka'|'salah_info'}`. Tanpa login. Masuk review queue (freshness > completeness).
+Body `{tenant_id, issue: 'tutup'|'buka'|'salah_info'}`. No login. Enters review queue (freshness > completeness).
 
-### 16. Claim Voucher — `POST /api/voucher/claim` (BARU — Addendum 09 v1.3, WAJIB login)
-KENAPA wajib login? Voucher = duit tenant. Anon bisa bikin 100 akun → borong voucher. Login = 1 user 1 klaim/tenant/hari.
-Body `{tenant_id}`. Auth: Required (anon → 401 + bottom sheet login "Login buat klaim voucher").
-Flow: cek tenant ada promo aktif → cek `voucher_claims` belum ada (user_id, tenant_id, today) → generate code `WIK-XXXXX` → insert → return code + cara pakai ("Tunjukin ke kasir").
-Double-klaim hari sama → 409 `ALREADY_CLAIMED`. Response: `{success, code, tenant_name, cara_pakai}`.
+### 16. Claim Voucher — `POST /api/voucher/claim` (NEW — Addendum 09 v1.3, login REQUIRED)
+WHY is login required? A voucher = the tenant's money. Anonymous users could create 100 accounts → hoard vouchers. Login = 1 user, 1 claim/tenant/day.
+Body `{voucher_code}` (the claim code of an active voucher, e.g. `WKD-7X2K9A`). Auth: Required (anonymous → 401 + login bottom sheet "Login buat klaim voucher").
+Flow: load the voucher by `voucher_code` and check it is active and not expired → check the user's daily limit (max 3 claims/day across all tenants → 429) → check `voucher_claims` doesn't exist yet (user_id, tenant_id, today) → insert → return the voucher's own `WKD-XXXXXX` code. The code is pre-issued in the `vouchers` table, not generated per claim.
+Double claim on the same day → 409 `ALREADY_CLAIMED`. Response: `{ status: "ok", claim_code, expires_at, voucher: { name, discount_percent }, time_remaining: { hours, minutes, expired } }`.
 
 ---
 

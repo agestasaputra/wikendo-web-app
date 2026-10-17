@@ -20,33 +20,33 @@ code:
 
 ## TL;DR
 
-Semua yang dipakai ≥2 feature hidup di `app/common/` (components, composables, store, utils, constants, types). Komponen & composable memakai import eksplisit (`~/common/...`), bukan auto-import.
+Everything used by ≥2 features lives in `app/common/` (components, composables, store, utils, constants, types). Components & composables use explicit imports (`~/common/...`), not auto-import.
 
 ## Components
 
 | Component        | Role                                                                |
 | ---------------- | ------------------------------------------------------------------- |
-| `AppLoader`      | Spinner fetch per variant (tempat orange / makan merah / mall teal) |
-| `AppSpinner`     | Ikon spinner tombol (warna + ukuran via prop)                       |
-| `QuizHeader`     | Header ink quiz (label putih, dot, segmen lime)                     |
-| `QuizOptionList` | Daftar opsi jawaban 56px                                            |
-| `ResultError`    | Wall quota vs error + Coba lagi                                     |
+| `AppLoader`      | Fetch spinner per variant (place orange / food red / mall teal)    |
+| `AppSpinner`     | Button spinner icon (colour + size via props)                      |
+| `QuizHeader`     | Quiz ink header (white label, dot, lime segments)                  |
+| `QuizOptionList` | 56px answer option list                                           |
+| `ResultError`    | Quota wall vs error + Coba lagi                                   |
 
 ## Composables & Utils
 
 | Item                     | File                                            | Role                                        |
 | ------------------------ | ----------------------------------------------- | ------------------------------------------- |
 | `useInfiniteList`        | `app/common/composables/useInfiniteList.ts`     | Paging start/loadMore/reset                 |
-| `useSentinelObserver`    | `app/common/composables/useSentinelObserver.ts` | Sentinel infinity scroll                    |
-| `useSupabaseBrowser`     | `app/common/composables/useSupabaseBrowser.ts`  | Client Supabase browser                     |
-| `getErrorMessage/Status` | `app/utils/error.ts`                            | Ekstraksi pesan/status dari error `unknown` |
-| `MALL_NAMES`             | `app/common/constants/malls.ts`                 | Slug → nama + label pendek                  |
+| `useSentinelObserver`    | `app/common/composables/useSentinelObserver.ts` | Infinite-scroll sentinel                   |
+| `useSupabaseBrowser`     | `app/common/composables/useSupabaseBrowser.ts`  | Browser Supabase client                    |
+| `getErrorMessage/Status` | `app/utils/error.ts`                            | Extract message/status from an `unknown` error|
+| `MALL_NAMES`             | `app/common/constants/malls.ts`                 | Slug → name + short label                  |
 
 ## Rules
 
-- `common/` dan `utils/` dilarang import `features/` (ESLint error).
-- Template di folder baru → daftarkan di `app/tailwind.config.ts` (`content`); tanpa itu Tailwind membuang class-nya. Dijaga `app/common/__tests__/tailwindContent.spec.ts`.
-- Menambah mall: 1 entry di `MALL_NAMES` + `MALL_SHORT_LABELS`, 1 option Q1 makan, 1 row tabel `malls`.
+- `common/` and `utils/` must not import `features/` (ESLint error).
+- Templates in a new folder → register them in `app/tailwind.config.ts` (`content`); otherwise Tailwind drops their classes. Guarded by `app/common/__tests__/tailwindContent.spec.ts`.
+- Adding a mall: 1 entry in `MALL_NAMES` + `MALL_SHORT_LABELS`, 1 Q1 food option, 1 row in the `malls` table.
 
 ## See Also
 

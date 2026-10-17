@@ -20,12 +20,12 @@ code:
 
 ## TL;DR
 
-Auth sepenuhnya Supabase dari browser (anon key). `AuthStore` (Pinia) memegang session (isLoggedIn/email/displayName/initial) dan di-`init()` sekali di `app.vue`. Login: email+password atau Google OAuth satu pintu; register memakai magic-link (`/check-email`). Akun & header 2-state membaca store yang sama.
+Auth is entirely Supabase from the browser (anon key). `AuthStore` (Pinia) holds the session (isLoggedIn/email/displayName/initial) and is `init()`-ed once in `app.vue`. Login: email+password or a single-entry Google OAuth; register uses a magic link (`/check-email`). The Account hub and the 2-state header read the same store.
 
 ## Entry Points
 
 - `app/features/auth/LoginPage.vue`, `RegisterPage.vue`, `CheckEmailPage.vue` (route `/login`, `/register`, `/check-email`).
-- `app/features/account/AccountPage.vue` — hub Akun (`/account`).
+- `app/features/account/AccountPage.vue` — Account hub (`/account`).
 - `app/app.vue` — `onMounted(() => auth.init())`.
 
 ## Sequence
@@ -37,33 +37,33 @@ sequenceDiagram
     participant Store as AuthStore
     participant SB as Supabase Auth
     participant Reg as RegisterPage
-    App->>Store: init() (client only, sekali)
+    App->>Store: init() (client only, once)
     Store->>SB: getSession() + onAuthStateChange()
-    SB-->>Store: session.user → applyUser (nama depan kapital)
+    SB-->>Store: session.user → applyUser (capitalised first name)
     Reg->>SB: signUp({ emailRedirectTo: origin + "/" })
     Reg->>Reg: push /check-email?email=
-    Note over Reg,SB: user klik link di inbox → HOME, session terbaca listener
+    Note over Reg,SB: user clicks the link in their inbox → HOME, session picked up by the listener
 ```
 
 1. `buildDisplayName`: `full_name` > `name` > prefix email > "Teman".
-2. Login/Register menghormati `?redirect=` lewat `getRedirectQuery`; `buildOriginUrl` membuat URL absolut di browser.
-3. Google: `useGoogleSignIn(redirect)` (label & redirect sama untuk login + register; register mewajibkan centang Syarat dulu).
-4. `signOut()` selalu mereset state walau Supabase error.
+2. Login/Register honour `?redirect=` via `getRedirectQuery`; `buildOriginUrl` builds an absolute URL in the browser.
+3. Google: `useGoogleSignIn(redirect)` (same label & redirect for login + register; register requires ticking the Terms checkbox first).
+4. `signOut()` always resets state even if Supabase errors.
 
 ## Key Components
 
 | Component                                     | File                                               | Role                                         |
 | --------------------------------------------- | -------------------------------------------------- | -------------------------------------------- |
-| `AuthStore`                                   | `app/common/store/AuthStore.ts`                    | Session sumber kebenaran (Pinia setup store) |
-| `useSupabaseBrowser`                          | `app/common/composables/useSupabaseBrowser.ts`     | Singleton client browser (anon key)          |
-| `useGoogleSignIn`                             | `app/features/auth/composables/useGoogleSignIn.ts` | OAuth 1-klik + state loading                 |
-| `PasswordField`, `GoogleButton`, `AuthBanner` | `app/features/auth/components/`                    | UI bersama login/register                    |
+| `AuthStore`                                   | `app/common/store/AuthStore.ts`                    | Session source of truth (Pinia setup store) |
+| `useSupabaseBrowser`                          | `app/common/composables/useSupabaseBrowser.ts`     | Browser client singleton (anon key)        |
+| `useGoogleSignIn`                             | `app/features/auth/composables/useGoogleSignIn.ts` | 1-click OAuth + loading state             |
+| `PasswordField`, `GoogleButton`, `AuthBanner` | `app/features/auth/components/`                    | UI shared by login/register               |
 
 ## Failure & State
 
-- Offline / SSR tanpa session → tetap anon (`refresh()` menelan error).
-- `init()` idempotent: listener tidak dipasang ganda.
-- Tombol auth disabled + spinner saat request (anti double-submit).
+- Offline / SSR without a session → stays anon (`refresh()` swallows errors).
+- `init()` is idempotent: the listener is not attached twice.
+- Auth buttons are disabled + show a spinner during a request (anti double-submit).
 
 ## See Also
 

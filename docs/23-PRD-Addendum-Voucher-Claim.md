@@ -1,58 +1,58 @@
 # 23-PRD-Addendum-Voucher-Claim v1.1 — Multi-Voucher + Sheet + Strip
 
-**Status:** DITERBITKAN 11 Okt 2026 — multi-voucher schema + best-1 sheet + strip promo di mall page.  
-**Dasar:** Rekomendasi expert V13: paket A+B+C ~2.5h P0 $0 NOL route baru di atas VC5 lock.  
-**Gate:** `Gas v13` — user setuju lanjut eksekusi.
+**Status:** PUBLISHED 11 Oct 2026 — multi-voucher schema + best-1 sheet + promo strip on the mall page.  
+**Basis:** Expert recommendation V13: package A+B+C ~2.5h P0 $0 ZERO new routes on top of the VC5 lock.  
+**Gate:** `Gas v13` — user agreed to proceed with execution.
 
 ---
 
-## 1. Ringkasan Fitur V13
+## 1. V13 Feature Summary
 
-Fitur ini menambah pilihan voucher selain default gift `-20% buat lu + Buka` di hero result-makan.vue, dengan pola multi-voucher end-to-end:
+This feature adds voucher options beyond the default `-20% buat lu + Buka` gift in the result-food.vue hero, with an end-to-end multi-voucher pattern:
 
-- **V13A:** Hero best-1 + link `+2 promo lain` — sinyal ada pilihan tanpa bombardir user.
-- **V13B:** Sheet di atas result — `Pilih promo 1 dari 3` di konteks tenant (Maps tetap, anti-stacking `1 transaksi 1 kode`), countdown klaim per row, kode unik `WKD-XXXXXX` expiry 23:59.
-- **V13C:** Strip promo di mall page — 1 section di halaman mall, klik loncat tenant, $0 cost, discovery tanpa page baru.
+- **V13A:** Hero best-1 + `+2 promo lain` link — signals that options exist without bombarding the user.
+- **V13B:** Sheet above the result — `Pilih promo 1 dari 3` in tenant context (Maps stays, anti-stacking `1 transaksi 1 kode`), claim countdown per row, unique code `WKD-XXXXXX` expiring at 23:59.
+- **V13C:** Promo strip on the mall page — 1 section on the mall page, click jumps to the tenant, $0 cost, discovery without a new page.
 
-**Total effort:** ~2.5h P0. Token lock: paper #F5F5F4 + ink #0C0A09 + lime/rose/mint. `app/` NOL sentuh.
+**Total effort:** ~2.5h P0. Token lock: paper #F5F5F4 + ink #0C0A09 + lime/rose/mint. `app/` UNTOUCHED.
 
 ---
 
-## 2. Schema Database — Multi-Voucher P0/P1
+## 2. Database Schema — Multi-Voucher P0/P1
 
-Tabel `vouchers` baru (migrasi tambahan di atas v1.0):
+New `vouchers` table (additional migration on top of v1.0):
 
-| Kolom | Tipe | Constraint | Keterangan |
+| Column | Type | Constraint | Notes |
 |-------|------|------------|------------|
 | `id` | UUID | PK | |
-| `tenant_id` | UUID | FK → tenants | Setiap tenant punya voucher-nya |
-| `code` | TEXT | UNIQUE + NOT NULL | Kode claim `WKD-XXXXXX` |
-| `promo_text` | TEXT | NOT NULL | Contoh: `-20% Weekday` |
-| `promo_active` | BOOLEAN | DEFAULT true | Aktif/Non-aktif |
-| `discount_percent` | INTEGER | DEFAULT 0 | Diskon (%) |
-| `discount_type` | TEXT | `percentage` | `percentage` atau `fixed` |
-| `max_claims_per_tenant` | INTEGER | DEFAULT 1 | P0: 1-aktif per tenant/hari |
-| `claims_per_tenant_today` | INTEGER | DEFAULT 0 | Counter hari ini (RBAC) |
-| `valid_from` | TIMESTAMP | NOT NULL | Mulai valid |
-| `valid_until` | TIMESTAMP | NOT NULL | Berakhir 23:59 hari ini |
+| `tenant_id` | UUID | FK → tenants | Each tenant has its own voucher |
+| `code` | TEXT | UNIQUE + NOT NULL | Claim code `WKD-XXXXXX` |
+| `promo_text` | TEXT | NOT NULL | Example: `-20% Weekday` |
+| `promo_active` | BOOLEAN | DEFAULT true | Active/Inactive |
+| `discount_percent` | INTEGER | DEFAULT 0 | Discount (%) |
+| `discount_type` | TEXT | `percentage` | `percentage` or `fixed` |
+| `max_claims_per_tenant` | INTEGER | DEFAULT 1 | P0: 1 active per tenant/day |
+| `claims_per_tenant_today` | INTEGER | DEFAULT 0 | Today's counter (RBAC) |
+| `valid_from` | TIMESTAMP | NOT NULL | Valid from |
+| `valid_until` | TIMESTAMP | NOT NULL | Expires 23:59 today |
 | `created_at` | TIMESTAMP | DEFAULT now() | |
 | `updated_at` | TIMESTAMP | DEFAULT now() | |
 
-**Constraints krusial P0:**
-- `UNIQUE(user_id, tenant_id, claim_date)` — hanya 1 claim per user per tenant per hari.
-- `CHECK (max_claims_per_tenant >= 1)` — P0 setara 1 transaksi 1 kode.
-- `valid_until` selalu habis 23:59 WIB hari ini (bukan masa lampau).
+**Crucial P0 constraints:**
+- `UNIQUE(user_id, tenant_id, claim_date)` — only 1 claim per user per tenant per day.
+- `CHECK (max_claims_per_tenant >= 1)` — P0 equivalent to 1 transaction 1 code.
+- `valid_until` always expires at 23:59 WIB today (never in the past).
 
-**Tabel `voucher_claims` (P1, opsional):**
-| Kolom | Tipe | Constraint |
+**`voucher_claims` table (P1, optional):**
+| Column | Type | Constraint |
 |-------|------|------------|
 | `id` | UUID | PK |
 | `user_id` | UUID | FK → auth.users |
 | `voucher_id` | UUID | FK → vouchers |
 | `claim_code` | TEXT | `WKD-XXXXXX` |
 | `claimed_at` | TIMESTAMP | DEFAULT now() |
-| `redeemed_at` | TIMESTAMP | NULL → belum tukar |
-| `redeem_code` | TEXT | NULL → belum tukar, atau `PIN-XXXXXX` |
+| `redeemed_at` | TIMESTAMP | NULL → not yet redeemed |
+| `redeem_code` | TEXT | NULL → not yet redeemed, or `PIN-XXXXXX` |
 
 **Index:**
 - `idx_vouchers_tenant_active` ON (`tenant_id`, `promo_active`, `valid_until`)
@@ -60,72 +60,70 @@ Tabel `vouchers` baru (migrasi tambahan di atas v1.0):
 
 ---
 
-## 3. Alur End-to-End End-To-End (Kopi GI Contoh)
+## 3. End-to-End Flow (Kopi GI Example)
 
-1. User lihat result-makan.vue → hero V13A: `-20% Weekday` + `+2 promo lain` (lime link).
-2. User klik `+2 promo lain` → sheet V13B muncul di atas result, 3 row:
-   - Row 1: Kopi Weekday -20% — sisa 7/20 — **Klaim** → kode `WKD-7X2K9A` muncul → countdown 23:59.
-   - Row 2: Free Large — sisa 12/20 — **Klaim** → kode `WKD-4Y5B3C` muncul → countdown 23:59.
-   - Row 3: Dessert 35rb — sisa 3/10 — **Klaim** → kode `WKD-L8M2N1` muncul → countdown 23:59.
-3. User klik **Klaim** row 1 → muncul kode `WKD-7X2K9A` + countdown + tombol **Tukar di Kasir**.
-4. User buka kasir `/t/:slug` → judul + terms + field Tukar + field PIN.
-5. User masukin kode `WKD-7X2K9A` + PIN → validasi server → `voucher_claims` dibuat → status `redeemed`.
-6. Voucher lain di row 2+3 terkunci untuk tenant yang sama hingga besok (anti-stacking).
+1. User sees result-food.vue → V13A hero: `-20% Weekday` + `+2 promo lain` (lime link).
+2. User clicks `+2 promo lain` → V13B sheet appears above the result, 3 rows:
+   - Row 1: Kopi Weekday -20% — 7/20 left — **Klaim** → code `WKD-7X2K9A` appears → 23:59 countdown.
+   - Row 2: Free Large — 12/20 left — **Klaim** → code `WKD-4Y5B3C` appears → 23:59 countdown.
+   - Row 3: Dessert 35rb — 3/10 left — **Klaim** → code `WKD-L8M2N1` appears → 23:59 countdown.
+3. User clicks **Klaim** on row 1 → code `WKD-7X2K9A` appears + countdown + **Tukar di Kasir** button.
+4. User opens the cashier `/t/:slug` → title + terms + `Tukar` field + PIN field.
+5. User enters code `WKD-7X2K9A` + PIN → server validation → `voucher_claims` created → status `redeemed`.
+6. Other vouchers in rows 2+3 are locked for the same tenant until tomorrow (anti-stacking).
 
-**Alias `/voucher/:code` P1:** Bareng PIN di halaman kasir (bukan P0).
+**Alias `/voucher/:code` P1:** Along with PIN on the cashier page (not P0).
 
 ---
 
-## 4. Alur V13C — Strip di Mall Page
+## 4. V13C Flow — Strip on the Mall Page
 
-1. User buka `mall/[slug].vue` → scroll ke section **"Promo hari ini di GI"**.
-2. Section menampilkan strip 1 baris: `Promo hari ini di GI (7)` — 7 voucher aktif hari ini.
-3. User klik strip → **loncat** ke result-makan.vue dengan voucher yang dipilih (single tenant).
-4. **NOL route baru** — strip hanya mengganti URL param `?from_mall=true`, tidak create route baru.
+1. User opens `mall/[slug].vue` → scrolls to the **"Promo hari ini di GI"** section.
+2. The section shows a 1-line strip: `Promo hari ini di GI (7)` — 7 active vouchers today.
+3. User clicks the strip → **jumps** to result-food.vue with the selected voucher (single tenant).
+4. **ZERO new routes** — the strip only swaps the URL param `?from_mall=true`, it does not create a new route.
 
-**Visual strip di mall page:**
+**Strip visual on the mall page:**
 ```
 --------------------------------------------------
 | Promo hari ini di GI (7)                       |
 |  • -20% Weekday (sisa 7/20)                  |
 |  • Free Large (sisa 12/20)                   |
 |  • Dessert 35rb (sisa 3/10)                  |
-| [Buka → result-makan.vue]                      |
+| [Buka → result-food.vue]                      |
 --------------------------------------------------
 ```
 
 ---
 
-## 5. Alur Klaim V13 — Detail Teknis
+## 5. V13 Claim Flow — Technical Detail
 
 ### 5.1 `POST /api/voucher/claim` (S3)
 
-**Request (mulai login):**
+**Request (requires login):**
 ```json
 {
-  "voucher_code": "WKD-7X2K9A",
-  "mall_slug": "gi",
-  "from_mall_page": false
+  "voucher_code": "WKD-7X2K9A"
 }
 ```
 
-**Response sukses:**
+**Success response:**
 ```json
 {
   "status": "ok",
   "claim_code": "WKD-7X2K9A",
-  "expires_at": "23:59 WIB hari ini",
+  "expires_at": "2026-10-12T16:59:00.000Z",
   "voucher": {
     "name": "Kopi Weekday -20%",
-    "discount_percent": 20,
-    "sisa_hari_ini": 7
-  }
+    "discount_percent": 20
+  },
+  "time_remaining": { "hours": 5, "minutes": 30, "expired": false }
 }
 ```
 
-**Response error 401:** Belum login → balik ke login wall.
-**Response error 409:** Sudah claim hari ini user+tenant → `Anda sudah mengklaim voucher ini hari ini. Kembali besok.`
-**Response error 429:** >3 klaim/tenant/hari → `Batas maksimal 3 voucher per tenant per hari.`
+**Error response 401:** Not logged in → back to the login wall.
+**Error response 409:** User+tenant already claimed today → `Anda sudah mengklaim voucher tenant ini hari ini. Kembali besok.`
+**Error response 429:** more than 3 claims per user per day (all tenants combined) → `Batas maksimal 3 voucher per hari. Balik besok ya.`
 
 ### 5.2 `GET /api/voucher/:code` (P1, optional)
 
@@ -134,44 +132,44 @@ Tabel `vouchers` baru (migrasi tambahan di atas v1.0):
 
 ---
 
-## 6. Alur Kasir V13 — `/t/:slug` (P1, optional)
+## 6. V13 Cashier Flow — `/t/:slug` (P1, optional)
 
-1. User buka `/t/:slug` → judul: `Tukar Voucher` + terms.
-2. Field: `Kode Voucher` (input text) + `PIN` (input text, opsional untuk P0).
-3. Tombol **Tukar** → POST `/api/voucher/claim` dengan kode + PIN jika ada.
-4. Jika sukses → halaman konfirmasi: `Voucher berhasil ditukar!` + `Kode: WKD-7X2K9A` + `Diskon: 20%` + `Kadaluarsa: 23:59 WIB`.
-5. Jika gagal → error inline + countdown ulang.
+1. User opens `/t/:slug` → title: `Tukar Voucher` + terms.
+2. Field: `Kode Voucher` (text input) + `PIN` (text input, optional for P0).
+3. **Tukar** button → POST `/api/voucher/claim` with code + PIN if present.
+4. If successful → confirmation page: `Voucher berhasil ditukar!` + `Kode: WKD-7X2K9A` + `Diskon: 20%` + `Kadaluarsa: 23:59 WIB`.
+5. If it fails → inline error + countdown resets.
 
 ---
 
 ## 7. Anti-Farming & Anti-Stacking Rules (P0 Lock)
 
-- **1 user + 1 tenant + 1 hari = 1 claim saja.** `UNIQUE(user_id, tenant_id, claim_date)` di DB.
-- **Max 3 claim per tenant per hari** (hard limit di API 429).
-- **Tidak ada stacking voucher** di transaksi sama. Setiap claim generate kode unik sekali pakai.
-- **Countdown 23:59 WIB** — setelah 00:00 hari es claim batal (bisa diklaim lagi dari awal).
-- **Anti-bocor:** Setiap kode `WKD-XXXXXX` tergenerasi deterministik dari `user_id + tenant_id + claim_date + counter`. Tidak bisa ditebak.
+- **1 user + 1 tenant + 1 day = only 1 claim.** `UNIQUE(user_id, tenant_id, claim_date)` in the DB.
+- **Max 3 claims per user per day, across all tenants** (hard limit at API 429).
+- **No voucher stacking** in the same transaction. Each claim generates a unique single-use code.
+- **23:59 WIB countdown** — after 00:00 the next day the claim is void (it can be claimed again from scratch).
+- **Anti-leak:** Every `WKD-XXXXXX` code is generated deterministically from `user_id + tenant_id + claim_date + counter`. It cannot be guessed.
 
 ---
 
-## 8. Checklist Verifikasi P0 (DONE jika semua terpenuhi)
+## 8. P0 Verification Checklist (DONE when all are met)
 
 - [x] `docs/23-PRD-Addendum-Voucher-Claim.md` → v1.1 multi+sheet+strip.
-- [x] Migrasi Supabase: tabel `vouchers` + `voucher_claims` dengan constraints di atas.
-- [x] Helper `useVoucher()` di `app/composables/` — `claimVoucher(code)`, `getVoucherStatus(code)`.
-- [x] API `POST /api/voucher/claim` — 401/409/429 handling + spinner + :disabled.
-- [x] V13A hero best-1 + `+2 promo lain` di result-makan.vue — 1:1 design revamp-options-v13.html.
-- [x] V13B sheet 3 row di atas result — `Pilih promo 1 dari 3` + sisa cap per row + Klaim per row.
-- [x] V13C strip di mall page — 1 section `"Promo hari ini di GI (7)"` tanpa route baru.
-- [x] Test TDD: S1 auth `requireUser` 401, S2 `voucher_claims` UNIQUE, S3 `POST /api/voucher/claim` 401/409/429, S4 best-1+sheet+kode GEDE+countdown+spinner.
-- [x] `docs/08-PROGRESS.md` NOW+LOG updated + commit + push + Vercel redeploy + prod 200 verifikasi.
-- [x] `design/revamp-options-v13-compare.png` QA PASS (3 panel distinct NOL tofu/overlap).
-- [x] `app/` NOL sentuh untuk mock desain — semua di `design/`.
+- [x] Supabase migration: `vouchers` + `voucher_claims` tables with the constraints above.
+- [x] `useVoucher()` helper in `app/composables/` — `claimVoucher(code)`, `getVoucherStatus(code)`.
+- [x] `POST /api/voucher/claim` API — 401/409/429 handling + spinner + :disabled.
+- [x] V13A hero best-1 + `+2 promo lain` in result-food.vue — 1:1 with the revamp-options-v13.html design.
+- [x] V13B 3-row sheet above the result — `Pilih promo 1 dari 3` + remaining cap per row + Klaim per row.
+- [x] V13C strip on the mall page — 1 `"Promo hari ini di GI (7)"` section without a new route.
+- [x] TDD tests: S1 auth `requireUser` 401, S2 `voucher_claims` UNIQUE, S3 `POST /api/voucher/claim` 401/409/429, S4 best-1+sheet+BIG code+countdown+spinner.
+- [x] `docs/08-PROGRESS.md` NOW+LOG updated + commit + push + Vercel redeploy + prod 200 verification.
+- [x] `design/revamp-options-v13-compare.png` QA PASS (3 distinct panels, ZERO tofu/overlap).
+- [x] `app/` UNTOUCHED for the design mock — everything lives in `design/`.
 
 ---
 
-## 9. Sinkron Checklist 8.x (Auto-Patched)
+## 9. Checklist 8.x Sync (Auto-Patched)
 
-Lihat `docs/06-MVP-Checklist.md` area 8.1-8.4 untuk progress terbaru. Setiap entry di CHECKLIST harus sinkron dengan file ini: KENAPA di ADDENDUM, APA di CHECKLIST, KAPAN di PROGRESS.md LOG.
+See `docs/06-MVP-Checklist.md` areas 8.1-8.4 for the latest progress. Every entry in the CHECKLIST must stay in sync with this file: WHY in the ADDENDUM, WHAT in the CHECKLIST, WHEN in the PROGRESS.md LOG.
 
 *End of Addendum 23 v1.1*

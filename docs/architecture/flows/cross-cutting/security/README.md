@@ -15,34 +15,34 @@ code:
 
 ## TL;DR
 
-Secret hanya hidup di server (`runtimeConfig` non-public + `server/utils/db.ts`). Aturan ESLint memaksa batas client/server dan melarang `v-html`, `process.env` di client, dan `console.log`. CI memindai secret (gitleaks) dan melaporkan kerentanan dependency.
+Secrets live only on the server (non-public `runtimeConfig` + `server/utils/db.ts`). ESLint rules enforce the client/server boundary and forbid `v-html`, `process.env` in client code, and `console.log`. CI scans for secrets (gitleaks) and reports dependency vulnerabilities.
 
 ## Controls
 
-| Area                | Kontrol                                                                             | Ditegakkan oleh                              |
+| Area                | Control                                                                             | Enforced by                                  |
 | ------------------- | ----------------------------------------------------------------------------------- | -------------------------------------------- |
-| Secrets management  | `supabaseServiceKey`, `cfApiToken`, `hermesApiKey` hanya di `runtimeConfig` server  | `no-restricted-imports` (client ↔ `server/`) |
-| Env di client       | Wajib `useRuntimeConfig()`; `process.env` dilarang di kode client                   | `no-restricted-properties`                   |
-| XSS / injection     | `v-html` dilarang; pakai `v-dompurify-html`                                         | `vue/no-v-html` + plugin dompurify           |
-| Eval / dynamic code | `eval`, `new Function`, implied eval dilarang                                       | ESLint                                       |
-| Logging             | `console.log` dilarang (hanya `warn`/`error`); token tidak pernah di-log            | `no-console`                                 |
-| AuthN klaim voucher | Bearer token diverifikasi `db.auth.getUser`; 401 tanpa token                        | `server/utils/voucherClaim.ts`               |
-| Anti-abuse          | Rate-limit 3 klaim/hari; UNIQUE user+tenant+hari; limit paging max 50; quota cookie | server                                       |
-| Input validation    | `parseVoucherCode`, `parsePaginationParams`, `coerceBool`, validasi hasil LLM       | utils pure + tests                           |
-| Secret scan         | gitleaks di CI (riwayat penuh)                                                      | `.github/workflows/ci.yml`                   |
-| Dependency audit    | `pnpm audit --prod` (non-blocking, lihat Known Debt)                                | CI                                           |
+| Secrets management  | `supabaseServiceKey`, `cfApiToken`, `hermesApiKey` only in server `runtimeConfig`    | `no-restricted-imports` (client ↔ `server/`) |
+| Env di client       | `useRuntimeConfig()` required; `process.env` forbidden in client code               | `no-restricted-properties`                   |
+| XSS / injection     | `v-html` forbidden; use `v-dompurify-html`                                         | `vue/no-v-html` + plugin dompurify           |
+| Eval / dynamic code | `eval`, `new Function`, implied eval forbidden                                     | ESLint                                       |
+| Logging             | `console.log` forbidden (only `warn`/`error`); tokens are never logged             | `no-console`                                 |
+| AuthN voucher claim | Bearer token verified by `db.auth.getUser`; 401 without a token                     | `server/utils/voucherClaim.ts`               |
+| Anti-abuse          | Rate limit 3 claims/day; UNIQUE user+tenant+day; paging limit max 50; cookie quota   | server                                       |
+| Input validation    | `parseVoucherCode`, `parsePaginationParams`, `coerceBool`, LLM result validation    | utils pure + tests                           |
+| Secret scan         | gitleaks in CI (full history)                                                      | `.github/workflows/ci.yml`                   |
+| Dependency audit    | `pnpm audit --prod` (non-blocking, see Known Debt)                                 | CI                                           |
 
-## Review Checklist (sebelum DONE)
+## Review Checklist (before DONE)
 
-1. Cek OWASP Top 10 (2021) untuk file yang berubah.
-2. Tidak ada `v-html`; tidak ada secret/token di log atau pesan error.
-3. Laporan: `No confirmed vulnerabilities found` ATAU temuan + kategori OWASP + `file:line`.
+1. Check the changed files against OWASP Top 10 (2021).
+2. No `v-html`; no secret/token in logs or error messages.
+3. Report: `No confirmed vulnerabilities found` OR findings + OWASP category + `file:line`.
 
 ## Known Debt
 
-- `pnpm audit --prod --audit-level=high` melaporkan temuan transitif (via `@nuxt/devtools` / `tailwind-config-viewer`, Okt 2026); belum diblokir di CI.
-- Quota anon berbasis cookie dapat dihapus pengguna (jatah MVP; DB `user_quota` untuk produksi).
-- Belum ada security headers / CSP di `nuxt.config.ts`.
+- `pnpm audit --prod --audit-level=high` reports transitive findings (via `@nuxt/devtools` / `tailwind-config-viewer`, Oct 2026); not yet blocking in CI.
+- The cookie-based anon quota can be cleared by the user (MVP allowance; DB `user_quota` for production).
+- No security headers / CSP in `nuxt.config.ts` yet.
 
 ## See Also
 

@@ -1,4 +1,4 @@
-"""Render PNG perbandingan 20 opsi voucher-claim (result-makan full page) untuk review Telegram.
+"""Render PNG perbandingan 20 opsi voucher-claim (result-food full page) untuk review Telegram.
 
 Grid 4 kolom x 5 baris. Tiap panel = top bar + quota + hero + gift variant + Maps/Lainnya + rank.
 CATATAN FONT: PIL load_default hanya aman ASCII — semua label ASCII-only.

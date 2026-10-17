@@ -1,5 +1,5 @@
-# CI — gerbang kualitas (pola hub-chat): lint → type-check → test → build + security scan.
-# Urutan sama dengan Husky pre-commit & ../AGENTS.md (Definition of done). Wajib hijau sebelum merge.
+# CI — quality gate (hub-chat pattern): lint → type-check → test → build + security scan.
+# Same order as the Husky pre-commit & ../AGENTS.md (Definition of done). Must be green before merge.
 name: CI
 
 on:
@@ -14,17 +14,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # gitleaks scan riwayat commit, bukan cuma snapshot
-      # Secrets management: gagal kalau ada API key / token / password ter-commit.
+          fetch-depth: 0 # gitleaks scans commit history, not just the snapshot
+      # Secrets management: fails if any API key / token / password is committed.
       - uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - uses: pnpm/action-setup@v4
         with:
           package_json_file: app/package.json
-      # Supply chain: laporan kerentanan dependency. Saat ini non-blocking karena temuan awal (Okt 2026)
-      # semuanya transitif dari @nuxt/devtools / tailwind-config-viewer (dev tooling). Hapus
-      # `continue-on-error` setelah dependency di-upgrade dan audit bersih.
+      # Supply chain: dependency vulnerability report. Currently non-blocking because the initial findings (Oct 2026)
+      # are all transitive from @nuxt/devtools / tailwind-config-viewer (dev tooling). Remove
+      # `continue-on-error` once the dependencies are upgraded and the audit is clean.
       - name: pnpm audit (prod)
         working-directory: app
         continue-on-error: true
@@ -46,7 +46,7 @@ jobs:
           node-version: 22
           cache: pnpm
           cache-dependency-path: app/pnpm-lock.yaml
-      # --ignore-scripts: jangan jalankan husky `prepare` di CI; nuxt prepare dijalankan manual di bawah.
+      # --ignore-scripts: don't run husky `prepare` in CI; nuxt prepare is run manually below.
       - run: pnpm install --frozen-lockfile --ignore-scripts
       - run: pnpm exec nuxt prepare
       - run: pnpm lint

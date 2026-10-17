@@ -1,8 +1,8 @@
-# User Journey - Weekend Planner MVP
+# User Journey — Weekend Planner MVP
 
-**Version:** 2.1 (7 Okt 2026 — patch Addendum 09 v1.3: auth progresif + kombo 5+10+15 + voucher)
-**Date:** October 5, 2026 (asli) + patch 7 Okt 2026
-**Status:** Final + patch v1.3 LOCKED
+**Version:** 2.1 (Oct 7, 2026 — Addendum 09 v1.3 patch: progressive auth + 5+10+15 combo + voucher)
+**Date:** October 5, 2026 (original) + Oct 7, 2026 patch
+**Status:** Final + v1.3 patch LOCKED
 
 ---
 
@@ -12,14 +12,14 @@ Weekend Planner has 2 main user types with distinct journeys:
 1. **Anonymous Users** (first-time visitors, no account)
 2. **Registered Users** (logged-in)
 
-**Quota Rules (patch Addendum 09 v1.3 — split + progresif, LOCKED):**
-- **Tempat** (`/quiz`→`/result`): 2/hari (anon 1x cookie `quota_used`, login 2x)
-- **Makan** (`/makan`→`/result-makan`): 5/hari TERPISAH (anon 2x cookie `makan_quota_used`, login 5x, tidak makan quota tempat)
-- **Klaim voucher makan WAJIB login** (1 user 1 tenant/hari, anti-farming)
-- **Anon locked:** Simpan/Wishlist/Riwayat. **Anon boleh:** full result + Maps + Lapor tutup/buka + Vote + share read-only
-- **Login wall 4 momen:** generate ke-2 tempat / ke-3 makan → 403 LOGIN_REQUIRED; tap Simpan/Klaim voucher → bottom sheet login; buka Wishlist/Riwayat anon → prompt; quota habis → countdown 00.00 + tombol login
-- Each generate: **5 recommendations** (tidak campur tempat+makan)
-- Reset 00:00 WIB | LLM fail → quota tidak kepotong | Abuse clear-storage diterima soft launch (growth > strict)
+**Quota Rules (patch Addendum 09 v1.3 — split + progressive, LOCKED):**
+- **Place** (`/quiz`→`/result`): 2/day (anonymous 1x cookie `quota_used`, logged in 2x)
+- **Food** (`/food`→`/result-food`): 5/day SEPARATE (anonymous 2x cookie `food_quota_used`, logged in 5x, does not eat into place quota)
+- **Food voucher claims REQUIRE login** (1 user per tenant/day, anti-farming)
+- **Locked for anonymous:** Save/Wishlist/History. **Allowed for anonymous:** full result + Maps + Report closed/open + Vote + read-only share
+- **4 login wall moments:** 2nd place generate / 3rd food generate → 403 LOGIN_REQUIRED; tap Save/Claim voucher → login bottom sheet; anonymous opens Wishlist/History → prompt; quota exhausted → 00.00 countdown + login button
+- Each generate: **5 recommendations** (place + food never mixed)
+- Reset 00:00 WIB | LLM fail → quota not deducted | clear-storage abuse accepted at soft launch (growth > strict)
 
 ---
 
@@ -60,39 +60,39 @@ gtag('event', 'landing_cta_clicked')
 **Questions:**
 
 1. **"Weekend ini lu pengen yang gimana?"**
-   - Santai/healing 🧘
-   - Aktif/petualangan 🏃
-   - Produktif (kerja sambil enjoy) 💼
-   - Quality time bareng orang tersayang ❤️
-   - Lainnya (text input)
+   - Relaxed/healing 🧘
+   - Active/adventure 🏃
+   - Productive (working while enjoying it) 💼
+   - Quality time with loved ones ❤️
+   - Other (text input)
 
 2. **"Sama siapa?"**
-   - Sendiri 🚶
-   - Pasangan (2 orang) 💑
-   - Teman (2-4 orang) 👥
-   - Keluarga kecil, dengan anak 👨‍👩‍👧
-   - Keluarga besar 👨‍👩‍👧‍👦
+   - Alone 🚶
+   - Partner (2 people) 💑
+   - Friends (2-4 people) 👥
+   - Small family, with kids 👨‍👩‍👧
+   - Extended family 👨‍👩‍👧‍👦
 
 3. **"Usia anak?"** (conditional, only if family with kids)
-   - Balita (0-5 tahun)
-   - SD (6-12 tahun)
-   - Remaja (13+ tahun)
-   - Tidak ada anak
+   - Toddlers (0-5 years)
+   - Elementary school (6-12 years)
+   - Teens (13+ years)
+   - No kids
 
 4. **"Budget per orang?"**
-   - Hemat (<100rb) 💵
-   - Menengah (100rb-300rb) 💴
-   - Leluasa (>300rb) 💰
+   - Frugal (<100k) 💵
+   - Mid-range (100k-300k) 💴
+   - Comfortable (>300k) 💰
 
 5. **"Mau kemana?"**
-   - Sekitar Jabodetabek 🌆
-   - Jauh, mau road trip 🚗
-   - Lainnya (text input untuk kota)
+   - Around Jabodetabek 🌆
+   - Far, up for a road trip 🚗
+   - Other (text input for the city)
 
 6. **"Waktu?"** (optional)
-   - Pagi (sebelum 12:00) ☀️
-   - Siang/Sore (12:00-18:00) 🌤️
-   - Seharian (pagi sampai malam) 🌙
+   - Morning (before 12:00) ☀️
+   - Midday/Afternoon (12:00-18:00) 🌤️
+   - All day (morning until night) 🌙
 
 **User Action:**
 → Answer all required questions  
@@ -156,17 +156,17 @@ gtag('event', 'quiz_completed', {
 
 ```
 ┌────────────────────────────────────────┐
-│ 🏖️ Pantai Ancol                        │
+│ 🏖️ Pantai Ancol                         │
 │ [Badge: Outdoor • Wisata]              │
 │                                         │
-│ Kenapa Cocok:                          │
+│ Why it fits:                           │
 │ "Perfect untuk quality time bareng     │
 │ pasangan dengan suasana santai. Ada    │
 │ area tenang jauh dari keramaian."      │
 │                                         │
-│ 💰 Budget: Rp 150rb - 250rb/orang      │
-│ 📍 Area: Jakarta Utara                 │
-│ ⏰ Best time: Sabtu sore (16:00-18:00) │
+│ 💰 Budget: Rp 150k - 250k/person       │
+│ 📍 Area: North Jakarta                 │
+│ ⏰ Best time: Sat, 16:00-18:00         │
 │                                         │
 │ [Button: 📍 Lihat di Maps]             │
 │ [Button: 💾 Simpan] (login required)   │
@@ -192,15 +192,15 @@ gtag('event', 'quiz_completed', {
    ```
 
 3. **"Generate Lagi"** (sticky bottom button)
-   - For anonymous user → **Show login wall:**
+   - For anonymous users → **Show login wall:**
    ```
    ┌────────────────────────────────────────┐
-   │  Mau Rekomendasi Lagi?                 │
+   │  Want More Recommendations?            │
    │                                         │
-   │  Login dulu untuk dapat 1x generate    │
-   │  lagi hari ini!                        │
+   │  Log in first to get 1 more generate   │
+   │  today!                                │
    │                                         │
-   │  [Login/Daftar]  [Nanti Aja]          │
+   │  [Login/Daftar]  [Nanti Aja]           │
    └────────────────────────────────────────┘
    ```
 
@@ -210,12 +210,12 @@ gtag('event', 'quiz_completed', {
 
 #### Path A: Satisfied, Exits
 - User clicks "Lihat di Maps" for 1+ recommendations
-- User leaves page
+- User leaves the page
 - **Journey ends** ✅ (Success)
 
 #### Path B: Wants More, Prompted to Login
 - User clicks "Generate Lagi" or "Simpan"
-- See login/register modal
+- Sees login/register modal
 - Decision:
   - Click "Login/Daftar" → Go to Step 5
   - Click "Nanti Aja" → Stay on page, journey ends
@@ -247,12 +247,12 @@ Form:
 - Email (validation, check duplicate)
 - Password (min 8 chars, strength indicator)
 - Confirm password
-- Phone (+62, OPTIONAL — field collapsible "Tambah HP (opsional, buat info promo)" — kosong = valid)
+- Phone (+62, OPTIONAL — collapsible field "Tambah HP (opsional, buat info promo)" — empty = valid)
 - Checkbox: "Setuju dengan [Syarat] dan [Privasi]"
 
 Actions:
-- "Daftar" button → Supabase signup + create profile (phone=NULL kalau skip)
-- "Daftar dengan Google" button → OAuth langsung masuk, TANPA modal HP (friksi nol)
+- "Daftar" button → Supabase signup + create profile (phone=NULL if skipped)
+- "Daftar dengan Google" button → OAuth logs straight in, WITHOUT phone modal (zero friction)
 
 **Google OAuth Flow (patch v1.3):**
 ```
@@ -260,12 +260,12 @@ Actions:
 2. Redirect to Google consent screen
 3. User approves
 4. Redirect to /auth/callback
-5. Profile auto-created phone=NULL via initialize_new_user trigger (TANPA modal "Masukkan nomor HP")
-6. Initialize quota tempat 2 + makan 5 hari ini
+5. Profile auto-created phone=NULL via initialize_new_user trigger (WITHOUT "Masukkan nomor HP" modal)
+6. Initialize place quota 2 + food quota 5 for today
 7. Redirect back to /quiz or previous page
 ```
 
-**Kenapa phone optional?** Setiap field tambahan = drop-off. HP cuma dipakai Phase 2 broadcast (belum ada) — minta sekarang = bayar cost tanpa benefit. Google 1-tap tanpa modal = conversion tertinggi.
+**Why is phone optional?** Every extra field = drop-off. Phone is only used for the Phase 2 broadcast (not built yet) — asking for it now = paying the cost with no benefit. Google 1-tap without a modal = highest conversion.
 
 **Success:**
 - Set session cookie (httpOnly)
@@ -325,39 +325,39 @@ gtag('event', 'user_logged_in', { method: 'email' | 'google' })
 
 3. **Generate Again**
    - Click "Generate Lagi" → Back to quiz
-   - Complete new quiz → Generate (tempat quota: 0/2) + makan quota TERPISAH 5/hari (tidak kepotong)
-   - After 2nd generate tempat: **Quota tempat exhausted** → countdown 00.00, makan masih bisa jalan
+   - Complete new quiz → Generate (place quota: 0/2) + food quota SEPARATE 5/day (not deducted)
+   - After 2nd place generate: **Place quota exhausted** → 00.00 countdown, food can still run
 
 ---
 
 ### Step 8: Quota Exhausted — wallet 2-state (patch Addendum 09 v1.3)
 
-**Anon (login wall + countdown):**
+**Anonymous (login wall + countdown):**
 ```
 ┌────────────────────────────────────────┐
-│  Jatah gratis hari ini habis 🎁        │
-│  Login gratis → buka 2 tempat +        │
-│  5 makan/hari. Besok reset 00:00 WIB   │
-│  ⏰ 8 jam 23 menit lagi                │
+│  Today's free quota is used up 🎁       │
+│  Free login → unlock 2 places +        │
+│  5 food/day. Resets tomorrow 00:00 WIB │
+│  ⏰ 8 hours 23 minutes left            │
 │  [Login 10 detik (Google 1-tap)]       │
-│  [Lihat Wishlist] → login juga         │
+│  [Lihat Wishlist] → login too          │
 └────────────────────────────────────────┘
 ```
 
-**Registered (countdown only, tetap bisa lihat history/save/share):**
+**Registered (countdown only, can still view history/save/share):**
 
 **Modal/Screen:**
 ```
 ┌────────────────────────────────────────┐
-│  Quota Hari Ini Habis! 😊             │
+│  Today's Quota Is Used Up! 😊          │
 │                                         │
-│  Reset besok jam 00:00 WIB             │
-│  ⏰ 8 jam 23 menit lagi                │
+│  Resets tomorrow at 00:00 WIB          │
+│  ⏰ 8 hours 23 minutes left            │
 │                                         │
-│  Sambil nunggu, kamu bisa:             │
-│  • Lihat history rekomendasi           │
-│  • Share hasil ke teman                │
-│  • Cek tempat yang udah kamu save      │
+│  While you wait, you can:              │
+│  • View your recommendation history    │
+│  • Share results with friends          │
+│  • Check the places you've saved       │
 │                                         │
 │  [Lihat History]  [Share]              │
 └────────────────────────────────────────┘
@@ -410,7 +410,7 @@ WHERE last_reset_at < NOW() - INTERVAL '1 day';
 ```
 ┌────────────────────────────────────────┐
 │ [Logo] Weekend Planner                 │
-│  [History] [Favorites] [👤 Agesta ▼]  │
+│  [History] [Favorites] [👤 Agesta ▼]   │
 │                        ├─ Profile      │
 │                        ├─ Settings     │
 │                        └─ Logout       │
@@ -426,12 +426,12 @@ WHERE last_reset_at < NOW() - INTERVAL '1 day';
 **Error Screen:**
 ```
 ┌────────────────────────────────────────┐
-│  Oops! Ada Masalah Teknis...           │
+│  Oops! Something Went Wrong...         │
 │                                         │
-│  Sistem lagi sibuk nih. Tenang, quota  │
-│  kamu nggak kepotong kok!              │
+│  The system is busy right now. Don't   │
+│  worry, your quota isn't deducted!     │
 │                                         │
-│  [Coba Lagi]  [Ubah Jawaban]          │
+│  [Coba Lagi]  [Ubah Jawaban]           │
 └────────────────────────────────────────┘
 ```
 
@@ -446,7 +446,7 @@ WHERE last_reset_at < NOW() - INTERVAL '1 day';
 
 **Loading State Message:**
 ```
-Permintaan taking longer than expected...
+The request is taking longer than expected...
 [Cancel]  [Keep Waiting]
 ```
 
@@ -462,7 +462,7 @@ Permintaan taking longer than expected...
 **Anonymous:**
 - Lose session_id
 - Can generate again (new anonymous session)
-- Effectively "reset" quota (minor abuse vector, acceptable)
+- Effectively "resets" quota (minor abuse vector, acceptable)
 
 **Registered:**
 - Session cleared → Must login again
@@ -472,7 +472,7 @@ Permintaan taking longer than expected...
 
 ### Case 4: Shared Result Link
 
-**Scenario:** User copies `/result?session=xxx` and sends to friend
+**Scenario:** User copies `/result?session=xxx` and sends it to a friend
 
 **Behavior:**
 - Friend opens link → Can view results (read-only)
@@ -549,9 +549,9 @@ gtag('event', 'recommendation_clicked', {
   category 
 })
 
-// Auth (patch Addendum 09 v1.3: 4 momen wall)
+// Auth (patch Addendum 09 v1.3: 4 wall moments)
 gtag('event', 'login_prompted', { reason: 'quota_limit' | 'save_favorite' | 'claim_voucher' | 'open_wishlist' | 'open_history' })
-gtag('event', 'anon_quota_exhausted', { type: 'tempat' | 'makan' })
+gtag('event', 'anon_quota_exhausted', { type: 'place' | 'food' })
 gtag('event', 'voucher_claimed', { tenant_id, mall_slug })
 gtag('event', 'user_registered', { method })
 gtag('event', 'user_logged_in', { method })
@@ -586,10 +586,10 @@ gtag('event', 'timeout_occurred')
 - **Avg Time on Page:** >60 seconds
 - **Save/Share Rate:** >10%
 
-### Auth Conversion (patch Addendum 09 v1.3 — funnel progresif, bukan mandatory)
-- **Anonymous → Register:** >15% (7-day window, event `user_registered` setelah `anon_quota_exhausted`)
-- **Login Prompt → Signup:** >40% per momen (`quota_limit` / `claim_voucher`pisah ukur — voucher wall biasanya tertinggi)
-- **Voucher Claim Rate:** >20% dari viewer result makan yang login (sinyal monetisasi tenant)
+### Auth Conversion (patch Addendum 09 v1.3 — progressive funnel, not mandatory)
+- **Anonymous → Register:** >15% (7-day window, `user_registered` event after `anon_quota_exhausted`)
+- **Login Prompt → Signup:** >40% per moment (measured separately for `quota_limit` / `claim_voucher` — the voucher wall is usually the highest)
+- **Voucher Claim Rate:** >20% of logged-in food result viewers (tenant monetization signal)
 
 ### Retention
 - **Day 2 Return:** >30%
@@ -598,32 +598,32 @@ gtag('event', 'timeout_occurred')
 
 ---
 
-## Journey 3: Cari Makan (Split Quiz — Addendum 07 v1.1 Approved 6 Okt 2026)
+## Journey 3: Find Food (Split Quiz — Addendum 07 v1.1 Approved Oct 6, 2026)
 
-### Step 10: Entry `/makan`
-**Goal:** Jawab "lagi di mall, makan apa?" <10 detik.
-**UI:** 4 pertanyaan, 1 layar 1 pertanyaan (reuse quiz.html, 80% copy-paste):
-1. "Mau makan di mall mana?" → [GI] / [Central Park] / [Kokas] / [PIM] / [Aeon BSD] (wajib 1)
-2. "Misi makan kali ini?" → Makan Cepat / Nongkrong Lama / Keluarga / Healing
-3. "Budget per orang?" → Hemat (<50k) / Menengah (50-150k) / Leluasa (>150k)
-4. "Rombongan + pantangan?" → Sendiri / Berdua / Rame + toggle Halal only + Kids-friendly
-**Result `/result-makan`:** 5 TENANT murni (tidak campur tempat). Card: Nama + [Kategori • Mall Lt.X] + [✅ Halal] + [🔥 Hype] + reason 1 kalimat + price_range + Maps + Simpan + Lapor tutup.
-**Quota:** Terpisah 5x/hari (anonymous 2x via cookie `makan_quota_used`, login 5x). Tidak makan quota tempat.
+### Step 10: Entry `/food`
+**Goal:** Answer "I'm at the mall, what should I eat?" in <10 seconds.
+**UI:** 4 questions, 1 question per screen (reuse quiz.html, 80% copy-paste):
+1. "Mau makan di mall mana?" → [GI] / [Central Park] / [Kokas] / [PIM] / [Aeon BSD] (pick 1, required)
+2. "Misi makan kali ini?" → Quick bite / Long hangout / Family / Healing
+3. "Budget per orang?" → Frugal (<50k) / Mid-range (50-150k) / Comfortable (>150k)
+4. "Rombongan + pantangan?" → Alone / Two / Group + Halal only toggle + Kids-friendly
+**Result `/result-food`:** 5 pure TENANTS (no place mixing). Card: Name + [Category • Mall Floor X] + [✅ Halal] + [🔥 Hype] + 1-sentence reason + price range + Maps + Save + Report closed.
+**Quota:** Separate 5x/day (anonymous 2x via cookie `food_quota_used`, logged in 5x). Doesn't eat into place quota.
 
-### Step 11: Direktori SEO `/mall/:slug`
-**Goal:** Akuisisi organik $0, tanpa LLM/quota.
-List 40 tenant searchable + filter halal/budget/lantai/kids/mission/search + banner "Males scroll? Cariin yang cocok →" → `/makan?mall=gi` (pre-fill Q1).
+### Step 11: SEO Directory `/mall/:slug`
+**Goal:** Zero-cost organic acquisition, no LLM/quota.
+List of 40 searchable tenants + halal/budget/floor/kids/mission/search filters + banner "Males scroll? Cariin yang cocok →" → `/food?mall=grand-indonesia` (pre-fills Q1).
 
 ### Step 12: History/Favorites Split
-Tab Tempat | Makanan. Snapshot JSONB + `type: 'tempat'|'makan'` agar tidak kecampur.
+Place | Food tab. JSONB snapshot + `type: 'place'|'food'` so they don't get mixed up.
 
-### Step 13: Klaim Voucher Makan — WAJIB login (Addendum 09 v1.3, 7 Okt 2026)
-**Goal:** User makan → tunjukin kode → tenant happy → repeat order.
-**Flow:** Result makan → card tenant promo → tap "Klaim Voucher" → kalau anon: bottom sheet login ("Login buat klaim voucher — 10 detik via Google") → klaim → kode `WIK-XXXXX` + "Tunjukin ke kasir" → 1 user 1 tenant per hari (`voucher_claims` UNIQUE) → double-klaim = 409 `ALREADY_CLAIMED` + ajak coba tenant lain. Kasir validasi visual Phase 1 (tunjukin kode), dashboard validasi Phase 2.
+### Step 13: Food Voucher Claim — LOGIN REQUIRED (Addendum 09 v1.3, Oct 7, 2026)
+**Goal:** User eats → shows code → tenant happy → repeat order.
+**Flow:** Food result → tenant promo card → tap "Klaim Voucher" → if anonymous: login bottom sheet ("Login buat klaim voucher — 10 detik via Google") → claim → code `WKD-XXXXXX` + "Tunjukin ke kasir" → 1 user per tenant per day (`voucher_claims` UNIQUE) → double claim = 409 `ALREADY_CLAIMED` + invite to try another tenant. Cashier does visual validation in Phase 1 (show the code), dashboard validation in Phase 2.
 **Analytics:** `gtag('event','voucher_claimed',{tenant_id,mall_slug})` + `login_prompted{reason:'claim_voucher'}`.
 
-### Step 14: Home Superapp Kombo 5+10+15 (ref visual `design/revamp-combo-5-10-15.html`)
-Wallet quota 2-state di hero ("🎁 1 tempat • 2 makan free — Login buat buka 2+5" vs register countdown 00.00) + 2 CTA "Cari Tempat" / "Cari Makan" + grid Event/Promo/Wishlist/Riwayat (2 terkunci gembok buat anon) + strip mall GI/CP/Kokas/PIM/Aeon → `/mall/:slug` → `/makan?mall=` pre-fill.
+### Step 14: Superapp Home Combo 5+10+15 (visual ref `design/revamp-combo-5-10-15.html`)
+Wallet quota 2-state in the hero ("🎁 1 tempat • 2 makan free — Login buat buka 2+5" vs registered countdown 00.00) + 2 CTAs "Cari Tempat" / "Cari Makan" + Event/Promo/Wishlist/History grid (2 padlocked for anonymous) + mall strip GI/CP/Kokas/PIM/Aeon → `/mall/:slug` → `/food?mall=` pre-fill.
 
 ---
 

@@ -67,9 +67,9 @@
 ```
 
 **Key Elements:**
-- **Fold 1 (above the fold):** Hero + CTA dalam 1 screen (critical!)
+- **Fold 1 (above the fold):** Hero + CTA in 1 screen (critical!)
 - **Progress:** No navigation needed, scroll only
-- **CTA:** 2x (top + bottom) untuk catch users at different stages
+- **CTA:** 2x (top + bottom) to catch users at different stages
 - **Trust:** Clear benefit bullets
 - **Mobile optimized:** No horizontal scroll, thumb-friendly CTA
 
@@ -127,26 +127,26 @@
 **Q2: Companion (required)**
 - Options: Sendiri, Pasangan, Teman (2-4 orang), Keluarga kecil, Keluarga besar
 
-**Q3: Budget per orang (required)**
+**Q3: Budget per person (required)**
 - Options: 
   - 💰 Hemat (< Rp 100k)
   - 💰💰 Menengah (Rp 100-300k)
   - 💰💰💰 Leluasa (> Rp 300k)
 
-**Q4: Lokasi (required)**
+**Q4: Location (required)**
 - Options:
   - 📍 Sekitar Jabodetabek
   - 🚗 Road trip / Luar Jabodetabek
   - ✏️ Lainnya... (text input)
 
-**Q5: Waktu (optional - has skip)**
+**Q5: Time (optional - has skip)**
 - Options:
   - ☀️ Pagi (06:00 - 12:00)
   - 🌤️ Siang (12:00 - 18:00)
   - 🌙 Seharian
   - [Skip →] (link button)
 
-**Q6 (Conditional): Usia anak (if Q2 = keluarga)**
+**Q6 (Conditional): Child's age (if Q2 = family)**
 - Options:
   - 👶 Balita (0-5 tahun)
   - 🎒 Sekolah (6-12 tahun)

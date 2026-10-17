@@ -1,7 +1,7 @@
 ---
 topic: history
 status: ready
-related: [quiz-tempat, quiz-makan, state-management]
+related: [quiz-place, quiz-food, state-management]
 code:
   - app/common/store/HistoryStore.ts
   - app/common/utils/history.ts
@@ -14,12 +14,12 @@ code:
 
 ## TL;DR
 
-Riwayat hasil quiz disimpan di `localStorage` key `wikendo_history` (maks 20, terbaru di depan, judul sama tidak ganda) — tanpa tabel/API, jadi anon pun punya riwayat. `HistoryStore` ditulis oleh kedua result page dan dibaca `HistoryPage`.
+Quiz result history is stored in `localStorage` key `wikendo_history` (max 20, newest first, no duplicate titles) — no table/API, so even anon users have history. `HistoryStore` is written by both result pages and read by `HistoryPage`.
 
 ## Entry Points
 
-- `HistoryStore.push(entry)` dipanggil `TempatResultPage` dan `MakanResultPage` saat data sukses.
-- `HistoryPage.vue` (`/riwayat`) memanggil `history.load()` di `onMounted`.
+- `HistoryStore.push(entry)` is called by `PlaceResultPage` and `FoodResultPage` when data loads successfully.
+- `HistoryPage.vue` (`/history`) calls `history.load()` in `onMounted`.
 
 ## Sequence
 
@@ -41,7 +41,7 @@ sequenceDiagram
 ```json
 [
   {
-    "kind": "makan",
+    "kind": "food",
     "title": "Kopi Kekinian",
     "sub": "L2 · GI",
     "at": 1760600000000
@@ -51,8 +51,8 @@ sequenceDiagram
 
 ## Failure & State
 
-- Storage rusak/penuh/diblok → list kosong atau tidak tersimpan; UI tidak crash (semua akses di-guard `typeof window` + try/catch).
-- Tidak ada sinkronisasi antar perangkat (disengaja).
+- Storage corrupt/full/blocked → empty list or not saved; the UI does not crash (every access is guarded by `typeof window` + try/catch).
+- No cross-device sync (intentional).
 
 ## See Also
 

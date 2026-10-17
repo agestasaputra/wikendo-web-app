@@ -8,43 +8,43 @@ Single source of truth for terminology used across `docs/architecture/`. Use the
 
 | Term          | Definition                                                                                                                                     |
 | ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Wikendo**   | Produk: quiz → rekomendasi weekend Jabodetabek. Dua mode dipisah total: **Tempat** dan **Makan**.                                              |
-| **Tempat**    | Mode rekomendasi 5 tempat wisata/nongkrong via LLM. Route `/quiz` → `/result`. Tidak pernah dicampur dengan tenant.                            |
-| **Makan**     | Mode rekomendasi 5 **Tenant** di 1 mall. Route `/makan` → `/result-makan`. Kandidat dari DB dulu, LLM hanya ranking.                           |
-| **Mall**      | Salah satu dari 5 mall aktif (`grand-indonesia`, `central-park`, `kota-kasablanka`, `pondok-indah-mall`, `aeon-bsd`). Identitas = **slug**.    |
-| **Tenant**    | Restoran/kafe di dalam mall (baris tabel `tenants`). Punya flag tri-state `halal`, `kids_friendly`, `hype_tiktok` (NULL = belum riset).        |
-| **Direktori** | Halaman `/mall` + `/mall/:slug`: daftar mall & tenant tanpa login/quota/LLM (SEO).                                                             |
-| **Quota**     | Jatah generate per hari. **Anon**: tempat 1x + makan 2x (cookie). **Register**: tempat 2x + makan 5x. Reset 00.00 WIB.                         |
-| **Anon**      | Pengguna belum login. Quota dilacak lewat cookie `quota_used` / `makan_quota_used`.                                                            |
-| **Wall**      | Momen UI yang mengunci aksi untuk anon dan mengarahkan ke login (#1 quota, #2 Simpan, #3 Wishlist/Riwayat, #4 klaim voucher).                  |
-| **Wallet**    | Kartu quota di Home: headline sisa ("1 tempat • 2 makan") + chip per mode. Selalu jujur ikut `GET /api/quota`.                                 |
-| **Voucher**   | Promo tenant (`vouchers`). **Klaim** wajib login; 1 user + 1 tenant + 1 hari = 1 klaim; maksimal 3 klaim/hari.                                 |
-| **Gift**      | Gaya banner voucher V12 di hero result makan ("Ada -20% buat lu" + Buka →). Detail promo di **Sheet**.                                         |
-| **Sheet**     | Panel overlay: `QuizPlusSheet` (pilih quiz) dan `VoucherSheet` (pilih 1 dari 3 promo).                                                         |
-| **Riwayat**   | Daftar hasil quiz terakhir (max 20) di localStorage `wikendo_history`. Tanpa backend.                                                          |
-| **Hero**      | Kartu utama result (deck BEST) atau blok quota di Home. Nilainya diturunkan oleh helper pure (`buildTempatHero`, `buildMakanHero`).            |
-| **Slicing**   | Menyalin desain/screenshot 1:1 ke komponen. "Token lock" = warna/spacing yang dikunci Agesta (ink `#0C0A09`, ember `#EA580C`, lime `#A3E635`). |
-| **Sentinel**  | Elemen di dasar list yang memicu muat page berikutnya saat masuk viewport (infinity scroll, `useSentinelObserver`).                            |
+| **Wikendo**   | Product: quiz → weekend recommendations in Jabodetabek. Two fully separate modes: **Tempat** (Place) and **Makan** (Food).                                              |
+| **Tempat**    | Mode that recommends 5 tourist/hangout places via LLM (slice `features/place`). Route `/quiz` → `/result`. Never mixed with tenants.                            |
+| **Makan**     | Mode that recommends 5 **Tenants** in 1 mall (slice `features/food`). Route `/food` → `/result-food`. Candidates come from the DB first; the LLM only ranks.                           |
+| **Mall**      | One of the 5 active malls (`grand-indonesia`, `central-park`, `kota-kasablanka`, `pondok-indah-mall`, `aeon-bsd`). Identity = **slug**.    |
+| **Tenant**    | Restaurant/cafe inside a mall (row of the `tenants` table). Has tri-state flags `halal`, `kids_friendly`, `hype_tiktok` (NULL = not yet researched).        |
+| **Direktori** | Pages `/mall` + `/mall/:slug`: list of malls & tenants with no login/quota/LLM (SEO).                                                             |
+| **Quota**     | Daily generate allowance. **Anon**: place 1x + food 2x (cookie). **Registered**: place 2x + food 5x. Resets at 00:00 WIB.                         |
+| **Anon**      | User who is not logged in. Quota is tracked via the `quota_used` / `food_quota_used` cookies.                                                            |
+| **Wall**      | UI moment that locks an action for anon users and redirects to login (#1 quota, #2 Save, #3 Wishlist/History, #4 voucher claim).                  |
+| **Wallet**    | Quota card on Home: remaining headline ("1 tempat • 2 makan") + a chip per mode. Always honest, following `GET /api/quota`.                                 |
+| **Voucher**   | Tenant promo (`vouchers`). **Claiming** requires login; 1 user + 1 tenant + 1 day = 1 claim; max 3 claims/day.                                 |
+| **Gift**      | V12 voucher banner style in the food result hero ("Ada -20% buat lu" + Buka →). Promo details live in the **Sheet**.                                         |
+| **Sheet**     | Overlay panel: `QuizPlusSheet` (pick a quiz) and `VoucherSheet` (pick 1 of 3 promos).                                                         |
+| **History**   | List of the latest quiz results (max 20) in localStorage `wikendo_history`. No backend.                                                             |
+| **Hero**      | Main card of a result (BEST deck) or the quota block on Home. Its value is derived by pure helpers (`buildPlaceHero`, `buildFoodHero`).            |
+| **Slicing**   | Copying a design/screenshot 1:1 into a component. "Token lock" = colours/spacing locked by Agesta (ink `#0C0A09`, ember `#EA580C`, lime `#A3E635`). |
+| **Sentinel**  | Element at the bottom of a list that triggers loading the next page when it enters the viewport (infinite scroll, `useSentinelObserver`).                            |
 
 ## 2. Architecture Patterns
 
 | Term                   | Definition                                                                                                                                   |
 | ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Feature slice**      | Folder `app/features/<name>/` berisi `XPage.vue`, `components/`, `utils/`, `constants/`, `@types/`, `store/`. Tidak boleh import slice lain. |
-| **Thin page**          | File `app/pages/*.vue` yang hanya merender 1 `XPage.vue` dari feature (tanpa business logic).                                                |
-| **Common**             | `app/common/`: components, composables, store, utils, constants, types yang dipakai lintas feature. Tidak boleh import `features/`.          |
-| **Pure helper**        | Fungsi input → output tanpa side effect/route/cookie/DB; satu-satunya tempat logic boleh diuji tanpa Nuxt (`utils/`, `*/utils/`).            |
-| **Setup store**        | Pinia store bersintaks setup (`defineStore("x", () => {...})`), file `XStore.ts`, fungsi `useXStore()`.                                      |
-| **File-assert test**   | Test yang membaca source sebagai teks (`test/utils.ts → readSource`) untuk mengunci copy/token UI. NOL network, deterministik.               |
-| **Definition of done** | Checklist di `AGENTS.md`: lint 0, type-check 0, test hijau, build exit 0, docs & boundary terjaga.                                           |
+| **Feature slice**      | Folder `app/features/<name>/` containing `XPage.vue`, `components/`, `utils/`, `constants/`, `@types/`, `store/`. Must not import other slices. |
+| **Thin page**          | An `app/pages/*.vue` file that only renders 1 `XPage.vue` from a feature (no business logic).                                                |
+| **Common**             | `app/common/`: components, composables, store, utils, constants, types shared across features. Must not import `features/`.          |
+| **Pure helper**        | Input → output function with no side effects/route/cookie/DB; the only place where logic can be tested without Nuxt (`utils/`, `*/utils/`).            |
+| **Setup store**        | Pinia store using setup syntax (`defineStore("x", () => {...})`), file `XStore.ts`, function `useXStore()`.                                      |
+| **File-assert test**   | Test that reads source as text (`test/utils.ts → readSource`) to lock UI copy/tokens. ZERO network, deterministic.               |
+| **Definition of done** | Checklist in `AGENTS.md`: lint 0, type-check 0, tests green, build exit 0, docs & boundaries preserved.                                           |
 
 ## 3. External Services
 
 | Term                      | Definition                                                                                                                  |
 | ------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| **Supabase**              | Postgres + Auth. Browser memakai anon key (`useSupabaseBrowser`); server memakai service key (`supabaseAdmin`, bypass RLS). |
-| **Cloudflare Workers AI** | Provider LLM produksi (endpoint OpenAI-compatible). Dipilih kalau `cfAccountId` + `cfApiToken` terisi.                      |
-| **Hermes-combo**          | Provider LLM lokal untuk dev (`http://127.0.0.1:20128`). Fallback kalau env Cloudflare kosong.                              |
-| **Vercel**                | Hosting produksi (root directory = `app/`).                                                                                 |
-| **Google OAuth**          | Login 1-klik lewat Supabase `signInWithOAuth({ provider: "google" })`.                                                      |
-| **GitHub Actions**        | CI `.github/workflows/ci.yml`: security (gitleaks + audit) dan verify (lint, type-check, test, build).                      |
+| **Supabase**              | Postgres + Auth. Browser uses the anon key (`useSupabaseBrowser`); server uses the service key (`supabaseAdmin`, bypasses RLS). |
+| **Cloudflare Workers AI** | Production LLM provider (OpenAI-compatible endpoint). Chosen when `cfAccountId` + `cfApiToken` are set.                      |
+| **Hermes-combo**          | Local LLM provider for dev (`http://127.0.0.1:20128`). Fallback when the Cloudflare env is empty.                              |
+| **Vercel**                | Production hosting (root directory = `app/`).                                                                                 |
+| **Google OAuth**          | 1-click login via Supabase `signInWithOAuth({ provider: "google" })`.                                                      |
+| **GitHub Actions**        | CI `.github/workflows/ci.yml`: security (gitleaks + audit) and verify (lint, type-check, test, build).                      |

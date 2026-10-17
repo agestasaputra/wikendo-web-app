@@ -1,114 +1,114 @@
-# PRD Addendum — Revamp Kombo 5+10+15 + Auth Progresif
+# PRD Addendum — Revamp Combo 5+10+15 + Progressive Auth
 
-**Version:** 1.3 (7 Okt 2026)
-**Date:** 7 Okt 2026
-**Status:** Approved by Agesta (7 Okt 2026) — LOCKED
-**Merujuk ke:** `docs/01-PRD.md v2.0 Final` + `docs/07-PRD-Addendum-Mall-F&B.md v1.2 LOCKED` + `docs/02-ADR.md v2.1` + visual `design/revamp-combo-5-10-15.html`
+**Version:** 1.3 (7 Oct 2026)
+**Date:** 7 Oct 2026
+**Status:** Approved by Agesta (7 Oct 2026) — LOCKED
+**References:** `docs/01-PRD.md v2.0 Final` + `docs/07-PRD-Addendum-Mall-F&B.md v1.2 LOCKED` + `docs/02-ADR.md v2.1` + visual `design/revamp-combo-5-10-15.html`
 **Owner:** Agesta
-**APA ini?** PRD v2.0 Final jangan diutak-atik. File ini = RFC mini: kunci visual kombo + aturan login/quota biar pas eksekusi nggak ngarang.
-**KENAPA perlu?** Dua open question (mandatory login? + kejar user sebanyak-banyaknya?) belum terkunci di dokumen. Tanpa ini, eksekusi Nuxt bakal beda interpretasi soal quota anon, voucher gate, dan phone.
+**WHAT is this?** PRD v2.0 Final must not be touched. This file = a mini RFC: it locks the combo visuals + login/quota rules so execution doesn't make things up.
+**WHY is it needed?** Two open questions (mandatory login? + chase as many users as possible?) were not yet locked in any document. Without this, the Nuxt implementation would interpret anon quota, voucher gate, and phone differently.
 
 ---
 
-## 1. Keputusan UI — Kombo 5+10+15 LOCKED (visual only)
+## 1. UI Decision — Combo 5+10+15 LOCKED (visual only)
 
-**APA?** Satu alur utuh, bukan 3 app terpisah. Referensi visual: `design/revamp-combo-5-10-15.html` (31KB, 8 mockup HP). File HTML itu TIDAK diubah di v1.3 ini — sudah cukup sebagai spec visual.
+**WHAT?** One complete flow, not 3 separate apps. Visual reference: `design/revamp-combo-5-10-15.html` (31KB, 8 phone mockups). That HTML file is NOT changed in v1.3 — it is sufficient as the visual spec.
 
-- **A. Home Superapp (Opsi 10)** — `/`: 2 CTA gede (🗺️ Cari Tempat / 🍜 Cari Makan) + wallet quota (`2 tempat • 5 makan` untuk register, `1 tempat • 2 makan free` untuk anon) + grid Event/Promo/Wishlist/Riwayat.
-- **B-C. Quiz swipe tempat (Opsi 5)** — `/quiz`: 6Q (mood/companion/anak conditional/budget/lokasi/waktu optional), 1 layar 1 pertanyaan, tombol 56px thumb-zone.
-- **D. Result deck (Opsi 5)** — `/result`: hero #1 + Navigasi/save/share + mini deck ②③ tap "Lainnya". Best Match murni skor. Slot #1 boleh sponsored TAPI badge wajib "Sponsored".
-- **E-F. Quiz makan (5+15)** — `/makan`: 4Q (mall wajib GI/CP/Kokas/PIM/Aeon + misi + budget + rombongan/Halal/Kids), ~20 detik, pre-filled `?mall=` dari direktori.
-- **G. Result makan + voucher (15)** — `/result-makan`: 5 tenant murni + badge -20%/Halal + tombol Klaim voucher (WAJIB login, lihat §2).
-- **H. Direktori (15)** — `/mall/:slug`: list 40 tenant + filter no-LLM SSR SEO, funnel organik → `/makan?mall=`.
+- **A. Home Superapp (Option 10)** — `/`: 2 big CTAs (🗺️ Cari Tempat / 🍜 Cari Makan) + quota wallet (`2 tempat • 5 makan` for registered, `1 tempat • 2 makan free` for anon) + Event/Promo/Wishlist/Riwayat grid.
+- **B-C. Swipe place quiz (Option 5)** — `/quiz`: 6Q (mood/companion/conditional child/budget/location/optional time), 1 question per screen, 56px thumb-zone buttons.
+- **D. Result deck (Option 5)** — `/result`: hero #1 + Navigasi/save/share + mini deck ②③ tap "Lainnya". Best Match is purely score-based. Slot #1 may be sponsored BUT the "Sponsored" badge is mandatory.
+- **E-F. Food quiz (5+15)** — `/food`: 4Q (mall required GI/CP/Kokas/PIM/Aeon + mission + budget + companions/Halal/Kids), ~20 seconds, pre-filled `?mall=` from the directory.
+- **G. Food result + voucher (15)** — `/result-food`: 5 pure tenants + -20%/Halal badge + Klaim voucher button (login REQUIRED, see §2).
+- **H. Directory (15)** — `/mall/:slug`: list of 40 tenants + no-LLM SSR SEO filters, organic funnel → `/food?mall=`.
 
-**Token disatuin (KENAPA? biar konsisten, nggak gado-gado):** base #fffdf9, Orange tempat #f97316, Merah makan #ee2c4b, Plus Jakarta Sans, kartu 24px, tombol 56px.
+**Unified tokens (WHY? for consistency, no mishmash):** base #fffdf9, place Orange #f97316, food Red #ee2c4b, Plus Jakarta Sans, 24px cards, 56px buttons.
 
-**Yang DITUNDA Phase 2 (biar MVP 2-3 minggu kekejar):** foto Opsi 2, peta Opsi 7 jadi toggle, streak Opsi 8, gacha 12. Bukan dibuang, cuma antre.
+**DEFERRED to Phase 2 (so the 2-3 week MVP is achievable):** Option 2 photos, Option 7 map as a toggle, Option 8 streak, 12 gacha. Not dropped, just queued.
 
 ---
 
-## 2. Auth — Progresif, BUKAN Mandatory Login
+## 2. Auth — Progressive, NOT Mandatory Login
 
-**Keputusan decisive (jawab 2 open question lu):**
-1. **Mandatory login? NGGAK.** Anon bisa pakai quiz tempat + quiz makan. Value first, login belakangan.
-2. **Kejar user sebanyak-banyaknya? IYA.** Skema di bawah didesain buat ubah non-register → register sebanyak-banyaknya tanpa bunuh conversion.
+**Decisive decisions (answering your 2 open questions):**
+1. **Mandatory login? NO.** Anon can use the place quiz + the food quiz. Value first, login later.
+2. **Chase as many users as possible? YES.** The scheme below is designed to convert as many non-registered users to registered as possible without killing conversion.
 
-### 2.1 Jatah anon vs register (split, tidak campur)
+### 2.1 Anon vs registered allowance (split, not mixed)
 
-| Jalur | Anon | Register |
+| Track | Anon | Registered |
 |---|---|---|
-| 🗺️ Tempat (`/quiz→/result`) | **1x generate/hari**, result full 5 kartu, Maps boleh diklik | **2/2 penuh** |
-| 🍜 Makan (`/makan→/result-makan`) | **2x generate/hari**, result full 5 tenant, Maps boleh | **5/5 penuh** |
-| 💾 Simpan / ❤️ Wishlist / 🕘 Riwayat | 🔒 locked → login prompt | ✅ jalan |
-| 🎟️ Klaim voucher makan | 🔒 **WAJIB login** (anti-farming voucher) | ✅ jalan |
-| 📣 Lapor tutup/buka + Vote/share | ✅ tanpa login (freshness data) | ✅ jalan |
-| 🔗 Share link result | read-only, penerima anon dapat jatah free (viral loop) | sama |
+| 🗺️ Tempat (`/quiz→/result`) | **1x generate/day**, full 5-card result, Maps clickable | **2/2 full** |
+| 🍜 Makan (`/food→/result-food`) | **2x generate/day**, full 5-tenant result, Maps clickable | **5/5 full** |
+| 💾 Simpan / ❤️ Wishlist / 🕘 Riwayat | 🔒 locked → login prompt | ✅ works |
+| 🎟️ Claim food voucher | 🔒 **login REQUIRED** (anti voucher farming) | ✅ works |
+| 📣 Lapor tutup/buka + Vote/share | ✅ no login (data freshness) | ✅ works |
+| 🔗 Share result link | read-only, anon recipients get the free allowance (viral loop) | same |
 
-**KENAPA makan 2x bukan 1x?** Frekuensi makan 2-3x sehari (lunch/dinner). Kasih 2 biar kerasa value-nya, tapi voucher dikunci → umpan register + anti-borong voucher pakai anon baru.
+**WHY food 2x instead of 1x?** People eat 2-3x a day (lunch/dinner). Giving 2 makes the value felt, but the voucher is locked → bait to register + prevents mass-claiming vouchers with fresh anon identities.
 
-### 2.2 4 momen login wall (semuanya pas high-intent, KENAPA? biar convert, bukan ngusir)
+### 2.2 4 login wall moments (all at high intent, WHY? to convert, not to drive users away)
 
-1. Generate ke-2 tempat / ke-3 makan → *"Sisa anon habis. Login gratis → buka 2 tempat/hari + simpan + riwayat."*
-2. Tap Simpan / Klaim voucher → bottom sheet login.
-3. Buka Wishlist/Riwayat → login prompt.
-4. Quota habis → countdown reset 00.00 WIB + tombol login (bukan dead-end).
+1. 2nd place generate / 3rd food generate → *"Sisa anon habis. Login gratis → buka 2 tempat/hari + simpan + riwayat."*
+2. Tap Simpan / Klaim voucher → login bottom sheet.
+3. Open Wishlist/Riwayat → login prompt.
+4. Quota exhausted → reset countdown 00.00 WIB + login button (not a dead end).
 
-**Copy jual benefit, bukan blokir:** *"Login 10 detik (Google 1-tap) → quota reset tiap hari, gratis."*
+**Copy sells the benefit, doesn't block:** *"Login 10 detik (Google 1-tap) → quota reset tiap hari, gratis."*
 
-### 2.3 Metode + open question PRD
+### 2.3 Method + PRD open questions
 
-- **Primary: Google OAuth 1-tap** (friksi nol). Secondary: Email+password.
-- **Email verification? OPTIONAL dulu** (jawab open question PRD §4.5). Jangan jegal register. Google OAuth otomatis verified.
-- **Phone mandatory? DROP** (jawab asumsi PRD §7 "Phone doesn't hurt conversion" → ternyata hurt, jadi drop). KENAPA? Phone bunuh conversion + SMS cost. Simpan buat optional Phase 2 (broadcast promo). Implikasi: `user_profiles.phone` jadi NULL-able, validasi +62 cuma kalau diisi. Google OAuth TANPA modal "Masukkan nomor HP" lagi.
-- **Wallet Home 2 state:** anon (*"1 tempat • 2 makan free, login buat full"*) vs register (*"2 • 5"*). Result: tombol Simpan/Klaim ada gembok kecil.
-
----
-
-## 3. Quota, Anti-Abuse, Cost
-
-- Tempat 2/hari + makan 5/hari, reset 00:00 WIB. Anon: UUID localStorage + cookie (`quota_used` tempat, `makan_quota_used` makan) + rate-limit IP di server.
-- **LLM fail → quota NGGAK kepotong** (edge case PRD §6 tetap berlaku).
-- Abuse (clear storage = reset) DITERIMA dulu pas soft launch 30-50 users — growth > strict. Kalau spike baru kerasin (fingerprint/IP tracking, sesuai risk table PRD).
-- Cost aman: makan = filter Supabase gratis, LLM cuma ranking ~400 token. Anon 1+2/hari nggak jebolin budget 500rb/bln. Target NFR <2s 3G + load result <1s tetap.
+- **Primary: Google OAuth 1-tap** (zero friction). Secondary: Email+password.
+- **Email verification? OPTIONAL for now** (answers PRD open question §4.5). Don't block registration. Google OAuth is automatically verified.
+- **Phone mandatory? DROP** (answers PRD §7 assumption "Phone doesn't hurt conversion" → turns out it does hurt, so drop it). WHY? Phone kills conversion + SMS cost. Keep it as optional for Phase 2 (promo broadcast). Implication: `user_profiles.phone` becomes NULL-able, +62 validation only when filled in. Google OAuth has NO "Masukkan nomor HP" modal anymore.
+- **Home wallet 2 states:** anon (*"1 tempat • 2 makan free, login buat full"*) vs registered (*"2 • 5"*). Result: the Simpan/Klaim buttons get a small lock icon.
 
 ---
 
-## 4. Delta API & Schema (dieksekusi SETELAH approve, bukan sekarang)
+- Place 2/day + food 5/day, reset 00:00 WIB. Anon: localStorage UUID + cookies (`quota_used` place, `food_quota_used` food) + server-side IP rate-limit.
 
-Non-breaking, patch downstream setelah v1.3 APPROVED:
-- `user_quota`: split `quota_type='tempat'|'makan'` atau tabel `mall_search_quota(user_id,date,used)` (sudah ada di 8.1, tinggal pakai).
+- Tempat 2/hari + makan 5/hari, reset 00:00 WIB. Anon: UUID localStorage + cookie (`quota_used` tempat, `food_quota_used` makan) + rate-limit IP di server.
+- **LLM fail → quota is NOT deducted** (PRD §6 edge case still applies).
+- Abuse (clear storage = reset) is ACCEPTED for now during the 30-50 user soft launch — growth > strict. Tighten only if there's a spike (fingerprint/IP tracking, per the PRD risk table).
+- Cost is safe: food = free Supabase filtering, LLM only ranks ~400 tokens. Anon 1+2/day won't break the 500k/month budget. NFR target <2s on 3G + result load <1s still holds.
+
+---
+
+## 4. API & Schema Delta (executed AFTER approval, not now)
+
+Non-breaking, downstream patch after v1.3 is APPROVED:
+- `user_quota`: split `quota_type='place'|'food'` or table `mall_search_quota(user_id,date,used)` (already exists in 8.1, just use it).
 - `user_profiles.phone`: NOT NULL → NULL-able (drop mandatory).
-- `GET /api/quota`: response anon = `{tempat:{used,limit:1}, makan:{used,limit:2}}`, register = `{tempat:{limit:2}, makan:{limit:5}}`.
-- `POST /api/tempat/recommend` → anon ke-2 = `403 LOGIN_REQUIRED`. `POST /api/makan/recommend` → anon ke-3 = `403 LOGIN_REQUIRED`. Voucher claim endpoint baru = `401` kalau anon.
-- `POST /api/vote` + `POST /api/report-tenant`: tetap tanpa login + rate-limit IP.
+- `GET /api/quota`: anon response = `{place:{used,limit:1}, food:{used,limit:2}}`, registered = `{place:{limit:2}, food:{limit:5}}`.
+- `POST /api/place/recommend` → anon 2nd = `403 LOGIN_REQUIRED`. `POST /api/food/recommend` → anon 3rd = `403 LOGIN_REQUIRED`. New voucher claim endpoint = `401` if anon.
+- `POST /api/vote` + `POST /api/report-tenant`: stay login-free + IP rate-limit.
 - Analytics: `login_prompted{reason}`, `user_registered{method}`, `voucher_claimed`, `anon_quota_exhausted{type}`.
 
 ---
 
-## 5. Metrics tambahan (selain North Star PRD)
+## 5. Additional Metrics (besides the PRD North Star)
 
-- Anon → register conversion >15% (goal utama v1.3 ini).
-- Login wall conversion per momen (mana paling convert? → iterasi copy).
-- Voucher claim rate (makan → klaim).
-- Tetap: landing→quiz >40%, completion >70%, CTR Maps >50%, time >60s, share >5%, tenant halu = 0.
+- Anon → registered conversion >15% (the main goal of this v1.3).
+- Login wall conversion per moment (which converts best? → iterate copy).
+- Voucher claim rate (food → claim).
+- Unchanged: landing→quiz >40%, completion >70%, Maps CTR >50%, time >60s, share >5%, hallucinated tenant = 0.
 
 ---
 
-## 6. Effort (kasar, dikunci pas Checklist)
+## 6. Effort (rough, locked at Checklist)
 
-- Patch docs downstream (ADR v2.2 + Schema + API + Journey + Checklist + PROGRESS): ~1 jam.
-- Auth slice (login/register/callback/middleware — blocker lama): ~4 jam (sudah ada di Checklist 3.5).
-- Wallet 2-state + login wall 4 momen + gembok Simpan/Klaim + countdown: ~3 jam.
-- Voucher gate + phone NULL-able migration: ~1.5 jam.
-- **Total tambahan v1.3: ~5-6 jam** di luar backlog auth yang memang belum dikerjain.
+- Downstream docs patch (ADR v2.2 + Schema + API + Journey + Checklist + PROGRESS): ~1 hour.
+- Auth slice (login/register/callback/middleware — the old blocker): ~4 hours (already in Checklist 3.5).
+- 2-state wallet + 4-moment login wall + Simpan/Klaim lock + countdown: ~3 hours.
+- Voucher gate + phone NULL-able migration: ~1.5 hours.
+- **Additional total for v1.3: ~5-6 hours**, on top of the auth backlog that genuinely hasn't been done yet.
 
 ---
 
 ## 7. Next Step
 
-1. Agesta ketik **"approve"** → gue patch ADR v2.2 + Schema + API + Journey + Checklist + PROGRESS (KENAPA+APA+KAPAN).
-2. Atau ketik **"revisi: ..."** kalau mau ubah (misal anon makan 1x bukan 2x, atau phone tetap wajib).
-3. Setelah itu baru eksekusi Nuxt via TDD (test→lint→build), tetap **0 ubah `app/` sebelum approve** — lock lama masih berlaku.
+1. Agesta types **"approve"** → I patch ADR v2.2 + Schema + API + Journey + Checklist + PROGRESS (WHY+WHAT+WHEN).
+2. Or types **"revisi: ..."** to request changes (e.g. anon food 1x instead of 2x, or phone stays mandatory).
+3. Only after that, execute Nuxt via TDD (test→lint→build); still **0 changes to `app/` before approval** — the old lock still applies.
 
-**Ditulis oleh:** Hermes (CTO+CEO mode)
-**Di-review oleh:** Agesta — ketik "approve" untuk gas, atau "revisi: ..." kalau mau ubah.
+**Written by:** Hermes (CTO+CEO mode)
+**Reviewed by:** Agesta — type "approve" to go, or "revisi: ..." to request changes.

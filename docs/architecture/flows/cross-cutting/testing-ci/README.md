@@ -16,16 +16,16 @@ code:
 
 ## TL;DR
 
-Vitest + happy-dom, test co-located di `__tests__/*.spec.ts`. Ada 3 jenis: unit pure (utils), unit store/composable (mock Supabase/`$fetch`), dan file-assert (membaca source sebagai teks untuk mengunci copy/token UI). Gerbang yang sama dijalankan Husky (commit) dan GitHub Actions (CI).
+Vitest + happy-dom, tests co-located in `__tests__/*.spec.ts`. There are 3 kinds: pure unit (utils), store/composable unit (mocked Supabase/`$fetch`), and file-assert (reads source as text to lock UI copy/tokens). The same gates run in Husky (commit) and GitHub Actions (CI).
 
 ## Test Types
 
-| Jenis             | Lokasi                                   | Isolasi                                                                                             |
+| Type              | Location                                 | Isolation                                                                                            |
 | ----------------- | ---------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| Unit — utility    | `*/utils/__tests__/*.spec.ts`            | Tanpa mock                                                                                          |
-| Unit — store      | `*/store/__tests__/*.spec.ts`            | `vi.hoisted` + `vi.mock` untuk Supabase, `vi.stubGlobal("$fetch")`                                  |
-| Unit — composable | `common/composables/__tests__/*.spec.ts` | Fetch mock                                                                                          |
-| File-assert       | `*/__tests__/*Page.spec.ts` dll.         | `readSource()` dari `app/test/utils.ts` (hex lowercase + whitespace dipadatkan agar tahan Prettier) |
+| Unit — utility    | `*/utils/__tests__/*.spec.ts`            | No mocks                                                                                            |
+| Unit — store      | `*/store/__tests__/*.spec.ts`            | `vi.hoisted` + `vi.mock` for Supabase, `vi.stubGlobal("$fetch")`                                  |
+| Unit — composable | `common/composables/__tests__/*.spec.ts` | Mocked fetch                                                                                        |
+| File-assert       | `*/__tests__/*Page.spec.ts` etc.         | `readSource()` from `app/test/utils.ts` (hex lowercased + whitespace collapsed to survive Prettier) |
 
 ## Gates
 
@@ -41,8 +41,8 @@ flowchart LR
 
 ## Rules
 
-- Fungsi/komposable/store baru wajib punya `__tests__/<nama>.spec.ts` (TDD: merah dulu).
-- Jangan `--no-verify`; perbaiki akar masalah. CI tetap menangkap.
+- New functions/composables/stores must have `__tests__/<name>.spec.ts` (TDD: red first).
+- Never use `--no-verify`; fix the root cause. CI catches it anyway.
 - `pnpm lint` = ESLint (0 warning) + `prettier --check`; `pnpm type-check` = `nuxt typecheck`.
 
 ## See Also

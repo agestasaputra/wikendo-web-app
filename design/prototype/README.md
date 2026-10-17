@@ -1,22 +1,22 @@
 # Weekend Planner - HTML Prototype
 
-## 📱 Cara Test di HP Android
+## 📱 How to Test on an Android Phone
 
 ### Method 1: Via File Manager (Recommended)
-1. Download file `wikendo-prototype.tar.gz`
-2. Extract menggunakan file manager (RAR, ZArchiver, dll)
-3. Buka `index.html` dengan browser (Chrome/Firefox)
+1. Download the `wikendo-prototype.tar.gz` file
+2. Extract it using a file manager (RAR, ZArchiver, etc.)
+3. Open `index.html` in a browser (Chrome/Firefox)
 4. Test flow: Landing → Quiz → Result
 
-### Method 2: Via Python Server (Jika punya laptop)
+### Method 2: Via Python Server (if you have a laptop)
 ```bash
 cd wikendo-prototype
 python3 -m http.server 8000
 ```
-Akses dari HP: `http://[IP-laptop]:8000`
+Access from your phone: `http://[IP-laptop]:8000`
 
-### Method 3: Upload ke Hosting Gratis
-Upload ke Netlify/Vercel/GitHub Pages untuk testing via URL
+### Method 3: Upload to Free Hosting
+Upload to Netlify/Vercel/GitHub Pages for testing via URL
 
 ---
 
@@ -199,13 +199,13 @@ wikendo-prototype/
 
 ## 📞 Feedback & Questions
 
-Test prototype ini di HP Anda dan berikan feedback:
-1. Apakah quiz flow lancar?
-2. Apakah loading time cepat?
-3. Apakah button mudah di-tap?
-4. Apakah text mudah dibaca?
-5. Apakah design menarik?
-6. Apa yang perlu diperbaiki?
+Test this prototype on your phone and share your feedback:
+1. Is the quiz flow smooth?
+2. Is the loading time fast?
+3. Are the buttons easy to tap?
+4. Is the text easy to read?
+5. Is the design appealing?
+6. What needs improvement?
 
 ---
 

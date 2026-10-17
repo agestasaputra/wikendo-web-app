@@ -1,78 +1,78 @@
 # PRD Addendum — Mall F&B Directory (Split Quiz)
 
-**Version:** 1.2 Amended (6 Okt 2026 malam — sinkron patch NULL tri-state)
-**Date:** 6 Okt 2026
-**Status:** Approved by Agesta (6 Okt 2026) — LOCKED, patch downstream ✅, UI ✅
-**Merujuk ke:** `docs/01-PRD.md v2.0 Final` + `docs/02-ADR.md v2.1 Amended`
+**Version:** 1.2 Amended (6 Oct 2026 evening — synced with the NULL tri-state patch)
+**Date:** 6 Oct 2026
+**Status:** Approved by Agesta (6 Oct 2026) — LOCKED, downstream patch ✅, UI ✅
+**References:** `docs/01-PRD.md v2.0 Final` + `docs/02-ADR.md v2.1 Amended`
 **Owner:** Agesta
-**Perubahan vs v1.1:** Section 5 sinkron skema real: kolom metadata `data_source`/`verified_at`/`needs_survey` + tabel staging `raw_scrape` + aturan NULL tri-state (patch 6 Okt, sudah live di migration + seed + API + UI).
+**Changes vs v1.1:** Section 5 synced with the real schema: metadata columns `data_source`/`verified_at`/`needs_survey` + staging table `raw_scrape` + NULL tri-state rule (6 Oct patch, already live in migration + seed + API + UI).
 
 ---
 
-## 0. PRD Addendum itu apa? (penjelasan 30 detik)
+## 0. What is a PRD Addendum? (30-second explanation)
 
-PRD lu yang `01-PRD.md v2.0` itu udah Final & Approved — jangan diutak-atik lagi.
+Your `01-PRD.md v2.0` is already Final & Approved — don't touch it anymore.
 
-**Addendum = tambahan resmi ke PRD lama, tanpa ngubah isinya.**
+**Addendum = an official extension to the existing PRD, without changing its content.**
 
-- PRD v2.0 tetap berlaku (quiz tempat 30 detik → 5 rekomendasi tempat, quota 2/hari).
-- File ini cuma nambah scope baru: **quiz + directory tenant F&B per mall yang berdiri sendiri**.
-- Di workflow company lu (PRD → RFC → ADR), file ini = RFC mini. Sekali approve → patch ADR + Schema + API → Jira.
-
----
-
-## 1. Problem Tambahan
-
-PRD v2.0 solve **decision fatigue weekend secara umum** ("mau kemana weekend ini?").
-
-Problem turunan satu topik:
-> "Gue udah di Grand Indonesia, mau makan apa? Halal, budget <100k, bisa nongkrong lama."
-
-Keputusan baru per masukan lu: **jangan campur**. Alasan CTO setuju:
-- Ekspektasi beda: cari tempat = planning 2-3 menit (save/share), cari makan = lapar <10 detik.
-- Card beda: tempat butuh area + best time, tenant butuh lantai + halal + budget + misi.
-- Kalau dicampur 3+2, user bingung ("ini mau ngajak jalan apa ngajak makan?") → click-rate turun.
+- PRD v2.0 still applies (30-second place quiz → 5 place recommendations, quota 2/day).
+- This file only adds new scope: **a standalone quiz + F&B tenant directory per mall**.
+- In your company workflow (PRD → RFC → ADR), this file = a mini RFC. Once approved → patch ADR + Schema + API → Jira.
 
 ---
 
-## 2. Visi Revisi: Two Entry, Two Quiz, One Data
+## 1. Additional Problem
+
+PRD v2.0 solves **weekend decision fatigue in general** ("where to go this weekend?").
+
+A derived, single-topic problem:
+> "I'm already at Grand Indonesia, what should I eat? Halal, budget <100k, somewhere I can hang out for a long time."
+
+New decision per your input: **don't mix them**. Why the CTO agrees:
+- Different expectations: finding a place = 2-3 minutes of planning (save/share), finding food = hungry in <10 seconds.
+- Different cards: a place needs area + best time, a tenant needs `floor` + halal + budget + mission.
+- If mixed 3+2, users get confused ("am I being invited out, or invited to eat?") → click-rate drops.
+
+---
+
+## 2. Revised Vision: Two Entry, Two Quiz, One Data
 
 ```
-[Entry 1: Cari Tempat] quiz 30 detik → 5 rekomendasi TEMPAT (PRD v2.0 murni)
-[Entry 2: Cari Makan] quiz 20 detik → 5 rekomendasi TENANT (data Supabase, file ini)
+[Entry 1: Cari Tempat] 30-second quiz → 5 PLACE recommendations (pure PRD v2.0)
+[Entry 2: Cari Makan] 20-second quiz → 5 TENANT recommendations (Supabase data, this file)
 ```
 
-Satu data fondasi (`malls → tenants`, 200 rows sudah jadi di `data/tenants-seed.csv`), dua quiz terpisah, dua result page terpisah.
+One foundation dataset (`malls → tenants`, 200 rows already prepared in `data/tenants-seed.csv`), two separate quizzes, two separate result pages.
 
-Landing `/` punya 2 CTA besar:
+Landing `/` has 2 big CTAs:
 - 🗺️ "Cari Tempat Weekend" → `/quiz` (existing)
-- 🍜 "Cari Makan di Mall" → `/makan` (baru)
+- 🍜 "Cari Makan di Mall" → `/food` (new)
 
 ---
 
-## 3. Scope V1 — Quiz Tempat (TIDAK BERUBAH, PRD v2.0 murni)
+## 3. Scope V1 — Place Quiz (UNCHANGED, pure PRD v2.0)
 
-Tidak ada Q6 mall. Tidak ada tenant di result tempat. 100% sesuai PRD v2.0:
+No Q6 mall. No tenants in the place result. 100% per PRD v2.0:
 
-Q1 mood → Q2 companion → Q3 child_age (conditional) → Q4 budget → Q5 location → Q6 time (optional) → `/result` 5 tempat.
+Q1 mood → Q2 companion → Q3 budget → Q4 location → Q5 time → `/result` 5 tempat (implemented in `features/place/constants/questions.ts`; the conditional child-age question from PRD v2.0 was not built in V1).
 
 ---
 
-## 4. Scope V1 — Quiz Makan (baru, eksekusi bareng Plan Mode)
+## 4. Scope V1 — Food Quiz (new, executed together with Plan Mode)
 
 ### 4.1 Entry
-- CTA di landing + navbar `[Makan]` + halaman direktori `/mall/:slug` ada tombol "Cariin yang cocok".
+- CTA on the landing page + `[Makan]` navbar item + the `/mall/:slug` directory page has a "Cariin yang cocok" button.
 
-### 4.2 Quiz `/makan` (4 pertanyaan, ~20 detik, 1 layar 1 pertanyaan)
+### 4.2 Quiz `/food` (4 questions, ~20 seconds, 1 question per screen)
 
-1. **"Mau makan di mall mana?"** → [GI] / [Central Park] / [Kokas] / [PIM] / [Aeon BSD] (wajib pilih 1, tidak ada opsi bebas — biar result murni tenant)
+1. **"Mau makan di mall mana?"** → [GI] / [Central Park] / [Kokas] / [PIM] / [Aeon BSD] (must pick 1, no free option — so the result is purely tenants)
 2. **"Misi makan kali ini?"** → Makan Cepat / Nongkrong Lama / Keluarga / Healing
-3. **"Budget per orang?"** → Hemat (<50k) / Menengah (50-150k) / Leluasa (>150k) — sama kayak quiz tempat biar konsisten
+3. **"Budget per orang?"** → Hemat (<50k) / Menengah (50-150k) / Leluasa (>150k) — same as the place quiz for consistency
 4. **"Rombongan + pantangan?"** → Sendiri / Berdua / Rame-rame + toggle Halal only + toggle Kids-friendly
 
-### 4.3 Result `/result-makan` (5 TENANT saja, tidak ada tempat umum)
+### 4.3 Result `/result-food` (5 TENANTS only, no general places)
 
-Card khusus tenant:
+Tenant-specific card:
 ```
 ┌────────────────────────────────────────┐
 │ 🍜 HokBen                              │
@@ -84,16 +84,16 @@ Card khusus tenant:
 └────────────────────────────────────────┘
 ```
 
-Actions: Maps (deep link nama tenant + mall), Simpan (login wall sama kayak tempat), Lapor tutup/buka (tanpa login), Vote/share.
+Actions: Maps (deep link with tenant name + mall), Simpan (login wall, same as place), Lapor tutup/buka (no login), Vote/share.
 
-### 4.4 Direktori SEO `/mall/:slug` (tetap ada, tanpa LLM, gratis)
-List 40 tenant searchable + filter halal/budget/lantai/kids/mission/search. Tombol "Cariin yang cocok →" masuk ke `/makan?mall=gi` (pre-filled Q1).
+### 4.4 SEO Directory `/mall/:slug` (stays, no LLM, free)
+List of 40 searchable tenants + filters halal/budget/floor/kids/mission/search. The "Cariin yang cocok →" button goes to `/food?mall=grand-indonesia` (Q1 pre-filled).
 
 ---
 
-## 5. Data — Daftar Tenant Per Mall
+## 5. Data — Tenant List Per Mall
 
-Schema tidak berubah dari v1.0 (sudah benar untuk split):
+Schema unchanged from v1.0 (already correct for the split):
 
 ```sql
 CREATE TABLE malls (
@@ -113,19 +113,20 @@ CREATE TABLE tenants (
   mall_id UUID NOT NULL REFERENCES malls(id) ON DELETE CASCADE,
   name TEXT NOT NULL,
   category TEXT NOT NULL,
-  lantai TEXT NOT NULL,
-  halal BOOLEAN DEFAULT NULL,          -- NULL = belum survey (tri-state, patch 6 Okt)
+  floor TEXT NOT NULL,
+  halal BOOLEAN DEFAULT NULL,          -- NULL = not surveyed yet (tri-state, 6 Oct patch)
   budget_tier TEXT NOT NULL,
-  price_range TEXT,
-  kids_friendly BOOLEAN DEFAULT NULL,  -- NULL = belum survey
+  price_min INT,  -- integer rupiah (UI formats "Rp 30-80rb")
+  price_max INT,
+  kids_friendly BOOLEAN DEFAULT NULL,  -- NULL = not surveyed yet
   mission TEXT[] DEFAULT '{}',
-  hype_tiktok BOOLEAN DEFAULT NULL,    -- NULL = belum survey
+  hype_tiktok BOOLEAN DEFAULT NULL,    -- NULL = not surveyed yet
   is_open BOOLEAN DEFAULT true,
   maps_url TEXT,
-  -- Metadata kualitas data (patch 6 Okt 2026, wajib):
+  -- Data quality metadata (6 Oct 2026 patch, mandatory):
   data_source TEXT DEFAULT 'curated',  -- 'curated' | 'scrape' | 'survey'
   verified_at TIMESTAMPTZ DEFAULT NULL,
-  needs_survey BOOLEAN DEFAULT false,  -- TRUE kalau halal/kids/hype masih NULL
+  needs_survey BOOLEAN DEFAULT false,  -- TRUE if halal/kids/hype are still NULL
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -137,39 +138,39 @@ CREATE POLICY "Public read malls" ON malls FOR SELECT USING (true);
 CREATE POLICY "Public read tenants" ON tenants FOR SELECT USING (true);
 ```
 
-**Staging scrape (patch 6 Okt 2026):** hasil scraper TIDAK langsung ke `tenants`.
-Wajib lewat `raw_scrape` (RLS closed, no public-read) + gate Jabodetabek 2 lapis
-(allowlist target + kolom city reject non-Jabodetabek) + parser per-mall.
-Mall tanpa tenant = `is_active=false` otomatis hidden.
+**Scrape staging (6 Oct 2026 patch):** scraper output does NOT go straight into `tenants`.
+It must go through `raw_scrape` (RLS closed, no public-read) + a 2-layer Jabodetabek gate
+(target allowlist + city column rejecting non-Jabodetabek) + a per-mall parser.
+A mall without tenants = `is_active=false`, automatically hidden.
 
-**Aturan NULL tri-state (patch 6 Okt 2026, wajib):** field belum riset = `NULL`,
-bukan `FALSE`/`""`. Filter safety: `.eq('halal', true)` auto-exclude NULL saat halal-only.
-UI badge ketiga: ❓ Belum terverifikasi + 📋 Perlu survey. Audit: `supabase/AUDIT.md`
-(halal 194/200 mustahil, is_open 200/200 mustahil — wajib survey lapangan P1).
+**NULL tri-state rule (6 Oct 2026 patch, mandatory):** a field not yet researched = `NULL`,
+not `FALSE`/`""`. Safety filter: `.eq('halal', true)` automatically excludes NULL when halal-only.
+Third UI badge: ❓ Belum terverifikasi + 📋 Perlu survey. Audit: `supabase/AUDIT.md`
+(halal 194/200 is implausible, is_open 200/200 is implausible — an on-site survey is mandatory, P1).
 
-CSV `data/tenants-seed.csv` 200 rows tetap dipakai (5 mall x 40). Tidak perlu ubah.
+The 200-row CSV `data/tenants-seed.csv` is still used (5 malls x 40). No change needed.
 
-### Dimana tenant list dipasang (revisi split):
-1. **Result Makan:** 5 tenant murni (bukan campuran).
-2. **Direktori `/mall/:slug`:** list + filter (SEO).
-3. **History/Favorites:** snapshot JSONB + `type: 'tempat' | 'makan'` biar tidak kecampur di UI.
+### Where the tenant list is placed (split revision):
+1. **Food Result:** 5 pure tenants (not mixed).
+2. **Directory `/mall/:slug`:** list + filters (SEO).
+3. **History/Favorites:** JSONB snapshot + `type: 'place' | 'food'` so they don't get mixed up in the UI.
 
 ---
 
-## 6. API (revisi split, tidak ngubah 9 endpoint tempat)
+## 6. API (split revision, does not change the 9 place endpoints)
 
-Tempat (existing, tidak berubah):
+Place (existing, unchanged):
 ```
-POST /api/generate → body quiz tempat → 5 tempat
+POST /api/generate → place quiz body → 5 places
 ```
 
-Makan (baru):
+Food (new):
 ```
-GET  /api/malls → list 5 mall
+GET  /api/malls → list of 5 malls
 GET  /api/malls/:slug → detail + stats
-GET  /api/malls/:slug/tenants?halal=true&budget=hemat&mission=nongkrong_lama&search=kopi
-POST /api/makan/recommend → body {mall_slug, mission, budget_tier, companion, halal_only, kids_friendly} → Top 5 tenant
-POST /api/vote → {generation_id, tenant_id} tanpa login, rate-limit IP
+GET  /api/malls/:slug/tenants?halal=true&budget=budget&mission=long_hangout&search=kopi
+POST /api/food/recommend → body {mall_slug, mission, budget_tier, companion, halal_only, kids_friendly} → Top 5 tenants
+POST /api/vote → {generation_id, tenant_id} no login, IP rate-limit
 POST /api/report-tenant → {tenant_id, issue}
 ```
 
@@ -177,9 +178,9 @@ Type:
 ```typescript
 export interface MakanQuizInput {
   mall_slug: string;
-  mission: 'makan_cepat'|'nongkrong_lama'|'keluarga'|'healing';
-  budget_tier: 'hemat'|'menengah'|'leluasa';
-  companion: 'sendiri'|'berdua'|'rame';
+  mission: 'quick_bite'|'long_hangout'|'family'|'healing';
+  budget_tier: 'budget'|'mid'|'splurge';
+  companion: 'solo'|'couple'|'group';
   halal_only?: boolean;
   kids_friendly?: boolean;
 }
@@ -187,43 +188,43 @@ export interface MakanQuizInput {
 
 ---
 
-## 7. Quota & Cost (revisi split)
+## 7. Quota & Cost (split revision)
 
-Rekomendasi CTO (decisive):
-- Quota Tempat: 2/hari (tetap, PRD v2.0).
-- Quota Makan: 5/hari terpisah (tidak makan quota tempat).
-- Alasan: behaviour beda (makan bisa 2-3x sehari: lunch/dinner), cost tetap $0 (filter Supabase gratis, LLM CF cuma ranking ~400 token).
-- Implementasi: tambah kolom `quota_type` di `user_quota` atau table baru `mall_search_quota(user_id, date, used)`. Anonymous: cookie terpisah `makan_quota_used`.
+CTO recommendation (decisive):
+- Place quota: 2/day (unchanged, PRD v2.0).
+- Food quota: 5/day, separate (does not consume the place quota).
+- Rationale: different behaviour (people eat 2-3x a day: lunch/dinner), cost stays $0 (Supabase filtering is free, the CF LLM only ranks, ~400 tokens).
+- Implementation: add a `quota_type` column to `user_quota` or a new table `mall_search_quota(user_id, date, used)`. Anonymous: separate cookie `food_quota_used`.
 
 ---
 
-## 8. Effort Revisi
+## 8. Revised Effort
 
-| Item | Estimasi |
+| Item | Estimate |
 |---|---|
-| Schema malls/tenants + seed 200 rows (sudah jadi CSV) | 1 jam import + verifikasi |
-| GET malls + tenants list + halaman `/mall/:slug` | 5 jam (reuse card) |
-| Quiz `/makan` (4 Q) + result-makan (card tenant) | 5 jam (copy-paste quiz tempat, ganti Q + card) |
-| POST /api/makan/recommend (filter DB + ranking LLM) | 2 jam |
-| **Total tambahan V1** | **~13 jam** (+2 jam vs campur, tapi UX bersih, worth it) |
+| Schema malls/tenants + seed 200 rows (CSV already prepared) | 1 hour import + verification |
+| GET malls + tenants list + `/mall/:slug` page | 5 hours (reuse card) |
+| Quiz `/food` (4 Q) + result-food (tenant card) | 5 hours (copy-paste the place quiz, swap Q + card) |
+| POST /api/food/recommend (DB filter + LLM ranking) | 2 hours |
+| **Total additional V1** | **~13 hours** (+2 hours vs mixed, but clean UX, worth it) |
 
-Hapus dari scope: logika campur 3+2 (tidak jadi).
+Removed from scope: the mixed 3+2 logic (dropped).
 
 ---
 
 ## 9. Metrics
 
-- Makan quiz completion >75% (lebih pendek dari tempat)
-- Makan result → Maps click >40%
-- Lapor tutup/buka per minggu (freshness)
-- Tenant halu complaint = 0 (semua dari DB)
+- Food quiz completion >75% (shorter than the place quiz)
+- Food result → Maps click >40%
+- Lapor tutup/buka reports per week (freshness)
+- Hallucinated-tenant complaints = 0 (everything comes from the DB)
 
 ---
 
 ## 10. Next Step
 
-1. Lu approve v1.1 ini → gue patch ADR + Schema + API + update prototype quiz/makan.
-2. Coding Phase 1 tetap jalan (tempat dulu, makan paralel).
+1. You approve this v1.1 → I patch ADR + Schema + API + update the quiz/food prototype.
+2. Coding Phase 1 keeps going (place first, food in parallel).
 
-**Ditulis oleh:** Hermes (CTO+CEO mode)
-**Di-review oleh:** Agesta — ketik "approve" untuk gas, atau "revisi: ..." kalau mau ubah.
+**Written by:** Hermes (CTO+CEO mode)
+**Reviewed by:** Agesta — type "approve" to go, or "revisi: ..." to request changes.

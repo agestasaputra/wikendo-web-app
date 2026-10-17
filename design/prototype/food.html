@@ -106,7 +106,7 @@
         function nextQuestion() {
             currentQuestion++;
             if (currentQuestion < quizData.length) renderQuestion();
-            else { showLoading(); setTimeout(() => { window.location.href = 'result-makan.html?' + new URLSearchParams(answers).toString(); }, 1500); }
+            else { showLoading(); setTimeout(() => { window.location.href = 'result-food.html?' + new URLSearchParams(answers).toString(); }, 1500); }
         }
         function showLoading() {
             const m = document.getElementById('loadingModal'); m.classList.remove('hidden'); m.classList.add('flex');

@@ -5,7 +5,7 @@ related: [auth, history, voucher-claim, shared-ui]
 code:
   - app/common/store/AuthStore.ts
   - app/common/store/HistoryStore.ts
-  - app/features/makan/store/VoucherStore.ts
+  - app/features/food/store/VoucherStore.ts
   - app/nuxt.config.ts
 ---
 
@@ -13,32 +13,32 @@ code:
 
 ## TL;DR
 
-Pinia (setup syntax, `@pinia/nuxt`) untuk state yang dipakai banyak file/feature. Composable + `ref` untuk state lokal satu feature. Data server yang cukup dibaca sekali per halaman memakai `useFetch`. Quiz memakai state lokal + query string (tanpa store).
+Pinia (setup syntax, `@pinia/nuxt`) for state used by many files/features. Composables + `ref` for the local state of a single feature. Server data that only needs to be read once per page uses `useFetch`. The quiz uses local state + query string (no store).
 
 ## Decision Guide
 
-| Situasi                                              | Pakai                                                  |
+| Situation                                            | Use                                                    |
 | ---------------------------------------------------- | ------------------------------------------------------ |
-| Dipakai ≥2 file / lintas feature / seluruh app       | Pinia store (`common/store` atau `features/<f>/store`) |
-| Hanya 1 halaman/komponen                             | `ref`/`reactive` lokal                                 |
-| Logic stateful dipakai ≥2 halaman, tanpa persistensi | Composable (`common/composables`)                      |
-| Data GET yang dirender SSR (mis. quota)              | `useFetch`                                             |
-| Jawaban quiz                                         | state lokal → query string → result                    |
+| Used by ≥2 files / across features / app-wide        | Pinia store (`common/store` or `features/<f>/store`) |
+| Only 1 page/component                                | `ref`/`reactive` lokal                                 |
+| Stateful logic used by ≥2 pages, no persistence      | Composable (`common/composables`)                      |
+| GET data rendered via SSR (e.g. quota)              | `useFetch`                                             |
+| Quiz answers                                        | local state → query string → result                   |
 
 ## Stores
 
-| Store          | File                                       | State                                   | Persistensi      |
+| Store          | File                                       | State                                   | Persistence      |
 | -------------- | ------------------------------------------ | --------------------------------------- | ---------------- |
 | `AuthStore`    | `app/common/store/AuthStore.ts`            | isLoggedIn, email, displayName, initial | Supabase session |
 | `HistoryStore` | `app/common/store/HistoryStore.ts`         | items (max 20)                          | localStorage     |
-| `VoucherStore` | `app/features/makan/store/VoucherStore.ts` | claiming, claimedCode, claimError       | — (per sesi)     |
+| `VoucherStore` | `app/features/food/store/VoucherStore.ts` | claiming, claimedCode, claimError       | — (per session)  |
 
 ## Rules
 
-- File `XStore.ts`, fungsi `useXStore()`, nama store `xStore`.
-- Destructure state dengan `storeToRefs()` (destructuring langsung memutus reaktivitas).
-- Store di `features/` hanya dipakai feature itu; lintas feature → `common/store`.
-- Modul yang diuji unit mengimpor `vue`/`pinia` secara eksplisit (tanpa auto-import).
+- File `XStore.ts`, function `useXStore()`, store name `xStore`.
+- Destructure state with `storeToRefs()` (direct destructuring breaks reactivity).
+- A store in `features/` is used only by that feature; cross-feature → `common/store`.
+- Unit-tested modules import `vue`/`pinia` explicitly (no auto-import).
 
 ## See Also
 

@@ -1,6 +1,6 @@
 # Architecture Doc Conventions
 
-Rules every doc in `docs/architecture/` follows. Keep docs short. (Format sama dengan hub-chat.)
+Rules every doc in `docs/architecture/` follows. Keep docs short. (Same format as hub-chat.)
 
 ## Frontmatter (4 fields, required)
 
@@ -51,4 +51,4 @@ Every spoke `README.md` follows the template:
 ## File naming
 
 - Topic folders: kebab-case. `README.md` is the only doc per folder. One file = one full context.
-- Istilah baru? Tambahkan ke [GLOSSARY.md](./GLOSSARY.md) DULU, baru dipakai di spoke.
+- New term? Add it to [GLOSSARY.md](./GLOSSARY.md) FIRST, then use it in a spoke.

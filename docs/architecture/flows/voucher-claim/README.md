@@ -1,11 +1,11 @@
 ---
 topic: voucher-claim
 status: ready
-related: [quiz-makan, auth, security]
+related: [quiz-food, auth, security]
 code:
-  - app/features/makan/store/VoucherStore.ts
-  - app/features/makan/components/VoucherSheet.vue
-  - app/features/makan/MakanResultPage.vue
+  - app/features/food/store/VoucherStore.ts
+  - app/features/food/components/VoucherSheet.vue
+  - app/features/food/FoodResultPage.vue
   - app/server/api/voucher/claim.post.ts
   - app/server/utils/voucherClaim.ts
   - app/common/types/database.ts
@@ -15,11 +15,11 @@ code:
 
 ## TL;DR
 
-Klaim voucher WAJIB login (anti-farming). Browser mengirim `POST /api/voucher/claim` dengan Bearer access token Supabase lewat `VoucherStore`. Server menjalankan langkah kecil berurutan di `server/utils/voucherClaim.ts`: token → kode → voucher aktif → verifikasi user → rate-limit 3/hari → 1 tenant/hari → insert dual-write → countdown 23:59 WIB.
+Claiming a voucher REQUIRES login (anti-farming). The browser sends `POST /api/voucher/claim` with the Supabase Bearer access token via `VoucherStore`. The server runs small sequential steps in `server/utils/voucherClaim.ts`: token → code → active voucher → user verification → rate limit 3/day → 1 tenant/day → dual-write insert → 23:59 WIB countdown.
 
 ## Entry Points
 
-- `VoucherSheet.vue` (picker 3 promo) → `MakanResultPage.claimRow` → `VoucherStore.claimVoucher(code)`.
+- `VoucherSheet.vue` (3-promo picker) → `FoodResultPage.claimRow` → `VoucherStore.claimVoucher(code)`.
 - `app/server/api/voucher/claim.post.ts`.
 
 ## Sequence
@@ -54,17 +54,17 @@ sequenceDiagram
 
 ## Failure & State
 
-| Status | Penyebab                                                       |
+| Status | Cause                                                          |
 | ------ | -------------------------------------------------------------- |
-| 400    | kode kosong / promo nonaktif / belum aktif / kadaluarsa        |
-| 401    | tanpa Bearer / token tidak valid                               |
-| 404    | voucher tidak ditemukan                                        |
-| 409    | sudah klaim tenant ini hari ini (termasuk race UNIQUE `23505`) |
-| 429    | lebih dari 3 klaim/hari                                        |
+| 400    | empty code / promo inactive / not yet active / expired       |
+| 401    | no Bearer / invalid token                                     |
+| 404    | voucher not found                                             |
+| 409    | already claimed this tenant today (including UNIQUE race `23505`)|
+| 429    | more than 3 claims/day                                        |
 
-- Dual-write kolom lama (`date`, `code`) + baru (`claim_date`, `claim_code`) menghindari 500 di skema produksi.
-- Klien: `claiming` mencegah double-klik; klaim kedua saat berjalan mengembalikan `status: "busy"` tanpa request.
+- Dual-writing the old (`date`, `code`) + new (`claim_date`, `claim_code`) columns avoids a 500 on the production schema.
+- Client: `claiming` prevents double-clicks; a second claim while one is in flight returns `status: "busy"` without a request.
 
 ## See Also
 
-[quiz-makan](../quiz-makan/README.md) · [security](../cross-cutting/security/README.md)
+[quiz-food](../quiz-food/README.md) · [security](../cross-cutting/security/README.md)

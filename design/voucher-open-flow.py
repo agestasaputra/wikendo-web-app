@@ -1,5 +1,5 @@
-"""Render flowchart PNG: alur klik Buka -> di voucher gift (result-makan).
-Sumber kode: app/pages/result-makan.vue baris 32-39 (gift hero + note), 107-109 (claim()).
+"""Render flowchart PNG: alur klik Buka -> di voucher gift (result-food).
+Sumber kode: app/pages/result-food.vue baris 32-39 (gift hero + note), 107-109 (claim()).
 Token: paper #F5F5F4, ink #0C0A09, accent orange, red/green branches. ASCII-only labels."""
 from PIL import Image, ImageDraw, ImageFont
 
@@ -88,7 +88,7 @@ def box(top, lane, lines_bold, lines, bg, border, text_color, bw=4):
 
 # Title bar
 d.rectangle([0, 0, W, 132], fill=INK)
-d.text((M, 22), "Alur klik Buka di voucher gift (result-makan)", font=f_title, fill=WHITE)
+d.text((M, 22), "Alur klik Buka di voucher gift (result-food)", font=f_title, fill=WHITE)
 d.text((M, 72), "claim() selalu wall login | NOL API call | 11 Okt 2026", font=f_sub, fill=(214, 211, 209))
 y = 162
 
@@ -96,7 +96,7 @@ y = box(y, "", ["START: user tap Buka -> di gift hero"], ["Banner: Ada -20% buat
 y_start_mid = y  # not needed
 prev_bottom = y - 26
 arrow(W // 2, prev_bottom, W // 2, prev_bottom + 26)
-y = box(y, "[BROWSER]", ["claim() jalan (result-makan.vue:107-109)"], ["Murni client-side: NOL fetch, NOL API, NOL ubah quota, NOL redirect."], WHITE, GRAY_B, INK) + 26
+y = box(y, "[BROWSER]", ["claim() jalan (result-food.vue:107-109)"], ["Murni client-side: NOL fetch, NOL API, NOL ubah quota, NOL redirect."], WHITE, GRAY_B, INK) + 26
 arrow(W // 2, y - 26, W // 2, y)
 y = box(y, "[BROWSER]", ["claimNote diset (wall anti-farming)"], ['Isi: "Login 10 detik untuk klaim voucher - anti-farming, gratis."'], WHITE, GRAY_B, INK) + 26
 arrow(W // 2, y - 26, W // 2, y)
@@ -143,6 +143,6 @@ for wl in wrap(d, foot, f_small, W - 2 * M):
 y += 24
 
 img = img.crop((0, 0, W, y + 10))
-out = "/home/ubuntu/wikendo-web-app/design/voucher-buka-flow-2026-10-11.png"
+out = "/home/ubuntu/wikendo-web-app/design/voucher-open-flow-2026-10-11.png"
 img.save(out)
 print("SAVED", out, img.size)

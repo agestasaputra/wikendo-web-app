@@ -1,7 +1,7 @@
 ---
 version: alpha
 name: Wikendo
-description: Weekend plan + mall F&B finder — playful utility, decisif 1-tap, split Tempat (ember) vs Makan (rose).
+description: Weekend plan + mall F&B finder — playful utility, decisive 1-tap, split Tempat (ember) vs Makan (rose).
 colors:
   primary: "#0C0A09"
   paper: "#F5F5F4"
@@ -65,21 +65,21 @@ components:
     typography: "{typography.option}"
     rounded: "{rounded.option}"
     padding: 14px
-  quiz-option-selected-tempat:
+  quiz-option-selected-place:
     backgroundColor: "{colors.ember-wash}"
     textColor: "{colors.primary}"
     rounded: "{rounded.option}"
     padding: 14px
-  quiz-option-selected-makan:
+  quiz-option-selected-food:
     backgroundColor: "{colors.rose-wash}"
     textColor: "{colors.primary}"
     rounded: "{rounded.option}"
     padding: 14px
-  quiz-dot-tempat:
+  quiz-dot-place:
     backgroundColor: "{colors.ember-bright}"
     rounded: "{rounded.full}"
     size: 8px
-  quiz-dot-makan:
+  quiz-dot-food:
     backgroundColor: "{colors.rose-bright}"
     rounded: "{rounded.full}"
     size: 8px
@@ -88,7 +88,7 @@ components:
     textColor: "{colors.on-lime}"
     rounded: "{rounded.full}"
     height: 8px
-  strip-tempat:
+  strip-place:
     backgroundColor: "{colors.ember}"
     rounded: "{rounded.full}"
     width: 5px
@@ -103,12 +103,12 @@ components:
     textColor: "{colors.primary}"
     rounded: "{rounded.header}"
     padding: 12px
-  cta-tempat:
+  cta-place:
     backgroundColor: "{colors.ember-cta}"
     textColor: "{colors.on-ember}"
     rounded: "{rounded.header}"
     height: 56px
-  cta-makan:
+  cta-food:
     backgroundColor: "{colors.rose}"
     textColor: "{colors.on-rose}"
     rounded: "{rounded.header}"
@@ -117,70 +117,70 @@ components:
 
 ## Overview
 
-Wikendo = perencana weekend + pencari makanan mall. Personality: playful utility — emoji, bahasa santai, tapi tiap layar cuma minta 1 keputusan kecil (completion >70%).
+Wikendo = weekend planner + mall food finder. Personality: playful utility — emoji, casual (santai) Indonesian copy, yet every screen asks for only 1 small decision (completion >70%).
 
-Split paling sakral: **Tempat = ember, Makan = rose**. Dua flow tidak pernah campur warna aksi. Label kecil dan question selalu putih di atas ink. Lime cuma buat kemajuan/nilai (<10% dosis).
+The most sacred split: **Tempat = ember, Makan = rose**. The two flows never mix accent colours. Small labels and questions are always white on ink. Lime is only for progress/value (<10% dose).
 
 ## Colors
 
-- **Primary ({colors.primary}):** Ink — teks, header quiz, tombol Maps. Background header quiz Q2d/M3d.
-- **Paper ({colors.paper}):** Background container semua pages (`page-canvas`, kombo hangat, bukan putih polos).
-- **Card ({colors.card}):** Permukaan opsi quiz dan kartu list.
-- **Ember ({colors.ember}):** Brand/strip/selected flow Tempat — strip hero 5px (`strip-tempat`), selected quiz. BUKAN background teks-putih (putih di atasnya 3.56:1, gagal AA) — CTA teks-putih wajib pakai `ember-cta`.
-- **Ember CTA ({colors.ember-cta}):** Ember-deep khusus permukaan teks-putih (`cta-tempat`, putih 5.2:1 lolos AA). Satu keluarga ember, hanya untuk CTA Tempat.
-- **Ember bright ({colors.ember-bright}):** Cuma dot label Q2d (`quiz-dot-tempat`). Wash ({colors.ember-wash}) cuma bg selected tempat.
-- **Rose ({colors.rose}):** SATU-SATUNYA aksi flow Makan — CTA (`cta-makan`, putih 4.73:1 lolos AA), cermin ember. Bright ({colors.rose-bright}) cuma dot label M3d (`quiz-dot-makan`). Wash ({colors.rose-wash}) bg selected makan + base voucher gift.
-- **Gift border ({colors.gift-border}):** Border/aksen kartu voucher gift V12 (`voucher-gift-edge`).
-- **Lime ({colors.lime}):** Kemajuan (segmen blok quiz `quiz-seg-on`) dan nilai (pill BEST, badge). BUKAN aksi, BUKAN label. Dosis <10% per layar. Teks di atas lime selalu ink ({colors.on-lime}).
-- **On-colors:** Putih di atas ink/ember-cta/rose; ink di atas lime.
+- **Primary ({colors.primary}):** Ink — text, quiz header, Maps button. Background of the Q2d/M3d quiz header.
+- **Paper ({colors.paper}):** Container background for all pages (`page-canvas`, a warm combo, not plain white).
+- **Card ({colors.card}):** Surface of quiz options and list cards.
+- **Ember ({colors.ember}):** Brand/strip/selected state of the Tempat flow — 5px hero strip (`strip-place`), selected quiz option. NOT a background for white text (white on it is 3.56:1, fails AA) — white-text CTAs must use `ember-cta`.
+- **Ember CTA ({colors.ember-cta}):** Ember-deep, reserved for white-text surfaces (`cta-place`, white 5.2:1 passes AA). Same ember family, only for the Tempat CTA.
+- **Ember bright ({colors.ember-bright}):** Only the Q2d label dot (`quiz-dot-place`). Wash ({colors.ember-wash}) is only the selected bg for Tempat.
+- **Rose ({colors.rose}):** The ONLY action colour of the Makan flow — CTA (`cta-food`, white 4.73:1 passes AA), mirrors ember. Bright ({colors.rose-bright}) is only the M3d label dot (`quiz-dot-food`). Wash ({colors.rose-wash}) is the selected bg for Makan + the gift voucher base.
+- **Gift border ({colors.gift-border}):** Border/accent of the V12 gift voucher card (`voucher-gift-edge`).
+- **Lime ({colors.lime}):** Progress (quiz block segments `quiz-seg-on`) and value (BEST pill, badges). NOT an action, NOT a label. Dose <10% per screen. Text on lime is always ink ({colors.on-lime}).
+- **On-colors:** White on ink/ember-cta/rose; ink on lime.
 
 ## Typography
 
-Plus Jakarta Sans untuk semua. Hierarki dari size + weight, bukan ganti font.
+Plus Jakarta Sans for everything. Hierarchy comes from size + weight, not from switching fonts.
 
-- `label-caps` (10px, 800, tracking lebar): label `QUIZ TEMPAT` / `QUIZ MAKAN` — selalu putih + dot terang, bukan aksi.
-- `question` (19px, 800, snug): teks pertanyaan quiz — putih di atas ink header.
-- `body-md` (13px): hint, microcopy, alasan tenant.
-- `option` (14px, 700): label opsi quiz.
+- `label-caps` (10px, 800, wide tracking): the `QUIZ TEMPAT` / `QUIZ MAKAN` labels — always white + bright dot, not an action.
+- `question` (19px, 800, snug): quiz question text — white on the ink header.
+- `body-md` (13px): hints, microcopy, tenant reasons.
+- `option` (14px, 700): quiz option labels.
 
 ## Layout
 
-Satu kolom mobile: container `max-w-md mx-auto px-4 pb-10` (`page-canvas`). **Background selalu di container ini, bukan body/root.** Spacing baseline 4px: `sm` gap antar segmen/chip, `md` gap antar kartu, `lg` antar section.
+Single mobile column: container `max-w-md mx-auto px-4 pb-10` (`page-canvas`). **The background always lives on this container, not on body/root.** 4px baseline spacing: `sm` is the gap between segments/chips, `md` between cards, `lg` between sections.
 
 ## Shapes
 
-Header quiz 14px, opsi quiz 20px, kartu hero/list 24px, tombol CTA min-height 56px, pill/chip full. Strip aksen kiri = border 5px (ember tempat, rose makan). Segmen progress = blok-blok (bukan bar gradasi), gap 5px, on = lime, off = putih 22%.
+Quiz header 14px, quiz option 20px, hero/list card 24px, CTA button min-height 56px, pill/chip full. Left accent strip = 5px border (ember for Tempat, rose for Makan). Progress segments = blocks (not a gradient bar), 5px gap, on = lime, off = white 22%.
 
 ## Components
 
-- `page-canvas`: container `max-w-md` semua pages, bg paper + teks ink.
-- `quiz-ink-header` (Q2d/M3d): kartu ink berisi label-caps putih + dot (`quiz-dot-tempat`/`quiz-dot-makan`) + question putih + segmen blok lime (`quiz-seg-on`). Satu-satunya header quiz yang sah.
-- `quiz-option` + `quiz-option-selected-tempat/makan`: opsi putih border netral; selected = border 2px ember/rose + bg wash. Chip mall (GI/CP/Kokas/PIM/Aeon) ikut pola selected makan.
-- `quiz-dot-tempat` / `quiz-dot-makan`: dot 8px di label header — satu-satunya pemakaian bright.
-- `quiz-seg-on`: segmen blok menyala (lime, teks di atasnya ink). Satu-satunya pemakaian lime di quiz.
-- `strip-tempat`: strip aksen 5px hero flow Tempat (ember murni, non-teks).
-- `voucher-gift` (V12): gradasi cream→rose (token: rose-wash + border gift-border), ikon 🎁 + `Ada −20% buat lu` + pill rose `Buka →`. 1 focal per kartu.
-- `voucher-gift-edge`: aksen/border gift (`gift-border`) kartu voucher.
-- `cta-tempat` / `cta-makan`: satu aksi dominan per layar, tinggi 56px, teks putih bold ≥14px. Tempat wajib `ember-cta` (bukan ember murni — alasan kontras AA).
-- Hasil (tempat & makan) = item list isi 5, pola 3 lapis: hero + minis + full list. Tidak pernah campur tempat wisata + tenant.
+- `page-canvas`: `max-w-md` container for all pages, bg paper + ink text.
+- `quiz-ink-header` (Q2d/M3d): ink card containing a white label-caps + dot (`quiz-dot-place`/`quiz-dot-food`) + white question + lime block segments (`quiz-seg-on`). The only valid quiz header.
+- `quiz-option` + `quiz-option-selected-place/food`: white option with a neutral border; selected = 2px ember/rose border + wash bg. Mall chips (GI/CP/Kokas/PIM/Aeon) follow the Makan selected pattern.
+- `quiz-dot-place` / `quiz-dot-food`: 8px dot on the header label — the only use of bright.
+- `quiz-seg-on`: lit block segment (lime, ink text on it). The only use of lime in the quiz.
+- `strip-place`: 5px accent strip on the Tempat flow hero (pure ember, non-text).
+- `voucher-gift` (V12): cream→rose gradient (tokens: rose-wash + border gift-border), 🎁 icon + `Ada −20% buat lu` + rose pill `Buka →`. 1 focal point per card.
+- `voucher-gift-edge`: accent/border of the gift (`gift-border`) voucher card.
+- `cta-place` / `cta-food`: one dominant action per screen, 56px tall, bold white text ≥14px. Tempat must use `ember-cta` (not pure ember — AA contrast).
+- Results (Tempat & Makan) = list of 5 items, 3-tier pattern: hero + minis + full list. Never mix tourist places + tenants.
 
 ## Logo
 
-Master terkunci: **D16 P3** — dadu 56px, W 29, rotasi dadu -8°, tile ink, dadu cream, titik tempat + makan. File master di `app/public/`: `d16-day.svg` (tile ink, utama), `d16-night.svg` (dadu takeout transparan), `d16-mono.svg` (1-warna), `d16-lockup.svg` (icon + wordmark bawah), `d16-lockup-horizontal.svg` (icon kiri + wordmark kanan). Favicon = Day.
+Locked master: **D16 P3** — 56px die, W 29, die rotation -8°, ink tile, cream die, place + food dots. Master files in `app/public/`: `d16-day.svg` (ink tile, primary), `d16-night.svg` (transparent takeout die), `d16-mono.svg` (1-colour), `d16-lockup.svg` (icon + wordmark below), `d16-lockup-horizontal.svg` (icon left + wordmark right). Favicon = Day.
 
-- **Dipakai di:** header web H-LOCK, app icon + splash light Day, web dark-mode (`prefers-color-scheme`) Night, struk voucher WIK-XXXXX Mono, splash/kaos V-LOCK.
-- **Jangan:** stretch/gepeng, ganti warna, Day di atas gelap (gelap = Night takeout), Night jadi app icon (launcher wajib opaque — iOS nolak transparan). Dadu (W + 2 titik + rotasi) tidak boleh diubah di versi apa pun.
+- **Used in:** web header H-LOCK, app icon + light splash Day, web dark mode (`prefers-color-scheme`) Night, WIK-XXXXX voucher receipt Mono, splash/T-shirt V-LOCK.
+- **Don't:** stretch/squash, recolour, put Day on dark (dark = Night takeout), use Night as the app icon (launcher must be opaque — iOS rejects transparency). The die (W + 2 dots + rotation) must not be changed in any version.
 
 ## Do's and Don'ts
 
-- **Do** pakai token reference (`{colors.ember-cta}`) — jangan hardcode hex di komponen baru.
-- **Do** jaga split: ember = tempat, rose = makan. Selected, CTA, strip ikut flow-nya.
-- **Do** pakai `ember-cta` untuk SEMUA teks-putih di atas oranye; ember murni hanya permukaan non-teks (strip, selected border).
-- **Do** pakai helper tested (`getQuizHeaderMeta`, `getQuizSegState`, `getVoucherCardMeta`, `getLogoAsset`) — bukan hex/path lepas di pages.
-- **Don't** pakai lime buat label, CTA, atau background besar. Lime = kemajuan/nilai saja.
-- **Don't** label full merah/oranye 10px — gagal AAA, label bukan aksi.
-- **Don't** campur hasil tempat + makanan dalam satu list.
-- **Don't** taruh background di body/root — selalu di container `max-w-md`.
-- **Don't** warna di luar palet — tambah token dulu, baru pakai.
-- **Don't** utak-atik dadu logo (W + 2 titik + rotasi -8°) di semua versi.
-- **Don't** nest varian komponen (`cta-tempat.hover` salah; `cta-tempat-hover` sibling yang benar).
+- **Do** use token references (`{colors.ember-cta}`) — don't hardcode hex in new components.
+- **Do** keep the split: ember = Tempat, rose = Makan. Selected, CTA, strip follow their flow.
+- **Do** use `ember-cta` for ALL white text on orange; pure ember is only for non-text surfaces (strip, selected border).
+- **Do** use the tested helpers (`getQuizHeaderMeta`, `getQuizSegState`, `getVoucherCardMeta`, `getLogoAsset`) — not loose hex/paths in pages.
+- **Don't** use lime for labels, CTAs, or large backgrounds. Lime = progress/value only.
+- **Don't** make full red/orange 10px labels — fails AAA, labels are not actions.
+- **Don't** mix Tempat + Makan results in one list.
+- **Don't** put a background on body/root — always on the `max-w-md` container.
+- **Don't** use colours outside the palette — add a token first, then use it.
+- **Don't** tamper with the logo die (W + 2 dots + -8° rotation) in any version.
+- **Don't** nest component variants (`cta-place.hover` is wrong; the sibling `cta-place-hover` is correct).

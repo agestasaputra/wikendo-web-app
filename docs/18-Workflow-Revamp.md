@@ -1,27 +1,27 @@
-# Workflow Revamp Halaman — 🔒 LOCKED 9 Okt 2026
+# Page Revamp Workflow — 🔒 LOCKED 9 Oct 2026
 
-> Anti miskom. Loop feedback jelas. Di luar template = belum lock.
+> Prevents miscommunication. Clear feedback loop. Anything outside the template = not locked yet.
 
-## 5 Langkah (dengan feedback loop)
+## 5 Steps (with feedback loop)
 
-1. Agesta upload refs → AI analisis preferensi (3 baris) → Agesta OK.
-2. AI bikin 20 opsi HTML, tiap opsi ID gede.
-3. Agesta jawab (cuma 2 template sah):
-   - Tanpa feedback: `Gua suka [ID]` (= lock final)
-   - Dengan feedback:
+1. Agesta uploads refs → AI analyzes preferences (3 lines) → Agesta OKs.
+2. AI makes 20 HTML options, each with a big ID.
+3. Agesta replies (only 2 valid templates; the reply text itself stays in Indonesian):
+   - Without feedback: `Gua suka [ID]` ("I like [ID]") (= final lock)
+   - With feedback:
      ```
      Gua suka [ID], tapi ada beberapa feedback:
      - feedback 1
      - feedback 2
      ```
-4. AI update desain sesuai feedback + kirim file HTML lagi (ID yang sama, versi revisi — ID jangan diganti).
-5. Loop hingga final:
-   - Agesta bilang `iya` (tanpa feedback) → AI eksekusi langsung sampe deploy (TDD passed, repo 0 error, sesuaikan fitur, cek prod sama dengan [ID] final).
-   - Agesta bilang `iya` + feedback baru → balik ke langkah 4, iterasi lagi hingga `iya` bersih.
+4. AI updates the design per the feedback + sends the HTML file again (same ID, revised version — don't change the ID).
+5. Loop until final:
+   - Agesta says `iya` ("yes", no feedback) → AI executes straight through to deploy (TDD passed, repo 0 errors, adapt features, check that prod matches the final [ID]).
+   - Agesta says `iya` + new feedback → back to step 4, iterate again until a clean `iya`.
 
-## Aturan Kunci
+## Key Rules
 
-- Tanpa ID = belum eksekusi. AI wajib minta ID dulu sebelum coding.
-- Revisi HTML tidak ganti ID — revisi menempel di ID yang sama biar tidak miskom.
-- Board HTML bukan spec coding. Slicing tetap 1:1 ikut SOP §8.
-- Sumber: skill `agesta-app-workflow` §9 (sumber tunggal SOP).
+- No ID = not executed yet. The AI must ask for the ID before coding.
+- An HTML revision does not change the ID — revisions attach to the same ID to avoid miscommunication.
+- The HTML board is not a coding spec. Slicing stays 1:1 per SOP §8.
+- Source: skill `agesta-app-workflow` §9 (single source of truth for the SOP).

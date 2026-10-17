@@ -14,11 +14,11 @@ code:
 
 ## TL;DR
 
-`app.vue` adalah layout global tipis: `AppHeader` (sticky, 2-state) + `<NuxtPage />` + footer `#tentang` + `BottomNav` (5 tab fixed, thumb-zone) dengan `pb-24` supaya konten tidak tertutup. Tab tengah **Quiz+** bukan route: membuka `QuizPlusSheet` dengan 2 intent (Tempat/Makan) berikut sisa quota jujur.
+`app.vue` is a thin global layout: `AppHeader` (sticky, 2-state) + `<NuxtPage />` + `#tentang` footer + `BottomNav` (5 fixed tabs, thumb zone) with `pb-24` so content is not covered. The centre **Quiz+** tab is not a route: it opens `QuizPlusSheet` with 2 intents (Tempat/Makan) along with the honest remaining quota.
 
 ## Entry Points
 
-- `app/app.vue` — `useAuthStore().init()` di `onMounted`.
+- `app/app.vue` — `useAuthStore().init()` in `onMounted`.
 - `app/common/components/BottomNav.vue` — tab Home, Mall, Quiz+, Riwayat, Akun (`isNavActive`).
 
 ## Sequence
@@ -29,9 +29,9 @@ sequenceDiagram
     participant Nav as BottomNav
     participant API as GET /api/quota
     participant Sheet as QuizPlusSheet
-    Nav->>API: useFetch (fallback anon fresh)
+    Nav->>API: useFetch (fresh-anon fallback)
     Nav->>Sheet: showSheet = true (tap +)
-    Sheet-->>Nav: emit go("/quiz" | "/makan")
+    Sheet-->>Nav: emit go("/quiz" | "/food")
     Nav->>Nav: showSheet=false + navigateTo(path)
 ```
 
@@ -40,9 +40,9 @@ sequenceDiagram
 | Component       | File                                      | Role                                           |
 | --------------- | ----------------------------------------- | ---------------------------------------------- |
 | `AppHeader`     | `app/common/components/AppHeader.vue`     | Anon: Login/Register; login: avatar + dropdown |
-| `BottomNav`     | `app/common/components/BottomNav.vue`     | 5 tab, aktif lime + dot                        |
+| `BottomNav`     | `app/common/components/BottomNav.vue`     | 5 tabs, active = lime + dot                    |
 | `QuizPlusSheet` | `app/common/components/QuizPlusSheet.vue` | 2 kartu intent; habis → "Besok lagi 00.00"     |
-| `isNavActive`   | `app/common/utils/nav.ts`                 | Penentu tab aktif (pure, tested)               |
+| `isNavActive`   | `app/common/utils/nav.ts`                 | Active-tab resolver (pure, tested)            |
 
 ## See Also
 
