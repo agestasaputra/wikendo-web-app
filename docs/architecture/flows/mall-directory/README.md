@@ -22,7 +22,7 @@ code:
 
 ## TL;DR
 
-`/mall` (hub of 5 malls) and `/mall/:slug` (tenants) are an SEO directory with no login/quota/LLM. Infinite scroll at 10/page (SSR page 1, continues on the client), server-side filter chips (reset the page), client-side keyword search, a promo strip above the list, and a CTA to `/food?mall=slug`.
+`/mall` (hub of 5 malls) and `/mall/:slug` (tenants) are an SEO directory with no login/quota/LLM. Infinite scroll at 10/page (SSR page 1, continues on the client), server-side filter chips (reset the page), client-side keyword search, a promo strip above the list, and a CTA to `/food?mall=slug`. Page-1 state is transferred via the Nuxt payload (useState) so the client hydrates from server data instead of re-fetching.
 
 ## Entry Points
 
