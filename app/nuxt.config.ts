@@ -4,44 +4,7 @@
 // Values come from env (local .env / prod Vercel env). See .env.example.
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  modules: [
-    "@nuxtjs/tailwindcss",
-    "@nuxt/eslint",
-    "@pinia/nuxt",
-    (_options, nuxt): void => {
-      // Nuxt 4.6 unconditionally registers vue-router/volar/sfc-route-blocks in
-      // prepare:types, but that subpath only exists in vue-router >=5 (we use v4).
-      // vue-tsc then fails to resolve it. We don't use <route> SFC blocks, so strip
-      // the plugin from the generated tsconfig files before type-check runs.
-      nuxt.hook("close", async () => {
-        const fs = await import("node:fs/promises");
-        const path = await import("node:path");
-        const root = nuxt.options.rootDir;
-        for (const name of [
-          "tsconfig.app.json",
-          "tsconfig.json",
-          "tsconfig.shared.json",
-          "tsconfig.server.json",
-        ]) {
-          const file = path.join(root, ".nuxt", name);
-          try {
-            const raw = await fs.readFile(file, "utf8");
-            const json = JSON.parse(raw);
-            const plugins = json?.vueCompilerOptions?.plugins;
-            if (Array.isArray(plugins)) {
-              json.vueCompilerOptions.plugins = plugins.filter((p) => {
-                const n = typeof p === "string" ? p : p?.name;
-                return !n || !String(n).includes("sfc-route-blocks");
-              });
-              await fs.writeFile(file, JSON.stringify(json, null, 2) + "\n");
-            }
-          } catch {
-            // file may not exist for this target; ignore
-          }
-        }
-      });
-    },
-  ],
+  modules: ["@nuxtjs/tailwindcss", "@nuxt/eslint", "@pinia/nuxt"],
   devtools: { enabled: true },
   app: {
     head: {

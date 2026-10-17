@@ -26,6 +26,7 @@ useHead({
 // S2b infinity: page-1 SSR (await start, SEO stays), continues on client via sentinel.
 const list = useInfiniteList<MallItem>({
   pageSize: 10,
+  key: "mall-list",
   keyOf: (m) => m.slug,
   fetchPage: (limit, offset) =>
     $fetch<InfiniteFetchPage<MallItem>>("/api/malls", {

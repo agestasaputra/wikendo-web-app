@@ -51,6 +51,7 @@ useHead({
 // S2b infinity: server-side filter (reset page), client-side keyword (spec: keyword(client) + page(server)).
 const list = useInfiniteList<TenantItem>({
   pageSize: 10,
+  key: `mall-detail-${slug}`,
   keyOf: (t) => t.name,
   fetchPage: (limit, offset) =>
     $fetch<InfiniteFetchPage<TenantItem>>(`/api/malls/${slug}/tenants`, {
