@@ -100,7 +100,7 @@ async function handleLogout(): Promise<void> {
         >
       </div>
       <a
-        href="https://wa.me/6280000000000"
+        href="https://wa.me/6285891630767"
         target="_blank"
         class="flex justify-between items-center px-4 py-3.5 font-extrabold text-[13px] hover:bg-stone-50 border-b border-stone-100"
       >
