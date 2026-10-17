@@ -6,14 +6,17 @@
  *   The sentinel changes on every new page → re-observe via watch.
  * EXAMPLE: const sentinel = useSentinelObserver(() => list.loadMore()) → <div ref="sentinel" />
  */
-import { onMounted, onUnmounted, ref, watch, type Ref } from "vue";
+import { onMounted, onUnmounted, shallowRef, watch, type Ref } from "vue";
 
 const ROOT_MARGIN = "320px";
 
 export function useSentinelObserver(
   onIntersect: () => void,
 ): Ref<HTMLDivElement | null> {
-  const sentinel = ref<HTMLDivElement | null>(null);
+  // shallowRef, NOT ref: this is a DOM element ref. ref()'s deep UnwrapRef expansion produces a
+  // structural clone that is not assignable to Element under noUncheckedIndexedAccess → vue-tsc
+  // error that blocks the pre-commit hook. shallowRef returns the raw element → vue-tsc clean.
+  const sentinel = shallowRef<HTMLDivElement | null>(null);
   let observer: IntersectionObserver | null = null;
 
   onMounted(() => {
