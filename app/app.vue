@@ -30,6 +30,18 @@ useHead({ bodyAttrs: { class: "bg-stone-200" } });
     <main class="flex-1 flex flex-col [&>*]:flex-1 [&>*]:w-full">
       <NuxtPage />
     </main>
+    <!-- Public footer (Addendum 25): product copy + Privacy/Terms links, #tentang anchor for the Account page shortcut. No dev jargon. -->
+    <footer
+      id="tentang"
+      class="text-center text-xs text-gray-400 py-6 flex flex-col gap-1"
+    >
+      <p>Wikendo — biar weekend nggak bingung lagi.</p>
+      <p>
+        © 2026 Wikendo ·
+        <NuxtLink to="/privacy" class="underline">Privacy</NuxtLink> ·
+        <NuxtLink to="/terms" class="underline">Terms</NuxtLink>
+      </p>
+    </footer>
     <BottomNav />
   </div>
 </template>

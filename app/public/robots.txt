@@ -1,0 +1,14 @@
+# robots.txt — gerbang crawler (SEO teknis). Crawler baca ini SEBELUM crawl halaman.
+# Aturan: halaman publik diizinkan; halaman personal/API dilarang (hemat crawl budget + privasi user).
+User-agent: *
+Allow: /
+Disallow: /history
+Disallow: /account
+Disallow: /login
+Disallow: /register
+Disallow: /check-email
+Disallow: /result
+Disallow: /result-food
+Disallow: /api/
+
+Sitemap: https://www.wikendo.id/sitemap.xml

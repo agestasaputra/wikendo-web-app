@@ -30,7 +30,9 @@ useHead({
       content:
         "Quiz 30 detik → 5 rekomendasi tempat. Quiz makan → 5 tenant + voucher. Gratis.",
     },
+    { property: "og:url", content: "https://www.wikendo.id/" },
   ],
+  link: [{ rel: "canonical", href: "https://www.wikendo.id/" }],
 });
 // Hero tokens I17 V2 Ember P1 — single source of truth, not hardcoded hex in the template.
 const hero = getHomeHeroMeta();

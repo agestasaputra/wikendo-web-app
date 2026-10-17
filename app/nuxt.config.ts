@@ -16,6 +16,30 @@ export default defineNuxtConfig({
           content:
             "Quiz 30 detik → 5 rekomendasi weekend Jabodetabek. Quiz makan 20 detik → 5 tenant mall. Gratis, tanpa ribet.",
         },
+        { property: "og:type", content: "website" },
+        { property: "og:site_name", content: "Wikendo" },
+        { property: "og:locale", content: "id_ID" },
+        { property: "og:url", content: "https://www.wikendo.id/" },
+        {
+          property: "og:image",
+          content: "https://www.wikendo.id/og-default.png",
+        },
+        { property: "og:image:width", content: "1200" },
+        { property: "og:image:height", content: "630" },
+        { name: "twitter:card", content: "summary_large_image" },
+        {
+          name: "twitter:title",
+          content: "Wikendo — Bingung Weekend Mau Kemana?",
+        },
+        {
+          name: "twitter:description",
+          content:
+            "Quiz 30 detik → 5 rekomendasi weekend Jabodetabek. Gratis, tanpa ribet.",
+        },
+        {
+          name: "twitter:image",
+          content: "https://www.wikendo.id/og-default.png",
+        },
         { name: "viewport", content: "width=device-width, initial-scale=1" },
       ],
       link: [

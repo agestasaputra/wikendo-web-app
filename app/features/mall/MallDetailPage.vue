@@ -45,7 +45,21 @@ useHead({
       name: "description",
       content: `List tenant ${mallName.value} curated: halal, budget, kids-friendly. Males scroll? Quiz 20 detik → 5 tenant + voucher.`,
     },
+    {
+      property: "og:title",
+      content: `Direktori ${mallName.value} — Wikendo`,
+    },
+    {
+      property: "og:description",
+      content: `Tenant ${mallName.value} curated: halal, budget, kids-friendly.`,
+    },
+    { property: "og:url", content: `https://www.wikendo.id/mall/${slug}` },
+    {
+      property: "og:image",
+      content: "https://www.wikendo.id/og-default.png",
+    },
   ],
+  link: [{ rel: "canonical", href: `https://www.wikendo.id/mall/${slug}` }],
 });
 
 // S2b infinity: server-side filter (reset page), client-side keyword (spec: keyword(client) + page(server)).

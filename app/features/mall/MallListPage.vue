@@ -20,7 +20,13 @@ useHead({
       content:
         "Direktori kuliner curated 5 mall Jakarta: Grand Indonesia, Central Park, Kokas, PIM, Aeon BSD. Males scroll? Quiz 20 detik → 5 tenant + voucher.",
     },
+    {
+      property: "og:title",
+      content: "Direktori Kuliner Mall Jakarta — Wikendo",
+    },
+    { property: "og:url", content: "https://www.wikendo.id/mall" },
   ],
+  link: [{ rel: "canonical", href: "https://www.wikendo.id/mall" }],
 });
 
 // S2b infinity: page-1 SSR (await start, SEO stays), continues on client via sentinel.

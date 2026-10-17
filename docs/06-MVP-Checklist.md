@@ -681,6 +681,16 @@ Consider feature flags for:
 - [ ] P1 features (can enable gradually)
 - [ ] Voucher claim gate strictness (strict UNIQUE vs lenient if tenants complain that claims are low)
 
+### SEO P0 share-ready (Addendum 25 — 17 Okt 2026)
+- [x] robots.txt (allow publik + disallow rute personal + Sitemap absolut)
+- [x] sitemap.xml dinamis (+ `/mall/:slug` dari DB, cache 1 jam)
+- [x] og-image 1200×630 + global head og/twitter (nuxt.config)
+- [x] canonical + og:url per-halaman (home/mall/detail) — TIDAK global
+- [x] Footer publik + halaman `/privacy` `/terms` (gate Google OAuth)
+- [x] GA4 plugin wiring (no-op; aktif saat `NUXT_PUBLIC_GA_ID` di-set)
+- [ ] P1: set `NUXT_PUBLIC_GA_ID` di Vercel env → GA4 live + event quiz/claim
+- [ ] P2: OG per-mall dinamis + compress brand assets + FAQ/Tentang content + preload font
+
 ---
 
 ## Success Criteria (2 Weeks Post-Launch) (Addendum 09 v1.3 patch — progressive funnel)
