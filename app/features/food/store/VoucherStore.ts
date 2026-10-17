@@ -1,16 +1,16 @@
 /**
- * features/makan/store/VoucherStore.ts — Wiring klaim voucher V13B ke POST /api/voucher/claim (Pinia).
+ * features/food/store/VoucherStore.ts — V13B voucher claim wiring to POST /api/voucher/claim (Pinia).
  *
- * APA: claimVoucher(code) + state claiming/claimedCode/claimError; Bearer token Supabase browser (anon key).
- * KENAPA store: 1 sumber kebenaran wiring API (sheet 3 row), bukan duplikat $fetch per row.
- *   Service key tetap server-only (server/utils/db.ts) — browser cuma kirim Bearer user.
- * Contoh: const { claimVoucher } = useVoucherStore(); await claimVoucher("WKD-7X2K9A")
+ * WHAT: claimVoucher(code) + claiming/claimedCode/claimError state; Supabase browser Bearer token (anon key).
+ * WHY store: 1 source of truth for the API wiring (3-row sheet), not a duplicate $fetch per row.
+ *   Service key stays server-only (server/utils/db.ts) — the browser just sends the user Bearer.
+ * EXAMPLE: const { claimVoucher } = useVoucherStore(); await claimVoucher("WKD-7X2K9A")
  */
 import { ref } from "vue";
 import { defineStore } from "pinia";
 import { useSupabaseBrowser } from "~/common/composables/useSupabaseBrowser";
 import { getErrorMessage } from "~/utils/error";
-import type { VoucherClaimResult } from "../@types/makan";
+import type { VoucherClaimResult } from "../@types/food";
 import { buildBusyClaimResult } from "../utils/voucherClaim";
 
 async function postClaim(code: string): Promise<VoucherClaimResult> {
@@ -29,7 +29,7 @@ export const useVoucherStore = defineStore("voucherStore", () => {
   const claimError = ref("");
 
   async function claimVoucher(code: string): Promise<VoucherClaimResult> {
-    // UX lock: early-return guard anti double-klik (keyboard Enter bypass :disabled).
+    // UX lock: early-return guard against double-click (keyboard Enter bypasses :disabled).
     if (claiming.value) return buildBusyClaimResult(claimedCode.value);
     claiming.value = true;
     claimError.value = "";

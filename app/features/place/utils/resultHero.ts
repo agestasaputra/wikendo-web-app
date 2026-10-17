@@ -1,12 +1,12 @@
 /**
- * features/tempat/utils/resultHero.ts — Data kartu hero result TEMPAT dari 1 rekomendasi.
+ * features/place/utils/resultHero.ts — PLACE result hero card data from 1 recommendation.
  *
- * APA: buildTempatHero(rec, idx) + buildTempatMapsUrl(name). PURE.
- * KENAPA: dulu computed 1 baris panjang di halaman → dipisah supaya testable + mudah dibaca.
- * Contoh: buildTempatHero({ name: "Rooftop", location_area: "Senayan, Jaksel" }, 0).areaLabel → "SENAYAN".
+ * WHAT: buildPlaceHero(rec, idx) + buildPlaceMapsUrl(name). PURE.
+ * WHY: previously a long 1-line computed on the page → split out so it's testable + easier to read.
+ * EXAMPLE: buildPlaceHero({ name: "Rooftop", location_area: "Senayan, Jaksel" }, 0).areaLabel → "SENAYAN".
  */
-import type { TempatRecommendation } from "~/common/types/api";
-import type { TempatHero } from "../@types/tempat";
+import type { PlaceRecommendation } from "~/common/types/api";
+import type { PlaceHero } from "../@types/place";
 
 const HERO_EMOJIS = ["🌇", "☕", "🌳", "🎡", "🌊"];
 const HERO_GRADIENTS = [
@@ -17,28 +17,28 @@ const HERO_GRADIENTS = [
   "linear-gradient(140deg,#cffafe,#67e8f9)",
 ];
 
-/** Area "Senayan, Jaksel" → "SENAYAN" (kata pertama huruf saja), kosong → "JKT". */
+/** Area "Senayan, Jaksel" → "SENAYAN" (first word letters only), empty → "JKT". */
 function toAreaLabel(area: string): string {
   const firstPart = area.split(",")[0] ?? "";
   const firstWord = firstPart.split(" ")[0] ?? "";
   return firstWord.replace(/[^A-Za-z]/g, "").toUpperCase() || "JKT";
 }
 
-/** Nilai kosong/undefined → "—". */
+/** Empty/undefined value → "—". */
 function orDash(value: string | undefined): string {
   return value || "—";
 }
 
-/** Rekomendasi (boleh kosong) + index kartu → data hero deck. Field kosong = "—". */
-export function buildTempatHero(
-  rec: Partial<TempatRecommendation> | undefined,
+/** Recommendation (may be empty) + card index → hero deck data. Empty field = "—". */
+export function buildPlaceHero(
+  rec: Partial<PlaceRecommendation> | undefined,
   idx: number,
-): TempatHero {
+): PlaceHero {
   const r = rec ?? {};
   const area = orDash(r.location_area);
   return {
     name: orDash(r.name),
-    category: r.category || "tempat",
+    category: r.category || "place",
     reason: orDash(r.reason),
     cost: orDash(r.estimated_cost),
     area,
@@ -51,8 +51,8 @@ export function buildTempatHero(
   };
 }
 
-/** Link Google Maps search untuk 1 tempat (Jakarta). */
-export function buildTempatMapsUrl(name: string): string {
+/** Google Maps search link for 1 place (Jakarta). */
+export function buildPlaceMapsUrl(name: string): string {
   return (
     "https://www.google.com/maps/search/?api=1&query=" +
     encodeURIComponent(`${name} Jakarta`)

@@ -1,6 +1,6 @@
 /**
- * utils/__tests__/pagination.spec.ts — TDD paging infinity scroll S2b.
- * Math limit/offset + append-dedupe + hasMore dipakai 2 halaman mall + 2 API + useInfiniteList.
+ * utils/__tests__/pagination.spec.ts — TDD for S2b infinite scroll paging.
+ * limit/offset math + append-dedupe + hasMore used by 2 mall pages + 2 APIs + useInfiniteList.
  */
 import { describe, it, expect } from "vitest";
 import {
@@ -12,20 +12,20 @@ import {
   parsePaginationParams,
 } from "../pagination";
 
-describe("parsePaginationParams (?limit & ?offset → angka aman)", () => {
-  it("tanpa param → default 10/0", () => {
+describe("parsePaginationParams (?limit & ?offset → safe numbers)", () => {
+  it("no params → default 10/0", () => {
     expect(parsePaginationParams({})).toEqual({ limit: 10, offset: 0 });
     expect(INFINITE_DEFAULT_LIMIT).toBe(10);
   });
 
-  it("string valid → angka", () => {
+  it("valid string → number", () => {
     expect(parsePaginationParams({ limit: "10", offset: "20" })).toEqual({
       limit: 10,
       offset: 20,
     });
   });
 
-  it("ngaco/negatif/nol → default/0 (tidak crash, tidak minus)", () => {
+  it("bogus/negative/zero → default/0 (no crash, no negative)", () => {
     expect(parsePaginationParams({ limit: "abc", offset: "-5" })).toEqual({
       limit: 10,
       offset: 0,
@@ -36,7 +36,7 @@ describe("parsePaginationParams (?limit & ?offset → angka aman)", () => {
     });
   });
 
-  it("limit > max 50 → dijepit (anti-abuse full dump)", () => {
+  it("limit > max 50 → clamped (anti-abuse full dump)", () => {
     expect(parsePaginationParams({ limit: "9999" })).toEqual({
       limit: 50,
       offset: 0,
@@ -44,13 +44,13 @@ describe("parsePaginationParams (?limit & ?offset → angka aman)", () => {
     expect(INFINITE_MAX_LIMIT).toBe(50);
   });
 
-  it("custom default dipakai saat limit absen", () => {
+  it("custom default used when limit is absent", () => {
     expect(parsePaginationParams({}, 5)).toEqual({ limit: 5, offset: 0 });
   });
 });
 
 describe("hasMorePages (loaded vs total)", () => {
-  it("belum semua → true; pas/lebih → false", () => {
+  it("not all yet → true; equal/more → false", () => {
     expect(hasMorePages(10, 40)).toBe(true);
     expect(hasMorePages(40, 40)).toBe(false);
     expect(hasMorePages(45, 40)).toBe(false);
@@ -60,7 +60,7 @@ describe("hasMorePages (loaded vs total)", () => {
 describe("mergePageItems (append + dedupe by key)", () => {
   const key = (t: { slug: string }) => t.slug;
 
-  it("page-1 + page-2 → gabung urut", () => {
+  it("page 1 + page 2 → merged in order", () => {
     const p1 = [{ slug: "a" }, { slug: "b" }];
     const p2 = [{ slug: "c" }];
     expect(mergePageItems(p1, p2, key)).toEqual([
@@ -70,7 +70,7 @@ describe("mergePageItems (append + dedupe by key)", () => {
     ]);
   });
 
-  it("duplikat key (overlap refetch) → tidak ganda", () => {
+  it("duplicate key (overlap refetch) → no duplicate", () => {
     const p1 = [{ slug: "a" }, { slug: "b" }];
     const p2 = [{ slug: "b" }, { slug: "c" }];
     expect(mergePageItems(p1, p2, key)).toEqual([
@@ -81,10 +81,10 @@ describe("mergePageItems (append + dedupe by key)", () => {
   });
 });
 
-describe("applyInfinitePage (terapkan 1 page ke list)", () => {
+describe("applyInfinitePage (apply 1 page to the list)", () => {
   const key = (t: { slug: string }): string => t.slug;
 
-  it("page objek: start (append=false) mengganti list + ikut total/hasMore server", () => {
+  it("page object: start (append=false) replaces the list + follows server total/hasMore", () => {
     const res = applyInfinitePage(
       [{ slug: "old" }],
       { items: [{ slug: "a" }], total: 40, hasMore: true },
@@ -93,7 +93,7 @@ describe("applyInfinitePage (terapkan 1 page ke list)", () => {
     expect(res).toEqual({ items: [{ slug: "a" }], total: 40, hasMore: true });
   });
 
-  it("page objek: append=true menggabung + dedupe", () => {
+  it("page object: append=true merges + dedupes", () => {
     const res = applyInfinitePage(
       [{ slug: "a" }],
       { items: [{ slug: "a" }, { slug: "b" }], total: 2, hasMore: false },
@@ -102,7 +102,7 @@ describe("applyInfinitePage (terapkan 1 page ke list)", () => {
     expect(res.items).toEqual([{ slug: "a" }, { slug: "b" }]);
   });
 
-  it("array legacy (API tanpa ?limit): dibungkus, hasMore false, total = panjang list", () => {
+  it("legacy array (API without ?limit): wrapped, hasMore false, total = list length", () => {
     const res = applyInfinitePage([], [{ slug: "x" }, { slug: "y" }], {
       append: false,
       keyOf: key,

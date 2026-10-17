@@ -1,7 +1,7 @@
-<!-- features/tempat/TempatQuizPage.vue → GET /quiz (Quiz TEMPAT swipe, mockup B-C kombo 5+10+15).
-APA: 1 layar 1 tanya + progress + opt-card + tombol 56px Orange #f97316, base #fffdf9.
-KENAPA: 1 keputusan kecil per layar = completion >70% (PRD §4). Engine sama dipakai quiz makan → codebase 1x.
-Contoh: tap opsi langsung next (tanpa tombol Lanjut) — quota kepake pas Generate, bukan per tanya. -->
+<!-- features/place/PlaceQuizPage.vue → GET /quiz (PLACE quiz swipe, mockup B-C combo 5+10+15).
+WHAT: 1 screen 1 question + progress + opt-card + 56px Orange #f97316 button, base #fffdf9.
+WHY: 1 small decision per screen = completion >70% (PRD §4). Same engine used by the food quiz → codebase 1x.
+EXAMPLE: tapping an option goes next immediately (no Next button) — quota is used at Generate, not per question. -->
 <script setup lang="ts">
 import QuizHeader from "~/common/components/QuizHeader.vue";
 import QuizOptionList from "~/common/components/QuizOptionList.vue";
@@ -11,14 +11,14 @@ import {
   getQuizSegState,
   isLastStep,
 } from "~/common/utils/quiz";
-import { TEMPAT_QUESTIONS } from "~/features/tempat/constants/questions";
+import { PLACE_QUESTIONS } from "~/features/place/constants/questions";
 
-const questions = TEMPAT_QUESTIONS;
+const questions = PLACE_QUESTIONS;
 const step = ref(0);
 const answers = reactive<Record<string, string>>({});
 const q = computed(() => getQuestion(questions, step.value));
-// Q2d: header ink + label putih + dot ember, segmen blok lime (helper tested).
-const headMeta = getQuizHeaderMeta("tempat");
+// Q2d: ink header + white label + ember dot, lime block segment (tested helper).
+const headMeta = getQuizHeaderMeta("place");
 const segState = computed(() => getQuizSegState(step.value, questions.length));
 const headerSuffix = computed(
   () => ` · ${step.value + 1}/${questions.length} · ⏱ 30 dtk`,
@@ -43,7 +43,7 @@ function select(v: string): void {
         >{{ step + 1 }}/{{ questions.length }} • ⏱ 30 dtk</span
       >
     </div>
-    <!-- Q2d ink header: label PUTIH + dot ember-terang, question putih, segmen blok lime -->
+    <!-- Q2d ink header: WHITE label + bright-ember dot, white question, lime block segment -->
     <QuizHeader
       :meta="headMeta"
       :seg-state="segState"

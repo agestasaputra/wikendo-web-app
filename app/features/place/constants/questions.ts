@@ -1,12 +1,12 @@
 /**
- * features/tempat/constants/questions.ts — 5 pertanyaan quiz TEMPAT (mood → companion → budget → area → waktu).
+ * features/place/constants/questions.ts — 5 PLACE quiz questions (mood → companion → budget → area → time).
  *
- * APA: data pertanyaan + opsi. KENAPA terpisah: data bukan logic; halaman quiz jadi tipis.
- * Jawaban dikirim via query string ke /result (id = nama field QuizTempatInput).
+ * WHAT: question + option data. WHY separate: data isn't logic; the quiz page stays thin.
+ * Answers are sent via query string to /result (id = QuizPlaceInput field name).
  */
 import type { QuizQuestion } from "~/common/types/quiz";
 
-export const TEMPAT_QUESTIONS: QuizQuestion[] = [
+export const PLACE_QUESTIONS: QuizQuestion[] = [
   {
     id: "mood",
     question: "Weekend ini pengen yang gimana? 🧭",
@@ -15,20 +15,20 @@ export const TEMPAT_QUESTIONS: QuizQuestion[] = [
         icon: "🧘",
         label: "Santai / Healing",
         desc: "Slow living, recharge",
-        value: "santai",
+        value: "relax",
       },
       {
         icon: "🎉",
         label: "Seru / Hype",
         desc: "Ramai, FOMO, viral",
-        value: "seru",
+        value: "fun",
       },
-      { icon: "🍜", label: "Kulineran", desc: "Makan enak", value: "kuliner" },
+      { icon: "🍜", label: "Kulineran", desc: "Makan enak", value: "foodie" },
       {
         icon: "🌿",
         label: "Alam / Outdoor",
         desc: "Hijau, udara segar",
-        value: "alam",
+        value: "nature",
       },
     ],
   },
@@ -36,33 +36,33 @@ export const TEMPAT_QUESTIONS: QuizQuestion[] = [
     id: "companion",
     question: "Dengan siapa? 👯",
     options: [
-      { icon: "🧘", label: "Sendiri", desc: "Me time", value: "sendiri" },
+      { icon: "🧘", label: "Sendiri", desc: "Me time", value: "solo" },
       {
         icon: "💑",
         label: "Pasangan",
         desc: "Pasangan / teman",
-        value: "berdua",
+        value: "couple",
       },
-      { icon: "👥", label: "Teman 2–4", desc: "3+ orang", value: "rame" },
-      { icon: "👨‍👩‍👧", label: "Keluarga", desc: "Anak / ortu", value: "keluarga" },
+      { icon: "👥", label: "Teman 2–4", desc: "3+ orang", value: "group" },
+      { icon: "👨‍👩‍👧", label: "Keluarga", desc: "Anak / ortu", value: "family" },
     ],
   },
   {
     id: "budget",
     question: "Budget per orang? 💰",
     options: [
-      { icon: "💰", label: "Hemat", desc: "< Rp 50.000", value: "hemat" },
+      { icon: "💰", label: "Hemat", desc: "< Rp 50.000", value: "budget" },
       {
         icon: "💰💰",
         label: "Menengah",
         desc: "Rp 50-150rb",
-        value: "menengah",
+        value: "mid",
       },
       {
         icon: "💰💰💰",
         label: "Leluasa",
         desc: "> Rp 150.000",
-        value: "leluasa",
+        value: "splurge",
       },
     ],
   },
@@ -74,25 +74,25 @@ export const TEMPAT_QUESTIONS: QuizQuestion[] = [
         icon: "📍",
         label: "Jakarta Selatan",
         desc: "Jaksel hype",
-        value: "jaksel",
+        value: "south-jakarta",
       },
       {
         icon: "📍",
         label: "Jakarta Pusat",
         desc: "Jakpus klasik",
-        value: "jakpus",
+        value: "central-jakarta",
       },
       {
         icon: "📍",
         label: "Jakarta Barat",
         desc: "Jakbar cozy",
-        value: "jakbar",
+        value: "west-jakarta",
       },
       {
         icon: "📍",
         label: "Bebas / Fleksibel",
         desc: "Dimana aja oke",
-        value: "bebas",
+        value: "anywhere",
       },
     ],
   },
@@ -100,9 +100,9 @@ export const TEMPAT_QUESTIONS: QuizQuestion[] = [
     id: "time",
     question: "Kapan mau jalan? ⏰",
     options: [
-      { icon: "☀️", label: "Siang", desc: "Siang-sore", value: "siang" },
-      { icon: "🌙", label: "Malam", desc: "Malam-minggu", value: "malam" },
-      { icon: "📅", label: "Fleksibel", desc: "Kapan aja", value: "fleksibel" },
+      { icon: "☀️", label: "Siang", desc: "Siang-sore", value: "day" },
+      { icon: "🌙", label: "Malam", desc: "Malam-minggu", value: "night" },
+      { icon: "📅", label: "Fleksibel", desc: "Kapan aja", value: "flexible" },
     ],
   },
 ];

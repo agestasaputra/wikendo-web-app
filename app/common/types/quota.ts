@@ -1,10 +1,10 @@
 /**
- * common/types/quota.ts — KONTRAK quota (GET /api/quota v1.1, Addendum 09 v1.3).
+ * common/types/quota.ts — Quota CONTRACT (GET /api/quota v1.1, Addendum 09 v1.3).
  *
- * APA: QuotaStatus split tempat+makan, input builder, label wallet home.
- * - Anon: tempat limit 1 + makan limit 2 + reset_at null + login_cta.
- * - Register: tempat limit 2 + makan limit 5 + reset_at 00:00 WIB, tanpa login_cta.
- * Dipakai: buildQuotaStatus() di common/utils/quota + server/api/quota.get.ts.
+ * WHAT: QuotaStatus split place+food, input builder, home wallet label.
+ * - Anonymous: place limit 1 + food limit 2 + reset_at null + login_cta.
+ * - Register: place limit 2 + food limit 5 + reset_at 00:00 WIB, without login_cta.
+ * Used by: buildQuotaStatus() in common/utils/quota + server/api/quota.get.ts.
  */
 export interface QuotaSlice {
   used: number;
@@ -13,24 +13,24 @@ export interface QuotaSlice {
 }
 
 export interface QuotaStatusInput {
-  tempatUsed: number;
-  makanUsed: number;
+  placeUsed: number;
+  foodUsed: number;
   isLoggedIn: boolean;
   resetAt?: string | null;
 }
 
 export interface QuotaStatus {
-  tempat: QuotaSlice;
-  makan: QuotaSlice;
+  place: QuotaSlice;
+  food: QuotaSlice;
   is_logged_in: boolean;
   reset_at: string | null;
   login_cta?: string;
 }
 
-/** Label wallet home: headline sisa, chip "sisa/limit", exhausted = momen login CTA. */
+/** Home wallet label: remaining headline, "remaining/limit" chip, exhausted = login CTA moment. */
 export interface WalletLabel {
   headline: string;
-  tempatChip: string;
-  makanChip: string;
+  placeChip: string;
+  foodChip: string;
   exhausted: boolean;
 }

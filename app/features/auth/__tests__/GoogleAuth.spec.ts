@@ -2,10 +2,10 @@ import { describe, it, expect } from "vitest";
 import { readSource } from "~/test/utils";
 
 /**
- * GoogleAuth.spec.ts — Satu pintu Google Auth (11 Okt 2026, approved "Gas fix!") + Opsi A board v10 (lock Agesta "A").
- * Satu pintu: (1) label netral SAMA "Lanjutkan dengan Google", (2) redirect SAMA hormati ?redirect=,
- * (3) checkbox Syarat dikunci: handleGoogle register wajib cek agree.
- * Opsi A: tombol outline resmi + divider ATAU + logo G 4-warna (bukan lingkaran biru "G").
+ * GoogleAuth.spec.ts — Single entry point for Google Auth (Oct 11 2026, approved "Gas fix!") + Option A board v10 (Agesta lock "A").
+ * Single entry: (1) SAME neutral label "Lanjutkan dengan Google", (2) SAME redirect respecting ?redirect=,
+ * (3) Terms checkbox locked: register handleGoogle must check agree.
+ * Option A: official outline button + ATAU divider + 4-color G logo (not a blue "G" circle).
  */
 const GOOGLE_BUTTON = readSource("features/auth/components/GoogleButton.vue");
 const COMPOSABLE = readSource("features/auth/composables/useGoogleSignIn.ts");
@@ -14,12 +14,12 @@ const PAGES: Record<string, string> = {
   "LoginPage.vue": readSource("features/auth/LoginPage.vue"),
 };
 
-describe("Google Auth satu pintu — label netral sama", () => {
-  it('GoogleButton (dipakai login + register): label "Lanjutkan dengan Google"', () => {
+describe("Google Auth single entry — same neutral label", () => {
+  it('GoogleButton (used by login + register): label "Lanjutkan dengan Google"', () => {
     expect(GOOGLE_BUTTON).toContain("Lanjutkan dengan Google");
   });
 
-  it("label lama hilang (Daftar via / Lanjut dengan)", () => {
+  it("old label gone (Daftar via / Lanjut dengan)", () => {
     for (const s of [GOOGLE_BUTTON, ...Object.values(PAGES)]) {
       expect(s).not.toContain("Daftar via Google");
       expect(s).not.toMatch(/["']Lanjut dengan Google["']/);
@@ -27,34 +27,34 @@ describe("Google Auth satu pintu — label netral sama", () => {
   });
 
   for (const [f, s] of Object.entries(PAGES)) {
-    it(`${f}: memakai <GoogleButton> bersama (1 tampilan untuk login + register)`, () => {
+    it(`${f}: uses shared <GoogleButton> (1 look for login + register)`, () => {
       expect(s).toContain("<GoogleButton");
     });
   }
 });
 
-describe("Google Auth satu pintu — redirect sama (hormati ?redirect=)", () => {
+describe("Google Auth single entry — same redirect (respects ?redirect=)", () => {
   for (const [f, s] of Object.entries(PAGES)) {
-    it(`${f}: baca route.query.redirect + teruskan ke useGoogleSignIn(redirect)`, () => {
+    it(`${f}: reads route.query.redirect + passes it to useGoogleSignIn(redirect)`, () => {
       expect(s).toContain("route.query.redirect");
       expect(s).toMatch(/useGoogleSignIn\(redirect\)/);
     });
   }
 
-  it('composable: redirectTo nempel variabel redirect (bukan hardcode "/")', () => {
+  it('composable: redirectTo attaches the redirect variable (not hardcoded "/")', () => {
     expect(COMPOSABLE).toContain("redirectTo");
     expect(COMPOSABLE).toMatch(/redirectTo:\s*buildOriginUrl\(redirect\)/);
   });
 
-  it("login: footer Daftar preservasi ?redirect=", () => {
+  it("login: Daftar footer preserves ?redirect=", () => {
     const s = PAGES["LoginPage.vue"] ?? "";
     expect(s).toContain("/register");
     expect(s).toMatch(/redirect/);
   });
 });
 
-describe("Google Auth register — checkbox Syarat dikunci", () => {
-  it("register: handleGoogle cek agree sebelum OAuth", () => {
+describe("Google Auth register — Terms checkbox locked", () => {
+  it("register: handleGoogle checks agree before OAuth", () => {
     const s = PAGES["RegisterPage.vue"] ?? "";
     expect(s).toContain("handleGoogle");
     expect(s).toContain("agree");
@@ -62,24 +62,24 @@ describe("Google Auth register — checkbox Syarat dikunci", () => {
   });
 });
 
-describe("Opsi A — tombol Google outline + divider ATAU (register + login selaras)", () => {
-  it("tombol outline abu #DADCE0 (bukan solid-putih kembaran form)", () => {
+describe("Option A — Google outline button + ATAU divider (register + login aligned)", () => {
+  it("gray outline button #DADCE0 (not a solid-white twin of the form)", () => {
     expect(GOOGLE_BUTTON).toContain("#dadce0");
   });
 
-  it('logo G 4-warna resmi (kuning #FBBC05 ikut, bukan lingkaran biru "G" imitasi)', () => {
+  it('official 4-color G logo (includes yellow #FBBC05, not an imitation blue "G" circle)', () => {
     expect(GOOGLE_BUTTON).toContain("#fbbc05");
     expect(GOOGLE_BUTTON).not.toContain(">G</span>");
   });
 
-  it("wiring Google utuh (OAuth + loading + label idle)", () => {
+  it("full Google wiring (OAuth + loading + idle label)", () => {
     expect(COMPOSABLE).toContain("signInWithOAuth");
     expect(GOOGLE_BUTTON).toContain("Menghubungkan…");
     for (const s of Object.values(PAGES)) expect(s).toContain("googleLoading");
   });
 
   for (const [f, s] of Object.entries(PAGES)) {
-    it(`${f}: divider ATAU antara Google dan form email + CTA hitam satu-satunya solid`, () => {
+    it(`${f}: ATAU divider between Google and email form + black CTA as the only solid`, () => {
       expect(s).toContain("ATAU");
       expect(s).toContain("#0c0a09");
     });

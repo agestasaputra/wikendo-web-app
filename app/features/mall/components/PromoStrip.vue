@@ -1,7 +1,7 @@
-<!-- features/mall/components/PromoStrip.vue → Strip promo V13C di halaman mall (Addendum 23 v1.1), BUKAN route baru.
-APA: section "Promo hari ini di {mall} (N)" — tenant yang ADA badge promo real, tiap row link ke /makan?mall=slug.
-KENAPA: di atas list tenant, di bawah pill count — user lihat promo dulu baru scroll direktori. Data real, bukan fake all -20%.
-Contoh: <PromoStrip :tenants="promoStrip" :slug="slug" :mall-short="mallShort" /> -->
+<!-- features/mall/components/PromoStrip.vue → V13C promo strip on the mall page (Addendum 23 v1.1), NOT a new route.
+WHAT: "Promo hari ini di {mall} (N)" section — tenants that HAVE a real promo badge, each row links to /food?mall=slug.
+WHY: above the tenant list, below the count pill — users see promos first before scrolling the directory. Real data, not a fake all -20%.
+EXAMPLE: <PromoStrip :tenants="promoStrip" :slug="slug" :mall-short="mallShort" /> -->
 <script setup lang="ts">
 import type { TenantItem } from "~/features/mall/@types/mall";
 import { buildTenantView } from "~/features/mall/utils/tenantCard";
@@ -20,7 +20,7 @@ defineProps<{ tenants: TenantItem[]; slug: string; mallShort: string }>();
     <NuxtLink
       v-for="t in tenants"
       :key="'promo-' + t.name"
-      :to="`/makan?mall=${slug}`"
+      :to="`/food?mall=${slug}`"
       class="flex gap-2 items-center border-t border-gray-100 py-2"
     >
       <div

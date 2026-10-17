@@ -1,13 +1,13 @@
-<!-- app.vue — Layout GLOBAL kombo 5+10+15 + E1 BottomNav (Addendum 09 v1.3 + 24 E1 APPROVED).
-APA: AppHeader sticky + <NuxtPage/> + footer id tentang + BottomNav 5-tab fixed dalam max-w-md thumb-zone, pb-24 anti-ketutup.
-KENAPA 1 layout dipakai semua halaman → konsisten + hemat. Isi header/nav ada di common/components (layout tetap tipis).
-Contoh: footer id tentang → Akun/Tentang anchor #tentang scroll; pb-24 cegah konten ketutup nav fixed. -->
+<!-- app.vue — GLOBAL layout combining 5+10+15 + E1 BottomNav (Addendum 09 v1.3 + 24 E1 APPROVED).
+WHAT: AppHeader sticky + <NuxtPage/> + footer id tentang + BottomNav 5-tab fixed inside a max-w-md thumb-zone, pb-24 anti-covered.
+WHY: 1 layout used by every page → consistent + saves work. Header/nav contents live in common/components (layout stays thin).
+EXAMPLE: footer id tentang → Akun/Tentang anchor #tentang scroll; pb-24 prevents content being covered by the fixed nav. -->
 <script setup lang="ts">
 import AppHeader from "~/common/components/AppHeader.vue";
 import BottomNav from "~/common/components/BottomNav.vue";
 import { useAuthStore } from "~/common/store/AuthStore";
 
-// Load session Supabase + dengar perubahan auth (client only, idempotent).
+// Load Supabase session + listen for auth changes (client only, idempotent).
 const auth = useAuthStore();
 onMounted(() => auth.init());
 </script>

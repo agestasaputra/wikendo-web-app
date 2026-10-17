@@ -1,8 +1,8 @@
 /**
- * common/types/pagination.ts — KONTRAK paging S2b infinity scroll (list mall + detail mall).
+ * common/types/pagination.ts — CONTRACT for S2b infinity scroll paging (mall list + mall detail).
  *
- * APA: InfinitePage {items,total,hasMore}; InfiniteFetchPage boleh array legacy (tanpa ?limit).
- * Dipakai: useInfiniteList() + GET /api/malls + GET /api/malls/:slug/tenants.
+ * WHAT: InfinitePage {items,total,hasMore}; InfiniteFetchPage may be a legacy array (without ?limit).
+ * Used by: useInfiniteList() + GET /api/malls + GET /api/malls/:slug/tenants.
  */
 export interface InfinitePage<T> {
   items: T[];

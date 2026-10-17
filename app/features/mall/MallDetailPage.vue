@@ -1,7 +1,7 @@
-<!-- features/mall/MallDetailPage.vue → GET /mall/:slug (Direktori SEO, S2c Foto Tenant + S2b infinity).
-APA: search + filter chip (halal/budget/misi) + kartu tenant foto + CTA quiz pre-filled, thumb 46px + badge promo overlay, bg paper #F5F5F4 + infinity 10/page (sentinel + skeleton 2 row + sticky count "10/40").
-KENAPA: S2b infinity — 40 tenant sekaligus berat di HP kentang → 10/page, SSR page-1 tetap (SEO aman), lanjut client. CTA quiz + search + chips STICKY biar nggak kelempar scroll. Filter server-side (reset page); keyword client-side di atas item termuat (spec S2b: filtered = keyword(client) + page(server)).
-Token lock: ink tetap #0C0A09, rose tetap #E11D48, paper tetap #F5F5F4. -->
+<!-- features/mall/MallDetailPage.vue → GET /mall/:slug (SEO Directory, S2c Tenant Photo + S2b infinity).
+WHAT: search + filter chips (halal/budget/mission) + tenant photo card + pre-filled quiz CTA, 46px thumb + promo badge overlay, paper bg #F5F5F4 + infinity 10/page (sentinel + 2-row skeleton + sticky count "10/40").
+WHY: S2b infinity — 40 tenants at once is heavy on low-end phones → 10/page, page-1 SSR stays (SEO safe), continues on client. Quiz CTA + search + chips STICKY so they aren't thrown off by scroll. Server-side filter (reset page); client-side keyword on top of loaded items (spec S2b: filtered = keyword(client) + page(server)).
+Token lock: ink stays #0C0A09, rose stays #E11D48, paper stays #F5F5F4. -->
 <script setup lang="ts">
 import AppLoader from "~/common/components/AppLoader.vue";
 import { useInfiniteList } from "~/common/composables/useInfiniteList";
@@ -18,7 +18,7 @@ import {
 } from "~/features/mall/utils/directory";
 import { getTenantPromo } from "~/features/mall/utils/tenantCard";
 
-// Filter chip (S2c 1:1 = 3 chip): halal + budget + nongkrong. Server-side via query, ganti filter = reset page.
+// Filter chips (S2c 1:1 = 3 chips): halal + budget + nongkrong. Server-side via query, changing filter = reset page.
 const FILTER_CHIPS: { key: keyof DirectoryFilters; label: string }[] = [
   { key: "halal", label: "✅ Halal" },
   { key: "budget", label: "💰 50-100rb" },
@@ -28,7 +28,7 @@ const FILTER_CHIPS: { key: keyof DirectoryFilters; label: string }[] = [
 const route = useRoute();
 const slug = route.params.slug as string;
 const mallName = computed(() => getMallName(slug));
-// S2c 1:1: breadcrumb short label (GI), bukan slug mentah.
+// S2c 1:1: breadcrumb short label (GI), not the raw slug.
 const mallShort = computed(() => getMallShortLabel(slug));
 const keyword = ref("");
 const filters = reactive<DirectoryFilters>({
@@ -37,7 +37,7 @@ const filters = reactive<DirectoryFilters>({
   mission: false,
 });
 
-// SEO direktori: title + description per-mall (funnel Google → tenant → quiz).
+// Directory SEO: title + description per mall (Google → tenant → quiz funnel).
 useHead({
   title: `Direktori Kuliner ${mallName.value} — Wikendo`,
   meta: [
@@ -48,7 +48,7 @@ useHead({
   ],
 });
 
-// S2b infinity: filter server-side (reset page), keyword client-side (spec: keyword(client) + page(server)).
+// S2b infinity: server-side filter (reset page), client-side keyword (spec: keyword(client) + page(server)).
 const list = useInfiniteList<TenantItem>({
   pageSize: 10,
   keyOf: (t) => t.name,
@@ -66,14 +66,14 @@ function toggleFilter(key: keyof DirectoryFilters): void {
   list.reset();
 }
 
-// Pill infinity S2c 1:1 (tested): 🟢 loaded/total tenant · scroll ↓
+// Infinity pill S2c 1:1 (tested): 🟢 loaded/total tenants · scroll ↓
 const dirCount = computed(() =>
   buildDirCountLabel(tenants.value.length, total.value || tenants.value.length),
 );
 const filtered = computed(() =>
   filterTenantsByKeyword(tenants.value, keyword.value),
 );
-// V13C strip promo (Addendum 23 v1.1): tenant yang ADA badge promo real, di atas list; slice 3 biar hemat HP kentang.
+// V13C promo strip (Addendum 23 v1.1): tenants that HAVE a real promo badge, above the list; slice 3 to save low-end phones.
 const promoStrip = computed(() =>
   tenants.value.filter((t) => !!getTenantPromo(t)).slice(0, 3),
 );
@@ -93,7 +93,7 @@ const promoStrip = computed(() =>
       Direktori kuliner curated · tanpa login/quota
     </p>
 
-    <!-- Sticky: search + chips + CTA (S2b spec: nggak kelempar scroll) -->
+    <!-- Sticky: search + chips + CTA (S2b spec: not thrown off by scroll) -->
     <div class="sticky top-0 pt-2 pb-2" style="background: #f5f5f4">
       <div
         class="bg-white border border-[#e4e4e7] rounded-xl px-3.5 py-2.5 text-[13px] text-gray-500 flex gap-2 items-center"
@@ -123,9 +123,9 @@ const promoStrip = computed(() =>
         </button>
       </div>
 
-      <!-- CTA jembatan direktori → quiz (S2c KARTU ASISTEN: strip lime + avatar ink-lime + 2 baris + panah) -->
+      <!-- Directory → quiz bridge CTA (S2c ASSISTANT CARD: lime strip + ink-lime avatar + 2 lines + arrow) -->
       <NuxtLink
-        :to="`/makan?mall=${slug}`"
+        :to="`/food?mall=${slug}`"
         class="block rounded-[14px] p-3.5 bg-white border border-gray-100 mt-1"
         style="border-left: 4px solid #a3e635"
       >
@@ -147,7 +147,7 @@ const promoStrip = computed(() =>
       </NuxtLink>
     </div>
 
-    <!-- Pill count infinity S2c -->
+    <!-- S2c infinity count pill -->
     <p
       v-if="!pending && tenants.length"
       class="inline-block text-[11px] font-extrabold px-2.5 py-1 rounded-full mt-3"
@@ -163,7 +163,7 @@ const promoStrip = computed(() =>
       :mall-short="mallShort"
     />
 
-    <!-- Kartu tenant (mockup S2c Foto Tenant): thumb foto 46px + badge promo overlay -->
+    <!-- Tenant card (S2c Tenant Photo mockup): 46px photo thumb + promo badge overlay -->
     <AppLoader v-if="pending" variant="mall" />
     <div
       v-else-if="error"
@@ -183,7 +183,7 @@ const promoStrip = computed(() =>
       <p v-if="!filtered.length" class="text-center text-sm text-gray-500 py-8">
         Tidak ada tenant cocok. Coba ubah filter.
       </p>
-      <!-- Skeleton 2 row pas nambah page (S2b spec) -->
+      <!-- 2-row skeleton when adding a page (S2b spec) -->
       <div v-if="loadingMore" class="flex flex-col gap-2.5" aria-live="polite">
         <div
           v-for="i in 2"
@@ -200,7 +200,7 @@ const promoStrip = computed(() =>
           </div>
         </div>
       </div>
-      <!-- Sentinel infinity scroll -->
+      <!-- Infinity scroll sentinel -->
       <div
         v-if="hasMore"
         ref="sentinel"

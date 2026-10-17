@@ -1,18 +1,18 @@
 /**
- * common/utils/mall.ts — Helper nama mall (slug → nama / label pendek).
+ * common/utils/mall.ts — Mall name helper (slug → name / short label).
  *
- * APA: getMallName + getMallShortLabel. PURE: tanpa baca route/DB.
- * KENAPA: dipakai 3 tempat (mall list, mall detail, quiz/result makan) → 1 sumber.
- * Contoh: getMallShortLabel("grand-indonesia") → "GI".
+ * WHAT: getMallName + getMallShortLabel. PURE: no route/DB reads.
+ * WHY: used in 3 places (mall list, mall detail, food quiz/result) → single source of truth.
+ * EXAMPLE: getMallShortLabel("grand-indonesia") → "GI".
  */
 import { MALL_NAMES, MALL_SHORT_LABELS } from "../constants/malls";
 
-/** Slug → nama lengkap. Slug ngaco = fallback slug as-is (tidak crash). */
+/** Slug → full name. Wrong slug = fallback to slug as-is (no crash). */
 export function getMallName(slug: string): string {
   return MALL_NAMES[slug] || slug;
 }
 
-/** Slug → label pendek chip (GI, CP, Kokas, PIM, Aeon). Ngaco = fallback slug. */
+/** Slug → short chip label (GI, CP, Kokas, PIM, Aeon). Wrong = fallback to slug. */
 export function getMallShortLabel(slug: string): string {
   return MALL_SHORT_LABELS[slug] || slug;
 }

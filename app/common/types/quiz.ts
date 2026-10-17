@@ -1,10 +1,10 @@
 /**
- * common/types/quiz.ts — KONTRAK header quiz Q2d/M3d (dipakai quiz tempat + quiz makan).
+ * common/types/quiz.ts — Quiz header CONTRACT Q2d/M3d (used by place quiz + food quiz).
  *
- * APA: flow + meta warna header (label putih, dot ember/rose, segmen lime).
- * Dipakai: getQuizHeaderMeta() di common/utils/quiz + QuizHeader.vue.
+ * WHAT: flow + header color meta (white label, ember/rose dot, lime segment).
+ * Used by: getQuizHeaderMeta() in common/utils/quiz + QuizHeader.vue.
  */
-export type QuizFlow = "tempat" | "makan";
+export type QuizFlow = "place" | "food";
 
 export interface QuizHeaderMeta {
   label: string;

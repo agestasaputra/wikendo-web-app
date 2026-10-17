@@ -1,10 +1,10 @@
 /**
- * common/store/HistoryStore.ts — Riwayat hasil quiz (Pinia + localStorage `wikendo_history`).
+ * common/store/HistoryStore.ts — Quiz result history (Pinia + localStorage `wikendo_history`).
  *
- * APA: items + load() + push(entry) + clear(); cap 20 + dedupe judul (logic di utils/history).
- * KENAPA store: result tempat + result makan menulis, halaman Riwayat membaca → state bersama.
- *   localStorage NOL backend: anon tetap punya riwayat. Semua akses storage di-guard window + try/catch.
- * Contoh: useHistoryStore().push({ kind: "tempat", title: "Kopi", sub: "GI", at: Date.now() })
+ * WHAT: items + load() + push(entry) + clear(); cap 20 + title dedupe (logic in utils/history).
+ * WHY store: place result + food result write, the Riwayat page reads → shared state.
+ *   localStorage with ZERO backend: anonymous users still get history. Every storage access is guarded by window + try/catch.
+ * EXAMPLE: useHistoryStore().push({ kind: "place", title: "Kopi", sub: "GI", at: Date.now() })
  */
 import { ref } from "vue";
 import { defineStore } from "pinia";
@@ -26,7 +26,7 @@ function writeStorage(list: HistoryEntry[]): void {
   try {
     window.localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(list));
   } catch {
-    // storage penuh / diblok → riwayat tidak tersimpan, UI tetap jalan
+    // storage full / blocked → history isn't saved, UI keeps working
   }
 }
 
@@ -35,7 +35,7 @@ function removeStorage(): void {
   try {
     window.localStorage.removeItem(HISTORY_STORAGE_KEY);
   } catch {
-    // storage diblok → state tetap dikosongkan
+    // storage blocked → the state is still emptied
   }
 }
 

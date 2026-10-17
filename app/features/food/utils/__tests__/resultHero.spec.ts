@@ -1,16 +1,17 @@
 import { describe, it, expect } from "vitest";
 import type { TenantRecommendation } from "~/common/types/api";
-import { buildMakanChips, buildMakanHero, buildRankItems } from "../resultHero";
+import { buildFoodChips, buildFoodHero, buildRankItems } from "../resultHero";
 
 const rec = (
   over: Partial<TenantRecommendation> = {},
 ): TenantRecommendation => ({
   name: "Kopi Kekinian",
-  category: "kopi",
-  lantai: "2",
+  category: "coffee",
+  floor: "2",
   halal: true,
-  budget_tier: "menengah",
-  price_range: "Rp 50-100rb",
+  budget_tier: "mid",
+  price_min: 50000,
+  price_max: 100000,
   kids_friendly: true,
   hype_tiktok: false,
   reason: "Cocok buat nongkrong lama bareng teman",
@@ -18,11 +19,12 @@ const rec = (
   ...over,
 });
 
-describe("buildMakanHero", () => {
-  it("terisi → dipetakan", () => {
-    const h = buildMakanHero(rec());
+describe("buildFoodHero", () => {
+  it("filled → mapped", () => {
+    const h = buildFoodHero(rec());
     expect(h).toMatchObject({
       name: "Kopi Kekinian",
+      price: "Rp 50-100rb",
       floor: "2",
       halal: true,
       kids: "👶 kids",
@@ -30,8 +32,13 @@ describe("buildMakanHero", () => {
     });
   });
 
-  it("kosong → placeholder aman, halal null (tri-state)", () => {
-    const h = buildMakanHero(undefined);
+  it("missing price bounds → dash placeholder", () => {
+    const h = buildFoodHero(rec({ price_min: null, price_max: null }));
+    expect(h.price).toBe("—");
+  });
+
+  it("empty → safe placeholder, halal null (tri-state)", () => {
+    const h = buildFoodHero(undefined);
     expect(h).toMatchObject({
       name: "—",
       floor: "?",
@@ -42,7 +49,7 @@ describe("buildMakanHero", () => {
   });
 });
 
-describe("buildMakanChips + buildRankItems", () => {
+describe("buildFoodChips + buildRankItems", () => {
   const list = [
     rec({ name: "Alpha Cafe" }),
     rec({ name: "Bravo Kitchen" }),
@@ -50,11 +57,11 @@ describe("buildMakanChips + buildRankItems", () => {
     rec({ name: "Delta" }),
   ];
 
-  it('chips: rekomendasi ke-2 & ke-3, nama dipotong 6 huruf + "..."', () => {
-    expect(buildMakanChips(list)).toEqual(["Bravo...", "Charli..."]);
+  it('chips: 2nd & 3rd recommendations, name truncated to 6 chars + "..."', () => {
+    expect(buildFoodChips(list)).toEqual(["Bravo...", "Charli..."]);
   });
 
-  it("rank: 3 teratas dengan tag halal · lantai · promo · alasan 28 huruf", () => {
+  it("rank: top 3 with halal · floor · promo · reason tags, 28 chars", () => {
     const items = buildRankItems(list);
     expect(items).toHaveLength(3);
     expect(items[0]?.tags).toBe(
@@ -63,7 +70,7 @@ describe("buildMakanChips + buildRankItems", () => {
     expect(items[2]?.tags.startsWith("Non-halal")).toBe(true);
   });
 
-  it("halal null → ❓ (belum verifikasi)", () => {
+  it("halal null → ❓ (not yet verified)", () => {
     expect(
       buildRankItems([rec({ halal: null })])[0]?.tags.startsWith("❓"),
     ).toBe(true);

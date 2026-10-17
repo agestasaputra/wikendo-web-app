@@ -1,9 +1,9 @@
 /**
- * features/mall/@types/mall.ts — KONTRAK UI direktori mall (S2b infinity + S2c kartu tenant).
+ * features/mall/@types/mall.ts — UI CONTRACT for the mall directory (S2b infinity + S2c tenant card).
  *
- * APA: MallItem (baris list), TenantItem (kartu tenant dari API), TenantCardMeta (thumb emoji + warna),
- *   TenantView (nilai siap-render per kartu), DirectoryFilters (3 chip filter server-side).
- * Dipakai: utils/* + MallListPage + MallDetailPage + components/*.
+ * WHAT: MallItem (list row), TenantItem (tenant card from API), TenantCardMeta (thumb emoji + color),
+ *   TenantView (ready-to-render value per card), DirectoryFilters (3 server-side filter chips).
+ * Used by: utils/* + MallListPage + MallDetailPage + components/*.
  */
 export interface MallItem {
   slug: string;
@@ -17,9 +17,9 @@ export interface TenantItem {
   name: string;
   cat?: string;
   category?: string;
-  lantai?: string;
-  price?: string;
-  price_range?: string;
+  floor?: string;
+  price_min?: number | null;
+  price_max?: number | null;
   mission?: string[];
   halal?: boolean | null;
   hype_tiktok?: boolean | null;
@@ -29,7 +29,7 @@ export interface TenantItem {
   emoji?: string;
 }
 
-/** Thumb kartu tenant S2c: emoji per kategori + warna avatar kotak. */
+/** S2c tenant card thumb: emoji per category + square avatar color. */
 export interface TenantCardMeta {
   emoji: string;
   bg: string;

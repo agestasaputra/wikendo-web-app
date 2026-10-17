@@ -1,9 +1,9 @@
 <!-- features/auth/LoginPage.vue → GET /login (Auth page, Addendum 09 v1.3 APPROVED).
-  APA: slicing 100% L1 EMBER HERO — banner hitam quota + Google + Email + Password•Lupa? + Masuk + pill + Daftar.
-  KENAPA: user anon quota habis klik Login di topbar global → harus lihat angka real + bisa masuk via Supabase.
-  Banner 1:1 L1 lock v9 (ink #0C0A09 + strip ember #EA580C + angka #D9F99D 17px + radius 12px + font 10px)
-  + referensi hero HomePage (getHomeHeroMeta — 1 sumber token, bukan hardcode beda).
-  Contoh: anon habis lihat 0 • 0 → Lanjutkan dengan Google / isi Email+Password → Masuk → balik ke ?redirect=. -->
+  WHAT: 100% slice of L1 EMBER HERO — black quota banner + Google + Email + Password•Lupa? + Masuk + pill + Daftar.
+  WHY: anonymous user whose quota is exhausted clicks Login in the global topbar → must see real numbers + be able to sign in via Supabase.
+  Banner 1:1 L1 lock v9 (ink #0C0A09 + ember strip #EA580C + number #D9F99D 17px + radius 12px + font 10px)
+  + reference to the HomePage hero (getHomeHeroMeta — 1 token source, not a different hardcode).
+  EXAMPLE: anonymous exhausted sees 0 • 0 → Lanjutkan dengan Google / fill Email+Password → Masuk → back to ?redirect=. -->
 <script setup lang="ts">
 import AppSpinner from "~/common/components/AppSpinner.vue";
 import { useSupabaseBrowser } from "~/common/composables/useSupabaseBrowser";
@@ -14,14 +14,14 @@ import PasswordField from "~/features/auth/components/PasswordField.vue";
 import { useGoogleSignIn } from "~/features/auth/composables/useGoogleSignIn";
 import { getRedirectQuery } from "~/features/auth/utils/redirect";
 
-// Quota real: GET /api/quota (cookie anon). Gagal fetch = fallback anon habis 0 • 0 kayak image.
+// Real quota: GET /api/quota (anonymous cookie). Fetch failure = fallback to anonymous exhausted 0 • 0 like the image.
 const { data: quotaData } = await useFetch<QuotaStatus>("/api/quota");
-const tempatSisa = computed(() => quotaData.value?.tempat.remaining ?? 0);
-const makanSisa = computed(() => quotaData.value?.makan.remaining ?? 0);
+const placeRemaining = computed(() => quotaData.value?.place.remaining ?? 0);
+const foodRemaining = computed(() => quotaData.value?.food.remaining ?? 0);
 
 const router = useRouter();
 const route = useRoute();
-// SSR-safe: useRoute, bukan router.currentRoute (pitfall 500 Vercel).
+// SSR-safe: useRoute, not router.currentRoute (Vercel 500 pitfall).
 const redirect = getRedirectQuery(route.query.redirect);
 const { googleLoading, signInWithGoogle } = useGoogleSignIn(redirect);
 
@@ -34,7 +34,7 @@ const busy = computed(
   () => loading.value || googleLoading.value || forgotLoading.value,
 );
 
-// Login email+password via Supabase → hormati ?redirect= (balik ke quiz/result yang dikunci).
+// Email+password login via Supabase → respect ?redirect= (back to the locked quiz/result).
 async function handleLogin(): Promise<void> {
   if (loading.value) return;
   errorMsg.value = "";
@@ -54,7 +54,7 @@ async function handleLogin(): Promise<void> {
   }
 }
 
-// Login sekali klik via Google OAuth.
+// One-click login via Google OAuth.
 async function handleGoogle(): Promise<void> {
   if (busy.value) return;
   errorMsg.value = "";
@@ -62,7 +62,7 @@ async function handleGoogle(): Promise<void> {
   if (err) errorMsg.value = err;
 }
 
-// Link Lupa? → email reset password Supabase. Butuh Email terisi dulu.
+// Lupa? link → Supabase password reset email. Requires Email to be filled in first.
 async function handleForgot(): Promise<void> {
   if (busy.value) return;
   errorMsg.value = "";
@@ -95,24 +95,24 @@ async function handleForgot(): Promise<void> {
         sans-serif;
     "
   >
-    <!-- 1. Banner hitam quota — 1:1 L1 EMBER HERO (strip ember + radius 12 + angka lime-muda) -->
+    <!-- 1. Black quota banner — 1:1 L1 EMBER HERO (ember strip + radius 12 + light-lime number) -->
     <AuthBanner
       title="QUOTA HABIS • reset 00.00"
-      :value="`${tempatSisa} • ${makanSisa}`"
+      :value="`${placeRemaining} • ${foodRemaining}`"
       footer="Login gratis → buka 2 + 5"
     >
-      <!-- fallback literal ikut image 0 • 0 -->
+      <!-- fallback literal follows the image 0 • 0 -->
       <span class="hidden">0 • 0</span>
     </AuthBanner>
 
-    <!-- 2. Tombol Google — outline abu resmi + logo G 4-warna (Opsi A board v10, selaras register). -->
+    <!-- 2. Google button — official gray outline + 4-color G logo (Option A board v10, aligned with register). -->
     <GoogleButton
       :loading="googleLoading"
       :disabled="busy"
       @click="handleGoogle"
     />
 
-    <!-- Divider ATAU: pemisah grup login-sosial vs form-email (Opsi A board v10). -->
+    <!-- ATAU divider: separates the social-login group from the email form (Option A board v10). -->
     <div class="flex items-center gap-3 mt-3 px-1" aria-hidden="true">
       <span class="flex-1 h-px" style="background: #d6d3d1" />
       <span
@@ -123,7 +123,7 @@ async function handleForgot(): Promise<void> {
       <span class="flex-1 h-px" style="background: #d6d3d1" />
     </div>
 
-    <!-- 3+4. Form Email + Password • Lupa? -->
+    <!-- 3+4. Email + Password • Lupa? form -->
     <form class="space-y-3 mt-3" @submit.prevent="handleLogin">
       <div
         class="bg-white rounded-full flex items-center gap-2 px-4 py-3.5 shadow-sm"
@@ -157,7 +157,7 @@ async function handleForgot(): Promise<void> {
       <p v-if="errorMsg" class="text-center text-xs font-bold text-red-600">
         {{ errorMsg }}
       </p>
-      <!-- 5. CTA utama hitam -->
+      <!-- 5. Main black CTA -->
       <button
         type="submit"
         :disabled="busy"
@@ -169,14 +169,14 @@ async function handleForgot(): Promise<void> {
       </button>
     </form>
 
-    <!-- 6. Pill info kecil -->
+    <!-- 6. Small info pill -->
     <div
       class="bg-white rounded-full mt-3 py-2.5 px-4 text-center text-[11px] font-bold text-black shadow-sm"
     >
       10 detik • quota reset tiap hari • gratis
     </div>
 
-    <!-- 7. Footer tanpa kotak -->
+    <!-- 7. Box-less footer -->
     <p class="text-center text-sm font-bold text-black mt-4">
       Belum punya akun?
       <NuxtLink

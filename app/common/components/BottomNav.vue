@@ -1,7 +1,7 @@
-<!-- common/components/BottomNav.vue → Nav bawah E1 Home-Mall-Quiz+-Riwayat-Akun (Addendum docs/24).
-APA: 5 tab max-w-md fixed bottom (aktif lime #A3E635 + dot) + Quiz+ center BUKAN route → sheet 2 intent quota jujur.
-KENAPA: jempol tak sampai header; quota ikut GET /api/quota (gagal = fallback anon fresh 1 • 2, bukan angka bohong).
-Contoh: tap + → sheet → Cari Tempat (sisa 1/1) → /quiz; habis → disabled Besok lagi 00.00. -->
+<!-- common/components/BottomNav.vue → E1 bottom nav Home-Mall-Quiz+-Riwayat-Akun (Addendum docs/24).
+WHAT: 5 tabs in a fixed max-w-md bottom bar (active lime #A3E635 + dot) + Quiz+ in the center is NOT a route → sheet with 2 honest quota intents.
+WHY: thumbs can't reach the header; quota follows GET /api/quota (on failure = fallback to fresh anonymous 1 • 2, not fake numbers).
+EXAMPLE: tap + → sheet → Cari Tempat (remaining 1/1) → /quiz; empty → disabled Besok lagi 00.00. -->
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import QuizPlusSheet from "~/common/components/QuizPlusSheet.vue";
@@ -20,7 +20,7 @@ const LEFT_TABS: NavTab[] = [
   { to: "/mall", label: "Mall", icon: "🏬" },
 ];
 const RIGHT_TABS: NavTab[] = [
-  { to: "/riwayat", label: "Riwayat", icon: "🕒" },
+  { to: "/history", label: "Riwayat", icon: "🕒" },
   { to: "/account", label: "Akun", icon: "👤" },
 ];
 
@@ -31,12 +31,12 @@ const { data: quotaData } = await useFetch<QuotaStatus>("/api/quota");
 const quotaStatus = computed(
   () =>
     quotaData.value ||
-    buildQuotaStatus({ tempatUsed: 0, makanUsed: 0, isLoggedIn: false }),
+    buildQuotaStatus({ placeUsed: 0, foodUsed: 0, isLoggedIn: false }),
 );
-const tempatLeft = computed(() => quotaStatus.value.tempat.remaining);
-const tempatLimit = computed(() => quotaStatus.value.tempat.limit);
-const makanLeft = computed(() => quotaStatus.value.makan.remaining);
-const makanLimit = computed(() => quotaStatus.value.makan.limit);
+const placeLeft = computed(() => quotaStatus.value.place.remaining);
+const placeLimit = computed(() => quotaStatus.value.place.limit);
+const foodLeft = computed(() => quotaStatus.value.food.remaining);
+const foodLimit = computed(() => quotaStatus.value.food.limit);
 
 function go(path: string): void {
   showSheet.value = false;
@@ -108,10 +108,10 @@ function go(path: string): void {
 
   <QuizPlusSheet
     v-if="showSheet"
-    :tempat-left="tempatLeft"
-    :tempat-limit="tempatLimit"
-    :makan-left="makanLeft"
-    :makan-limit="makanLimit"
+    :place-left="placeLeft"
+    :place-limit="placeLimit"
+    :food-left="foodLeft"
+    :food-limit="foodLimit"
     @go="go"
     @close="showSheet = false"
   />

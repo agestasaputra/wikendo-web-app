@@ -1,21 +1,21 @@
 /**
- * features/makan/utils/makanQuiz.ts — Logic murni quiz MAKAN (step awal + hint per pertanyaan).
+ * features/food/utils/foodQuiz.ts — Pure FOOD quiz logic (initial step + hint per question).
  *
- * APA: getMakanStartStep(mallQuery, validSlugs) + getMakanHint(questionId). PURE.
- * KENAPA: user datang dari direktori (?mall=slug-valid) → Q1 (pilih mall) di-skip.
- * Contoh: getMakanStartStep("grand-indonesia", slugs) → 1.
+ * WHAT: getFoodStartStep(mallQuery, validSlugs) + getFoodHint(questionId). PURE.
+ * WHY: a user coming from the directory (?mall=valid-slug) → Q1 (pick mall) is skipped.
+ * EXAMPLE: getFoodStartStep("grand-indonesia", slugs) → 1.
  */
 
-/** Step awal quiz makan: 1 (skip Q1) kalau ?mall= valid, selain itu 0. */
-export function getMakanStartStep(
+/** Food quiz initial step: 1 (skip Q1) if ?mall= is valid, otherwise 0. */
+export function getFoodStartStep(
   mallQuery: string | undefined,
   validSlugs: string[],
 ): number {
   return mallQuery && validSlugs.includes(mallQuery) ? 1 : 0;
 }
 
-/** Hint kecil di bawah header per pertanyaan. */
-export function getMakanHint(questionId: string): string {
+/** Small hint below the header per question. */
+export function getFoodHint(questionId: string): string {
   if (questionId === "mall_slug")
     return "Wajib 1 — biar hasil murni tenant situ";
   if (questionId === "companion") return "Terakhir, janji 😄";

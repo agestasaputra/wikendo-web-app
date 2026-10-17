@@ -1,7 +1,7 @@
-<!-- features/account/AccountPage.vue → GET /account (Hub Akun E1, cermin header AS6).
-APA: hub Akun 2-state anon (Login/Daftar + note 2+5) vs login (avatar initial + nama + email grey + Keluar merah spinner+guard) + 4 baris hub Riwayat/Wishlist Segera/WA/Tentang.
-KENAPA cermin AS6: header sudah punya dropdown, tapi jempol tak sampai header → butuh hub thumb-zone di BottomNav; 1 file ringan tanpa /profile full/foto Google/quota-server (ikut guard Addendum 22).
-Contoh: anon → Login → /login; login Siska → avatar S + siskadptr@gmail.com + Keluar → signOut → / anon. -->
+<!-- features/account/AccountPage.vue → GET /account (Account Hub E1, mirrors the AS6 header).
+WHAT: 2-state Account hub anonymous (Login/Daftar + 2+5 note) vs logged in (avatar initial + name + grey email + red Keluar with spinner+guard) + 4 hub rows Riwayat/Wishlist Segera/WA/Tentang.
+WHY mirrors AS6: the header already has a dropdown, but the thumb can't reach the header → needs a thumb-zone hub in BottomNav; 1 lightweight file without full /profile/Google photo/server quota (follows the Addendum 22 guard).
+Example: anonymous → Login → /login; Budi logged in → avatar S + budi@example.com + Keluar → signOut → / anonymous. -->
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
 import AppSpinner from "~/common/components/AppSpinner.vue";
@@ -31,7 +31,7 @@ async function handleLogout(): Promise<void> {
       <NuxtLink to="/" class="text-gray-500 underline text-xs">Home →</NuxtLink>
     </div>
 
-    <!-- Anon state -->
+    <!-- Anonymous state -->
     <div
       v-if="!isLoggedIn"
       class="rounded-2xl p-4 bg-white border border-stone-200"
@@ -58,7 +58,7 @@ async function handleLogout(): Promise<void> {
       </p>
     </div>
 
-    <!-- Login state -->
+    <!-- Logged-in state -->
     <div v-else class="rounded-2xl p-4 bg-white border border-stone-200">
       <div class="flex gap-3 items-center">
         <div
@@ -85,12 +85,12 @@ async function handleLogout(): Promise<void> {
       </button>
     </div>
 
-    <!-- 4 baris hub LOCKED (urutan Addendum 24): Riwayat/Wishlist Segera/WA/Tentang -->
+    <!-- 4 hub rows LOCKED (Addendum 24 order): Riwayat/Wishlist Segera/WA/Tentang -->
     <div
       class="rounded-2xl bg-white border border-stone-200 mt-3 overflow-hidden"
     >
       <NuxtLink
-        to="/riwayat"
+        to="/history"
         class="flex justify-between items-center px-4 py-3.5 font-extrabold text-[13px] hover:bg-stone-50 border-b border-stone-100"
       >
         <span>🕒 Riwayat</span><span class="text-gray-400">→</span>

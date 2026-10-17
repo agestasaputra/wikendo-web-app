@@ -1,7 +1,7 @@
-<!-- features/auth/components/PasswordField.vue → Field password pill + toggle intip (SVG Heroicons, type=button, aria-label).
-APA: ikon 🔒 + input type dinamis + tombol mata kanan; slot "trailing" untuk elemen tambahan (mis. link Lupa? di login).
-KENAPA: user harus bisa cek typo sebelum submit (turunin gagal login). Pattern standar: toggle ujung kanan, anti-submit, a11y.
-Contoh: <PasswordField v-model="password"><template #trailing>…Lupa?…</template></PasswordField> -->
+<!-- features/auth/components/PasswordField.vue → Pill password field + peek toggle (Heroicons SVG, type=button, aria-label).
+WHAT: 🔒 icon + dynamic-type input + right eye button; "trailing" slot for extra elements (e.g. the Lupa? link in login).
+WHY: user must be able to check typos before submit (cuts failed logins). Standard pattern: end-right toggle, anti-submit, a11y.
+EXAMPLE: <PasswordField v-model="password"><template #trailing>…Lupa?…</template></PasswordField> -->
 <script setup lang="ts">
 import { ref } from "vue";
 

@@ -2,35 +2,35 @@ import { describe, it, expect } from "vitest";
 import { readSource, sourceExists } from "~/test/utils";
 
 /**
- * MakanResultPage.spec.ts — Result MAKAN: voucher gift di hero (11 Okt) + multi-voucher V13A/B (Gas v13)
- * + riwayat E1 + Coba lagi. File-assert deterministik: NOL network, NOL browser.
- * V13A hero best-1 + link +2 promo → sheet. V13B sheet pilih 1 dari 3 + Klaim per row + spinner + guard.
+ * FoodResultPage.spec.ts — FOOD result: voucher gift in hero (Oct 11) + multi-voucher V13A/B (Gas v13)
+ * + E1 history + Coba lagi. Deterministic file-assert: ZERO network, ZERO browser.
+ * V13A hero best-1 + "+2 promo lain" link → sheet. V13B sheet pick 1 of 3 + Klaim per row + spinner + guard.
  */
-const PAGE = readSource("features/makan/MakanResultPage.vue");
-const SHEET = readSource("features/makan/components/VoucherSheet.vue");
+const PAGE = readSource("features/food/FoodResultPage.vue");
+const SHEET = readSource("features/food/components/VoucherSheet.vue");
 const VIEW = `${PAGE} ${SHEET}`;
 const ALL = readSource(
-  "features/makan/MakanResultPage.vue",
-  "features/makan/components/VoucherSheet.vue",
-  "features/makan/constants/questions.ts",
+  "features/food/FoodResultPage.vue",
+  "features/food/components/VoucherSheet.vue",
+  "features/food/constants/questions.ts",
   "common/components/AppSpinner.vue",
 );
 const ERR = readSource("common/components/ResultError.vue");
-const STORE = readSource("features/makan/store/VoucherStore.ts");
+const STORE = readSource("features/food/store/VoucherStore.ts");
 
 function count(hay: string, needle: string): number {
   return hay.split(needle).length - 1;
 }
 
-describe("result-makan voucher — tiket atas dihapus", () => {
-  it("TIDAK ada tiket dashed: tanpa VOUCHER + Klaim → + tunjukin ke kasir + dashed", () => {
+describe("result-food voucher — top ticket removed", () => {
+  it("NO dashed ticket: no VOUCHER, no 'Klaim →', no 'tunjukin ke kasir', no dashed", () => {
     expect(VIEW).not.toContain("VOUCHER");
     expect(VIEW).not.toContain("Klaim →");
     expect(VIEW).not.toContain("tunjukin ke kasir");
     expect(VIEW).not.toContain("dashed");
   });
 
-  it("ADA banner gift di dalam hero: Ada -20% buat lu + Buka + vGift", () => {
+  it("HAS gift banner inside hero: 'Ada' '-20%' 'buat lu' + 'Buka →' + vGift", () => {
     expect(PAGE).toContain("Ada");
     expect(PAGE).toContain("-20%");
     expect(PAGE).toContain("buat lu");
@@ -39,11 +39,11 @@ describe("result-makan voucher — tiket atas dihapus", () => {
     expect(PAGE).toMatch(/getVoucherCardMeta\(["']gift["']\)/);
   });
 
-  it("HANYA 1 voucher: Buka → muncul tepat 1x (bawah bersih)", () => {
+  it("ONLY 1 voucher: 'Buka →' appears exactly 1x (clean bottom)", () => {
     expect(count(VIEW, "Buka →")).toBe(1);
   });
 
-  it("Hero tetap utuh: BEST MATCH + Maps tenant + rank + Coba lagi", () => {
+  it("Hero stays intact: BEST MATCH + tenant Maps + rank + Coba lagi", () => {
     expect(PAGE).toContain("BEST MATCH");
     expect(PAGE).toContain("Maps tenant →");
     expect(PAGE).toContain("#{{ i + 1 }}");
@@ -52,25 +52,25 @@ describe("result-makan voucher — tiket atas dihapus", () => {
   });
 });
 
-describe("V13A hero best-1 + link +2 promo", () => {
-  it("ADA link +2 promo lain pemicu sheet", () => {
+describe("V13A hero best-1 + '+2 promo' link", () => {
+  it("HAS a '+2 promo lain' link triggering the sheet", () => {
     expect(PAGE).toContain("+2 promo lain");
   });
 
-  it("ADA state sheet (showSheet)", () => {
+  it("HAS sheet state (showSheet)", () => {
     expect(PAGE.toLowerCase()).toContain("sheet");
     expect(PAGE).toMatch(/showSheet|sheetOpen|sheet/);
   });
 });
 
-describe("V13B sheet picker 3 row + Klaim API", () => {
-  it("ADA judul pilih 1 + aturan 1 transaksi 1 kode + 23:59", () => {
+describe("V13B sheet picker 3 rows + Klaim API", () => {
+  it("HAS a 'Pilih 1' title + '1 transaksi 1 kode' rule + 23:59", () => {
     expect(ALL).toContain("Pilih 1");
     expect(ALL).toContain("1 transaksi 1 kode");
     expect(ALL).toContain("23:59");
   });
 
-  it("ADA 3 kode seed WKD-7X2K9A/4Y5B3C/L8M2N1 atau sisa cap per row", () => {
+  it("HAS 3 seed codes WKD-7X2K9A/4Y5B3C/L8M2N1 or remaining cap per row", () => {
     const hasCodes =
       ALL.includes("WKD-7X2K9A") &&
       ALL.includes("WKD-4Y5B3C") &&
@@ -79,7 +79,7 @@ describe("V13B sheet picker 3 row + Klaim API", () => {
     expect(hasCodes || hasCap).toBe(true);
   });
 
-  it("ADA tombol Klaim per row (tanpa panah, beda dari Buka)", () => {
+  it("HAS Klaim button per row (no arrow, different from Buka)", () => {
     expect(VIEW).toContain("Klaim");
     expect(VIEW).not.toContain("Klaim →");
   });
@@ -96,16 +96,16 @@ describe("V13B sheet picker 3 row + Klaim API", () => {
     expect(STORE).toMatch(/authorization|Bearer|access_token|getSession/i);
   });
 
-  it("ADA store VoucherStore dengan claimVoucher", () => {
-    expect(sourceExists("features/makan/store/VoucherStore.ts")).toBe(true);
+  it("HAS a VoucherStore store with claimVoucher", () => {
+    expect(sourceExists("features/food/store/VoucherStore.ts")).toBe(true);
     expect(STORE).toContain("claimVoucher");
     expect(STORE).toContain("/api/voucher/claim");
   });
 });
 
-describe("E1 result makan tulis riwayat", () => {
-  it("push ke HistoryStore pas data sukses (kind makan)", () => {
+describe("E1 food result writes history", () => {
+  it("pushes to HistoryStore on success (kind food)", () => {
     expect(PAGE).toContain("useHistoryStore");
-    expect(PAGE).toMatch(/kind:\s*["']makan["']/);
+    expect(PAGE).toMatch(/kind:\s*["']food["']/);
   });
 });

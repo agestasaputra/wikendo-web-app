@@ -1,7 +1,7 @@
-// vitest.config.ts — Config unit test: environment happy-dom (simulasi browser ringan).
-// Pola test: co-located `**/__tests__/*.spec.ts` (sibling dgn source). Alias ~ / ~~ = root app/
-// supaya import `~/common/...` dari source bisa di-resolve tanpa plugin Nuxt.
-// Perintah: pnpm test (sekali) / pnpm test:watch / pnpm test:related.
+// vitest.config.ts — Unit test config: happy-dom environment (lightweight browser simulation).
+// Test pattern: co-located `**/__tests__/*.spec.ts` (sibling of the source). Alias ~ / ~~ = app/ root
+// so that `~/common/...` imports from source can be resolved without the Nuxt plugin.
+// Commands: pnpm test (once) / pnpm test:watch / pnpm test:related.
 import { fileURLToPath } from "node:url";
 import { defineConfig } from "vitest/config";
 

@@ -1,45 +1,46 @@
 /**
- * features/makan/utils/resultHero.ts — Data kartu hasil MAKAN (hero, chips, rank #1-3).
+ * features/food/utils/resultHero.ts — FOOD result card data (hero, chips, rank #1-3).
  *
- * APA: buildMakanHero(rec), buildMakanChips(list), buildRankItems(list). PURE.
- * KENAPA: dulu computed panjang di halaman → dipisah supaya testable + mudah dibaca.
- * Contoh: buildMakanHero(undefined).name → "—".
+ * WHAT: buildFoodHero(rec), buildFoodChips(list), buildRankItems(list). PURE.
+ * WHY: previously a long computed on the page → split out so it's testable + easier to read.
+ * EXAMPLE: buildFoodHero(undefined).name → "—".
  */
 import type { TenantRecommendation } from "~/common/types/api";
-import type { MakanHero, RankItem } from "../@types/makan";
+import { formatPriceRange } from "~/utils/price";
+import type { FoodHero, RankItem } from "../@types/food";
 
-/** Halal tri-state → kata (null = belum verifikasi ❓). */
+/** Halal tri-state → word (null = not yet verified ❓). */
 function halalWord(halal: boolean | null | undefined): string {
   if (halal === true) return "Halal";
   if (halal === false) return "Non-halal";
   return "❓";
 }
 
-/** 1 rekomendasi (boleh kosong) → data hero. Field kosong = "—"/"?". */
-export function buildMakanHero(
+/** 1 recommendation (may be empty) → hero data. Empty field = "—"/"?". */
+export function buildFoodHero(
   rec: Partial<TenantRecommendation> | undefined,
-): MakanHero {
+): FoodHero {
   const r = rec ?? {};
   return {
     name: r.name || "—",
     reason: r.reason || "—",
-    price: r.price_range || "—",
-    floor: r.lantai || "?",
+    price: formatPriceRange(r.price_min, r.price_max) || "—",
+    floor: r.floor || "?",
     halal: r.halal ?? null,
     kids: r.kids_friendly ? "👶 kids" : "—",
     maps: r.maps_url || "#",
   };
 }
 
-/** 2 chip preview (rekomendasi ke-2 & ke-3), nama dipotong 6 huruf. */
-export function buildMakanChips(list: TenantRecommendation[]): string[] {
+/** 2 chip previews (2nd & 3rd recommendations), name truncated to 6 chars. */
+export function buildFoodChips(list: TenantRecommendation[]): string[] {
   return list.slice(1, 3).map((r) => (r.name || "").slice(0, 6).trim() + "...");
 }
 
-/** Rank #1-3: nama + tag (halal · lantai · promo · alasan 28 huruf). */
+/** Rank #1-3: name + tags (halal · floor · promo · reason 28 chars). */
 export function buildRankItems(list: TenantRecommendation[]): RankItem[] {
   return list.slice(0, 3).map((r) => ({
     name: r.name || "—",
-    tags: `${halalWord(r.halal)} · L${r.lantai || "?"} · -20% · ${(r.reason || "").slice(0, 28)}`,
+    tags: `${halalWord(r.halal)} · L${r.floor || "?"} · -20% · ${(r.reason || "").slice(0, 28)}`,
   }));
 }

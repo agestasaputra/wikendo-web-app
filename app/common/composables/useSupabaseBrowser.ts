@@ -1,10 +1,10 @@
 /**
- * common/composables/useSupabaseBrowser.ts — Client Supabase BROWSER (anon key, aman ke browser).
+ * common/composables/useSupabaseBrowser.ts — BROWSER Supabase client (anon key, safe for the browser).
  *
- * APA: singleton createClient pakai runtimeConfig.public (supabaseUrl + supabaseAnonKey).
- * KENAPA: auth dari browser (signIn, OAuth, reset password). BEDA dgn server/utils/db.ts
- *   (service key, server-only — dilarang diimport dari kode browser, lihat eslint.config.mjs).
- * Contoh: const sb = useSupabaseBrowser(); await sb.auth.signInWithPassword({ email, password })
+ * WHAT: singleton createClient using runtimeConfig.public (supabaseUrl + supabaseAnonKey).
+ * WHY: auth from the browser (signIn, OAuth, reset password). DIFFERENT from server/utils/db.ts
+ *   (service key, server-only — importing it from browser code is forbidden, see eslint.config.mjs).
+ * EXAMPLE: const sb = useSupabaseBrowser(); await sb.auth.signInWithPassword({ email, password })
  */
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 

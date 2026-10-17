@@ -1,13 +1,13 @@
 /**
- * features/home/utils/homeHero.ts — Token hero home I17 V2 Ember P1 (slicing dari screenshot V2).
+ * features/home/utils/homeHero.ts — Hero token for home I17 V2 Ember P1 (sliced from the V2 screenshot).
  *
- * APA: getHomeHeroMeta() → warna hero. PURE (tanpa baca route/state).
- * KENAPA: 1 sumber kebenaran, bukan hardcode hex di template HomePage.
- * Contoh: getHomeHeroMeta().strip → "#EA580C".
+ * WHAT: getHomeHeroMeta() → hero colors. PURE (reads no route/state).
+ * WHY: single source of truth, not hardcoded hex in the HomePage template.
+ * Example: getHomeHeroMeta().strip → "#EA580C".
  */
 import type { HomeHeroMeta } from "../@types/home";
 
-/** Meta hero home: I17 V2 Ember P1 lock (strip ember, bukan orange I2). */
+/** Home hero meta: I17 V2 Ember P1 lock (ember strip, not the orange I2). */
 export function getHomeHeroMeta(): HomeHeroMeta {
   return {
     headBg: "#0C0A09",

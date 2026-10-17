@@ -1,8 +1,8 @@
-<!-- features/home/HomePage.vue → GET / (Home Superapp I17 V2 Ember P1, slicing full dari screenshot V2).
-APA: header sapaan + hero quota ink strip ember + 2 CTA ink + 4 ikon + rekomendasi + AI + riwayat.
-KENAPA: tugas home cuma 1 — dorong landing→quiz >40% (PRD §4). Hero = scarcity jujur ikut GET /api/quota.
-Contoh: quota real di-wire ke GET /api/quota (endpoint server/api/quota.get.ts); loading = skeleton, error = fallback 1 • 2.
-Token via getHomeHeroMeta(): ink #0C0A09 + strip ember #EA580C + angka #D9F99D + pill lime #A3E635. -->
+<!-- features/home/HomePage.vue → GET / (Home Superapp I17 V2 Ember P1, full slice from the V2 screenshot).
+WHAT: greeting header + quota hero ink with ember strip + 2 ink CTAs + 4 icons + recommendations + AI + history.
+WHY: home has only 1 job — push landing→quiz >40% (PRD §4). Hero = honest scarcity following GET /api/quota.
+EXAMPLE: real quota is wired to GET /api/quota (server/api/quota.get.ts endpoint); loading = skeleton, error = fallback 1 • 2.
+Tokens via getHomeHeroMeta(): ink #0C0A09 + ember strip #EA580C + number #D9F99D + lime pill #A3E635. -->
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
 import { useAuthStore } from "~/common/store/AuthStore";
@@ -10,9 +10,9 @@ import type { QuotaStatus } from "~/common/types/quota";
 import { buildQuotaStatus, buildWalletLabel } from "~/common/utils/quota";
 import { getHomeHeroMeta } from "~/features/home/utils/homeHero";
 
-// Auth-state AS6 wallet-card: anon 1:1, login greeting Halo {displayName} + sub Sisa kamu.
+// Auth-state AS6 wallet-card: anonymous 1:1, logged-in greeting Halo {displayName} + Sisa kamu sub.
 const { isLoggedIn, displayName, initial } = storeToRefs(useAuthStore());
-// SEO Home: GEO-friendly (og + description ID). Direktori /mall/:slug nyusul slice-4.
+// Home SEO: GEO-friendly (og + description ID). /mall/:slug directory comes later in slice-4.
 useHead({
   title: "Wikendo — Bingung Weekend Mau Kemana?",
   meta: [
@@ -32,9 +32,9 @@ useHead({
     },
   ],
 });
-// Token hero I17 V2 Ember P1 — 1 sumber kebenaran, bukan hardcode hex di template.
+// Hero tokens I17 V2 Ember P1 — single source of truth, not hardcoded hex in the template.
 const hero = getHomeHeroMeta();
-// Quota real: GET /api/quota (cookie anon). Gagal fetch = fallback anon fresh (1 • 2), bukan angka bohong register.
+// Real quota: GET /api/quota (anonymous cookie). Failed fetch = fresh anonymous fallback (1 • 2), not a fake register number.
 const {
   data: quotaData,
   pending: quotaPending,
@@ -43,14 +43,14 @@ const {
 const quotaStatus = computed(
   () =>
     quotaData.value ||
-    buildQuotaStatus({ tempatUsed: 0, makanUsed: 0, isLoggedIn: false }),
+    buildQuotaStatus({ placeUsed: 0, foodUsed: 0, isLoggedIn: false }),
 );
 const wallet = computed(() => buildWalletLabel(quotaStatus.value));
 </script>
 
 <template>
   <div class="max-w-md mx-auto px-4 pb-10" :style="{ background: hero.pageBg }">
-    <!-- Header sapaan — AS6 wallet-card: anon 1:1 (👦 + teman Wikendo), login avatar initial + Halo {displayName} + sub Sisa kamu -->
+    <!-- Greeting header — AS6 wallet-card: anonymous 1:1 (👦 + teman Wikendo), logged in avatar initial + Halo {displayName} + Sisa kamu sub -->
     <div class="flex justify-between items-center font-bold text-sm py-3">
       <span class="flex items-center gap-2">
         <span
@@ -68,7 +68,7 @@ const wallet = computed(() => buildWalletLabel(quotaStatus.value));
       Sisa kamu: {{ quotaPending ? "…" : wallet.headline }}
     </p>
 
-    <!-- Hero QUOTA HARI INI — ink + strip ember V2 + watermark dadu -->
+    <!-- QUOTA HARI INI hero — ink + ember strip V2 + dice watermark -->
     <div
       class="rounded-2xl p-3 text-white relative overflow-hidden"
       :style="{
@@ -95,11 +95,11 @@ const wallet = computed(() => buildWalletLabel(quotaStatus.value));
       <div class="flex gap-1.5 mt-2">
         <span
           class="flex-1 rounded-lg px-1 py-1.5 text-center text-[10px] font-extrabold bg-white/10"
-          >👥 {{ quotaPending ? "…" : wallet.tempatChip }}</span
+          >👥 {{ quotaPending ? "…" : wallet.placeChip }}</span
         >
         <span
           class="flex-1 rounded-lg px-1 py-1.5 text-center text-[10px] font-extrabold bg-white/10"
-          >🍜 {{ quotaPending ? "…" : wallet.makanChip }}</span
+          >🍜 {{ quotaPending ? "…" : wallet.foodChip }}</span
         >
       </div>
       <NuxtLink
@@ -120,7 +120,7 @@ const wallet = computed(() => buildWalletLabel(quotaStatus.value));
       >
     </div>
 
-    <!-- 2 CTA gede ink — thumb-zone min 56px -->
+    <!-- 2 big ink CTAs — thumb-zone min 56px -->
     <div class="grid grid-cols-2 gap-1.5 mt-2">
       <NuxtLink
         to="/quiz"
@@ -134,7 +134,7 @@ const wallet = computed(() => buildWalletLabel(quotaStatus.value));
         🗺️<br />Cari Tempat<br /><small class="font-normal">quiz 30 dtk</small>
       </NuxtLink>
       <NuxtLink
-        to="/makan"
+        to="/food"
         class="rounded-xl p-2.5 font-extrabold text-[10.5px] text-center leading-snug"
         :style="{
           background: hero.ctaBg,
@@ -146,7 +146,7 @@ const wallet = computed(() => buildWalletLabel(quotaStatus.value));
       </NuxtLink>
     </div>
 
-    <!-- 4 ikon cepat -->
+    <!-- 4 quick icons -->
     <div class="grid grid-cols-4 gap-1.5 mt-2">
       <NuxtLink to="/mall" class="text-center text-[9.5px] font-extrabold"
         ><i
@@ -174,7 +174,7 @@ const wallet = computed(() => buildWalletLabel(quotaStatus.value));
       >
     </div>
 
-    <!-- Rekomendasi buatmu -->
+    <!-- Recommendations for you -->
     <div
       class="mt-2 rounded-xl px-2.5 py-2.5 bg-white shadow"
       :style="{ background: hero.cardBg }"
@@ -215,7 +215,7 @@ const wallet = computed(() => buildWalletLabel(quotaStatus.value));
       </div>
     </div>
 
-    <!-- Asisten AI -->
+    <!-- AI assistant -->
     <div
       class="flex gap-2 items-center mt-2 rounded-[14px] p-2.5 bg-white shadow"
       :style="{ background: hero.cardBg }"
@@ -233,7 +233,7 @@ const wallet = computed(() => buildWalletLabel(quotaStatus.value));
       <span class="text-sm font-extrabold">→</span>
     </div>
 
-    <!-- Mall Terdekat (M3 entrypoint direktori, lock M1+M3 9 Okt) -->
+    <!-- Nearest Mall (M3 directory entrypoint, lock M1+M3 Oct 9) -->
     <NuxtLink
       to="/mall"
       class="flex gap-2 items-center mt-2 rounded-[14px] p-2.5 bg-white shadow"
@@ -252,7 +252,7 @@ const wallet = computed(() => buildWalletLabel(quotaStatus.value));
       <span class="text-sm font-extrabold">→</span>
     </NuxtLink>
 
-    <!-- Terakhir dilihat -->
+    <!-- Recently viewed -->
     <div
       class="mt-2 rounded-xl px-2.5 py-2.5 bg-white shadow text-[10.5px]"
       :style="{ background: hero.cardBg }"

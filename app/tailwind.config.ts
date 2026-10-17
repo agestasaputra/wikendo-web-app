@@ -1,10 +1,10 @@
-// tailwind.config.ts — Token brand KOMBO 5+10+15 (Addendum 09 v1.3 APPROVED).
-// Base hangat #fffdf9, Orange tempat #f97316, Merah makan #ee2c4b, wallet teal #0e7490, teks #18181b.
-// Pakai sebagai class (bg-base, bg-tempat, bg-makan, bg-wallet, text-ink). Font Plus Jakarta Sans via nuxt.config head.
+// tailwind.config.ts — KOMBO 5+10+15 brand tokens (Addendum 09 v1.3 APPROVED).
+// Warm base #fffdf9, place orange #f97316, food red #ee2c4b, wallet teal #0e7490, ink #18181b.
+// Use as a class (bg-base, bg-place, bg-food, bg-wallet, text-ink). Font Plus Jakarta Sans via the nuxt.config head.
 /** @type {import('tailwindcss').Config} */
 export default {
-  // Template hidup di features/ + common/ (bukan folder default Nuxt) → WAJIB didaftarkan,
-  // kalau tidak Tailwind membuang semua class di sana (desain polos tanpa style).
+  // Templates live in features/ + common/ (not Nuxt's default folders) → MUST be registered,
+  // if not Tailwind discards every class there (plain design with no styling).
   content: [
     "./features/**/*.{vue,ts}",
     "./common/**/*.{vue,ts}",
@@ -21,8 +21,8 @@ export default {
           DEFAULT: "#f97316",
         },
         base: "#fffdf9",
-        tempat: "#f97316",
-        makan: "#ee2c4b",
+        place: "#f97316",
+        food: "#ee2c4b",
         wallet: "#0e7490",
         ink: "#18181b",
       },

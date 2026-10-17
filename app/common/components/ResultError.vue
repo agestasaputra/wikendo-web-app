@@ -1,7 +1,7 @@
-<!-- common/components/ResultError.vue → Kotak error hasil rekomendasi (wall quota vs error biasa).
-APA: isWall = kotak orange "Quota habis → Login"; selain itu kotak merah + pesan + tombol Coba lagi (disabled saat pending).
-KENAPA: result tempat + result makan identik kecuali teks wall → 1 komponen; teks wall lewat prop.
-Contoh: <ResultError :is-wall="isWall" :message="errorMessage" :pending="pending" wall-text="..." @retry="refresh()" /> -->
+<!-- common/components/ResultError.vue → Recommendation result error box (quota wall vs regular error).
+WHAT: isWall = orange box "Quota habis → Login"; otherwise red box + message + "Coba lagi" button (disabled while pending).
+WHY: place result + food result are identical except the wall text → 1 component; wall text via prop.
+EXAMPLE: <ResultError :is-wall="isWall" :message="errorMessage" :pending="pending" wall-text="..." @retry="refresh()" /> -->
 <script setup lang="ts">
 defineProps<{
   isWall: boolean;

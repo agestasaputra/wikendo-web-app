@@ -1,10 +1,10 @@
 /**
- * POST /api/voucher/claim — Klaim voucher (S1-S4 Gas v13, fix skema real 13 Okt 2026).
+ * POST /api/voucher/claim — Claim voucher (S1-S4 Gas v13, real schema fix 13 Oct 2026).
  *
- * APA: auth guard 401 → cek vouchers aktif/expired → anti-farming UNIQUE(user,tenant,hari)
- *   + rate-limit 3/hari (global) → dual-write voucher_claims (kolom lama+baru) → countdown 23:59 WIB.
- * KENAPA tipis: tiap langkah = fungsi di server/utils/voucherClaim.ts (batas ukuran fungsi + testable).
- * Contoh: POST {voucher_code:'WKD-7X2K9A'} + Bearer valid → 200 {claim_code, expires_at, time_remaining}.
+ * WHAT: 401 auth guard → check active/expired vouchers → anti-farming UNIQUE(user,tenant,day)
+ *   + 3/day rate limit (global) → dual-write voucher_claims (old+new columns) → 23:59 WIB countdown.
+ * WHY thin: each step = a function in server/utils/voucherClaim.ts (function size limit + testable).
+ * EXAMPLE: POST {voucher_code:'WKD-7X2K9A'} + valid Bearer → 200 {claim_code, expires_at, time_remaining}.
  *
  * Response:
  *   200: { status: "ok", claim_code, expires_at, voucher, time_remaining }

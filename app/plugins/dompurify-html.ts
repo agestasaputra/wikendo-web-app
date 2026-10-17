@@ -1,10 +1,10 @@
 /**
- * plugins/dompurify-html.ts — Direktif `v-dompurify-html` (sanitasi HTML, anti-XSS).
+ * plugins/dompurify-html.ts — `v-dompurify-html` directive (HTML sanitization, anti-XSS).
  *
- * APA: registrasi vue-dompurify-html ke Vue app.
- * KENAPA: `v-html` DILARANG (ESLint vue/no-v-html = error). Kalau benar-benar butuh render HTML
- *   dinamis, pakai `v-dompurify-html` supaya input disanitasi (OWASP A03 Injection/XSS).
- * Contoh: <div v-dompurify-html="htmlDariApi" />
+ * WHAT: registers vue-dompurify-html on the Vue app.
+ * WHY: `v-html` is FORBIDDEN (ESLint vue/no-v-html = error). If you truly need to render dynamic
+ *   HTML, use `v-dompurify-html` so the input is sanitized (OWASP A03 Injection/XSS).
+ * EXAMPLE: <div v-dompurify-html="htmlDariApi" />
  */
 import VueDOMPurifyHTML from "vue-dompurify-html";
 

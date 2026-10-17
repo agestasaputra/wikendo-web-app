@@ -1,10 +1,10 @@
-<!-- features/makan/components/VoucherSheet.vue → Sheet picker V13B: pilih 1 dari 3 promo + sisa cap + Klaim per row.
-APA: panel di atas hasil: judul tenant, aturan "1 transaksi 1 kode · s/d 23:59 WIB", 3 row (nama, min, sisa cap, tombol Klaim + spinner), Tutup.
-KENAPA: dipisah dari MakanResultPage supaya halaman tipis. Klaim WAJIB login (anti-farming, 401 di server).
-Contoh: <VoucherSheet :vouchers="vouchers" hero-name="Kopi" :claiming="claiming" :claiming-code="code" @claim="claimRow" @close="close" /> -->
+<!-- features/food/components/VoucherSheet.vue → V13B sheet picker: pick 1 of 3 promos + remaining cap + Claim per row.
+WHAT: panel above the result: tenant title, rule "1 transaksi 1 kode · s/d 23:59 WIB", 3 rows (name, min, remaining cap, Claim button + spinner), Tutup.
+WHY: split from FoodResultPage so the page stays thin. Claim REQUIRES login (anti-farming, 401 on the server).
+EXAMPLE: <VoucherSheet :vouchers="vouchers" hero-name="Kopi" :claiming="claiming" :claiming-code="code" @claim="claimRow" @close="close" /> -->
 <script setup lang="ts">
 import AppSpinner from "~/common/components/AppSpinner.vue";
-import type { VoucherItem } from "~/features/makan/@types/makan";
+import type { VoucherItem } from "~/features/food/@types/food";
 
 defineProps<{
   vouchers: VoucherItem[];

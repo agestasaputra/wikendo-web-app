@@ -1,7 +1,7 @@
-<!-- common/components/AppHeader.vue → Header GLOBAL sticky 2-state AS6 wallet-card (Addendum 22 APPROVED).
-APA: anon = Login/Register; login = avatar initial + Bell + dropdown (email, Riwayat, Wishlist Segera, Keluar).
-KENAPA: dulu blok ini hidup di app.vue; dipisah supaya layout tipis + header testable. State dari AuthStore (Pinia).
-Contoh: dipasang sekali di app.vue di atas <NuxtPage />. -->
+<!-- common/components/AppHeader.vue → GLOBAL sticky 2-state header, AS6 wallet-card (Addendum 22 APPROVED).
+WHAT: anonymous = Login/Register; logged in = avatar initial + Bell + dropdown (email, Riwayat, Wishlist Segera, Keluar).
+WHY: this block previously lived in app.vue; split out so the layout stays thin + the header is testable. State from AuthStore (Pinia).
+EXAMPLE: mounted once in app.vue above <NuxtPage />. -->
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
 import AppSpinner from "~/common/components/AppSpinner.vue";
@@ -17,7 +17,7 @@ function toggleMenu(): void {
   showMenu.value = !showMenu.value;
 }
 
-// Logout real: signOut Supabase → tutup menu → balik / sebagai anon. Guard anti double-klik + spinner Keluar.
+// Real logout: Supabase signOut → close menu → back to / as anonymous. Anti double-click guard + "Keluar" spinner.
 async function handleLogout(): Promise<void> {
   if (loggingOut.value) return;
   loggingOut.value = true;
@@ -81,7 +81,7 @@ async function handleLogout(): Promise<void> {
           🔔
         </button>
       </div>
-      <!-- Dropdown mini AS6 wallet-card: email grey + Riwayat + Wishlist (Segera) + Keluar merah. -->
+      <!-- AS6 wallet-card mini dropdown: grey email + Riwayat + Wishlist (Segera) + red Keluar. -->
       <div
         v-if="isLoggedIn && showMenu"
         class="absolute right-4 top-full mt-1 w-56 rounded-xl bg-white shadow-lg border border-stone-200 py-2 z-50"

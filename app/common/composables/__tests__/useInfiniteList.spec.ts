@@ -1,12 +1,12 @@
 /**
- * common/composables/__tests__/useInfiniteList.spec.ts — Test composable infinity scroll (fetch mock).
- * Spec S2b: 10/page, reset ganti filter, array legacy tidak crash.
+ * common/composables/__tests__/useInfiniteList.spec.ts — Infinite scroll composable test (mocked fetch).
+ * Spec S2b: 10/page, reset on filter change, legacy array doesn't crash.
  */
 import { describe, it, expect, vi } from "vitest";
 import { useInfiniteList } from "../useInfiniteList";
 
-describe("useInfiniteList (composable, fetch mock)", () => {
-  it("start() isi page-1 + hasMore true (40 tenant, 10/page)", async () => {
+describe("useInfiniteList (composable, mocked fetch)", () => {
+  it("start() fills page 1 + hasMore true (40 tenants, 10/page)", async () => {
     const fetchPage = vi.fn(async (limit: number, offset: number) => ({
       items: Array.from({ length: limit }, (_, i) => ({
         slug: `m${offset + i}`,
@@ -25,7 +25,7 @@ describe("useInfiniteList (composable, fetch mock)", () => {
     expect(list.hasMore.value).toBe(true);
   });
 
-  it("loadMore() append 10 → 20/40; respons array legacy → hasMore false", async () => {
+  it("loadMore() appends 10 → 20/40; legacy array response → hasMore false", async () => {
     const fetchPage = vi.fn(async (limit: number, offset: number) => ({
       items: Array.from({ length: 10 }, (_, i) => ({ slug: `m${offset + i}` })),
       total: 40,
@@ -39,7 +39,7 @@ describe("useInfiniteList (composable, fetch mock)", () => {
     await list.start();
     await list.loadMore();
     expect(list.items.value).toHaveLength(20);
-    // Array legacy (API tanpa ?limit) → dibungkus, hasMore false, tidak crash.
+    // Legacy array (API without ?limit) → wrapped, hasMore false, no crash.
     const legacy = useInfiniteList({
       fetchPage: async () => [{ slug: "x" }] as { slug: string }[],
     });
@@ -48,7 +48,7 @@ describe("useInfiniteList (composable, fetch mock)", () => {
     expect(legacy.hasMore.value).toBe(false);
   });
 
-  it("reset() buang page lama + muat ulang dari 0 (ganti filter)", async () => {
+  it("reset() drops old pages + reloads from 0 (filter change)", async () => {
     let mode = "a";
     const fetchPage = vi.fn(async () => ({
       items: [{ slug: mode }],

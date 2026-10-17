@@ -1,7 +1,7 @@
-<!-- features/auth/components/GoogleButton.vue → Tombol "Lanjutkan dengan Google" (outline resmi + logo G 4-warna, Opsi A board v10).
-APA: outline abu #DADCE0 (bukan solid-putih kembaran form) + logo G resmi + spinner "Menghubungkan…" saat loading.
-KENAPA: login + register satu keluarga auth — tampilan SAMA; border #DADCE0 + G resmi patuh branding Google, CTA hitam tetap satu-satunya solid.
-Contoh: <GoogleButton :loading="googleLoading" :disabled="loading || googleLoading" @click="handleGoogle" /> -->
+<!-- features/auth/components/GoogleButton.vue → "Lanjutkan dengan Google" button (official outline + 4-color G logo, Option A board v10).
+WHAT: gray outline #DADCE0 (not the solid-white twin of the form) + official G logo + "Menghubungkan…" spinner while loading.
+WHY: login + register are one auth family — SAME look; border #DADCE0 + official G comply with Google branding, the black CTA stays the only solid one.
+EXAMPLE: <GoogleButton :loading="googleLoading" :disabled="loading || googleLoading" @click="handleGoogle" /> -->
 <script setup lang="ts">
 import AppSpinner from "~/common/components/AppSpinner.vue";
 

@@ -1,9 +1,9 @@
 <!-- features/auth/RegisterPage.vue → GET /register (Auth page, Addendum 09 v1.3 APPROVED).
-  APA: slicing 100% image img_19a0ea1cfdcf — banner hitam DAFTAR GRATIS 2•5 + Lanjutkan dengan Google + Email + Password (toggle intip SVG + meter bar di bawah field) + checkbox + Daftar →.
-  KENAPA: user klik Register di topbar global → lihat benefit quota full + bisa daftar via Supabase (email atau Google 1-klik).
-  Banner 1:1 R1 lock v9 (ink #0C0A09 + strip ember #EA580C + angka #D9F99D 17px + radius 12px + font 10px kiri).
-  TAKEOUT 10 Okt 2026 (request Agesta): field Nama dihapus — user hanya isi Email + Password.
-  Contoh: anon lihat 2 • 5 → Lanjutkan dengan Google / isi Email+Password → Daftar → home. -->
+  WHAT: 100% slice of image img_19a0ea1cfdcf — black DAFTAR GRATIS 2•5 banner + Lanjutkan dengan Google + Email + Password (SVG peek toggle + meter bar below the field) + checkbox + Daftar →.
+  WHY: user clicks Register in the global topbar → sees the full-quota benefit + can register via Supabase (email or 1-click Google).
+  Banner 1:1 R1 lock v9 (ink #0C0A09 + ember strip #EA580C + number #D9F99D 17px + radius 12px + font 10px left).
+  TAKEOUT 10 Oct 2026 (Agesta request): Nama field removed — user only fills Email + Password.
+  EXAMPLE: anonymous sees 2 • 5 → Lanjutkan dengan Google / fill Email+Password → Daftar → home. -->
 <script setup lang="ts">
 import AppSpinner from "~/common/components/AppSpinner.vue";
 import { useSupabaseBrowser } from "~/common/composables/useSupabaseBrowser";
@@ -23,9 +23,9 @@ import {
 
 const router = useRouter();
 const route = useRoute();
-// SSR-safe: useRoute, bukan router.currentRoute (pitfall 500 Vercel).
-// Google Auth satu pintu (11 Okt 2026): hormati ?redirect= kayak login —
-// user dari quota wall yang kepencet Daftar tetap balik ke konteks quiz-nya.
+// SSR-safe: useRoute, not router.currentRoute (Vercel 500 pitfall).
+// Single-door Google Auth (11 Oct 2026): respect ?redirect= like login —
+// a user coming from the quota wall who pressed Daftar still returns to their quiz context.
 const redirect = getRedirectQuery(route.query.redirect);
 const { googleLoading, signInWithGoogle } = useGoogleSignIn(redirect);
 
@@ -35,13 +35,13 @@ const agree = ref(true);
 const errorMsg = ref("");
 const loading = ref(false);
 
-// Meter kuat? 0-5 ikut panjang + variasi huruf/angka — bar + label kata + warna skala di bawah field.
+// Strength? meter 0-5 follows length + letter/number variety — bar + word label + scale color below the field.
 const strength = computed(() => getPasswordStrength(password.value));
 const strengthLabel = computed(() => getStrengthLabel(strength.value));
 const strengthColor = computed(() => getStrengthColor(strength.value));
 
-// Daftar email+password via Supabase signUp → /check-email (Opsi B magic-link, lock 10 Okt 2026).
-// Link verifikasi di inbox balik ke HOME (/). Google OAuth tetap langsung (tanpa cek-email).
+// Email+password register via Supabase signUp → /check-email (Option B magic-link, locked 10 Oct 2026).
+// The verification link in the inbox returns to HOME (/). Google OAuth stays immediate (no check-email).
 async function handleRegister(): Promise<void> {
   if (loading.value) return;
   errorMsg.value = "";
@@ -62,9 +62,9 @@ async function handleRegister(): Promise<void> {
   }
 }
 
-// Google 1-klik via OAuth — SATU PINTU kayak login (best practice 11 Okt 2026).
-// APA: signInWithOAuth SAMA (Supabase auto create-vs-login by email), label netral SAMA,
-// redirect SAMA hormati ?redirect=, + kunci checkbox Syarat (form email wajib, Google jangan bolong).
+// 1-click Google via OAuth — SINGLE DOOR like login (best practice 11 Oct 2026).
+// WHAT: signInWithOAuth is THE SAME (Supabase auto create-vs-login by email), neutral label THE SAME,
+// redirect THE SAME respecting ?redirect=, + locks the Syarat checkbox (required for the email form, Google must not be a loophole).
 async function handleGoogle(): Promise<void> {
   if (loading.value || googleLoading.value) return;
   errorMsg.value = "";
@@ -88,21 +88,21 @@ async function handleGoogle(): Promise<void> {
         sans-serif;
     "
   >
-    <!-- 1. Banner hitam promo — 1:1 image (strip ember + radius 12 + angka lime-muda) -->
+    <!-- 1. Black promo banner — 1:1 image (ember strip + radius 12 + light-lime number) -->
     <AuthBanner
       title="DAFTAR GRATIS"
       value="2 • 5"
       footer="quota full + voucher 🎟️"
     />
 
-    <!-- 2. Tombol Google — outline abu resmi + logo G 4-warna (Opsi A board v10 lock "A"). -->
+    <!-- 2. Google button — official gray outline + 4-color G logo (Option A board v10 lock "A"). -->
     <GoogleButton
       :loading="googleLoading"
       :disabled="loading || googleLoading"
       @click="handleGoogle"
     />
 
-    <!-- Divider ATAU: pemisah grup login-sosial vs form-email (Opsi A board v10). -->
+    <!-- ATAU divider: separates the social-login group from the email form (Option A board v10). -->
     <div class="flex items-center gap-3 mt-3 px-1" aria-hidden="true">
       <span class="flex-1 h-px" style="background: #d6d3d1" />
       <span
@@ -113,7 +113,7 @@ async function handleGoogle(): Promise<void> {
       <span class="flex-1 h-px" style="background: #d6d3d1" />
     </div>
 
-    <!-- 3+4. Form Email + Password + meter kuat? (Nama di-takeout 10 Okt 2026) -->
+    <!-- 3+4. Email + Password + strength? meter form (Nama taken out 10 Oct 2026) -->
     <form class="space-y-3 mt-3" @submit.prevent="handleRegister">
       <div
         class="bg-white rounded-full flex items-center gap-2 px-4 py-3.5 shadow-sm"
@@ -128,7 +128,7 @@ async function handleGoogle(): Promise<void> {
         />
       </div>
       <PasswordField v-model="password" />
-      <!-- Meter kekuatan di bawah field: bar + label kata, cuma muncul setelah user ngetik -->
+      <!-- Strength meter below the field: bar + word label, only appears after the user types -->
       <div v-if="password.length" class="px-4">
         <div
           class="h-1.5 rounded-full overflow-hidden"
@@ -162,7 +162,7 @@ async function handleGoogle(): Promise<void> {
       <p v-if="errorMsg" class="text-center text-xs font-bold text-red-600">
         {{ errorMsg }}
       </p>
-      <!-- 6. CTA utama hitam -->
+      <!-- 6. Main black CTA -->
       <button
         type="submit"
         :disabled="loading || googleLoading"

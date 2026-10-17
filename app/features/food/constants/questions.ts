@@ -1,14 +1,14 @@
 /**
- * features/makan/constants/questions.ts — 4 pertanyaan quiz MAKAN + 3 promo seed GI.
+ * features/food/constants/questions.ts — 4 FOOD quiz questions + 3 GI promo seeds.
  *
- * APA: data pertanyaan (mall → misi → budget → rombongan+toggle) dan daftar voucher sheet V13B.
- * KENAPA terpisah: data bukan logic; halaman jadi tipis. Q1 mall wajib biar hasil murni tenant situ.
- * Mall ke-6 = 1 option di Q1 (+ MALL_NAMES di common/constants/malls.ts).
+ * WHAT: question data (mall → mission → budget → group+toggle) and the V13B voucher sheet list.
+ * WHY separate: data isn't logic; the page stays thin. Q1 mall required so the result is purely that mall's tenants.
+ * Mall #6 = 1 option in Q1 (+ MALL_NAMES in common/constants/malls.ts).
  */
 import type { QuizQuestion } from "~/common/types/quiz";
-import type { VoucherItem } from "../@types/makan";
+import type { VoucherItem } from "../@types/food";
 
-export const MAKAN_QUESTIONS: QuizQuestion[] = [
+export const FOOD_QUESTIONS: QuizQuestion[] = [
   {
     id: "mall_slug",
     question: "Makan di mall mana? 📍",
@@ -53,19 +53,19 @@ export const MAKAN_QUESTIONS: QuizQuestion[] = [
         icon: "⚡",
         label: "Makan Cepat",
         desc: "Laper, langsung makan",
-        value: "makan_cepat",
+        value: "quick_bite",
       },
       {
         icon: "☕",
         label: "Nongkrong Lama",
         desc: "Ngobrol, kerja, kopi",
-        value: "nongkrong_lama",
+        value: "long_hangout",
       },
       {
         icon: "👨‍👩‍👧",
         label: "Keluarga",
         desc: "Ajak anak / rame",
-        value: "keluarga",
+        value: "family",
       },
       {
         icon: "🧘",
@@ -79,18 +79,18 @@ export const MAKAN_QUESTIONS: QuizQuestion[] = [
     id: "budget_tier",
     question: "Budget per orang? 💰",
     options: [
-      { icon: "💰", label: "Hemat", desc: "< Rp 50.000", value: "hemat" },
+      { icon: "💰", label: "Hemat", desc: "< Rp 50.000", value: "budget" },
       {
         icon: "💰💰",
         label: "Menengah",
         desc: "Rp 50-150rb",
-        value: "menengah",
+        value: "mid",
       },
       {
         icon: "💰💰💰",
         label: "Leluasa",
         desc: "> Rp 150.000",
-        value: "leluasa",
+        value: "splurge",
       },
     ],
   },
@@ -99,25 +99,25 @@ export const MAKAN_QUESTIONS: QuizQuestion[] = [
     question: "Rombongan + pantangan? 👥",
     toggles: true,
     options: [
-      { icon: "🧘", label: "Sendiri", desc: "Me time", value: "sendiri" },
+      { icon: "🧘", label: "Sendiri", desc: "Me time", value: "solo" },
       {
         icon: "💑",
         label: "Berdua",
         desc: "Pasangan / teman",
-        value: "berdua",
+        value: "couple",
       },
-      { icon: "👥", label: "Rame-rame", desc: "3+ orang", value: "rame" },
+      { icon: "👥", label: "Rame-rame", desc: "3+ orang", value: "group" },
     ],
   },
 ];
 
-/** Slug mall valid (opsi Q1) — pre-fill ?mall= dari direktori hanya lolos kalau ada di sini. */
-export const MAKAN_MALL_SLUGS: string[] = (
-  MAKAN_QUESTIONS[0]?.options ?? []
-).map((o) => o.value);
+/** Valid mall slugs (Q1 options) — a ?mall= pre-fill from the directory passes only if it's here. */
+export const FOOD_MALL_SLUGS: string[] = (FOOD_QUESTIONS[0]?.options ?? []).map(
+  (o) => o.value,
+);
 
-/** 3 promo seed GI (WKD-7X2K9A / WKD-4Y5B3C / WKD-L8M2N1) + sisa cap per row. */
-export const MAKAN_PROMOS: VoucherItem[] = [
+/** 3 GI promo seeds (WKD-7X2K9A / WKD-4Y5B3C / WKD-L8M2N1) + remaining cap per row. */
+export const FOOD_PROMOS: VoucherItem[] = [
   {
     code: "WKD-7X2K9A",
     name: "Kopi Weekday -20%",

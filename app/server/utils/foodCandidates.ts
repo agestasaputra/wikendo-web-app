@@ -1,29 +1,29 @@
 /**
- * server/utils/makanCandidates.ts — Kandidat tenant quiz makan + bentuk rekomendasi akhir.
+ * server/utils/foodCandidates.ts — Food quiz tenant candidates + final recommendation shape.
  *
- * APA: fetchMakanCandidates(db, body) (mall_slug→mall_id, filter tenants, limit 30, GRATIS),
+ * WHAT: fetchFoodCandidates(db, body) (mall_slug→mall_id, filter tenants, limit 30, FREE),
  *   toTenantRecommendation(t, reason, slug) + pickCandidate(candidates, name).
- * KENAPA: handler makan/recommend dulu >50 baris + kompleksitas tinggi → dipecah.
- * Kosong → 404 ("Tidak ada tenant cocok. Coba ubah filter.").
- * Contoh: toTenantRecommendation(row, "cocok", "grand-indonesia").maps_url → link Google Maps.
+ * WHY: the food/recommend handler was previously >50 lines + high complexity → split out.
+ * Empty → 404 ("Tidak ada tenant cocok. Coba ubah filter.").
+ * EXAMPLE: toTenantRecommendation(row, "cocok", "grand-indonesia").maps_url → Google Maps link.
  */
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { createError } from "h3";
 import type {
-  QuizMakanInput,
+  QuizFoodInput,
   TenantRecommendation,
   TenantRow,
 } from "../../common/types/api";
 import type { MallRow } from "../../common/types/database";
 import { buildMapsUrl } from "../../utils/url";
-import { buildMakanEqFilters } from "./tenantFilters";
+import { buildFoodEqFilters } from "./tenantFilters";
 
 const MAX_CANDIDATES = 30;
 
-/** Kandidat tenant (is_open + budget/halal/kids) untuk 1 mall. 404 kalau mall/tenant tidak ada. */
-export async function fetchMakanCandidates(
+/** Tenant candidates (is_open + budget/halal/kids) for 1 mall. 404 if the mall/tenants don't exist. */
+export async function fetchFoodCandidates(
   db: SupabaseClient,
-  body: QuizMakanInput,
+  body: QuizFoodInput,
 ): Promise<TenantRow[]> {
   const { data: mall } = await db
     .from("malls")
@@ -41,7 +41,7 @@ export async function fetchMakanCandidates(
     .select("*")
     .eq("mall_id", mall.id)
     .eq("is_open", true);
-  for (const [column, value] of buildMakanEqFilters(body))
+  for (const [column, value] of buildFoodEqFilters(body))
     q = q.eq(column, value);
   const { data } = await q.limit(MAX_CANDIDATES);
   const candidates = (data || []) as TenantRow[];
@@ -54,7 +54,7 @@ export async function fetchMakanCandidates(
   return candidates;
 }
 
-/** Cari kandidat by nama; tidak ketemu → kandidat pertama (LLM sudah divalidasi, ini jaring pengaman). */
+/** Find candidate by name; not found → first candidate (LLM already validated, this is a safety net). */
 export function pickCandidate(
   candidates: TenantRow[],
   name: string,
@@ -64,7 +64,7 @@ export function pickCandidate(
   return found;
 }
 
-/** Tenant DB + reason LLM → kartu hasil (needs_survey: ada kolom tri-state yang masih NULL). */
+/** DB tenant + LLM reason → result card (needs_survey: some tri-state column is still NULL). */
 export function toTenantRecommendation(
   t: TenantRow,
   reason: string,
@@ -73,10 +73,11 @@ export function toTenantRecommendation(
   return {
     name: t.name,
     category: t.category,
-    lantai: t.lantai,
+    floor: t.floor,
     halal: t.halal,
     budget_tier: t.budget_tier,
-    price_range: t.price_range,
+    price_min: t.price_min,
+    price_max: t.price_max,
     kids_friendly: t.kids_friendly,
     hype_tiktok: t.hype_tiktok,
     reason,

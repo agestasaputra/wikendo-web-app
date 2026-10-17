@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { readSource } from "~/test/utils";
 
 /**
- * HistoryPage.spec.ts — Riwayat E1 localStorage wikendo_history (Addendum docs/24).
+ * HistoryPage.spec.ts — History E1 localStorage wikendo_history (Addendum docs/24).
  */
 const RIW = readSource("features/history/HistoryPage.vue");
 const STORE = readSource(
@@ -10,13 +10,13 @@ const STORE = readSource(
   "common/constants/storage.ts",
 );
 
-describe("E1 riwayat localStorage wikendo_history", () => {
-  it("halaman membaca HistoryStore + kosong jujur 1:1 home", () => {
+describe("E1 history localStorage wikendo_history", () => {
+  it("page reads HistoryStore + honest empty matches home 1:1", () => {
     expect(RIW).toContain("useHistoryStore");
     expect(RIW).toContain("Belum ada riwayat");
   });
 
-  it("store memakai key wikendo_history + guard window (anon/SSR aman)", () => {
+  it("store uses wikendo_history key + window guard (anon/SSR safe)", () => {
     expect(STORE).toContain("wikendo_history");
     expect(STORE).toMatch(/typeof window/i);
   });

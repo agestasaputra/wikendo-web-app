@@ -1,11 +1,11 @@
-<!-- pages/result.vue → GET /result. Route TIPIS: logic ada di features/tempat/TempatResultPage.vue.
-APA: file-based routing Nuxt — nama file = URL; halaman hanya merender 1 komponen feature.
-KENAPA: pages/ = routes only (tanpa business logic) supaya feature bisa diuji & dipindah. Lihat AGENTS.md.
-Contoh: tambah halaman → buat features/<name>/<Name>Page.vue + file ini. -->
+<!-- pages/result.vue → GET /result. THIN route: logic lives in features/place/PlaceResultPage.vue.
+WHAT: Nuxt file-based routing — file name = URL; the page only renders 1 feature component.
+WHY: pages/ = routes only (no business logic) so a feature can be tested & moved. See AGENTS.md.
+EXAMPLE: add a page → create features/<name>/<Name>Page.vue + this file. -->
 <script setup lang="ts">
-import TempatResultPage from "~/features/tempat/TempatResultPage.vue";
+import PlaceResultPage from "~/features/place/PlaceResultPage.vue";
 </script>
 
 <template>
-  <TempatResultPage />
+  <PlaceResultPage />
 </template>

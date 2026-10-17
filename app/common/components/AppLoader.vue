@@ -1,7 +1,7 @@
-<!-- common/components/AppLoader.vue → Spinner fetching API (1 komponen, 3 halaman).
-APA: cincin spin + judul + hint, warna aksen per variant (tempat orange / makan merah / mall teal).
-KENAPA: dipakai result tempat + result makan + mall detail → pesan + warna konsisten. Meta dari getLoaderMeta (pure, tested).
-Contoh: <AppLoader variant="makan" /> pas POST /api/makan/recommend pending. -->
+<!-- common/components/AppLoader.vue → API fetching spinner (1 component, 3 pages).
+WHAT: spinning ring + title + hint, accent color per variant (place orange / food red / mall teal).
+WHY: used by place result + food result + mall detail → consistent message + colors. Meta from getLoaderMeta (pure, tested).
+EXAMPLE: <AppLoader variant="food" /> while POST /api/food/recommend is pending. -->
 <script setup lang="ts">
 import { computed } from "vue";
 import type { LoaderVariant } from "~/common/types/loader";

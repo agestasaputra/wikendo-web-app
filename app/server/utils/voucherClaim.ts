@@ -1,13 +1,13 @@
 /**
- * server/utils/voucherClaim.ts — Langkah-langkah klaim voucher (S1-S4 Gas v13, skema real 13 Okt 2026).
+ * server/utils/voucherClaim.ts — Voucher claim steps (S1-S4 Gas v13, real schema 13 Oct 2026).
  *
- * APA: guard 401 → parse kode → voucher aktif/expired → verifikasi user → rate-limit 3/hari
- *   → anti-farming UNIQUE(user,tenant,hari) → dual-write voucher_claims → countdown 23:59 WIB.
- * KENAPA dipecah: handler lama 185 baris (batas hub-chat: 50 baris/fungsi, kompleksitas 10);
- *   tiap langkah = 1 fungsi kecil yang melempar createError. Urutan dipanggil: server/api/voucher/claim.post.ts.
- * KENAPA fix dual-write: migration-base (voucher_claims lama: user_id/tenant_id/date/code NOT NULL) vs kolom v13
- *   (claim_date/claim_code/claimed_at) — isi dua-duanya biar NOL 500 di prod.
- * Contoh: expiryWIBToday() → Date 23:59 WIB hari ini (offset +07:00 eksplisit, anti-bug TZ server UTC).
+ * WHAT: 401 guard → parse code → active/expired voucher → user verification → 3/day rate limit
+ *   → anti-farming UNIQUE(user,tenant,day) → dual-write voucher_claims → 23:59 WIB countdown.
+ * WHY split up: the old handler was 185 lines (hub-chat limit: 50 lines/function, complexity 10);
+ *   each step = 1 small function that throws createError. Call order: server/api/voucher/claim.post.ts.
+ * WHY the dual-write fix: migration-base (old voucher_claims: user_id/tenant_id/date/code NOT NULL) vs the v13 columns
+ *   (claim_date/claim_code/claimed_at) — fill both so there are ZERO 500s in prod.
+ * EXAMPLE: expiryWIBToday() → Date 23:59 WIB today (explicit +07:00 offset, anti-bug for UTC server TZ).
  */
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { createError, getHeader, type H3Event } from "h3";
@@ -15,7 +15,7 @@ import type { VoucherRow } from "../../common/types/database";
 
 const DAILY_CLAIM_LIMIT = 3;
 
-/** Lempar error JSON konsisten: { statusCode, statusMessage, data.message }. */
+/** Throw consistent JSON error: { statusCode, statusMessage, data.message }. */
 function fail(
   statusCode: number,
   statusMessage: string,
@@ -24,17 +24,17 @@ function fail(
   throw createError({ statusCode, statusMessage, data: { message } });
 }
 
-/** YYYY-MM-DD Asia/Jakarta (en-CA = ISO date, stabil). */
+/** YYYY-MM-DD Asia/Jakarta (en-CA = ISO date, stable). */
 export function todayWIB(): string {
   return new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Jakarta" });
 }
 
-/** 23:59 WIB hari ini sebagai Date (offset +07:00 eksplisit, anti-bug TZ server UTC). */
+/** 23:59 WIB today as a Date (explicit +07:00 offset, anti-bug for UTC server TZ). */
 export function expiryWIBToday(): Date {
   return new Date(`${todayWIB()}T23:59:00+07:00`);
 }
 
-/** S1: Auth guard — butuh Bearer token Supabase. */
+/** S1: Auth guard — requires a Supabase Bearer token. */
 export function requireBearerToken(event: H3Event): string {
   const authHeader = getHeader(event, "authorization") || "";
   const token = authHeader.replace(/^Bearer\s+/i, "").trim();
@@ -42,7 +42,7 @@ export function requireBearerToken(event: H3Event): string {
   return token;
 }
 
-/** S2: kode voucher dari body, uppercase; kosong → 400. */
+/** S2: voucher code from the body, uppercase; empty → 400. */
 export function parseVoucherCode(
   body: { voucher_code?: string } | undefined,
 ): string {
@@ -59,7 +59,7 @@ export function parseVoucherCode(
   return code;
 }
 
-/** S2: ambil voucher by kode; tidak ada → 404. */
+/** S2: load voucher by code; not found → 404. */
 export async function loadVoucher(
   db: SupabaseClient,
   code: string,
@@ -74,7 +74,7 @@ export async function loadVoucher(
   return voucher;
 }
 
-/** S2: promo dimatikan manual / belum aktif / kadaluarsa → 400. */
+/** S2: promo manually disabled / not active yet / expired → 400. */
 export function assertVoucherActive(voucher: VoucherRow, now: Date): void {
   if (voucher.promo_active === false) {
     fail(400, "VOUCHER_INACTIVE", "Promo ini lagi nonaktif. Coba promo lain.");
@@ -87,7 +87,7 @@ export function assertVoucherActive(voucher: VoucherRow, now: Date): void {
   }
 }
 
-/** S3: verifikasi token → user id; gagal → 401. */
+/** S3: verify token → user id; on failure → 401. */
 export async function requireUserId(
   db: SupabaseClient,
   token: string,
@@ -101,7 +101,7 @@ export async function requireUserId(
   return user.id;
 }
 
-/** Rate-limit global: max 3 claim/hari/user (semua tenant). Dicek dulu biar 429 menang atas 409. */
+/** Global rate limit: max 3 claims/day/user (all tenants). Checked first so that 429 wins over 409. */
 export async function assertDailyLimit(
   db: SupabaseClient,
   userId: string,
@@ -122,14 +122,14 @@ export async function assertDailyLimit(
   }
 }
 
-/** Kunci anti-farming: 1 user + 1 tenant + 1 hari. */
+/** Anti-farming key: 1 user + 1 tenant + 1 day. */
 interface ClaimKey {
   userId: string;
   tenantId: string;
   claimDate: string;
 }
 
-/** P0 lock: 1 user + 1 tenant + 1 hari = 1 claim (UNIQUE user,tenant,claim_date). */
+/** P0 lock: 1 user + 1 tenant + 1 day = 1 claim (UNIQUE user,tenant,claim_date). */
 export async function assertNotClaimedForTenant(
   db: SupabaseClient,
   key: ClaimKey,
@@ -153,7 +153,7 @@ export async function assertNotClaimedForTenant(
   }
 }
 
-/** Data 1 klaim baru. */
+/** Data for 1 new claim. */
 interface NewClaim {
   userId: string;
   voucher: VoucherRow;
@@ -161,7 +161,7 @@ interface NewClaim {
   nowIso: string;
 }
 
-/** S3: insert dual-write (kolom lama date/code + kolom baru claim_date/claim_code/dll). */
+/** S3: dual-write insert (old date/code columns + new claim_date/claim_code/etc columns). */
 export async function insertClaim(
   db: SupabaseClient,
   claim: NewClaim,
@@ -180,7 +180,7 @@ export async function insertClaim(
     redeemed_at: null,
   });
   if (!error) return;
-  // Race 2 klik bersamaan → UNIQUE nabrak (23505) → 409 ramah, bukan 500.
+  // Race with 2 simultaneous clicks → UNIQUE collision (23505) → friendly 409, not 500.
   if (error.code === "23505") {
     fail(
       409,
@@ -191,7 +191,7 @@ export async function insertClaim(
   fail(500, "DB_INSERT_FAILED", "Gagal simpan claim. Coba lagi.");
 }
 
-/** S4: response sukses + countdown ke 23:59 WIB hari ini. */
+/** S4: success response + countdown to 23:59 WIB today. */
 export function buildClaimResponse(voucher: VoucherRow): {
   status: string;
   claim_code: string;

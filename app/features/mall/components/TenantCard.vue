@@ -1,7 +1,7 @@
-<!-- features/mall/components/TenantCard.vue → Kartu tenant S2c Foto Tenant (thumb 46px + badge promo + rating/lantai/halal).
-APA: thumb emoji + warna per kategori, nama + lantai, badge promo rose, baris ★ rating · lantai · halal.
-KENAPA: dipisah dari MallDetailPage supaya halaman tipis; nilai render dari buildTenantView (pure, tested).
-Contoh: <TenantCard :tenant="t" /> -->
+<!-- features/mall/components/TenantCard.vue → S2c Tenant Photo card (46px thumb + promo badge + rating/floor/halal).
+WHAT: emoji thumb + color per category, name + floor, rose promo badge, ★ rating · floor · halal row.
+WHY: split out of MallDetailPage so the page stays thin; render values from buildTenantView (pure, tested).
+EXAMPLE: <TenantCard :tenant="t" /> -->
 <script setup lang="ts">
 import { computed } from "vue";
 import type { TenantItem } from "~/features/mall/@types/mall";

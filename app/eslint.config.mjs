@@ -1,14 +1,14 @@
-// eslint.config.mjs — Config ESLint 10 (flat) via withNuxt() + Prettier + konvensi Wikendo.
-// APA: preset Nuxt/Vue/TS + Prettier (format) + batas ukuran + batas modul + aturan security.
-// KENAPA: konvensi di ../AGENTS.md harus DIPAKSA mesin, bukan diingat. Pola sama dgn hub-chat
-//   (batas ukuran, feature boundary, security) tapi flat config (ESLint 8 .eslintrc sudah usang).
-// Perintah: pnpm lint (cek, 0 warning) / pnpm lint:fix (auto-fix). Detail: ../AGENTS.md.
+// eslint.config.mjs — ESLint 10 (flat) config via withNuxt() + Prettier + Wikendo conventions.
+// WHAT: Nuxt/Vue/TS preset + Prettier (format) + size limits + module boundaries + security rules.
+// WHY: the conventions in ../AGENTS.md must be ENFORCED by the machine, not remembered. Same pattern as hub-chat
+//   (size limits, feature boundary, security) but as a flat config (ESLint 8 .eslintrc is deprecated).
+// Commands: pnpm lint (check, 0 warnings) / pnpm lint:fix (auto-fix). Details: ../AGENTS.md.
 // https://eslint.nuxt.com/packages/module
 import { readdirSync } from "node:fs";
 import withNuxt from "./.nuxt/eslint.config.mjs";
 import eslintPluginPrettierRecommended from "eslint-plugin-prettier/recommended";
 
-// Nama feature dibaca dari folder features/ — tidak perlu update manual saat tambah feature.
+// Feature names are read from the features/ folder — no manual update needed when adding a feature.
 const FEATURE_NAMES = readdirSync("features", { withFileTypes: true })
   .filter((entry) => entry.isDirectory())
   .map((entry) => entry.name);
@@ -22,7 +22,7 @@ const CLIENT_FILES = [
   "utils/**/*.ts",
 ];
 
-// Antar feature dilarang saling import (hub-chat: lewat common/ atau store bersama).
+// Features must not import each other (hub-chat: go through common/ or a shared store).
 const featureBoundaryOverrides = FEATURE_NAMES.map((feature) => ({
   files: [`features/${feature}/**/*.ts`, `features/${feature}/**/*.vue`],
   rules: {
@@ -50,7 +50,7 @@ const featureBoundaryOverrides = FEATURE_NAMES.map((feature) => ({
 export default withNuxt(
   {
     rules: {
-      // ── Batas ukuran (sama dgn hub-chat) ──
+      // ── Size limits (same as hub-chat) ──
       complexity: ["error", 10],
       "max-depth": ["error", 3],
       "max-lines-per-function": ["error", { max: 50 }],
@@ -78,7 +78,7 @@ export default withNuxt(
       ],
 
       // ── Security (OWASP: injection / XSS / secrets) ──
-      "vue/no-v-html": "error", // pakai v-dompurify-html (plugins/dompurify-html.ts)
+      "vue/no-v-html": "error", // use v-dompurify-html (plugins/dompurify-html.ts)
       "no-eval": "error",
       "no-implied-eval": "error",
       "no-new-func": "error",
@@ -87,7 +87,7 @@ export default withNuxt(
     },
   },
   {
-    // Env var di client wajib lewat useRuntimeConfig() (secret tidak bocor ke bundle).
+    // Env vars in the client MUST go through useRuntimeConfig() (so secrets don't leak into the bundle).
     files: CLIENT_FILES,
     rules: {
       "no-restricted-properties": [
@@ -102,7 +102,7 @@ export default withNuxt(
     },
   },
   {
-    // common/ = kode bersama, tanpa logika feature (hub-chat: Common → no feature-specific logic).
+    // common/ = shared code, no feature logic (hub-chat: Common → no feature-specific logic).
     files: ["common/**/*.{ts,vue}", "utils/**/*.ts"],
     rules: {
       "no-restricted-imports": [
@@ -124,7 +124,7 @@ export default withNuxt(
   },
   ...featureBoundaryOverrides,
   {
-    // Layer client lain yg bukan feature/common: tetap dilarang import server/.
+    // Other client layers that are not feature/common: still forbidden from importing server/.
     files: ["app.vue", "pages/**/*.vue", "layouts/**/*.vue"],
     rules: {
       "no-restricted-imports": [
@@ -141,7 +141,7 @@ export default withNuxt(
     },
   },
   {
-    // Test: describe/it callback panjang & fixture wajar; batas ukuran tidak berlaku.
+    // Tests: long describe/it callbacks & fixtures are fine; the size limits do not apply.
     files: ["**/*.spec.ts", "test/**/*.ts"],
     rules: {
       "max-lines-per-function": "off",
@@ -151,6 +151,6 @@ export default withNuxt(
       "@typescript-eslint/explicit-function-return-type": "off",
     },
   },
-  // Prettier terakhir: matikan rule format yg bentrok + tampilkan selisih format sebagai error.
+  // Prettier last: turn off conflicting format rules + surface format differences as errors.
   eslintPluginPrettierRecommended,
 );

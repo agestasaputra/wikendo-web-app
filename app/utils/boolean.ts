@@ -1,11 +1,11 @@
 /**
- * utils/boolean.ts — Normalisasi boolean dari input longgar.
+ * utils/boolean.ts — Normalize booleans from loose input.
  *
- * APA: coerceBool("false") → false. PURE.
- * KENAPA: frontend kirim halal_only:"false" (string) via query → truthy bug bikin filter halal nyala.
+ * WHAT: coerceBool("false") → false. PURE.
+ * WHY: the frontend sends halal_only:"false" (string) via query → truthy bug turns the halal filter on.
  */
 
-/** Normalisasi boolean dari query string frontend ("false" string → false). */
+/** Normalize a boolean from the frontend query string ("false" string → false). */
 export function coerceBool(v: unknown): boolean {
   if (typeof v === "boolean") return v;
   if (typeof v === "number") return v !== 0;

@@ -1,7 +1,7 @@
-<!-- common/components/AppSpinner.vue → Ikon spinner kecil untuk tombol yang sedang request API.
-APA: cincin SVG animate-spin; warna + ukuran via prop.
-KENAPA: SVG spinner dulu disalin ±8x di login/register/check-email/account/header/result → 1 komponen.
-Contoh: <AppSpinner v-if="loading" color="#fff" size="w-4 h-4" /> -->
+<!-- common/components/AppSpinner.vue → Small spinner icon for buttons that are requesting the API.
+WHAT: SVG ring with animate-spin; color + size via props.
+WHY: the SVG spinner was previously copied ±8x across login/register/check-email/account/header/result → 1 component.
+EXAMPLE: <AppSpinner v-if="loading" color="#fff" size="w-4 h-4" /> -->
 <script setup lang="ts">
 withDefaults(defineProps<{ color?: string; size?: string }>(), {
   color: "currentColor",

@@ -6,17 +6,17 @@ import {
 } from "../passwordStrength";
 
 describe("getPasswordStrength (0-5)", () => {
-  it("pendek → rendah, kosong → 0", () => {
+  it("short → low, empty → 0", () => {
     expect(getPasswordStrength("")).toBe(0);
     expect(getPasswordStrength("abcd")).toBe(1);
   });
 
-  it("panjang 8 + besar-kecil + angka & simbol → 5 (dijepit)", () => {
+  it("length 8 + mixed case + digit & symbol → 5 (clamped)", () => {
     expect(getPasswordStrength("Abcdef1!")).toBe(5);
   });
 });
 
-describe("getStrengthLabel + getStrengthColor (skala merah → hijau)", () => {
+describe("getStrengthLabel + getStrengthColor (red → green scale)", () => {
   it("label: Lemah / Sedang / Kuat / Sangat kuat", () => {
     expect(getStrengthLabel(1)).toBe("Lemah");
     expect(getStrengthLabel(2)).toBe("Sedang");
@@ -25,7 +25,7 @@ describe("getStrengthLabel + getStrengthColor (skala merah → hijau)", () => {
     expect(getStrengthLabel(5)).toBe("Sangat kuat");
   });
 
-  it("warna: merah → ember → kuning → hijau", () => {
+  it("colors: red → ember → yellow → green", () => {
     expect(getStrengthColor(0)).toBe("#DC2626");
     expect(getStrengthColor(2)).toBe("#EA580C");
     expect(getStrengthColor(3)).toBe("#CA8A04");

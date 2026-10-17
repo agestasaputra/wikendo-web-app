@@ -1,215 +1,215 @@
-# 🗓️ Wikendo — Dokumentasi Project Nuxt
+# 🗓️ Wikendo — Nuxt Project Documentation
 
-> Quiz 30 detik → 5 rekomendasi weekend Jabodetabek + Quiz makan 20 detik → 5 tenant mall.
-> Stack: **Nuxt 4 + Vue 3 + TypeScript + Tailwind + Supabase + Hermes-combo (LLM)** — hosting **Vercel, cost $0/bulan**.
+> 30-second quiz → 5 weekend recommendations in Jabodetabek + 20-second food quiz → 5 mall tenants.
+> Stack: **Nuxt 4 + Vue 3 + TypeScript + Tailwind + Supabase + Hermes-combo (LLM)** — hosting on **Vercel, cost $0/month**.
 
-Dokumen ini adalah panduan utama buat folder `app/`.
-Ditulis buat **pemula**: tiap bagian menjelaskan **apa itu, kenapa ada, dan gimana cara pakainya**.
+This document is the main guide for the `app/` folder.
+Written for **beginners**: each section explains **what it is, why it exists, and how to use it**.
 
-> **Buat AI assistant** (Cursor, Copilot, Claude, dsb): baca **[`../AGENTS.md`](../AGENTS.md)** (single source of truth:
-> konvensi, batas ukuran, pola nambah fitur, larangan) — bukan README ini.
-> **Buat memahami arsitektur**: [`../docs/architecture/architecture.md`](../docs/architecture/architecture.md) (hub + spoke per alur).
-> **Buat unit testing**: `pnpm test` (Vitest, test co-located di `__tests__/*.spec.ts`). Logic baru yang pure →
-> taruh di `utils/` (atau `features/<x>/utils/`) + tambah test sibling.
+> **For AI assistants** (Cursor, Copilot, Claude, etc.): read **[`../AGENTS.md`](../AGENTS.md)** (single source of truth:
+> conventions, size limits, patterns for adding features, prohibitions) — not this README.
+> **To understand the architecture**: [`../docs/architecture/architecture.md`](../docs/architecture/architecture.md) (hub + spoke per flow).
+> **For unit testing**: `pnpm test` (Vitest, tests co-located in `__tests__/*.spec.ts`). New pure logic →
+> put it in `utils/` (or `features/<x>/utils/`) + add a sibling test.
 
-> ⚠️ **Update 16 Okt 2026:** struktur folder diubah jadi _vertical slice_ (`features/`, `common/`) + Pinia + Prettier +
-> type-check + Husky. Bagian 3 (Struktur Folder), 8 (Types), 10 (Lint), 11 (Perintah) sudah disesuaikan; bagian lain yang
-> menyebut `types/index.ts`, `utils/quiz-logic.ts` atau `components/` adalah catatan lama.
+> ⚠️ **Update Oct 16, 2026:** the folder structure changed to _vertical slice_ (`features/`, `common/`) + Pinia + Prettier +
+> type-check + Husky. Sections 3 (Folder Structure), 8 (Types), 10 (Lint), 11 (Commands) have been updated; other sections that
+> mention `types/index.ts`, `utils/quiz-logic.ts` or `components/` are old notes.
 
 ---
 
-## Daftar Isi
+## Table of Contents
 
-1. [Gambaran Besar](#1-gambaran-besar)
+1. [Big Picture](#1-big-picture)
 2. [Tech Stack](#2-tech-stack)
-3. [Struktur Folder](#3-struktur-folder)
-4. [Setup & Instalasi](#4-setup--instalasi)
+3. [Folder Structure](#3-folder-structure)
+4. [Setup & Installation](#4-setup--installation)
 5. [Environment Variables](#5-environment-variables)
-6. [Pages (Halaman)](#6-pages-halaman)
+6. [Pages](#6-pages)
 7. [Server API (Backend)](#7-server-api-backend)
-8. [Types (Kontrak Data)](#8-types-kontrak-data)
+8. [Types (Data Contracts)](#8-types-data-contracts)
 9. [Styling (Tailwind)](#9-styling-tailwind)
-10. [Lint & Code Style (ESLint)](#10-lint--code-style-eslint)
-11. [Perintah NPM](#11-perintah-npm)
-12. [Alur Data End-to-End](#12-alur-data-end-to-end)
-13. [Quota & Batasan](#13-quota--batasan)
-14. [Deploy ke Vercel](#14-deploy-ke-vercel)
-15. [Troubleshooting (Masalah Umum)](#15-troubleshooting-masalah-umum)
+10. [Lint, Format & Type-check](#10-lint-format--type-check)
+11. [NPM Commands](#11-npm-commands)
+12. [End-to-End Data Flow](#12-end-to-end-data-flow)
+13. [Quota & Limits](#13-quota--limits)
+14. [Deploying to Vercel](#14-deploying-to-vercel)
+15. [Troubleshooting (Common Issues)](#15-troubleshooting-common-issues)
 16. [FAQ](#16-faq)
 
 ---
 
-## 1. Gambaran Besar
+## 1. Big Picture
 
-**Wikendo** menjawab satu masalah: _decision fatigue_ — bingung mau ngapain tiap weekend.
+**Wikendo** answers one problem: _decision fatigue_ — not knowing what to do every weekend.
 
-Ada **2 mode yang dipisah total** (hasilnya tidak pernah dicampur):
+There are **2 totally separate modes** (their results are never mixed):
 
-| Mode                 | Route                      | Input                    | Output                       | Quota                                      |
-| -------------------- | -------------------------- | ------------------------ | ---------------------------- | ------------------------------------------ |
-| 🗺️ **Plan** (tempat) | `/quiz` → `/result`        | 5 pertanyaan (~30 detik) | 5 rekomendasi **tempat**     | Anon 1x (cookie; login 2x target produksi) |
-| 🍜 **Mall** (makan)  | `/makan` → `/result-makan` | 4 pertanyaan (~20 detik) | 5 rekomendasi **tenant F&B** | Anon 2x (cookie; login 5x target produksi) |
+| Mode                | Route                    | Input                     | Output                           | Quota                                                 |
+| ------------------- | ------------------------ | ------------------------- | -------------------------------- | ----------------------------------------------------- |
+| 🗺️ **Plan** (place) | `/quiz` → `/result`      | 5 questions (~30 seconds) | 5 **place** recommendations      | Anonymous 1x (cookie; login 2x target for production) |
+| 🍜 **Mall** (food)  | `/food` → `/result-food` | 4 questions (~20 seconds) | 5 **F&B tenant** recommendations | Anonymous 2x (cookie; login 5x target for production) |
 
-Plus 1 halaman direktori (tanpa login, tanpa quota, tanpa LLM):
+Plus 1 directory page (no login, no quota, no LLM):
 
-| Halaman           | Route         | Fungsi                                                                   |
-| ----------------- | ------------- | ------------------------------------------------------------------------ |
-| 🏬 Direktori mall | `/mall/:slug` | List semua tenant 1 mall + search & filter + banner ke `/makan?mall=...` |
+| Page              | Route         | Function                                                                  |
+| ----------------- | ------------- | ------------------------------------------------------------------------- |
+| 🏬 Mall directory | `/mall/:slug` | List all tenants of 1 mall + search & filter + banner to `/food?mall=...` |
 
-**Kenapa monolit (1 repo)?**
-Backend = Nuxt Server Routes + Supabase. Tidak ada repo backend terpisah karena Supabase sudah jadi backend (Auth + Postgres + RLS), dan server Nuxt hanya lapisan tipis: jaga secret, enforce quota, panggil LLM. Split baru dipertimbangkan kalau: ada client ke-2 non-web, >10rb req/hari, atau tim >3 orang. (Lihat `docs/02-ADR.md`.)
+**Why a monolith (1 repo)?**
+Backend = Nuxt Server Routes + Supabase. There is no separate backend repo because Supabase is already the backend (Auth + Postgres + RLS), and the Nuxt server is only a thin layer: keep secrets, enforce quota, call the LLM. We'd only consider splitting if: there's a 2nd non-web client, >10k req/day, or a team >3 people. (See `docs/02-ADR.md`.)
 
 ---
 
 ## 2. Tech Stack
 
-| Lapisan         | Teknologi                                  | Versi           | Fungsi                                                         |
-| --------------- | ------------------------------------------ | --------------- | -------------------------------------------------------------- |
-| Framework       | **Nuxt**                                   | ^4.6.0 (stable) | SSR + routing + server API dalam 1 framework                   |
-| UI              | **Vue** + **Vue Router**                   | ^3.5 / ^4.5     | Komponen reaktif + navigasi halaman                            |
-| Bahasa          | **TypeScript**                             | ^5.6            | Type safety — salah ketik field ketahuan sebelum runtime       |
-| Styling         | **Tailwind CSS** via `@nuxtjs/tailwindcss` | 6.14.0          | Utility-first CSS, tanpa tulis CSS manual                      |
-| Database + Auth | **Supabase** (`@supabase/supabase-js`)     | 2.117.2         | Postgres + Auth + Row Level Security                           |
-| LLM             | **Hermes-combo via 9Router**               | —               | Ranking Top 5 + alasan 1 kalimat (lihat `server/utils/llm.ts`) |
-| Lint            | **ESLint 10** + `@nuxt/eslint`             | ^10 / 1.17.0    | Jaga konsistensi kode (`pnpm lint`)                            |
-| Hosting         | **Vercel Hobby**                           | —               | 1 project = frontend + serverless backend                      |
-| Analytics       | **GA4**                                    | —               | Event: quiz_started, quiz_completed, quota_exhausted, dll      |
+| Layer           | Technology                                 | Version         | Function                                                    |
+| --------------- | ------------------------------------------ | --------------- | ----------------------------------------------------------- |
+| Framework       | **Nuxt**                                   | ^4.6.0 (stable) | SSR + routing + server API in 1 framework                   |
+| UI              | **Vue** + **Vue Router**                   | ^3.5 / ^4.5     | Reactive components + page navigation                       |
+| Language        | **TypeScript**                             | ^5.6            | Type safety — mistyped fields caught before runtime         |
+| Styling         | **Tailwind CSS** via `@nuxtjs/tailwindcss` | 6.14.0          | Utility-first CSS, no manual CSS                            |
+| Database + Auth | **Supabase** (`@supabase/supabase-js`)     | 2.117.2         | Postgres + Auth + Row Level Security                        |
+| LLM             | **Hermes-combo via 9Router**               | —               | Rank Top 5 + 1-sentence reason (see `server/utils/llm.ts`)  |
+| Lint            | **ESLint 10** + `@nuxt/eslint`             | ^10 / 1.17.0    | Keep code consistent (`pnpm lint`)                          |
+| Hosting         | **Vercel Hobby**                           | —               | 1 project = frontend + serverless backend                   |
+| Analytics       | **GA4**                                    | —               | Events: quiz_started, quiz_completed, quota_exhausted, etc. |
 
-**Prasyarat di laptop:** Node.js 22.x (cek: `node -v; pnpm -v`).
+**Laptop prerequisites:** Node.js 22.x (check: `node -v; pnpm -v`).
 
 ---
 
-## 3. Struktur Folder
+## 3. Folder Structure
 
-Lokasi project Nuxt: **`wikendo-web-app/app/`** (bukan root repo — root dipakai buat `docs/`, `data/`, `design/`).
+Nuxt project location: **`wikendo-web-app/app/`** (not the repo root — the root holds `docs/`, `data/`, `design/`).
 
 ```text
 app/
-├── app.vue                  # Layout global tipis: AppHeader + <NuxtPage/> + footer + BottomNav
+├── app.vue                  # Thin global layout: AppHeader + <NuxtPage/> + footer + BottomNav
 ├── nuxt.config.ts           # Modules (tailwind, eslint, pinia), runtimeConfig, head/SEO
-├── eslint.config.mjs        # ESLint flat config + Prettier + batas ukuran/modul/security
+├── eslint.config.mjs        # ESLint flat config + Prettier + size/module/security limits
 ├── .prettierrc              # semi, double quote, printWidth 80
-├── tsconfig.json            # Referensi tsconfig Nuxt (dipakai `pnpm type-check`)
-├── vitest.config.ts         # Test co-located **/*.spec.ts
+├── tsconfig.json            # Nuxt tsconfig reference (used by `pnpm type-check`)
+├── vitest.config.ts         # Co-located tests **/*.spec.ts
 ├── .husky/                  # pre-commit (lint-staged → type-check → test:related) + commit-msg
 │
-├── pages/                   # ROUTE TIPIS: nama file = URL, isi = render 1 XPage dari features/
-├── features/                # VERTICAL SLICE per domain (tidak boleh saling import)
-│   ├── home/  tempat/  makan/  mall/  auth/  account/  history/
+├── pages/                   # THIN ROUTES: file name = URL, content = render 1 XPage from features/
+├── features/                # VERTICAL SLICE per domain (may not import each other)
+│   ├── home/  place/  food/  mall/  auth/  account/  history/
 │   │   └── XPage.vue · components/ · utils/ · constants/ · @types/ · store/ · __tests__/
-├── common/                  # Kode bersama (tidak boleh import features/)
+├── common/                  # Shared code (may not import features/)
 │   └── components/ composables/ store/ utils/ constants/ types/
-├── utils/                   # Fungsi pure app-wide (error, pagination, url, boolean)
-├── plugins/                 # dompurify-html (sanitasi HTML)
-├── server/                  # BACKEND — secret aman di sini
-│   ├── api/                 # quota.get, tempat/recommend.post, makan/recommend.post,
+├── utils/                   # App-wide pure functions (error, pagination, url, boolean)
+├── plugins/                 # dompurify-html (HTML sanitization)
+├── server/                  # BACKEND — secrets are safe here
+│   ├── api/                 # quota.get, place/recommend.post, food/recommend.post,
 │   │                        # malls/index.get, malls/[slug]/tenants.get, voucher/claim.post
-│   └── utils/               # db, llm, llmParsing, makanCandidates, tenantFilters, voucherClaim
-└── test/utils.ts            # Helper test (readSource)
+│   └── utils/               # db, llm, llmParsing, foodCandidates, tenantFilters, voucherClaim
+└── test/utils.ts            # Test helper (readSource)
 ```
 
-**Aturan penamaan server routes (penting buat pemula):**
-`recommend.post.ts` = hanya terima HTTP POST. `index.get.ts` / `tenants.get.ts` = hanya terima HTTP GET.
-Salah method → Nuxt balas 405 otomatis.
+**Server route naming rule (important for beginners):**
+`recommend.post.ts` = only accepts HTTP POST. `index.get.ts` / `tenants.get.ts` = only accept HTTP GET.
+Wrong method → Nuxt replies 405 automatically.
 
 ---
 
-## 4. Setup & Instalasi
+## 4. Setup & Installation
 
-Langkah dari nol sampai jalan di laptop (5–10 menit):
+From zero to running on your laptop (5–10 minutes):
 
 ```bash
-# 1. Masuk folder app
+# 1. Enter the app folder
 cd wikendo-web-app/app
 
-# 2. Install dependencies (sekali aja, ~3 menit)
+# 2. Install dependencies (once, ~3 minutes)
 pnpm install
 
-# 3. Siapkan environment
+# 3. Set up the environment
 cp .env.example .env
-# → lalu isi nilai asli di .env (lihat Bab 5)
+# → then fill in the real values in .env (see Section 5)
 
-# 4. Jalankan dev server
+# 4. Run the dev server
 pnpm dev
-# → buka http://localhost:3000
+# → open http://localhost:3000
 ```
 
-**Coba alur utama:**
+**Try the main flows:**
 
-1. `http://localhost:3000/` — landing, klik 🗺️ atau 🍜
-2. `http://localhost:3000/quiz` — jawab 5Q → redirect `/result`
-3. `http://localhost:3000/makan` — jawab 4Q → redirect `/result-makan`
-4. `http://localhost:3000/mall/grand-indonesia` — direktori (butuh DBSupabase terisi)
-5. `http://localhost:3000/makan?mall=grand-indonesia` — Q1 mall ke-skip otomatis (pre-fill dari direktori)
+1. `http://localhost:3000/` — landing, click 🗺️ or 🍜
+2. `http://localhost:3000/quiz` — answer 5Q → redirect to `/result`
+3. `http://localhost:3000/food` — answer 4Q → redirect to `/result-food`
+4. `http://localhost:3000/mall/grand-indonesia` — directory (needs the Supabase DB populated)
+5. `http://localhost:3000/food?mall=grand-indonesia` — Q1 mall is auto-skipped (pre-filled from the directory)
 
-> Catatan: `/result`, `/result-makan`, dan `/mall/:slug` butuh Supabase + Hermes-combo hidup.
-> Tanpa itu, halaman quiz tetap bisa dibuka, tapi generate rekomendasi akan error (lihat Bab 15).
+> Note: `/result`, `/result-food`, and `/mall/:slug` need Supabase + Hermes-combo running.
+> Without them, the quiz pages still open, but generating recommendations will error (see Section 15).
 
 ---
 
 ## 5. Environment Variables
 
-Copy `.env.example` → `.env`, isi nilai asli. **File `.env` tidak boleh di-commit** (sudah ada di `.gitignore`).
+Copy `.env.example` → `.env`, fill in the real values. **The `.env` file must not be committed** (already in `.gitignore`).
 
-| Variable                        | Contoh                    | Dipakai di                          | Keterangan                                                         |
-| ------------------------------- | ------------------------- | ----------------------------------- | ------------------------------------------------------------------ |
-| `NUXT_PUBLIC_SUPABASE_URL`      | `https://xxx.supabase.co` | Client + server                     | URL project Supabase. Prefix `NUXT_PUBLIC_` = boleh dibaca browser |
-| `NUXT_PUBLIC_SUPABASE_ANON_KEY` | `eyJxxx…`                 | Client                              | Anon key (aman di browser, dibatasi RLS)                           |
-| `SUPABASE_SERVICE_KEY`          | `eyJxxx…service_role`     | Server SAJA (`server/utils/db.ts`)  | Service-role key — **RAHASIA, jangan pernah ke client**            |
-| `HERMES_API_URL`                | `http://127.0.0.1:20128`  | Server SAJA (`server/utils/llm.ts`) | Endpoint 9Router lokal; di Vercel ganti URL prod                   |
-| `HERMES_API_KEY`                | `sk-…`                    | Server SAJA                         | API key Hermes — **RAHASIA**                                       |
-| `NUXT_PUBLIC_GA_ID`             | `G-XXXXXXX`               | Client                              | Google Analytics ID                                                |
+| Variable                        | Example                   | Used in                             | Notes                                                                     |
+| ------------------------------- | ------------------------- | ----------------------------------- | ------------------------------------------------------------------------- |
+| `NUXT_PUBLIC_SUPABASE_URL`      | `https://xxx.supabase.co` | Client + server                     | Supabase project URL. The `NUXT_PUBLIC_` prefix = readable by the browser |
+| `NUXT_PUBLIC_SUPABASE_ANON_KEY` | `eyJxxx…`                 | Client                              | Anon key (safe in the browser, restricted by RLS)                         |
+| `SUPABASE_SERVICE_KEY`          | `eyJxxx…service_role`     | Server ONLY (`server/utils/db.ts`)  | Service-role key — **SECRET, never expose to the client**                 |
+| `HERMES_API_URL`                | `http://127.0.0.1:20128`  | Server ONLY (`server/utils/llm.ts`) | Local 9Router endpoint; on Vercel use the prod URL                        |
+| `HERMES_API_KEY`                | `sk-…`                    | Server ONLY                         | Hermes API key — **SECRET**                                               |
+| `NUXT_PUBLIC_GA_ID`             | `G-XXXXXXX`               | Client                              | Google Analytics ID                                                       |
 
-**Cara baca di kode (Nuxt runtimeConfig):**
+**How to read them in code (Nuxt runtimeConfig):**
 
 ```ts
-// Di server (boleh akses secret):
+// On the server (can access secrets):
 const config = useRuntimeConfig();
-config.hermesApiKey; // ✅ rahasia, hanya server
-config.supabaseServiceKey; // ✅ rahasia, hanya server
+config.hermesApiKey; // ✅ secret, server only
+config.supabaseServiceKey; // ✅ secret, server only
 
-// Di browser/client (hanya yang public):
-config.public.supabaseUrl; // ✅ boleh
+// In the browser/client (public only):
+config.public.supabaseUrl; // ✅ allowed
 config.public.supabaseAnonKey;
 ```
 
-Mapping env → runtimeConfig didefinisikan di `nuxt.config.ts`.
+The env → runtimeConfig mapping is defined in `nuxt.config.ts`.
 
 ---
 
-## 6. Pages (Halaman)
+## 6. Pages
 
-Semua di `pages/`. **Nama file = URL otomatis** (file-based routing, tidak ada config router manual).
+All in `pages/`. **The file name = the URL automatically** (file-based routing, no manual router config).
 
 ### `pages/index.vue` → `/` (Landing, SSR)
 
-Hero "Bingung Weekend Mau Kemana?" + **2 CTA**: 🗺️ Cari Tempat (`/quiz`) dan 🍜 Lagi di Mall (`/makan`).
-Halaman statis, cocok untuk SSR + SEO.
+Hero "Bingung Weekend Mau Kemana?" + **2 CTAs**: 🗺️ Cari Tempat (`/quiz`) and 🍜 Lagi di Mall (`/food`).
+A static page, great for SSR + SEO.
 
-### `pages/quiz.vue` → `/quiz` (Quiz Tempat — 5 pertanyaan, ~30 detik)
+### `pages/quiz.vue` → `/quiz` (Place Quiz — 5 questions, ~30 seconds)
 
-- Konsep: **1 layar 1 pertanyaan** + progress bar + tombol Kembali.
-- State lokal: `step` (index pertanyaan), `answers` (reactive object), `q` & `progress` (computed).
-- Pertanyaan: `mood` → `companion` → `budget` → `location` → `time`.
-- Selesai → `router.push({ path: '/result', query: { ...answers } })` — jawaban dikirim via **query string**.
-- Tidak ada fetch di sini — quiz murni kumpulin jawaban di browser.
+- Concept: **1 screen, 1 question** + progress bar + Back button.
+- Local state: `step` (question index), `answers` (reactive object), `q` & `progress` (computed).
+- Questions: `mood` → `companion` → `budget` → `location` → `time`.
+- On finish → `router.push({ path: '/result', query: { ...answers } })` — answers are sent via a **query string**.
+- No fetch here — the quiz just collects answers in the browser.
 
-### `pages/result.vue` → `/result` (Hasil Tempat)
+### `pages/result.vue` → `/result` (Place Result)
 
 ```ts
-const { data, pending, error } = await useFetch("/api/tempat/recommend", {
+const { data, pending, error } = await useFetch("/api/place/recommend", {
   method: "POST",
-  body: route.query, // jawaban quiz dari URL
+  body: route.query, // quiz answers from the URL
 });
 ```
 
-- 3 state UI: `pending` (loading ✨) → `error` (kotak merah) → `data` (5 kartu `#1–#5`: nama, kategori, reason 💡, estimasi cost, best time).
-- Prinsip yang sama dipakai `result-makan.vue`.
+- 3 UI states: `pending` (loading ✨) → `error` (red box) → `data` (5 cards `#1–#5`: name, category, reason 💡, estimated cost, best time).
+- The same principle is used by `result-food.vue`.
 
-### `pages/makan.vue` → `/makan` (Quiz Makan — 4 pertanyaan, ~20 detik)
+### `pages/food.vue` → `/food` (Food Quiz — 4 questions, ~20 seconds)
 
-- Q1 `mall_slug` (wajib: 5 mall V1) → Q2 `mission` → Q3 `budget_tier` → Q4 `companion` + **toggle Halal-only & Kids-friendly**.
-- **Pre-fill:** kalau dibuka dari direktori (`/makan?mall=grand-indonesia`), Q1 di-skip otomatis:
+- Q1 `mall_slug` (required: the 5 V1 malls) → Q2 `mission` → Q3 `budget_tier` → Q4 `companion` + **Halal-only & Kids-friendly toggles**.
+- **Pre-fill:** if opened from the directory (`/food?mall=grand-indonesia`), Q1 is auto-skipped:
 
 ```ts
 const startStep =
@@ -219,247 +219,247 @@ const startStep =
     : 0;
 ```
 
-- Selesai → redirect `/result-makan` dengan jawaban + `halal_only` + `kids_friendly` di query string.
+- On finish → redirect to `/result-food` with the answers + `halal_only` + `kids_friendly` in the query string.
 
-### `pages/result-makan.vue` → `/result-makan` (Hasil Tenant)
+### `pages/result-food.vue` → `/result-food` (Tenant Result)
 
-- POST jawaban ke `/api/makan/recommend`, render 5 kartu tenant: badge `[#N]`, `[✅ Halal / ⚠️ Non-halal]`, `[🔥 Hype]`, reason 💡, tombol **📍 Maps** (link Google Maps + info lantai).
-- Prinsip "result tidak dicampur": halaman ini **hanya** render tenant, tidak ada tempat wisata.
+- POST the answers to `/api/food/recommend`, render 5 tenant cards: badge `[#N]`, `[✅ Halal / ⚠️ Non-halal]`, `[🔥 Hype]`, reason 💡, **📍 Maps** button (Google Maps link + floor info).
+- The "results are never mixed" principle: this page renders **only** tenants, no tourist spots.
 
-### `pages/mall/[slug].vue` → `/mall/:slug` (Direktori — tanpa login/quota/LLM)
+### `pages/mall/[slug].vue` → `/mall/:slug` (Directory — no login/quota/LLM)
 
-- `[slug].vue` = **dynamic route**: 1 file melayani `/mall/grand-indonesia`, `/mall/central-park`, dll (`route.params.slug`).
-- Fetch: `useFetch('/api/malls/${slug}/tenants')` + search box client-side (`keyword` + `filtered` computed).
-- Banner gradient di atas mengarah ke `/makan?mall=${slug}` (jembatan direktori → quiz).
-- `TenantItem` didefinisikan lokal di file ini (bentuk ringkas buat list; bentuk lengkap ada di `TenantRecommendation`).
+- `[slug].vue` = a **dynamic route**: 1 file serves `/mall/grand-indonesia`, `/mall/central-park`, etc. (`route.params.slug`).
+- Fetch: `useFetch('/api/malls/${slug}/tenants')` + a client-side search box (`keyword` + a `filtered` computed).
+- The gradient banner at the top points to `/food?mall=${slug}` (a bridge from directory → quiz).
+- `TenantItem` is defined locally in this file (a compact shape for the list; the full shape lives in `TenantRecommendation`).
 
-### `app.vue` (Layout global)
+### `app.vue` (Global layout)
 
-Header (logo + link 🍜 Makan + 🏬 Mall) + `<NuxtPage />` (tempat render tiap page) + footer.
-Mau tambah navbar/footer global? Edit file ini, bukan tiap page.
+Header (logo + 🍜 Makan link + 🏬 Mall link) + `<NuxtPage />` (where each page renders) + footer.
+Want to add a global navbar/footer? Edit this file, not each page.
 
 ---
 
 ## 7. Server API (Backend)
 
-Semua di `server/`. **Kode di sini tidak pernah dikirim ke browser** — tempat aman buat secret & quota.
+All in `server/`. **This code is never sent to the browser** — a safe place for secrets & quota.
 
-### `server/utils/db.ts` — Koneksi Supabase (admin)
+### `server/utils/db.ts` — Supabase connection (admin)
 
 ```ts
 export function supabaseAdmin() {
-  // singleton: 1 client dipakai ulang (hemat koneksi)
-  // pakai config.public.supabaseUrl + config.supabaseServiceKey
+  // singleton: 1 client reused (saves connections)
+  // uses config.public.supabaseUrl + config.supabaseServiceKey
 }
 ```
 
-Dipakai semua endpoint yang baca/tulis DB. Service key **bypass RLS** — jadi validasi input & quota harus dilakukan di handler sebelum query.
+Used by every endpoint that reads/writes the DB. The service key **bypasses RLS** — so input validation & quota must be done in the handler before the query.
 
-### `server/utils/llm.ts` — Client LLM (Hermes-combo)
+### `server/utils/llm.ts` — LLM client (Hermes-combo)
 
-| Fungsi                                        | Input                                   | Output                                 |
-| --------------------------------------------- | --------------------------------------- | -------------------------------------- |
-| `callLLM(system, user)`                       | 2 string prompt                         | string (raw JSON dari LLM)             |
-| `generateTempat(input: QuizTempatInput)`      | jawaban quiz tempat                     | `TempatRecommendation[]` (5 item)      |
-| `rankTenants(input, candidates: TenantRow[])` | preferensi + ≤30 kandidat dari Supabase | `RankResult[]` (5 item: nama + reason) |
+| Function                                      | Input                                      | Output                                  |
+| --------------------------------------------- | ------------------------------------------ | --------------------------------------- |
+| `callLLM(system, user)`                       | 2 prompt strings                           | string (raw JSON from the LLM)          |
+| `generatePlace(input: QuizPlaceInput)`        | place quiz answers                         | `PlaceRecommendation[]` (5 items)       |
+| `rankTenants(input, candidates: TenantRow[])` | preferences + ≤30 candidates from Supabase | `RankResult[]` (5 items: name + reason) |
 
-Prinsip hemat: **filter di Supabase dulu (gratis) → LLM cuma ranking + 1 kalimat alasan**.
-Prompt system memaksa LLM balas **JSON valid saja** (tanpa disclaimer) supaya bisa `JSON.parse` langsung.
-Timeout 15 detik, `max_tokens: 2000`, model `hermes-combo`.
+Cost-saving principle: **filter in Supabase first (free) → the LLM only ranks + writes 1 sentence of reasoning**.
+The system prompt forces the LLM to reply with **valid JSON only** (no disclaimer) so it can be `JSON.parse`d directly.
+Timeout 15 seconds, `max_tokens: 2000`, model `hermes-combo`.
 
-### `POST /api/tempat/recommend` — Generate tempat
+### `POST /api/place/recommend` — Generate places
 
-File: `server/api/tempat/recommend.post.ts`
+File: `server/api/place/recommend.post.ts`
 
-1. Baca body + siapkan `session_id` (cookie 30 hari).
-2. Cek quota anon: cookie `quota_used === '1'` → 403 `LOGIN_REQUIRED`.
-3. `generateTempat(body)` → simpan ke tabel `generations` (`quiz_input.type: 'tempat'`) → set `quota_used=1`.
-4. Balas `{ recommendations, quota_remaining: 0 }`.
+1. Read the body + set up a `session_id` (30-day cookie).
+2. Check the anonymous quota: cookie `quota_used === '1'` → 403 `LOGIN_REQUIRED`.
+3. `generatePlace(body)` → save to the `generations` table (`quiz_input.type: 'place'`) → set `quota_used=1`.
+4. Reply `{ recommendations, quota_remaining: 0 }`.
 
-### `POST /api/makan/recommend` — Generate tenant
+### `POST /api/food/recommend` — Generate tenants
 
-File: `server/api/makan/recommend.post.ts`
+File: `server/api/food/recommend.post.ts`
 
-1. Baca body (`QuizMakanInput`) + cek cookie `makan_quota_used >= 2` → 403 `MAKAN_QUOTA_EXCEEDED`.
-2. Cari `mall_id` dari `mall_slug` → query `tenants` (`is_open=true` + filter budget/halal/kids, limit 30).
-3. Kosong → 404 ("Tidak ada tenant cocok. Coba ubah filter.").
-4. `rankTenants(body, candidates)` → gabung data tenant + `reason` LLM + `maps_url` Google Maps → simpan `generations` (`type: 'makan'`) → quota +1.
-5. Balas `{ recommendations, quota_remaining }`.
+1. Read the body (`QuizFoodInput`) + check cookie `food_quota_used >= 2` → 403 `FOOD_QUOTA_EXCEEDED`.
+2. Find `mall_id` from `mall_slug` → query `tenants` (`is_open=true` + filter by budget/halal/kids, limit 30).
+3. Empty → 404 ("Tidak ada tenant cocok. Coba ubah filter.").
+4. `rankTenants(body, candidates)` → merge tenant data + the LLM `reason` + `maps_url` Google Maps → save to `generations` (`type: 'food'`) → quota +1.
+5. Reply `{ recommendations, quota_remaining }`.
 
-### `GET /api/malls` — List mall
+### `GET /api/malls` — List malls
 
-File: `server/api/malls/index.get.ts`. Balas semua mall aktif (`is_active=true`, urut nama). Tanpa login/quota/LLM.
+File: `server/api/malls/index.get.ts`. Returns all active malls (`is_active=true`, sorted by name). No login/quota/LLM.
 
-### `GET /api/malls/:slug/tenants` — List tenant 1 mall + filter
+### `GET /api/malls/:slug/tenants` — List tenants of 1 mall + filter
 
 File: `server/api/malls/[slug]/tenants.get.ts`.
-Query params: `?halal=true` `?budget=hemat|menengah|leluasa` `?kids=true` `?search=kopi` `?mission=nongkrong_lama`.
-Filter kolom dikerjakan di SQL Supabase; filter `mission` (array) di-memory setelah fetch. Tanpa login/quota/LLM.
+Query params: `?halal=true` `?budget=budget|mid|splurge` `?kids=true` `?search=kopi` `?mission=long_hangout`.
+Column filters run in Supabase SQL; the `mission` filter (array) runs in memory after the fetch. No login/quota/LLM.
 
 ---
 
-## 8. Types (Kontrak Data)
+## 8. Types (Data Contracts)
 
-File: `common/types/api.ts` (+ `common/types/quota.ts` dll.; tipe UI di `features/<x>/@types/`) — **sumber kebenaran bentuk data**. Kalau nambah field, ubah di sini dulu, baru di feature/server yang pakai.
+File: `common/types/api.ts` (+ `common/types/quota.ts` etc.; UI types in `features/<x>/@types/`) — **the source of truth for data shapes**. If you add a field, change it here first, then in the feature/server that uses it.
 
-| Interface              | Dipakai di                                | Isi                                                                                                   |
-| ---------------------- | ----------------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| `QuizTempatInput`      | `quiz.vue` → `POST /api/tempat/recommend` | mood, companion, budget, location, time?                                                              |
-| `QuizMakanInput`       | `makan.vue` → `POST /api/makan/recommend` | mall_slug, mission, budget_tier, companion, halal_only?, kids_friendly?                               |
-| `TempatRecommendation` | `result.vue`                              | name, category, reason, estimated_cost, location_area, best_time, confidence                          |
-| `TenantRecommendation` | `result-makan.vue`                        | name, category, lantai, halal, budget_tier, price_range, kids_friendly, hype_tiktok, reason, maps_url |
-| `TenantRow`            | server makan/malls                        | Bentuk mentah 1 baris tabel `tenants` (+ mission?, mall_id?, is_open?)                                |
-| `RankResult`           | `rankTenants()`                           | name + reason (output ranking LLM)                                                                    |
-| `LLMChatResponse`      | `callLLM()`                               | choices[0].message.content                                                                            |
+| Interface              | Used in                                  | Contents                                                                                                      |
+| ---------------------- | ---------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `QuizPlaceInput`       | `quiz.vue` → `POST /api/place/recommend` | mood, companion, budget, location, time?                                                                      |
+| `QuizFoodInput`        | `food.vue` → `POST /api/food/recommend`  | mall_slug, mission, budget_tier, companion, halal_only?, kids_friendly?                                       |
+| `PlaceRecommendation`  | `result.vue`                             | name, category, reason, estimated_cost, location_area, best_time, confidence                                  |
+| `TenantRecommendation` | `result-food.vue`                        | name, category, floor, halal, budget_tier, price_min, price_max, kids_friendly, hype_tiktok, reason, maps_url |
+| `TenantRow`            | server food/malls                        | Raw shape of 1 `tenants` table row (+ mission?, mall_id?, is_open?)                                           |
+| `RankResult`           | `rankTenants()`                          | name + reason (LLM ranking output)                                                                            |
+| `LLMChatResponse`      | `callLLM()`                              | choices[0].message.content                                                                                    |
 
 ---
 
 ## 9. Styling (Tailwind)
 
-- Provider: `@nuxtjs/tailwindcss` (terdaftar di `modules` dalam `nuxt.config.ts`).
-- Token brand di `tailwind.config.ts`: `primary` cyan `#0891b2`, `accent` orange `#f97316`.
-- Pola yang dipakai: utility classes langsung di template (`bg-orange-500`, `rounded-2xl`, `max-w-2xl`), gradient hero (`bg-gradient-to-br from-cyan-600`), badge (`rounded-full`), kartu (`bg-white rounded-2xl shadow-sm border p-5`).
-- Pemula: tidak perlu tulis file CSS — cukup kombinasikan utility classes. Kalau butuh warna/ukuran baru, tambah dulu ke `tailwind.config.ts` biar konsisten.
+- Provider: `@nuxtjs/tailwindcss` (registered in `modules` in `nuxt.config.ts`).
+- Brand tokens in `tailwind.config.ts`: `primary` cyan `#0891b2`, `accent` orange `#f97316`.
+- Patterns used: utility classes directly in the template (`bg-orange-500`, `rounded-2xl`, `max-w-2xl`), hero gradient (`bg-gradient-to-br from-cyan-600`), badge (`rounded-full`), card (`bg-white rounded-2xl shadow-sm border p-5`).
+- For beginners: no need to write a CSS file — just combine utility classes. If you need a new color/size, add it to `tailwind.config.ts` first to stay consistent.
 
 ---
 
 ## 10. Lint, Format & Type-check
 
-- **ESLint** (`eslint.config.mjs`): preset `@nuxt/eslint` + **Prettier** + batas ukuran (`complexity ≤ 10`, `max-lines-per-function ≤ 50`,
-  `max-params ≤ 3`, `max-lines ≤ 500`, dll.) + batas modul (antar feature dilarang, client→`server/` dilarang) + security
-  (`v-html`, `process.env` di client, `console.log` dilarang).
-- **Prettier** (`.prettierrc`): titik koma, double quote, lebar 80. Jangan debat format — `pnpm lint:fix`.
+- **ESLint** (`eslint.config.mjs`): the `@nuxt/eslint` preset + **Prettier** + size limits (`complexity ≤ 10`, `max-lines-per-function ≤ 50`,
+  `max-params ≤ 3`, `max-lines ≤ 500`, etc.) + module boundaries (cross-feature imports banned, client→`server/` banned) + security
+  (`v-html`, `process.env` in the client, `console.log` banned).
+- **Prettier** (`.prettierrc`): semicolons, double quotes, width 80. Don't argue about format — `pnpm lint:fix`.
 - **Type-check**: `pnpm type-check` (`nuxt typecheck` / vue-tsc, TS strict).
-- **Husky**: `pnpm install` memasang hook otomatis. Commit menjalankan lint-staged → type-check → test terkait;
-  pesan commit wajib _Conventional Commits_ (`feat(scope): ...`). Jangan `--no-verify`.
+- **Husky**: `pnpm install` installs the hooks automatically. A commit runs lint-staged → type-check → related tests;
+  the commit message must follow _Conventional Commits_ (`feat(scope): ...`). No `--no-verify`.
 
 ```bash
-pnpm lint         # ESLint (0 warning) + prettier --check (dipakai di CI)
+pnpm lint         # ESLint (0 warnings) + prettier --check (used in CI)
 pnpm lint:fix     # prettier --write + eslint --fix
 pnpm type-check   # vue-tsc
 ```
 
 ---
 
-## 11. Perintah NPM
+## 11. NPM Commands
 
-| Perintah             | Fungsi                                  | Kapan dipakai                                         |
-| -------------------- | --------------------------------------- | ----------------------------------------------------- |
-| `pnpm install`       | Install dependencies                    | Sekali di awal / tiap pull yang ubah `package.json`   |
-| `pnpm dev`           | Dev server + hot reload                 | Kerja harian → `http://localhost:3000`                |
-| `pnpm build`         | Build production                        | Sebelum deploy / verifikasi tidak ada error           |
-| `pnpm preview`       | Jalankan hasil build lokal              | Cek hasil `build` persis seperti di server            |
-| `pnpm generate`      | Pre-render statis                       | Kalau butuh output statis (jarang dipakai di MVP ini) |
-| `pnpm lint`          | ESLint + Prettier check                 | Sebelum commit (hook juga menjalankan)                |
-| `pnpm lint:fix`      | Format + perbaiki lint otomatis         | Kalau `lint` merah yang bisa auto-fix                 |
-| `pnpm type-check`    | `nuxt typecheck` (vue-tsc)              | **Wajib exit 0** sebelum klaim beres                  |
-| `pnpm test`          | Jalankan semua unit test (Vitest)       | **Wajib hijau** sebelum klaim beres                   |
-| `pnpm test:related`  | Test terkait file yang berubah          | Dipakai hook pre-commit                               |
-| `pnpm test:watch`    | Test watch mode (jalan ulang tiap save) | Saat nulis kode + test bareng                         |
-| `npx nuxi --version` | Cek versi Nuxt                          | Diagnosa (`nuxi` = CLI resmi Nuxt)                    |
+| Command              | Function                               | When to use                                                    |
+| -------------------- | -------------------------------------- | -------------------------------------------------------------- |
+| `pnpm install`       | Install dependencies                   | Once at the start / after any pull that changes `package.json` |
+| `pnpm dev`           | Dev server + hot reload                | Daily work → `http://localhost:3000`                           |
+| `pnpm build`         | Production build                       | Before deploy / to verify there are no errors                  |
+| `pnpm preview`       | Run the local build                    | Check the `build` output exactly as on the server              |
+| `pnpm generate`      | Static pre-render                      | If you need static output (rarely used in this MVP)            |
+| `pnpm lint`          | ESLint + Prettier check                | Before commit (the hook runs it too)                           |
+| `pnpm lint:fix`      | Auto-format + auto-fix lint            | When `lint` is red and the issues are auto-fixable             |
+| `pnpm type-check`    | `nuxt typecheck` (vue-tsc)             | **Must exit 0** before you call it done                        |
+| `pnpm test`          | Run all unit tests (Vitest)            | **Must be green** before you call it done                      |
+| `pnpm test:related`  | Test only files that changed           | Used by the pre-commit hook                                    |
+| `pnpm test:watch`    | Test watch mode (re-runs on each save) | When writing code + tests together                             |
+| `npx nuxi --version` | Check the Nuxt version                 | Diagnostics (`nuxi` = the official Nuxt CLI)                   |
 
 ---
 
-## 12. Alur Data End-to-End
+## 12. End-to-End Data Flow
 
-**Mode Plan (tempat):**
+**Plan mode (place):**
 
 ```text
-[quiz.vue] jawab 5Q (browser only)
+[quiz.vue] answer 5Q (browser only)
    │  router.push /result?mood=..&companion=..&...
    ▼
-[result.vue] useFetch POST /api/tempat/recommend (body = query)
-   │  ┌─ cek cookie quota_used → 403 kalau habis
-   │  ├─ generateTempat() → callLLM(hermes-combo) → 5 tempat
-   │  └─ INSERT generations {type:'tempat'} + set cookie
+[result.vue] useFetch POST /api/place/recommend (body = query)
+   │  ┌─ check cookie quota_used → 403 if exhausted
+   │  ├─ generatePlace() → callLLM(hermes-combo) → 5 places
+   │  └─ INSERT generations {type:'place'} + set cookie
    ▼
-render 5 kartu tempat
+render 5 place cards
 ```
 
-**Mode Mall (makan):**
+**Mall mode (food):**
 
 ```text
-[makan.vue] jawab 4Q + toggle halal/kids (browser only)
-   │  router.push /result-makan?mall_slug=..&mission=..&...
+[food.vue] answer 4Q + halal/kids toggles (browser only)
+   │  router.push /result-food?mall_slug=..&mission=..&...
    ▼
-[result-makan.vue] useFetch POST /api/makan/recommend
-   │  ┌─ cek cookie makan_quota_used → 403 kalau habis
-   │  ├─ Supabase: mall_slug → mall_id → filter tenants (GRATIS, limit 30)
-   │  ├─ rankTenants() → callLLM ranking Top 5 + reason
-   │  └─ gabung data tenant + maps_url → INSERT generations {type:'makan'}
+[result-food.vue] useFetch POST /api/food/recommend
+   │  ┌─ check cookie food_quota_used → 403 if exhausted
+   │  ├─ Supabase: mall_slug → mall_id → filter tenants (FREE, limit 30)
+   │  ├─ rankTenants() → callLLM rank Top 5 + reason
+   │  └─ merge tenant data + maps_url → INSERT generations {type:'food'}
    ▼
-render 5 kartu tenant + tombol Maps
+render 5 tenant cards + Maps button
 ```
 
-**Direktori (tanpa LLM):**
+**Directory (no LLM):**
 
 ```text
 [mall/[slug].vue] → GET /api/malls/:slug/tenants?halal&budget&...
-   └─ Supabase langsung → list tenant → search client-side
+   └─ Supabase directly → tenant list → client-side search
 ```
 
 ---
 
-## 13. Quota & Batasan
+## 13. Quota & Limits
 
-| Aturan                   | Implementasi sekarang                        | Target produksi (lihat `docs/04-Database-Schema.md`) |
-| ------------------------ | -------------------------------------------- | ---------------------------------------------------- |
-| Tempat 2x/hari           | Cookie `quota_used` (anon 1x → login)        | Tabel `user_quota`, reset 00:00 WIB, enforce di DB   |
-| Makan 5x/hari (terpisah) | Cookie `makan_quota_used` (max 2 untuk anon) | Tabel `mall_search_quota`, reset 00:00 WIB           |
-| Result tidak campur      | Page & endpoint terpisah total               | Sama — kontrak tidak berubah                         |
-| Timeout LLM              | 15 detik (`server/utils/llm.ts`)             | Sama                                                 |
+| Rule                   | Current implementation                         | Production target (see `docs/04-Database-Schema.md`)    |
+| ---------------------- | ---------------------------------------------- | ------------------------------------------------------- |
+| Place 2x/day           | Cookie `quota_used` (anonymous 1x → login)     | `user_quota` table, reset 00:00 WIB, enforced in the DB |
+| Food 5x/day (separate) | Cookie `food_quota_used` (max 2 for anonymous) | `mall_search_quota` table, reset 00:00 WIB              |
+| Results never mixed    | Fully separate pages & endpoints               | Same — the contract doesn't change                      |
+| LLM timeout            | 15 seconds (`server/utils/llm.ts`)             | Same                                                    |
 
-> Cookie = solusi sementara buat MVP. Sebelum launch, pindahkan ke quota DB biar tidak bisa di-bypass dengan hapus cookie.
-
----
-
-## 14. Deploy ke Vercel
-
-1. Push folder ini ke GitHub (atau set root directory = `app/` kalau monorepo).
-2. Di Vercel: **New Project → import repo → Framework: Nuxt.js** (auto-detect).
-3. Isi **Environment Variables** (lihat Bab 5 — nilai PROD, bukan lokal).
-4. Deploy. Setiap push ke `main` = deploy otomatis + preview URL per PR.
-5. Cek: `/` → `/quiz` → `/result`, `/makan` → `/result-makan`, `/mall/grand-indonesia`.
+> Cookies = a temporary solution for the MVP. Before launch, move to DB quota so it can't be bypassed by deleting cookies.
 
 ---
 
-## 15. Troubleshooting (Masalah Umum)
+## 14. Deploying to Vercel
 
-| Gejala                                               | Penyebab paling mungkin                                                                                 | Cara cek / fix                                                            |
-| ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
-| `pnpm dev` error `ECONNREFUSED` / halaman result 500 | `HERMES_API_URL` salah / 9Router tidak jalan                                                            | `curl http://127.0.0.1:20128/v1/models` — harus balas JSON, bukan refused |
-| Result 403 `LOGIN_REQUIRED` / `MAKAN_QUOTA_EXCEEDED` | Quota cookie habis (normal, bukan bug)                                                                  | Buka incognito / hapus cookie / login untuk jatah lebih                   |
-| Direktori `/mall/...` kosong                         | Tabel `malls`/`tenants` di Supabase belum di-seed                                                       | Import `data/tenants-seed.csv` (200 rows) ke Supabase                     |
-| `useFetch` 404 di `/mall/:slug`                      | Slug salah (cek: `grand-indonesia`, `central-park`, `kota-kasablanka`, `pondok-indah-mall`, `aeon-bsd`) | Samakan dengan kolom `slug` di tabel `malls`                              |
-| `pnpm lint` merah `no-explicit-any`                  | Ada tipe `any` di kode baru                                                                             | Ganti dengan interface dari `types/index.ts`                              |
-| Build lolos tapi page blank                          | `NUXT_PUBLIC_*` belum diisi di `.env` / Vercel env                                                      | Cek `runtimeConfig.public` di `nuxt.config.ts` vs env yang ada            |
-| `nuxt prepare` / TS error setelah pull               | `node_modules` basi                                                                                     | `rm -rf node_modules .nuxt && pnpm install`                               |
+1. Push this folder to GitHub (or set root directory = `app/` if it's a monorepo).
+2. In Vercel: **New Project → import repo → Framework: Nuxt.js** (auto-detect).
+3. Fill in the **Environment Variables** (see Section 5 — PROD values, not local).
+4. Deploy. Every push to `main` = an automatic deploy + a preview URL per PR.
+5. Check: `/` → `/quiz` → `/result`, `/food` → `/result-food`, `/mall/grand-indonesia`.
+
+---
+
+## 15. Troubleshooting (Common Issues)
+
+| Symptom                                                 | Most likely cause                                                                                         | How to check / fix                                                           |
+| ------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| `pnpm dev` errors with `ECONNREFUSED` / result page 500 | Wrong `HERMES_API_URL` / 9Router not running                                                              | `curl http://127.0.0.1:20128/v1/models` — it should return JSON, not refused |
+| Result 403 `LOGIN_REQUIRED` / `FOOD_QUOTA_EXCEEDED`     | Quota cookie exhausted (normal, not a bug)                                                                | Open incognito / delete the cookie / log in for more allowance               |
+| Directory `/mall/...` is empty                          | The `malls`/`tenants` tables in Supabase haven't been seeded                                              | Import `data/tenants-seed.csv` (200 rows) into Supabase                      |
+| `useFetch` 404 at `/mall/:slug`                         | Wrong slug (check: `grand-indonesia`, `central-park`, `kota-kasablanka`, `pondok-indah-mall`, `aeon-bsd`) | Match it with the `slug` column in the `malls` table                         |
+| `pnpm lint` red `no-explicit-any`                       | There's an `any` type in new code                                                                         | Replace it with an interface from `types/index.ts`                           |
+| Build passes but the page is blank                      | `NUXT_PUBLIC_*` not filled in `.env` / Vercel env                                                         | Check `runtimeConfig.public` in `nuxt.config.ts` against the env you have    |
+| `nuxt prepare` / TS errors after a pull                 | Stale `node_modules`                                                                                      | `rm -rf node_modules .nuxt && pnpm install`                                  |
 
 ---
 
 ## 16. FAQ
 
-**Q: Project Nuxt-nya ada di mana?**
-A: Di `wikendo-web-app/app/`. Root repo (`docs/`, `data/`, `design/`) sengaja di luar biar dokumentasi, seed CSV, dan prototype tidak kecampur kode.
+**Q: Where is the Nuxt project?**
+A: In `wikendo-web-app/app/`. The repo root (`docs/`, `data/`, `design/`) is intentionally outside so docs, seed CSVs, and the prototype don't get mixed with code.
 
-**Q: Kenapa tidak ada backend terpisah (mis. Express/FastAPI)?**
-A: Keputusan sadar (ADR): Supabase sudah jadi backend (DB+Auth), server Nuxt cuma lapisan tipis (secret, quota, LLM). Bikin repo backend sendiri = +8–12 jam tanpa nilai user. Split hanya kalau ada trigger: client ke-2 non-web, >10rb req/hari, atau tim >3 orang.
+**Q: Why no separate backend (e.g. Express/FastAPI)?**
+A: A deliberate decision (ADR): Supabase is already the backend (DB+Auth), and the Nuxt server is just a thin layer (secrets, quota, LLM). Building our own backend repo = +8–12 hours with no user value. We'd only split on a trigger: a 2nd non-web client, >10k req/day, or a team >3 people.
 
-**Q: Kenapa quiz tempat dan quiz makan dipisah?**
-A: Beda momen butuh (planning di rumah vs lapar di mall), beda quota, dan hasil tidak boleh campur (keputusan owner, Addendum v1.1 LOCKED). Satu quiz campuran bikin bingung + decision fatigue balik lagi.
+**Q: Why are the place quiz and food quiz separate?**
+A: Different moments of need (planning at home vs hungry at the mall), different quotas, and the results must never be mixed (owner's decision, Addendum v1.1 LOCKED). One mixed quiz causes confusion + the decision fatigue comes right back.
 
-**Q: LLM dipakai buat apa aja? Biar hemat gimana?**
-A: Cuma 2 hal: generate 5 tempat + ranking 5 tenant. Daftar kandidat selalu dari Supabase dulu (gratis), LLM tidak pernah browsing/list dari nol.
+**Q: What is the LLM used for? How do we keep it cheap?**
+A: Only 2 things: generating 5 places + ranking 5 tenants. The candidate list always comes from Supabase first (free); the LLM never browses/lists from scratch.
 
-**Q: Mau nambah mall ke-6, langkahnya apa?**
-A: (1) Tambah row di tabel `malls`; (2) tambah tenants di `tenants-seed.csv` + import; (3) tambah 1 option di `questions[0]` dalam `pages/makan.vue`; (4) tambah 1 entry di `mallName` dalam `pages/mall/[slug].vue`. Tidak perlu endpoint baru.
+**Q: I want to add a 6th mall — what are the steps?**
+A: (1) Add a row to the `malls` table; (2) add tenants to `tenants-seed.csv` + import; (3) add 1 option to `questions[0]` in `pages/food.vue`; (4) add 1 entry to `mallName` in `pages/mall/[slug].vue`. No new endpoint needed.
 
-**Q: Mau nambah halaman baru?**
-A: Bikin 1 file di `pages/nama.vue` → otomatis jadi route `/nama`. Kalau dinamis: `pages/x/[id].vue` → `/x/apapun`.
+**Q: I want to add a new page?**
+A: Create 1 file at `pages/nama.vue` → it automatically becomes the route `/nama`. If it's dynamic: `pages/x/[id].vue` → `/x/apapun`.
 
-**Q: Mau nambah endpoint API baru?**
-A: Bikin file di `server/api/...` ikut pola nama (`*.get.ts` / `*.post.ts`), pakai `supabaseAdmin()` dari `server/utils/db.ts` buat DB dan `defineEventHandler` + `createError` buat handler.
+**Q: I want to add a new API endpoint?**
+A: Create a file in `server/api/...` following the naming pattern (`*.get.ts` / `*.post.ts`), use `supabaseAdmin()` from `server/utils/db.ts` for the DB and `defineEventHandler` + `createError` for the handler.
 
 ---
 
-_Terakhir diverifikasi: Nuxt 4.6.0 · ESLint 10 · pnpm 9.15.4 · `pnpm lint` clean · `pnpm build` EXIT:0. Kalau ada yang tidak sesuai dengan kode, kode yang menang — lalu update dokumen ini._
+_Last verified: Nuxt 4.6.0 · ESLint 10 · pnpm 9.15.4 · `pnpm lint` clean · `pnpm build` EXIT:0. If something doesn't match the code, the code wins — then update this document._

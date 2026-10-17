@@ -1,6 +1,6 @@
 /**
- * server/utils/__tests__/llmParsing.spec.ts — Test routing LLM (CF direct vs hermes) + validasi hasil anti-500.
- * Prod Vercel tak bisa ke localhost:20128 → CF Workers AI; dev lokal hermes-combo.
+ * server/utils/__tests__/llmParsing.spec.ts — LLM routing test (CF direct vs hermes) + anti-500 result validation.
+ * Prod Vercel can't reach localhost:20128 → CF Workers AI; local dev uses hermes-combo.
  */
 import { describe, it, expect } from "vitest";
 import {
@@ -8,18 +8,18 @@ import {
   buildRankFallback,
   cleanJSON,
   parseRankResults,
-  parseTempatResults,
+  parsePlaceResults,
   pickLLMProvider,
 } from "../llmParsing";
 
 describe("buildCfChatUrl (endpoint OpenAI-compatible CF)", () => {
-  it("bikin URL .../ai/v1/chat/completions dari accountId", () => {
+  it("builds URL .../ai/v1/chat/completions from accountId", () => {
     expect(buildCfChatUrl("abc123def456")).toBe(
       "https://api.cloudflare.com/client/v4/accounts/abc123def456/ai/v1/chat/completions",
     );
   });
 
-  it("trim spasi accountId", () => {
+  it("trims accountId whitespace", () => {
     expect(buildCfChatUrl("  abc123  ")).toBe(
       "https://api.cloudflare.com/client/v4/accounts/abc123/ai/v1/chat/completions",
     );
@@ -27,7 +27,7 @@ describe("buildCfChatUrl (endpoint OpenAI-compatible CF)", () => {
 });
 
 describe("pickLLMProvider (dev/prod split)", () => {
-  it("CF kalau accountId + token ada → kind cf + model llama-3.1-8b-instruct-fast", () => {
+  it("CF if accountId + token present → kind cf + model llama-3.1-8b-instruct-fast", () => {
     const p = pickLLMProvider({
       cfAccountId: "acc123",
       cfToken: "tok456",
@@ -40,7 +40,7 @@ describe("pickLLMProvider (dev/prod split)", () => {
     expect(p.model).toBe("@cf/meta/llama-3.1-8b-instruct-fast");
   });
 
-  it("hermes fallback kalau CF kosong (dev lokal)", () => {
+  it("hermes fallback if CF empty (local dev)", () => {
     const p = pickLLMProvider({
       cfAccountId: "",
       cfToken: "",
@@ -51,7 +51,7 @@ describe("pickLLMProvider (dev/prod split)", () => {
     expect(p.model).toBe("hermes-combo");
   });
 
-  it("hermes fallback kalau cuma salah satu CF ada (aman, anti setengah config)", () => {
+  it("hermes fallback if only one CF value present (safe, anti half-configured)", () => {
     const p = pickLLMProvider({
       cfAccountId: "acc123",
       cfToken: "",
@@ -62,23 +62,23 @@ describe("pickLLMProvider (dev/prod split)", () => {
 });
 
 describe("cleanJSON (strip markdown fence LLM)", () => {
-  it("buang ```json fence + teks prefix", () => {
+  it("strips ```json fence + prefix text", () => {
     const raw = 'Baik! ```json\n{"recommendations":[]}\n```';
     expect(cleanJSON(raw)).toBe('{"recommendations":[]}');
   });
 
-  it("JSON polos tetap utuh", () => {
+  it("plain JSON stays intact", () => {
     expect(cleanJSON('{"a":1}')).toBe('{"a":1}');
   });
 
-  it("buang teks trailing setelah JSON (penyebab 500 flaky)", () => {
+  it("strips trailing text after JSON (cause of flaky 500)", () => {
     expect(cleanJSON('{"ranking":[]} semoga membantu ya!')).toBe(
       '{"ranking":[]}',
     );
   });
 });
 
-describe("parseRankResults (validasi ranking LLM anti-500)", () => {
+describe("parseRankResults (anti-500 LLM ranking validation)", () => {
   const cands = [
     "HokBen",
     "Marugame Udon",
@@ -87,7 +87,7 @@ describe("parseRankResults (validasi ranking LLM anti-500)", () => {
     "Solaria",
     "J.CO",
   ];
-  it("JSON valid dengan nama pas kandidat → lolos 5", () => {
+  it("valid JSON with names matching candidates → 5 pass", () => {
     const raw = JSON.stringify({
       ranking: cands
         .slice(0, 5)
@@ -98,27 +98,27 @@ describe("parseRankResults (validasi ranking LLM anti-500)", () => {
     expect(out[0]?.name).toBe("HokBen");
   });
 
-  it("key salah (recommendations bukan ranking) → throw (picu retry/fallback)", () => {
+  it("wrong key (recommendations instead of ranking) → throws (triggers retry/fallback)", () => {
     const raw = JSON.stringify({
       recommendations: [{ name: "HokBen", reason: "x" }],
     });
     expect(() => parseRankResults(raw, cands)).toThrow();
   });
 
-  it("nama halu di luar kandidat → throw", () => {
+  it("hallucinated name outside candidates → throws", () => {
     const raw = JSON.stringify({
       ranking: [{ name: "Sushi Hantu", reason: "x" }],
     });
     expect(() => parseRankResults(raw, cands)).toThrow();
   });
 
-  it("JSON rusak/truncated → throw", () => {
+  it("broken/truncated JSON → throws", () => {
     expect(() => parseRankResults('{"ranking":[', cands)).toThrow();
   });
 });
 
-describe("parseTempatResults (validasi tempat anti-500)", () => {
-  it("JSON valid 5 tempat → lolos", () => {
+describe("parsePlaceResults (anti-500 place validation)", () => {
+  it("valid JSON with 5 places → passes", () => {
     const recs = Array.from({ length: 5 }, (_, i) => ({
       name: "T" + i,
       category: "c",
@@ -129,17 +129,17 @@ describe("parseTempatResults (validasi tempat anti-500)", () => {
       confidence: "high",
     }));
     const raw = JSON.stringify({ recommendations: recs });
-    expect(parseTempatResults(raw).length).toBe(5);
+    expect(parsePlaceResults(raw).length).toBe(5);
   });
 
-  it("shape salah → throw", () => {
-    expect(() => parseTempatResults('{"ranking":[]}')).toThrow();
-    expect(() => parseTempatResults("bukan json")).toThrow();
+  it("wrong shape → throws", () => {
+    expect(() => parsePlaceResults('{"ranking":[]}')).toThrow();
+    expect(() => parsePlaceResults("bukan json")).toThrow();
   });
 });
 
-describe("buildRankFallback (deterministik, nol LLM, anti-500)", () => {
-  it("ambil 5 pertama kandidat + reason generik", () => {
+describe("buildRankFallback (deterministic, zero LLM, anti-500)", () => {
+  it("takes the first 5 candidates + generic reason", () => {
     const cands = [
       { name: "HokBen" },
       { name: "Marugame Udon" },

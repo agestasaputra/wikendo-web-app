@@ -1,27 +1,50 @@
 /**
- * common/utils/history.ts — Logic murni riwayat (parse storage, tambah entry, cap + dedupe).
+ * common/utils/history.ts — Pure history logic (parse storage, add entry, cap + dedupe).
  *
- * APA: parseHistory(raw) + addHistoryEntry(list, entry). PURE: tanpa akses localStorage.
- * KENAPA: dulu ditulis 2x (result tempat + result makan) → 1 sumber, testable.
- * Contoh: addHistoryEntry([], { kind: "tempat", title: "A", sub: "", at: 1 }) → [entry].
+ * WHAT: parseHistory(raw) + addHistoryEntry(list, entry). PURE: no localStorage access.
+ * WHY: previously written 2x (place result + food result) → single source of truth, testable.
+ * EXAMPLE: addHistoryEntry([], { kind: "place", title: "A", sub: "", at: 1 }) → [entry].
  */
 import { HISTORY_MAX_ENTRIES } from "../constants/storage";
-import type { HistoryEntry } from "../types/history";
+import type { HistoryEntry, HistoryKind } from "../types/history";
 
-/** JSON string localStorage → list. Null/rusak/bukan array = [] (aman). */
+/** Old `kind` values (pre-rename flow) → new values. localStorage migration. */
+const LEGACY_KIND: Record<string, HistoryKind> = {
+  tempat: "place",
+  makan: "food",
+};
+
+/** Raw `kind` → HistoryKind; old values are mapped, unknown → "place". */
+function normalizeKind(kind: unknown): HistoryKind {
+  if (kind === "place" || kind === "food") return kind;
+  return LEGACY_KIND[String(kind)] ?? "place";
+}
+
+/** 1 raw storage row → HistoryEntry (kind normalized, other fields coerced). */
+function normalizeEntry(raw: unknown): HistoryEntry {
+  const e = (raw ?? {}) as Partial<HistoryEntry>;
+  return {
+    kind: normalizeKind(e.kind),
+    title: String(e.title ?? ""),
+    sub: String(e.sub ?? ""),
+    at: Number(e.at ?? 0),
+  };
+}
+
+/** localStorage JSON string → list. Null/corrupt/not an array = [] (safe). */
 export function parseHistory(raw: string | null): HistoryEntry[] {
   if (!raw) return [];
   try {
     const parsed: unknown = JSON.parse(raw);
     return Array.isArray(parsed)
-      ? (parsed as HistoryEntry[]).slice(0, HISTORY_MAX_ENTRIES)
+      ? parsed.slice(0, HISTORY_MAX_ENTRIES).map(normalizeEntry)
       : [];
   } catch {
     return [];
   }
 }
 
-/** Tambah di depan; judul sama = tidak ganda (list sama); dipotong max 20. */
+/** Add at the front; same title = no duplicate (same list); truncated to max 20. */
 export function addHistoryEntry(
   list: HistoryEntry[],
   entry: HistoryEntry,
@@ -30,7 +53,7 @@ export function addHistoryEntry(
   return [entry, ...list].slice(0, HISTORY_MAX_ENTRIES);
 }
 
-/** Selisih waktu → "barusan" / "5m lalu" / "2j lalu" / tanggal id-ID. */
+/** Time difference → "barusan" / "5m lalu" / "2j lalu" / id-ID date. */
 export function timeAgo(at: number, now: number = Date.now()): string {
   const d = now - at;
   if (d < 60_000) return "barusan";

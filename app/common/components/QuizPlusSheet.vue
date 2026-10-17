@@ -1,13 +1,13 @@
-<!-- common/components/QuizPlusSheet.vue → Sheet Quiz+ 2 intent eksplisit (Addendum docs/24 E1).
-APA: backdrop + dialog 2 kartu (Cari Tempat → /quiz, Cari Makan → /makan) dengan sisa quota jujur; habis = disabled "Besok lagi 00.00".
-KENAPA: 1 tombol + tak bisa bawa 2 intent quota beda (tempat 2/hari vs makan 5/hari) tanpa bohong → cost 2-tap diterima. NOL API baru.
-Contoh: <QuizPlusSheet :tempat-left="1" :tempat-limit="1" :makan-left="2" :makan-limit="2" @go="go" @close="close" /> -->
+<!-- common/components/QuizPlusSheet.vue → Quiz+ sheet with 2 explicit intents (Addendum docs/24 E1).
+WHAT: backdrop + dialog with 2 cards (Cari Tempat → /quiz, Cari Makan → /food) showing honest remaining quota; empty = disabled "Besok lagi 00.00".
+WHY: 1 "+" button can't carry 2 different quota intents (place 2/day vs food 5/day) without lying → the 2-tap cost is accepted. ZERO new API.
+EXAMPLE: <QuizPlusSheet :place-left="1" :place-limit="1" :food-left="2" :food-limit="2" @go="go" @close="close" /> -->
 <script setup lang="ts">
 defineProps<{
-  tempatLeft: number;
-  tempatLimit: number;
-  makanLeft: number;
-  makanLimit: number;
+  placeLeft: number;
+  placeLimit: number;
+  foodLeft: number;
+  foodLimit: number;
 }>();
 const emit = defineEmits<{ go: [path: string]; close: [] }>();
 </script>
@@ -43,7 +43,7 @@ const emit = defineEmits<{ go: [path: string]; close: [] }>();
         <div class="flex flex-col gap-2">
           <button
             type="button"
-            :disabled="tempatLeft <= 0"
+            :disabled="placeLeft <= 0"
             class="rounded-xl p-3 flex gap-2 items-center bg-white text-left disabled:opacity-60"
             style="border: 1.5px solid #e7e5e4"
             @click="emit('go', '/quiz')"
@@ -52,35 +52,35 @@ const emit = defineEmits<{ go: [path: string]; close: [] }>();
             <span class="flex-1 text-[13px] font-extrabold">
               Cari Tempat<br />
               <small class="font-bold text-gray-500">
-                Quiz 30 dtk · 2/hari · sisa {{ tempatLeft }}/{{ tempatLimit }}
+                Quiz 30 dtk · 2/hari · sisa {{ placeLeft }}/{{ placeLimit }}
               </small>
             </span>
             <span
               class="text-[12px] font-extrabold rounded-full px-3 py-1.5 text-white"
               style="background: #0c0a09"
             >
-              {{ tempatLeft <= 0 ? "Besok lagi 00.00" : "Mulai →" }}
+              {{ placeLeft <= 0 ? "Besok lagi 00.00" : "Mulai →" }}
             </span>
           </button>
           <button
             type="button"
-            :disabled="makanLeft <= 0"
+            :disabled="foodLeft <= 0"
             class="rounded-xl p-3 flex gap-2 items-center bg-white text-left disabled:opacity-60"
             style="border: 1.5px solid #e7e5e4"
-            @click="emit('go', '/makan')"
+            @click="emit('go', '/food')"
           >
             <span class="text-2xl">🍜</span>
             <span class="flex-1 text-[13px] font-extrabold">
               Cari Makan<br />
               <small class="font-bold text-gray-500">
-                Quiz 20 dtk · 5/hari · sisa {{ makanLeft }}/{{ makanLimit }}
+                Quiz 20 dtk · 5/hari · sisa {{ foodLeft }}/{{ foodLimit }}
               </small>
             </span>
             <span
               class="text-[12px] font-extrabold rounded-full px-3 py-1.5 text-white"
               style="background: #e11d48"
             >
-              {{ makanLeft <= 0 ? "Besok lagi 00.00" : "Mulai →" }}
+              {{ foodLeft <= 0 ? "Besok lagi 00.00" : "Mulai →" }}
             </span>
           </button>
         </div>

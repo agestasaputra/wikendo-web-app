@@ -1,9 +1,9 @@
 /**
- * GET /api/malls — List mall aktif + paging S2b infinity scroll.
- * Tanpa ?limit = array legacy (backward-compat, 5 mall sekaligus seperti sekarang).
- * Dengan ?limit&?offset = objek { items, total, hasMore } (10/page default, max 50).
- * Tanpa login/quota/LLM — halaman direktori boleh diakses siapa pun.
- * Contoh: /api/malls?limit=10&offset=0 → { items:[...5], total:5, hasMore:false }.
+ * GET /api/malls — List active malls + S2b infinity scroll paging.
+ * Without ?limit = legacy array (backward-compat, 5 malls at once as it is now).
+ * With ?limit&?offset = object { items, total, hasMore } (10/page default, max 50).
+ * No login/quota/LLM — the directory page is accessible to anyone.
+ * EXAMPLE: /api/malls?limit=10&offset=0 → { items:[...5], total:5, hasMore:false }.
  */
 import { hasMorePages, parsePaginationParams } from "../../../utils/pagination";
 import { supabaseAdmin } from "../../utils/db";
@@ -12,7 +12,7 @@ export default defineEventHandler(async (event) => {
   const db = supabaseAdmin();
   const query = getQuery(event);
 
-  // Legacy: tanpa ?limit → array 5 mall (kontrak lama, pages lama tidak crash).
+  // Legacy: without ?limit → array of 5 malls (old contract, old pages don't crash).
   if (query.limit === undefined) {
     const { data } = await db
       .from("malls")

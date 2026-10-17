@@ -1,14 +1,14 @@
 /**
- * common/types/api.ts — KONTRAK data API (client + server).
+ * common/types/api.ts — API data CONTRACT (client + server).
  *
- * APA: bentuk body/response POST /api/tempat|makan/recommend, baris tabel, respons LLM.
- * KENAPA di common/: dipakai pages (client) DAN server/api — 1 sumber kebenaran.
- * ATURAN: ubah/tambah field? Edit file ini DULU, baru feature/server yang pakai.
- * Contoh: const body: QuizMakanInput = { mall_slug: "grand-indonesia", ... }
+ * WHAT: body/response shape of POST /api/place|food/recommend, table rows, LLM response.
+ * WHY in common/: used by pages (client) AND server/api — single source of truth.
+ * RULES: change/add a field? Edit this file FIRST, then the feature/server that uses it.
+ * EXAMPLE: const body: QuizFoodInput = { mall_slug: "grand-indonesia", ... }
  */
 
-/** Body POST /api/tempat/recommend (dari quiz tempat via query string). */
-export interface QuizTempatInput {
+/** Body POST /api/place/recommend (from place quiz via query string). */
+export interface QuizPlaceInput {
   mood: string;
   companion: string;
   budget: string;
@@ -16,8 +16,8 @@ export interface QuizTempatInput {
   time?: string;
 }
 
-/** Body POST /api/makan/recommend (dari quiz makan via query string). */
-export interface QuizMakanInput {
+/** Body POST /api/food/recommend (from food quiz via query string). */
+export interface QuizFoodInput {
   mall_slug: string;
   mission: string;
   budget_tier: string;
@@ -26,8 +26,8 @@ export interface QuizMakanInput {
   kids_friendly?: boolean | string;
 }
 
-/** 1 kartu hasil tempat (output generateTempat/LLM). */
-export interface TempatRecommendation {
+/** 1 place result card (output of generatePlace/LLM). */
+export interface PlaceRecommendation {
   name: string;
   category: string;
   reason: string;
@@ -37,14 +37,15 @@ export interface TempatRecommendation {
   confidence: string;
 }
 
-/** 1 kartu hasil makan (tenant DB + reason LLM + maps_url). */
+/** 1 food result card (tenant DB + LLM reason + maps_url). */
 export interface TenantRecommendation {
   name: string;
   category: string;
-  lantai: string;
+  floor: string;
   halal: boolean | null;
   budget_tier: string;
-  price_range: string;
+  price_min: number | null; // IDR rupiah
+  price_max: number | null; // IDR rupiah
   kids_friendly: boolean | null;
   hype_tiktok: boolean | null;
   reason: string;
@@ -53,14 +54,15 @@ export interface TenantRecommendation {
   needs_survey?: boolean;
 }
 
-/** 1 baris mentah tabel `tenants` Supabase. */
+/** 1 raw row of the Supabase `tenants` table. */
 export interface TenantRow {
   name: string;
   category: string;
-  lantai: string;
+  floor: string;
   halal: boolean | null;
   budget_tier: string;
-  price_range: string;
+  price_min: number | null; // IDR rupiah
+  price_max: number | null; // IDR rupiah
   kids_friendly: boolean | null;
   hype_tiktok: boolean | null;
   mission?: string[];
@@ -71,13 +73,13 @@ export interface TenantRow {
   needs_survey?: boolean;
 }
 
-/** Output rankTenants(): nama (HARUS persis dari kandidat) + reason. */
+/** Output of rankTenants(): name (MUST match the candidate exactly) + reason. */
 export interface RankResult {
   name: string;
   reason: string;
 }
 
-/** Bentuk mentah response LLM (choices[0].message.content). */
+/** Raw shape of the LLM response (choices[0].message.content). */
 export interface LLMChatResponse {
   choices: { message: { content: string } }[];
 }

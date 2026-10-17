@@ -1,18 +1,17 @@
 /**
- * features/mall/utils/__tests__/directory.spec.ts — Test logic direktori (search, area, lantai, harga, pill, filter).
- * Slot S2c/D1 1:1; DB real tanpa kolom rating/promo → turunan deterministik.
+ * features/mall/utils/__tests__/directory.spec.ts — Directory logic test (search, area, floor, price, pill, filter).
+ * S2c/D1 slots 1:1; real DB without rating/promo columns → deterministic derivation.
  */
 import { describe, it, expect } from "vitest";
 import {
   buildDirCountLabel,
   buildTenantQuery,
   filterTenantsByKeyword,
-  formatLantai,
-  priceShort,
+  formatFloor,
   shortArea,
 } from "../directory";
 
-describe("filterTenantsByKeyword (search direktori)", () => {
+describe("filterTenantsByKeyword (directory search)", () => {
   const tenants = [
     { name: "Kopi Kenangan" },
     { name: "Ramen Seirock-ya" },
@@ -23,52 +22,44 @@ describe("filterTenantsByKeyword (search direktori)", () => {
     expect(filterTenantsByKeyword(tenants, "kopi")).toHaveLength(2);
   });
 
-  it("keyword kosong = semua", () => {
+  it("empty keyword = all", () => {
     expect(filterTenantsByKeyword(tenants, "")).toHaveLength(3);
   });
 
-  it("tidak ketemu = array kosong", () => {
+  it("no match = empty array", () => {
     expect(filterTenantsByKeyword(tenants, "sushi")).toHaveLength(0);
   });
 });
 
-describe("shortArea (area full → pendek 1:1 D1)", () => {
-  it("ambil segmen terpendek (Thamrin, Grogol)", () => {
+describe("shortArea (full area → short 1:1 D1)", () => {
+  it("takes the shortest segment (Thamrin, Grogol)", () => {
     expect(shortArea("Thamrin / Menteng")).toBe("Thamrin");
     expect(shortArea("Tanjung Duren / Grogol")).toBe("Grogol");
   });
 
-  it("area tunggal as-is, kosong → string kosong", () => {
+  it("single area as-is, empty → empty string", () => {
     expect(shortArea("BSD City")).toBe("BSD City");
     expect(shortArea("")).toBe("");
     expect(shortArea(undefined)).toBe("");
   });
 });
 
-describe("formatLantai (lantai DB → label kartu S2c)", () => {
-  it("angka → prefix L (1→L1, 3A→L3A)", () => {
-    expect(formatLantai("1")).toBe("L1");
-    expect(formatLantai("3")).toBe("L3");
-    expect(formatLantai("3A")).toBe("L3A");
-    expect(formatLantai("5")).toBe("L5");
+describe("formatFloor (DB floor → S2c card label)", () => {
+  it("number → L prefix (1→L1, 3A→L3A)", () => {
+    expect(formatFloor("1")).toBe("L1");
+    expect(formatFloor("3")).toBe("L3");
+    expect(formatFloor("3A")).toBe("L3A");
+    expect(formatFloor("5")).toBe("L5");
   });
 
-  it("kode gedung as-is (LG, GF, UG, G, nama area)", () => {
-    expect(formatLantai("LG")).toBe("LG");
-    expect(formatLantai("GF")).toBe("GF");
-    expect(formatLantai("UG")).toBe("UG");
-    expect(formatLantai("G")).toBe("G");
-    expect(formatLantai("Foodprint")).toBe("Foodprint");
-    expect(formatLantai("Tribeca")).toBe("Tribeca");
-    expect(formatLantai("")).toBe("");
-  });
-});
-
-describe("priceShort (Rp 50-90rb → 50-90rb)", () => {
-  it("buang prefix Rp", () => {
-    expect(priceShort("Rp 50-90rb")).toBe("50-90rb");
-    expect(priceShort("50-100rb")).toBe("50-100rb");
-    expect(priceShort("")).toBe("");
+  it("building code as-is (LG, GF, UG, G, area name)", () => {
+    expect(formatFloor("LG")).toBe("LG");
+    expect(formatFloor("GF")).toBe("GF");
+    expect(formatFloor("UG")).toBe("UG");
+    expect(formatFloor("G")).toBe("G");
+    expect(formatFloor("Foodprint")).toBe("Foodprint");
+    expect(formatFloor("Tribeca")).toBe("Tribeca");
+    expect(formatFloor("")).toBe("");
   });
 });
 
@@ -80,20 +71,20 @@ describe("buildDirCountLabel (pill infinity S2c)", () => {
   });
 });
 
-describe("buildTenantQuery (3 chip filter → query server-side)", () => {
-  it("semua mati → objek kosong", () => {
+describe("buildTenantQuery (3 filter chips → server-side query)", () => {
+  it("all off → empty object", () => {
     expect(
       buildTenantQuery({ halal: false, budget: false, mission: false }),
     ).toEqual({});
   });
 
-  it("semua nyala → halal + budget menengah + misi nongkrong", () => {
+  it("all on → halal + mid budget + hangout mission", () => {
     expect(
       buildTenantQuery({ halal: true, budget: true, mission: true }),
     ).toEqual({
       halal: "true",
-      budget: "menengah",
-      mission: "nongkrong_lama",
+      budget: "mid",
+      mission: "long_hangout",
     });
   });
 });

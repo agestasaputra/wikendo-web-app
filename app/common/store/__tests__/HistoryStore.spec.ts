@@ -5,11 +5,11 @@ import type { HistoryEntry } from "../../types/history";
 import { useHistoryStore } from "../HistoryStore";
 
 /**
- * HistoryStore.spec.ts — Riwayat E1 (localStorage wikendo_history, NOL backend).
- * happy-dom menyediakan localStorage; storage rusak/penuh tidak boleh merusak UI.
+ * HistoryStore.spec.ts — History E1 (localStorage wikendo_history, ZERO backend).
+ * happy-dom provides localStorage; broken/full storage must not break the UI.
  */
 const entry = (title: string): HistoryEntry => ({
-  kind: "makan",
+  kind: "food",
   title,
   sub: "GI · L2",
   at: 1,
@@ -21,7 +21,7 @@ describe("HistoryStore", () => {
     window.localStorage.clear();
   });
 
-  it("push: simpan ke state + localStorage (newest-first)", () => {
+  it("push: saves to state + localStorage (newest-first)", () => {
     const history = useHistoryStore();
     history.push(entry("A"));
     history.push(entry("B"));
@@ -31,14 +31,14 @@ describe("HistoryStore", () => {
     ).toHaveLength(2);
   });
 
-  it("push judul sama → tidak ganda", () => {
+  it("push same title → no duplicate", () => {
     const history = useHistoryStore();
     history.push(entry("A"));
     history.push(entry("A"));
     expect(history.items).toHaveLength(1);
   });
 
-  it("load: baca dari localStorage (store baru = sesi baru)", () => {
+  it("load: reads from localStorage (new store = new session)", () => {
     window.localStorage.setItem(
       HISTORY_STORAGE_KEY,
       JSON.stringify([entry("X")]),
@@ -48,14 +48,14 @@ describe("HistoryStore", () => {
     expect(history.items[0]?.title).toBe("X");
   });
 
-  it("load: storage rusak → list kosong (tidak crash)", () => {
+  it("load: broken storage → empty list (no crash)", () => {
     window.localStorage.setItem(HISTORY_STORAGE_KEY, "{rusak");
     const history = useHistoryStore();
     history.load();
     expect(history.items).toEqual([]);
   });
 
-  it("clear: hapus key + kosongkan state", () => {
+  it("clear: removes key + empties state", () => {
     const history = useHistoryStore();
     history.push(entry("A"));
     history.clear();
@@ -63,7 +63,7 @@ describe("HistoryStore", () => {
     expect(window.localStorage.getItem(HISTORY_STORAGE_KEY)).toBeNull();
   });
 
-  it("clear: localStorage melempar (diblok) → state tetap dikosongkan, tidak crash", () => {
+  it("clear: localStorage throws (blocked) → state still emptied, no crash", () => {
     const history = useHistoryStore();
     history.push(entry("A"));
     const spy = vi

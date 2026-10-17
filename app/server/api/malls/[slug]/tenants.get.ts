@@ -1,12 +1,12 @@
 /**
- * GET /api/malls/:slug/tenants — List tenant 1 mall + filter server-side + paging S2b.
- * Query filter: ?halal=true ?budget=hemat|menengah|leluasa ?kids=true ?search=kopi ?mission=nongkrong_lama
- * Tanpa ?limit = array legacy (backward-compat, 40 tenant sekaligus seperti sekarang).
- * Dengan ?limit&?offset = objek { items, total, hasMore } (10/page default, max 50).
- * Filter kolom di SQL Supabase; mission (array) di-memory; paging di-slice setelah
- * semua filter (benar untuk 40 row/mall, total = pasca-filter buat sticky count "10/40").
- * Tanpa login/quota/LLM. 404 kalau slug mall tidak ada.
- * ATURAN NULL (tri-state): lihat server/utils/tenantFilters.ts.
+ * GET /api/malls/:slug/tenants — List tenants of 1 mall + server-side filter + S2b paging.
+ * Query filter: ?halal=true ?budget=budget|mid|splurge ?kids=true ?search=kopi ?mission=long_hangout
+ * Without ?limit = legacy array (backward-compat, 40 tenants at once as it is now).
+ * With ?limit&?offset = object { items, total, hasMore } (10/page default, max 50).
+ * Column filters in Supabase SQL; mission (array) in-memory; paging is sliced after
+ * all filters (correct for 40 rows/mall, total = post-filter for the sticky count "10/40").
+ * No login/quota/LLM. 404 if the mall slug doesn't exist.
+ * NULL RULE (tri-state): see server/utils/tenantFilters.ts.
  */
 import type { TenantRow } from "../../../../common/types/api";
 import type { MallRow } from "../../../../common/types/database";
@@ -49,7 +49,7 @@ export default defineEventHandler(async (event) => {
 
   const list = filterByMission((tenants || []) as TenantRow[], query.mission);
 
-  // Legacy: tanpa ?limit → array penuh (kontrak lama).
+  // Legacy: without ?limit → full array (old contract).
   if (query.limit === undefined) return list;
 
   const { limit, offset } = parsePaginationParams(

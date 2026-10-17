@@ -1,19 +1,19 @@
 import { describe, it, expect } from "vitest";
 import { isNavActive } from "../nav";
 
-describe("isNavActive (tab BottomNav aktif)", () => {
-  it('Home hanya aktif di "/" persis', () => {
+describe("isNavActive (active BottomNav tab)", () => {
+  it('Home only active at exactly "/"', () => {
     expect(isNavActive("/", "/")).toBe(true);
     expect(isNavActive("/", "/mall")).toBe(false);
   });
 
-  it("tab lain aktif di path sendiri + child route", () => {
+  it("other tabs active on their own path + child route", () => {
     expect(isNavActive("/mall", "/mall")).toBe(true);
     expect(isNavActive("/mall", "/mall/grand-indonesia")).toBe(true);
   });
 
-  it("prefix mirip tapi bukan child → tidak aktif", () => {
+  it("similar prefix but not a child → not active", () => {
     expect(isNavActive("/mall", "/mallx")).toBe(false);
-    expect(isNavActive("/riwayat", "/account")).toBe(false);
+    expect(isNavActive("/history", "/account")).toBe(false);
   });
 });

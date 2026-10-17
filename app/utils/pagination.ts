@@ -1,10 +1,10 @@
 /**
- * utils/pagination.ts — Math paging infinity scroll S2b (limit/offset, hasMore, merge).
+ * utils/pagination.ts — S2b infinity scroll paging math (limit/offset, hasMore, merge).
  *
- * APA: parsePaginationParams, hasMorePages, mergePageItems. PURE.
- * KENAPA: dipakai 2 halaman (mall list/detail) + 2 API + composable useInfiniteList.
- * Spec S2b: 10/page, max 50, tanpa ?limit = array legacy.
- * Contoh: parsePaginationParams({ limit: "10", offset: "20" }) → { limit: 10, offset: 20 }.
+ * WHAT: parsePaginationParams, hasMorePages, mergePageItems. PURE.
+ * WHY: used by 2 pages (mall list/detail) + 2 APIs + the useInfiniteList composable.
+ * Spec S2b: 10/page, max 50, without ?limit = legacy array.
+ * EXAMPLE: parsePaginationParams({ limit: "10", offset: "20" }) → { limit: 10, offset: 20 }.
  */
 import type { InfiniteFetchPage } from "../common/types/pagination";
 
@@ -21,7 +21,7 @@ function firstValue(v: unknown): unknown {
   return Array.isArray(v) ? v[0] : v;
 }
 
-/** ?limit & ?offset (string|array|absen) → angka aman. Ngaco/negatif/nol → default/0. */
+/** ?limit & ?offset (string|array|missing) → safe numbers. Garbage/negative/zero → default/0. */
 export function parsePaginationParams(
   query: Record<string, unknown>,
   defaultLimit: number = INFINITE_DEFAULT_LIMIT,
@@ -33,12 +33,12 @@ export function parsePaginationParams(
   return { limit: Math.min(limit, INFINITE_MAX_LIMIT), offset };
 }
 
-/** Masih ada page berikut? loaded < total. Contoh: hasMorePages(10, 40) → true. */
+/** Is there a next page? loaded < total. EXAMPLE: hasMorePages(10, 40) → true. */
 export function hasMorePages(loaded: number, total: number): boolean {
   return loaded < total;
 }
 
-/** Gabung page baru ke list lama, dedupe by key (overlap refetch tidak ganda). */
+/** Merge a new page into the old list, dedupe by key (overlapping refetch is not duplicated). */
 export function mergePageItems<T>(
   prev: T[],
   next: T[],
@@ -63,14 +63,14 @@ interface AppliedPage<T> {
 }
 
 interface ApplyPageOptions<T> {
-  /** false = ganti list (start/reset); true = gabung + dedupe (loadMore). */
+  /** false = replace the list (start/reset); true = merge + dedupe (loadMore). */
   append: boolean;
   keyOf: (item: T) => string | number;
 }
 
 /**
- * Terapkan 1 page hasil fetch ke list. Array legacy (API tanpa ?limit) = dibungkus,
- * hasMore false, tidak crash.
+ * Apply 1 fetched page to the list. Legacy array (API without ?limit) = wrapped,
+ * hasMore false, doesn't crash.
  */
 export function applyInfinitePage<T>(
   prev: T[],

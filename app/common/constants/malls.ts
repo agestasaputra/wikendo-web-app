@@ -1,8 +1,8 @@
 /**
- * common/constants/malls.ts — Data mall: slug → nama lengkap + label pendek.
+ * common/constants/malls.ts — Mall data: slug → full name + short label.
  *
- * APA: 5 mall aktif. KENAPA di sini: dipakai direktori, quiz makan, result makan.
- * Mall ke-6 = tambah 1 entry di 2 map ini (+ row tabel `malls` + option quiz makan).
+ * WHAT: 5 active malls. WHY here: used by directory, food quiz, food result.
+ * 6th mall = add 1 entry in these 2 maps (+ row in `malls` table + food quiz option).
  */
 export const MALL_NAMES: Record<string, string> = {
   "grand-indonesia": "Grand Indonesia",

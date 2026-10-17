@@ -1,9 +1,9 @@
 /**
- * features/makan/utils/__tests__/makanQuiz.spec.ts — Test step awal quiz makan + hint.
- * Pre-fill ?mall= dari direktori skip Q1.
+ * features/food/utils/__tests__/foodQuiz.spec.ts — Food quiz initial step + hint test.
+ * ?mall= pre-fill from the directory skips Q1.
  */
 import { describe, it, expect } from "vitest";
-import { getMakanHint, getMakanStartStep } from "../makanQuiz";
+import { getFoodHint, getFoodStartStep } from "../foodQuiz";
 
 const VALID_SLUGS = [
   "grand-indonesia",
@@ -13,24 +13,24 @@ const VALID_SLUGS = [
   "aeon-bsd",
 ];
 
-describe("getMakanStartStep (pre-fill dari direktori)", () => {
-  it("skip Q1 (return 1) kalau ?mall= valid", () => {
-    expect(getMakanStartStep("grand-indonesia", VALID_SLUGS)).toBe(1);
+describe("getFoodStartStep (pre-fill from directory)", () => {
+  it("skips Q1 (returns 1) if ?mall= is valid", () => {
+    expect(getFoodStartStep("grand-indonesia", VALID_SLUGS)).toBe(1);
   });
 
-  it("mulai dari 0 kalau ?mall= tidak ada", () => {
-    expect(getMakanStartStep(undefined, VALID_SLUGS)).toBe(0);
+  it("starts from 0 if ?mall= is absent", () => {
+    expect(getFoodStartStep(undefined, VALID_SLUGS)).toBe(0);
   });
 
-  it("mulai dari 0 kalau ?mall= slug ngaco", () => {
-    expect(getMakanStartStep("mall-ngaco", VALID_SLUGS)).toBe(0);
+  it("starts from 0 if ?mall= slug is bogus", () => {
+    expect(getFoodStartStep("mall-ngaco", VALID_SLUGS)).toBe(0);
   });
 });
 
-describe("getMakanHint (hint per pertanyaan)", () => {
-  it("Q1 mall wajib, Q4 terakhir, sisanya netral", () => {
-    expect(getMakanHint("mall_slug")).toContain("Wajib 1");
-    expect(getMakanHint("companion")).toContain("Terakhir");
-    expect(getMakanHint("mission")).toBe("Tap 1 — nggak ada jawaban salah");
+describe("getFoodHint (hint per question)", () => {
+  it("Q1 mall required, Q4 last, the rest neutral", () => {
+    expect(getFoodHint("mall_slug")).toContain("Wajib 1");
+    expect(getFoodHint("companion")).toContain("Terakhir");
+    expect(getFoodHint("mission")).toBe("Tap 1 — nggak ada jawaban salah");
   });
 });

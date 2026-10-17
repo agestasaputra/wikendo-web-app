@@ -1,11 +1,11 @@
 /**
- * features/makan/@types/makan.ts — KONTRAK UI mode Makan (result F1b + voucher V12/V13).
+ * features/food/@types/food.ts — UI contract for the food mode (result F1b + voucher V12/V13).
  *
- * APA: ResultMakanMeta (tiket ink + diskon lime + Klaim rose + halal mint), MakanHero/RankItem
- *   (data kartu hasil), VoucherStyle/VoucherCardMeta (gift V12), VoucherItem + VoucherClaimResult.
- * Dipakai: utils/* + store/VoucherStore + MakanResultPage + VoucherSheet.
+ * WHAT: ResultFoodMeta (ink ticket + lime discount + Claim rose + halal mint), FoodHero/RankItem
+ *   (result card data), VoucherStyle/VoucherCardMeta (gift V12), VoucherItem + VoucherClaimResult.
+ * Used by: utils/* + store/VoucherStore + FoodResultPage + VoucherSheet.
  */
-export interface ResultMakanMeta {
+export interface ResultFoodMeta {
   ticketBg: string;
   discountColor: string;
   ticketBorder: string;
@@ -18,7 +18,7 @@ export interface ResultMakanMeta {
   cardBg: string;
 }
 
-/** gift = V12 gift surprise: bg grad cream-rose + border pink + pill rose. */
+/** gift = V12 gift surprise: cream-rose grad bg + pink border + rose pill. */
 export type VoucherStyle = "gift";
 
 export interface VoucherCardMeta {
@@ -28,7 +28,7 @@ export interface VoucherCardMeta {
   goColor: string;
 }
 
-export interface MakanHero {
+export interface FoodHero {
   name: string;
   reason: string;
   price: string;

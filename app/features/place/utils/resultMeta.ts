@@ -1,14 +1,14 @@
 /**
- * features/tempat/utils/resultMeta.ts — Token kartu result TEMPAT R3b (photo + lime).
+ * features/place/utils/resultMeta.ts — PLACE result card tokens R3b (photo + lime).
  *
- * APA: getResultTempatMeta() → warna. PURE. Token lock Agesta: lime=nilai, ember=strip, ink=aksi.
- * KENAPA: 1 sumber kebenaran, bukan hardcode hex di template TempatResultPage.
- * Contoh: getResultTempatMeta().strip → "#EA580C".
+ * WHAT: getResultPlaceMeta() → colors. PURE. Agesta token lock: lime=value, ember=strip, ink=action.
+ * WHY: 1 source of truth, not hardcoded hex in the PlaceResultPage template.
+ * EXAMPLE: getResultPlaceMeta().strip → "#EA580C".
  */
-import type { ResultTempatMeta } from "../@types/tempat";
+import type { ResultPlaceMeta } from "../@types/place";
 
-/** Meta kartu result tempat R3b: strip ember + best lime + aksi ink. */
-export function getResultTempatMeta(): ResultTempatMeta {
+/** Place result card meta R3b: ember strip + best lime + action ink. */
+export function getResultPlaceMeta(): ResultPlaceMeta {
   return {
     strip: "#EA580C",
     bestBg: "#A3E635",

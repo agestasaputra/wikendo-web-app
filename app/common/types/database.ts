@@ -1,10 +1,10 @@
 /**
- * common/types/database.ts — Baris tabel Supabase yang dibaca server (typed query).
+ * common/types/database.ts — Supabase table rows read by the server (typed query).
  *
- * APA: interface minimal untuk `.single<T>()` / `.maybeSingle<T>()` / `.returns<T>()`.
- * KENAPA: client Supabase tanpa generic Database → hasil query `never` (type-check gagal).
- * Kolom lengkap: ../../docs/04-Database-Schema.md. Hanya kolom yang dipakai kode.
- * Contoh: db.from("vouchers").select("*").eq("code", c).maybeSingle<VoucherRow>()
+ * WHAT: minimal interface for `.single<T>()` / `.maybeSingle<T>()` / `.returns<T>()`.
+ * WHY: Supabase client without the generic Database → query result is `never` (type-check fails).
+ * Full columns: ../../docs/04-Database-Schema.md. Only columns used by the code.
+ * EXAMPLE: db.from("vouchers").select("*").eq("code", c).maybeSingle<VoucherRow>()
  */
 export interface MallRow {
   id: string;

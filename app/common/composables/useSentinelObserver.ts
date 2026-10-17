@@ -1,10 +1,10 @@
 /**
- * common/composables/useSentinelObserver.ts — Sentinel infinity scroll (IntersectionObserver).
+ * common/composables/useSentinelObserver.ts — Infinity scroll sentinel (IntersectionObserver).
  *
- * APA: ref elemen sentinel; saat masuk viewport (rootMargin 320px) panggil onIntersect.
- * KENAPA: mall list + mall detail dulu menulis blok observer identik → 1 composable.
- *   Sentinel pindah tiap page baru → observe ulang via watch.
- * Contoh: const sentinel = useSentinelObserver(() => list.loadMore()) → <div ref="sentinel" />
+ * WHAT: ref of the sentinel element; when it enters the viewport (rootMargin 320px) call onIntersect.
+ * WHY: mall list + mall detail previously wrote an identical observer block → 1 composable.
+ *   The sentinel changes on every new page → re-observe via watch.
+ * EXAMPLE: const sentinel = useSentinelObserver(() => list.loadMore()) → <div ref="sentinel" />
  */
 import { onMounted, onUnmounted, ref, watch, type Ref } from "vue";
 

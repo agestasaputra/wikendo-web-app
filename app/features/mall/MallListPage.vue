@@ -1,7 +1,7 @@
-<!-- features/mall/MallListPage.vue → GET /mall (Index direktori hub, D1 Mall Hub Netral ⭐ + S2b infinity).
-APA: list kartu mall (nama + area + jumlah tenant) + 2 CTA per kartu (Lihat Tenant / Cariin yang cocok), label mall INK (#0C0A09), CTA "Cariin" rose (#E11D48), bg paper (#F5F5F4) + infinity scroll 10/page (sentinel + skeleton 2 row + sticky count).
-KENAPA: D1 "Mall Hub · Netral" + S2b infinity — 5 mall sekarang ringan, tapi pola SAMA dengan detail (40 tenant) → 1 composable useInfiniteList, API backward-compat (tanpa ?limit = array legacy). SSR page-1 via await start() (SEO tetap).
-Token lock: ink tetap #0C0A09, rose tetap #E11D48, paper tetap #F5F5F4. -->
+<!-- features/mall/MallListPage.vue → GET /mall (Directory hub index, D1 Neutral Mall Hub ⭐ + S2b infinity).
+WHAT: mall card list (name + area + tenant count) + 2 CTAs per card (Lihat Tenant / Cariin yang cocok), mall label INK (#0C0A09), "Cariin" CTA rose (#E11D48), paper bg (#F5F5F4) + infinity scroll 10/page (sentinel + 2-row skeleton + sticky count).
+WHY: D1 "Mall Hub · Neutral" + S2b infinity — 5 malls is light now, but the SAME pattern as detail (40 tenants) → 1 useInfiniteList composable, backward-compat API (no ?limit = legacy array). Page-1 SSR via await start() (SEO stays).
+Token lock: ink stays #0C0A09, rose stays #E11D48, paper stays #F5F5F4. -->
 <script setup lang="ts">
 import AppLoader from "~/common/components/AppLoader.vue";
 import { useInfiniteList } from "~/common/composables/useInfiniteList";
@@ -11,7 +11,7 @@ import { getMallName, getMallShortLabel } from "~/common/utils/mall";
 import type { MallItem } from "~/features/mall/@types/mall";
 import { shortArea } from "~/features/mall/utils/directory";
 
-// SEO hub: /mall = pintu masuk direktori (hub → 5 leaf /mall/:slug, Google suka struktur ini).
+// SEO hub: /mall = directory entrypoint (hub → 5 leaves /mall/:slug, Google likes this structure).
 useHead({
   title: "Direktori Kuliner Mall Jakarta — Wikendo",
   meta: [
@@ -23,7 +23,7 @@ useHead({
   ],
 });
 
-// S2b infinity: page-1 SSR (await start, SEO tetap), lanjut client via sentinel.
+// S2b infinity: page-1 SSR (await start, SEO stays), continues on client via sentinel.
 const list = useInfiniteList<MallItem>({
   pageSize: 10,
   keyOf: (m) => m.slug,
@@ -36,7 +36,7 @@ await list.start();
 const { items: malls, hasMore, pending, loadingMore, error } = list;
 const sentinel = useSentinelObserver(() => list.loadMore());
 
-// D1 1:1: area pendek segmen '/' terpendek (Thamrin, Grogol), fallback city.
+// D1 1:1: short area = shortest '/' segment (Thamrin, Grogol), fallback city.
 function mallArea(m: MallItem): string {
   return shortArea(m.area || m.city || "");
 }
@@ -102,7 +102,7 @@ function mallArea(m: MallItem): string {
             🏢 Lihat Tenant →
           </NuxtLink>
           <NuxtLink
-            :to="`/makan?mall=${m.slug}`"
+            :to="`/food?mall=${m.slug}`"
             class="flex-1 text-center text-white rounded-[14px] p-3 font-extrabold text-[13px]"
             style="background: #e11d48; min-height: 56px"
           >
@@ -110,7 +110,7 @@ function mallArea(m: MallItem): string {
           </NuxtLink>
         </div>
       </div>
-      <!-- Skeleton 2 row pas nambah page (S2b spec) -->
+      <!-- 2-row skeleton when adding a page (S2b spec) -->
       <div v-if="loadingMore" class="flex flex-col gap-2.5" aria-live="polite">
         <div
           v-for="i in 2"
@@ -121,7 +121,7 @@ function mallArea(m: MallItem): string {
           <div class="h-3 rounded w-1/3 mt-2" style="background: #f5f5f4" />
         </div>
       </div>
-      <!-- Sentinel infinity scroll -->
+      <!-- Infinity scroll sentinel -->
       <div
         v-if="hasMore"
         ref="sentinel"

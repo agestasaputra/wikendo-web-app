@@ -1,8 +1,8 @@
 import { describe, it, expect } from "vitest";
 import { getErrorMessage, getErrorStatus } from "../error";
 
-describe("getErrorMessage (unknown → pesan aman untuk UI)", () => {
-  it("ambil data.message dulu (bentuk error $fetch/createError)", () => {
+describe("getErrorMessage (unknown → safe message for the UI)", () => {
+  it("reads data.message first ($fetch/createError error shape)", () => {
     expect(
       getErrorMessage(
         { data: { message: "LOGIN_REQUIRED" }, message: "x" },
@@ -11,11 +11,11 @@ describe("getErrorMessage (unknown → pesan aman untuk UI)", () => {
     ).toBe("LOGIN_REQUIRED");
   });
 
-  it("fallback ke message (Error biasa)", () => {
+  it("fallback to message (plain Error)", () => {
     expect(getErrorMessage(new Error("boom"), "fb")).toBe("boom");
   });
 
-  it("fallback ke string default kalau tidak ada pesan / null / bukan object", () => {
+  it("fallback to the default string when there is no message / null / not an object", () => {
     expect(getErrorMessage({}, "fb")).toBe("fb");
     expect(getErrorMessage(null, "fb")).toBe("fb");
     expect(getErrorMessage("oops", "fb")).toBe("fb");
@@ -23,11 +23,11 @@ describe("getErrorMessage (unknown → pesan aman untuk UI)", () => {
 });
 
 describe("getErrorStatus (unknown → HTTP status | undefined)", () => {
-  it("baca statusCode", () => {
+  it("reads statusCode", () => {
     expect(getErrorStatus({ statusCode: 403 })).toBe(403);
   });
 
-  it("undefined kalau tidak ada / bukan angka", () => {
+  it("undefined when absent / not a number", () => {
     expect(getErrorStatus({})).toBeUndefined();
     expect(getErrorStatus(null)).toBeUndefined();
     expect(getErrorStatus({ statusCode: "403" })).toBeUndefined();

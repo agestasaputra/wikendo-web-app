@@ -1,11 +1,11 @@
 /**
- * common/types/loader.ts — KONTRAK spinner fetching API (1 helper + 1 komponen).
+ * common/types/loader.ts — CONTRACT for the API fetching spinner (1 helper + 1 component).
  *
- * APA: variant warna aksen per halaman.
- * - tempat = orange #f97316 · makan = merah #ee2c4b · mall = teal #0e7490 (tanpa LLM)
- * Dipakai: getLoaderMeta() di common/utils/loader + common/components/AppLoader.vue.
+ * WHAT: accent color variant per page.
+ * - place = orange #f97316 · food = red #ee2c4b · mall = teal #0e7490 (without LLM)
+ * Used by: getLoaderMeta() in common/utils/loader + common/components/AppLoader.vue.
  */
-export type LoaderVariant = "tempat" | "makan" | "mall";
+export type LoaderVariant = "place" | "food" | "mall";
 
 export interface LoaderMeta {
   accent: string;

@@ -3,8 +3,8 @@ import { createPinia, setActivePinia } from "pinia";
 import { useVoucherStore } from "../VoucherStore";
 
 /**
- * VoucherStore.spec.ts — Klaim voucher V13B (Bearer user ke POST /api/voucher/claim).
- * Supabase + $fetch di-mock. Dikunci: header Bearer, guard anti double-klik, pesan error ramah.
+ * VoucherStore.spec.ts — Voucher claim V13B (user Bearer to POST /api/voucher/claim).
+ * Supabase + $fetch mocked. Locked: Bearer header, anti double-click guard, friendly error message.
  */
 const { getSession, fetchMock } = vi.hoisted(() => ({
   getSession: vi.fn(),
@@ -37,7 +37,7 @@ describe("VoucherStore.claimVoucher", () => {
     vi.stubGlobal("$fetch", fetchMock);
   });
 
-  it("sukses: POST /api/voucher/claim + Authorization Bearer + simpan claimedCode", async () => {
+  it("success: POST /api/voucher/claim + Authorization Bearer + stores claimedCode", async () => {
     const store = useVoucherStore();
     const res = await store.claimVoucher("WKD-7X2K9A");
     expect(res.claim_code).toBe("WKD-7X2K9A");
@@ -53,7 +53,7 @@ describe("VoucherStore.claimVoucher", () => {
     expect(opts.headers.Authorization).toBe("Bearer tok-abc");
   });
 
-  it("tanpa session → request tanpa header (server balas 401, wall login)", async () => {
+  it("without session → request with no header (server replies 401, login wall)", async () => {
     getSession.mockResolvedValue({ data: { session: null } });
     const store = useVoucherStore();
     await store.claimVoucher("WKD-7X2K9A");
@@ -63,7 +63,7 @@ describe("VoucherStore.claimVoucher", () => {
     expect(opts.headers).toEqual({});
   });
 
-  it("gagal: pesan server dipakai, error dilempar ulang, claiming kembali false", async () => {
+  it("failure: server message used, error rethrown, claiming back to false", async () => {
     fetchMock.mockRejectedValue({
       data: { message: "Anda sudah mengklaim voucher tenant ini hari ini." },
     });
@@ -75,14 +75,14 @@ describe("VoucherStore.claimVoucher", () => {
     expect(store.claiming).toBe(false);
   });
 
-  it("gagal tanpa pesan → fallback ramah", async () => {
+  it("failure without message → friendly fallback", async () => {
     fetchMock.mockRejectedValue({});
     const store = useVoucherStore();
     await expect(store.claimVoucher("X")).rejects.toBeDefined();
     expect(store.claimError).toBe("Gagal klaim. Coba lagi.");
   });
 
-  it('UX lock: klaim kedua saat masih claiming → status "busy", NOL request tambahan', async () => {
+  it('UX lock: second claim while still claiming → "busy" status, ZERO extra requests', async () => {
     let release: (v: typeof ok) => void = () => {};
     fetchMock.mockReturnValue(
       new Promise<typeof ok>((resolve) => {

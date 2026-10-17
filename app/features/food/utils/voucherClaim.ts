@@ -1,9 +1,9 @@
 /**
- * features/makan/utils/voucherClaim.ts — Hasil klaim placeholder saat tombol ditekan 2x.
+ * features/food/utils/voucherClaim.ts — Placeholder claim result when the button is pressed twice.
  *
- * APA: buildBusyClaimResult(code) → result status "busy" (UX lock anti double-klik). PURE.
+ * WHAT: buildBusyClaimResult(code) → result status "busy" (UX lock against double-click). PURE.
  */
-import type { VoucherClaimResult } from "../@types/makan";
+import type { VoucherClaimResult } from "../@types/food";
 
 export function buildBusyClaimResult(claimedCode: string): VoucherClaimResult {
   return {

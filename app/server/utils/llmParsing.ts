@@ -1,13 +1,13 @@
 /**
- * server/utils/llmParsing.ts — Logic murni LLM (pilih provider, bersihkan JSON, validasi hasil, fallback).
+ * server/utils/llmParsing.ts — Pure LLM logic (pick provider, clean JSON, validate result, fallback).
  *
- * APA: buildCfChatUrl, pickLLMProvider, cleanJSON, parseRankResults, parseTempatResults, buildRankFallback.
- *   PURE (tanpa $fetch/runtimeConfig) supaya unit-testable.
- * KENAPA: (1) prod Vercel tak bisa ke localhost:20128 → CF Workers AI direct kalau env CF ada, hermes lokal untuk dev.
- *   (2) LLM sesekali balas JSON ngaco/nama halu → validasi + throw picu retry/fallback (anti-500).
- * Contoh: pickLLMProvider({ cfAccountId: "", cfToken: "", hermesUrl }) → { kind: "hermes", ... }.
+ * WHAT: buildCfChatUrl, pickLLMProvider, cleanJSON, parseRankResults, parsePlaceResults, buildRankFallback.
+ *   PURE (no $fetch/runtimeConfig) so it is unit-testable.
+ * WHY: (1) prod Vercel can't reach localhost:20128 → CF Workers AI direct if the CF env exists, local hermes for dev.
+ *   (2) LLM occasionally replies with broken JSON / hallucinated names → validation + throw triggers retry/fallback (anti-500).
+ * EXAMPLE: pickLLMProvider({ cfAccountId: "", cfToken: "", hermesUrl }) → { kind: "hermes", ... }.
  */
-import type { RankResult, TempatRecommendation } from "../../common/types/api";
+import type { RankResult, PlaceRecommendation } from "../../common/types/api";
 
 export interface LLMProvider {
   kind: "cf" | "hermes";
@@ -18,13 +18,13 @@ export interface LLMProvider {
 const CF_MODEL = "@cf/meta/llama-3.1-8b-instruct-fast";
 const HERMES_DEFAULT_URL = "http://127.0.0.1:20128";
 
-/** Account ID → URL chat completions CF (OpenAI-compatible). */
+/** Account ID → CF chat completions URL (OpenAI-compatible). */
 export function buildCfChatUrl(accountId: string): string {
   const id = (accountId || "").trim();
   return `https://api.cloudflare.com/client/v4/accounts/${id}/ai/v1/chat/completions`;
 }
 
-/** Pilih provider: CF kalau accountId+token lengkap, hermes fallback (dev lokal). */
+/** Pick provider: CF if accountId+token complete, hermes fallback (local dev). */
 export function pickLLMProvider(input: {
   cfAccountId: string;
   cfToken: string;
@@ -43,7 +43,7 @@ export function pickLLMProvider(input: {
   };
 }
 
-/** Potong teks setelah penutup JSON pertama (LLM kadang nambah "semoga membantu ya!"). */
+/** Trim text after the first JSON closer (LLM sometimes adds "semoga membantu ya!"). */
 function trimAfterJson(s: string): string {
   const closer = s.startsWith("{") ? "}" : s.startsWith("[") ? "]" : "";
   if (!closer) return s;
@@ -51,7 +51,7 @@ function trimAfterJson(s: string): string {
   return last > 0 ? s.slice(0, last + 1).trim() : s;
 }
 
-/** Strip markdown fence + teks prefix/suffix dari output LLM → JSON murni (anti-500 JSON.parse). */
+/** Strip markdown fence + prefix/suffix text from the LLM output → pure JSON (anti-500 JSON.parse). */
 export function cleanJSON(raw: string): string {
   let s = (raw || "").trim();
   const fence = s.match(/```(?:json)?\s*([\s\S]*?)```/i);
@@ -66,7 +66,7 @@ interface RawRank {
   reason?: unknown;
 }
 
-/** Validasi ranking LLM → RankResult[5]. Throw kalau key salah / nama halu / JSON rusak (picu retry/fallback). */
+/** Validate LLM ranking → RankResult[5]. Throw if a key is wrong / hallucinated name / broken JSON (triggers retry/fallback). */
 export function parseRankResults(
   raw: string,
   candidates: string[],
@@ -88,23 +88,23 @@ export function parseRankResults(
   return out.slice(0, 5);
 }
 
-/** Validasi rekomendasi tempat LLM → TempatRecommendation[5]. Throw kalau shape salah. */
-export function parseTempatResults(raw: string): TempatRecommendation[] {
+/** Validate LLM place recommendation → PlaceRecommendation[5]. Throw if the shape is wrong. */
+export function parsePlaceResults(raw: string): PlaceRecommendation[] {
   const obj = JSON.parse(cleanJSON(raw)) as { recommendations?: unknown };
   if (!obj || !Array.isArray(obj.recommendations)) {
-    throw new Error("TEMPAT_SHAPE_INVALID");
+    throw new Error("PLACE_SHAPE_INVALID");
   }
   const out = obj.recommendations as Array<Record<string, unknown>>;
-  if (!out.length) throw new Error("TEMPAT_EMPTY");
+  if (!out.length) throw new Error("PLACE_EMPTY");
   for (const r of out) {
     if (typeof r?.name !== "string" || !r.name) {
-      throw new Error("TEMPAT_NAME_INVALID");
+      throw new Error("PLACE_NAME_INVALID");
     }
   }
-  return (out as unknown as TempatRecommendation[]).slice(0, 5);
+  return (out as unknown as PlaceRecommendation[]).slice(0, 5);
 }
 
-/** Fallback deterministik nol-LLM: 5 kandidat pertama + reason generik (jaminan anti-500). */
+/** Zero-LLM deterministic fallback: first 5 candidates + generic reason (anti-500 guarantee). */
 export function buildRankFallback(
   candidates: Array<{ name: string }>,
   context: string,

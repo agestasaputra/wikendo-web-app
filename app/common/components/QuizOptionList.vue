@@ -1,7 +1,7 @@
-<!-- common/components/QuizOptionList.vue → Daftar opsi jawaban quiz (kartu 56px, tap = pilih).
-APA: tombol per opsi; terpilih = border + bg sesuai flow (ember tempat / rose makan).
-KENAPA: markup identik di quiz tempat + makan → 1 komponen. Tap langsung emit select (tanpa tombol Lanjut).
-Contoh: <QuizOptionList :options="q.options" :selected="answers[q.id]" :meta="meta" @select="select" /> -->
+<!-- common/components/QuizOptionList.vue → Quiz answer option list (56px cards, tap = select).
+WHAT: one button per option; selected = border + bg per flow (place ember / food rose).
+WHY: identical markup in the place + food quiz → 1 component. Tap emits select right away (no "Lanjut" button).
+EXAMPLE: <QuizOptionList :options="q.options" :selected="answers[q.id]" :meta="meta" @select="select" /> -->
 <script setup lang="ts">
 import type { QuizHeaderMeta, QuizOption } from "~/common/types/quiz";
 

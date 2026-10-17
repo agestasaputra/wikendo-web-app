@@ -1,7 +1,7 @@
-<!-- features/history/HistoryPage.vue → GET /riwayat (Riwayat E1 localStorage wikendo_history).
-APA: baca riwayat dari HistoryStore (localStorage key wikendo_history, array {kind,title,sub,at} max 20 newest-first) + kosong jujur 1:1 home + list kartu + CTA quiz.
-KENAPA localStorage NOL backend: NOL tabel + NOL API + anon tetap punya riwayat; result tempat/makan menulis pas sukses (guard window + try/catch + dedupe + cap 20).
-Contoh: habis /result Kopi Kekinian → /riwayat muncul "Kopi Kekinian — GI L2" paling atas. -->
+<!-- features/history/HistoryPage.vue → GET /history (History E1 localStorage wikendo_history).
+WHAT: read history from HistoryStore (localStorage key wikendo_history, array {kind,title,sub,at} max 20 newest-first) + honest empty state 1:1 home + card list + quiz CTA.
+WHY localStorage ZERO backend: ZERO tables + ZERO API + anonymous users still have history; place/food result writes on success (window guard + try/catch + dedupe + cap 20).
+Example: after /result Kopi Kekinian → /history shows "Kopi Kekinian — GI L2" at the top. -->
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
 import { useHistoryStore } from "~/common/store/HistoryStore";
@@ -40,7 +40,7 @@ onMounted(() => history.load());
           >Cari Tempat →</NuxtLink
         >
         <NuxtLink
-          to="/makan"
+          to="/food"
           class="flex-1 text-center rounded-2xl py-3 font-extrabold text-sm bg-white border-2 border-gray-200"
           >Cari Makan →</NuxtLink
         >
@@ -53,7 +53,7 @@ onMounted(() => history.load());
         :key="i"
         class="rounded-2xl p-3 bg-white border border-stone-200 flex gap-2 items-center"
       >
-        <span class="text-xl">{{ it.kind === "makan" ? "🍜" : "🗺️" }}</span>
+        <span class="text-xl">{{ it.kind === "food" ? "🍜" : "🗺️" }}</span>
         <div class="flex-1 min-w-0">
           <p class="font-extrabold text-[13px] truncate">{{ it.title }}</p>
           <p class="text-[11px] text-gray-500 truncate">{{ it.sub }}</p>

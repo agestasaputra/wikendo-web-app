@@ -1,13 +1,13 @@
 /**
- * features/makan/utils/resultMeta.ts — Token kartu result MAKAN F1b (tiket ink + diskon lime).
+ * features/food/utils/resultMeta.ts — FOOD result card tokens F1b (ink ticket + lime discount).
  *
- * APA: getResultMakanMeta() → warna. PURE. Token lock Agesta: ink + lime + rose + mint.
- * Contoh: getResultMakanMeta().claimBg → "#E11D48".
+ * WHAT: getResultFoodMeta() → colors. PURE. Agesta token lock: ink + lime + rose + mint.
+ * EXAMPLE: getResultFoodMeta().claimBg → "#E11D48".
  */
-import type { ResultMakanMeta } from "../@types/makan";
+import type { ResultFoodMeta } from "../@types/food";
 
-/** Meta kartu result makan F1b: tiket ink + diskon lime + Klaim rose + halal mint. */
-export function getResultMakanMeta(): ResultMakanMeta {
+/** Food result card meta F1b: ink ticket + lime discount + Claim rose + halal mint. */
+export function getResultFoodMeta(): ResultFoodMeta {
   return {
     ticketBg: "#0C0A09",
     discountColor: "#A3E635",

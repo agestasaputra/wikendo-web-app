@@ -1,11 +1,11 @@
 /**
- * server/utils/db.ts — Koneksi Supabase (ADMIN, server-only).
+ * server/utils/db.ts — Supabase connection (ADMIN, server-only).
  *
- * APA: Singleton client Supabase pakai SERVICE ROLE key (bypass RLS).
- * KENAPA singleton: 1 client dipakai ulang, hemat koneksi DB.
- * ATURAN: file ini HANYA di-import dari server/. JANGAN import dari kode browser
- * (service key = rahasia; dijaga ESLint no-restricted-imports, lihat eslint.config.mjs).
- * Contoh: const db = supabaseAdmin(); const { data } = await db.from('malls').select('*')
+ * WHAT: Singleton Supabase client using the SERVICE ROLE key (bypasses RLS).
+ * WHY singleton: 1 client reused, saves DB connections.
+ * RULE: this file is ONLY imported from server/. DON'T import it from browser code
+ * (service key = secret; guarded by ESLint no-restricted-imports, see eslint.config.mjs).
+ * EXAMPLE: const db = supabaseAdmin(); const { data } = await db.from('malls').select('*')
  */
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 

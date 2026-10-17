@@ -2,10 +2,10 @@ import { describe, it, expect } from "vitest";
 import { readSource } from "~/test/utils";
 
 /**
- * ButtonLoading.spec.ts — Spinner + disable semua tombol auth yang request API (10 Okt 2026).
- * KENAPA: cegah double-klik (double signUp = email ganda, double resend = spam, double OAuth = popup ganda)
+ * ButtonLoading.spec.ts — Spinner + disable on every auth button that requests an API (Oct 10 2026).
+ * WHY: prevent double-click (double signUp = duplicate email, double resend = spam, double OAuth = duplicate popup)
  * + UX feedback. Scope: register (Daftar+Google), login (Masuk+Google+Lupa?), check-email (Kirim ulang).
- * Idle state tetap 1:1 slicing (spinner cuma muncul pas loading, via v-if).
+ * Idle state stays 1:1 with the slicing (spinner only appears while loading, via v-if).
  */
 const REGISTER = readSource(
   "features/auth/RegisterPage.vue",
@@ -25,39 +25,39 @@ function spinCount(s: string): number {
 }
 
 describe("auth buttons — spinner + disabled (anti double-submit)", () => {
-  it("register: CTA Daftar punya spinner + disabled saat loading", () => {
+  it("register: Daftar CTA has spinner + disabled while loading", () => {
     expect(REGISTER).toContain(":disabled=");
     expect(REGISTER).toContain("Tunggu…");
     expect(REGISTER).toContain("Daftar →");
     expect(spinCount(REGISTER)).toBeGreaterThanOrEqual(2);
   });
 
-  it("register: tombol Google punya loading sendiri + disabled (anti double OAuth)", () => {
+  it("register: Google button has its own loading + disabled (anti double OAuth)", () => {
     expect(REGISTER).toContain("googleLoading");
     expect(REGISTER).toContain(':disabled="loading || googleLoading"');
     expect(REGISTER).toContain("Lanjutkan dengan Google");
   });
 
-  it("register: handler jaga double-submit via early-return guard", () => {
+  it("register: handler prevents double-submit via early-return guard", () => {
     expect(REGISTER).toContain("if (loading.value) return");
     expect(GOOGLE_COMPOSABLE).toContain("googleLoading.value = true");
   });
 
-  it("login: Masuk punya spinner + disabled saat loading", () => {
+  it("login: Masuk has spinner + disabled while loading", () => {
     expect(LOGIN).toContain(":disabled=");
     expect(LOGIN).toContain("Tunggu…");
     expect(LOGIN).toContain("Masuk →");
     expect(spinCount(LOGIN)).toBeGreaterThanOrEqual(3);
   });
 
-  it("login: tombol Google + Lupa? punya loading sendiri + disabled", () => {
+  it("login: Google button + Lupa? have their own loading + disabled", () => {
     expect(LOGIN).toContain("googleLoading");
     expect(LOGIN).toContain("forgotLoading");
     expect(LOGIN).toContain("Lupa?");
     expect(LOGIN).toContain("Lanjutkan dengan Google");
   });
 
-  it("check-email: Kirim ulang punya spinner + disabled saat mengirim", () => {
+  it("check-email: Kirim ulang has spinner + disabled while sending", () => {
     expect(CHECK).toContain(':disabled="loading"');
     expect(CHECK).toContain("Mengirim…");
     expect(CHECK).toContain("Kirim ulang");

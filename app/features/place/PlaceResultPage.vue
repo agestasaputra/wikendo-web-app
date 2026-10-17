@@ -1,27 +1,27 @@
-<!-- features/tempat/TempatResultPage.vue → GET /result (Result TEMPAT deck, R3b Photo + Lime 1:1 screenshot).
-APA: header Hasil + 5 rekomendasi + hero photo + badge BEST lime + strip ember + Navigasi ink/Simpan/Share + chips + rank #1-3 + quota note. Base paper #F5F5F4, kartu 24px.
-KENAPA R3b 1:1: lime=nilai (best/rating) + ember=strip + ink=aksi (footnote spec), token lock via getResultTempatMeta (1 sumber, tested). Lock Split: TEMPAT saja, 0 tenant. Simpan = login wall momen #2.
-Contoh: hero Rooftop Senayan — Senayan 4.8 sunset+live music → Navigasi → chips Lainnya geser deck 1→5 tanpa fetch ulang. -->
+<!-- features/place/PlaceResultPage.vue → GET /result (PLACE result deck, R3b Photo + Lime 1:1 screenshot).
+WHAT: header Hasil + 5 recommendations + hero photo + BEST lime badge + ember strip + Navigate ink/Save/Share + chips + rank #1-3 + quota note. Base paper #F5F5F4, 24px cards.
+WHY R3b 1:1: lime=value (best/rating) + ember=strip + ink=action (footnote spec), token lock via getResultPlaceMeta (1 source, tested). Lock Split: PLACE only, 0 tenant. Save = login wall moment #2.
+EXAMPLE: hero Rooftop Senayan — Senayan 4.8 sunset+live music → Navigate → Lainnya chips shift the deck 1→5 without refetching. -->
 <script setup lang="ts">
 import AppLoader from "~/common/components/AppLoader.vue";
 import ResultError from "~/common/components/ResultError.vue";
 import { useHistoryStore } from "~/common/store/HistoryStore";
-import type { TempatRecommendation } from "~/common/types/api";
+import type { PlaceRecommendation } from "~/common/types/api";
 import {
-  buildTempatHero,
-  buildTempatMapsUrl,
-} from "~/features/tempat/utils/resultHero";
-import { getResultTempatMeta } from "~/features/tempat/utils/resultMeta";
+  buildPlaceHero,
+  buildPlaceMapsUrl,
+} from "~/features/place/utils/resultHero";
+import { getResultPlaceMeta } from "~/features/place/utils/resultMeta";
 import { getErrorMessage, getErrorStatus } from "~/utils/error";
 
-interface TempatResponse {
-  recommendations: TempatRecommendation[];
+interface PlaceResponse {
+  recommendations: PlaceRecommendation[];
   quota_remaining?: number;
 }
 
 const route = useRoute();
-const { data, pending, error, refresh } = await useFetch<TempatResponse>(
-  "/api/tempat/recommend",
+const { data, pending, error, refresh } = await useFetch<PlaceResponse>(
+  "/api/place/recommend",
   { method: "POST", body: route.query },
 );
 const list = computed(() => data.value?.recommendations || []);
@@ -34,19 +34,19 @@ const isWall = computed(
   () =>
     /login/i.test(errorMessage.value) || getErrorStatus(error.value) === 403,
 );
-// Quota real: sisa dari response POST (quota_remaining). Anon limit tempat 1x → sukses = 0/1 (habis hari ini, jujur).
+// Real quota: remaining from the POST response (quota_remaining). Anon place limit 1x → success = 0/1 (used up today, honest).
 const quotaLeft = computed(() => data.value?.quota_remaining);
 const quotaLabel = computed(() =>
   isWall.value ? "1/1 habis 🔒" : (quotaLeft.value ?? 1) + "/1",
 );
-// R3b token lock (tested): strip ember + best lime + aksi ink + Lainnya ink/lime.
-const meta = getResultTempatMeta();
-const hero = computed(() => buildTempatHero(list.value[idx.value], idx.value));
+// R3b token lock (tested): ember strip + best lime + action ink + Lainnya ink/lime.
+const meta = getResultPlaceMeta();
+const hero = computed(() => buildPlaceHero(list.value[idx.value], idx.value));
 const minis = computed(() =>
   list.value.slice(1, 3).map((r) => (r.name || "").slice(0, 6).trim() + "..."),
 );
 const rankTop3 = computed(() => list.value.slice(0, 3));
-const mapsUrl = computed(() => buildTempatMapsUrl(hero.value.name));
+const mapsUrl = computed(() => buildPlaceMapsUrl(hero.value.name));
 
 function next(): void {
   if (list.value.length) idx.value = (idx.value + 1) % list.value.length;
@@ -62,12 +62,12 @@ function share(): void {
   }
 }
 
-// E1 riwayat: tulis 1 entry pas data sukses (store: guard window + cap 20 + dedupe).
+// E1 history: write 1 entry when data succeeds (store: window guard + cap 20 + dedupe).
 function pushHistory(): void {
   const r = list.value[0];
   if (!r) return;
   useHistoryStore().push({
-    kind: "tempat",
+    kind: "place",
     title: r.name || "—",
     sub: r.location_area || r.category || "",
     at: Date.now(),
@@ -91,7 +91,7 @@ watch(
       Quota tempat {{ quotaLabel }}
     </p>
 
-    <AppLoader v-if="pending" variant="tempat" />
+    <AppLoader v-if="pending" variant="place" />
     <ResultError
       v-else-if="error"
       :is-wall="isWall"
@@ -101,7 +101,7 @@ watch(
       @retry="refresh()"
     />
     <div v-else-if="list.length" class="flex flex-col">
-      <!-- R3b hero deck: strip ember kiri + foto + badge BEST lime -->
+      <!-- R3b hero deck: ember strip on the left + photo + BEST lime badge -->
       <div
         class="overflow-hidden shadow-lg relative"
         style="border-radius: 24px; border: 1px solid #eee"
@@ -177,7 +177,7 @@ watch(
           </p>
         </div>
       </div>
-      <!-- chips: 2 preview + Lainnya aktif ink/lime -->
+      <!-- chips: 2 previews + active Lainnya ink/lime -->
       <div class="flex gap-2 mt-3">
         <div
           v-for="(r, i) in minis"
@@ -198,7 +198,7 @@ watch(
         Kartu {{ idx + 1 }}/{{ list.length }} · generate ulang = quota habis ·
         <u>lihat semua ↓</u>
       </p>
-      <!-- rank #1-3 abu + full list -->
+      <!-- rank #1-3 gray + full list -->
       <div
         class="flex flex-col gap-2 mt-3 rounded-2xl p-3"
         style="background: #f4f4f5"

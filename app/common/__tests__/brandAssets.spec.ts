@@ -4,9 +4,9 @@ import path from "node:path";
 import { fromRoot } from "~/test/utils";
 
 /**
- * brandAssets.spec.ts — Test aset logo Day (app icon + header).
- * KENAPA: logo D16 Day FINAL LOCK dipasang sebagai app icon (PWA install + apple-touch)
- * + header icon-only. public/*.png + site.webmanifest harus ada & non-kosong,
+ * brandAssets.spec.ts — Day logo asset test (app icon + header).
+ * WHY: the D16 Day FINAL LOCK logo is installed as the app icon (PWA install + apple-touch)
+ * + an icon-only header. public/*.png + site.webmanifest must exist & be non-empty,
  * manifest valid (name Wikendo + icons 192/512).
  */
 const PUBLIC = fromRoot("public");
@@ -22,7 +22,7 @@ const REQUIRED_FILES = [
 
 describe("brand assets (logo Day icon-only)", () => {
   for (const f of REQUIRED_FILES) {
-    it(`${f} ada & non-kosong`, () => {
+    it(`${f} exists & is non-empty`, () => {
       const p = path.join(PUBLIC, f);
       expect(fs.existsSync(p), `hilang: public/${f}`).toBe(true);
       expect(fs.statSync(p).size).toBeGreaterThan(0);

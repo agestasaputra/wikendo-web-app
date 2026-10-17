@@ -1,9 +1,9 @@
 /**
- * common/utils/quiz.ts — Logic murni quiz (progress, step terakhir, header meta).
+ * common/utils/quiz.ts — Pure quiz logic (progress, last step, header meta).
  *
- * APA: progressPercent, isLastStep, getQuizHeaderMeta, getQuizSegState. PURE.
- * KENAPA: dipakai quiz tempat + quiz makan → 1 engine, bukan duplikat hex/math per halaman.
- * Contoh: getQuizSegState(0, 5) → [true, false, false, false, false].
+ * WHAT: progressPercent, isLastStep, getQuizHeaderMeta, getQuizSegState. PURE.
+ * WHY: used by place quiz + food quiz → 1 engine, not duplicated hex/math per page.
+ * EXAMPLE: getQuizSegState(0, 5) → [true, false, false, false, false].
  */
 import type { QuizFlow, QuizHeaderMeta, QuizQuestion } from "../types/quiz";
 
@@ -22,9 +22,9 @@ export function isLastStep(step: number, total: number): boolean {
   return step >= total - 1;
 }
 
-/** Meta header quiz per flow: label putih + dot + segmen lime + selected split. */
+/** Quiz header meta per flow: white label + dot + lime segment + selected split. */
 export function getQuizHeaderMeta(flow: QuizFlow): QuizHeaderMeta {
-  if (flow === "makan") {
+  if (flow === "food") {
     return {
       ...QUIZ_HEADER_BASE,
       label: "QUIZ MAKAN",
@@ -42,12 +42,12 @@ export function getQuizHeaderMeta(flow: QuizFlow): QuizHeaderMeta {
   };
 }
 
-/** Segmen blok quiz: index <= step = nyala. Contoh: (0,5) → [T,F,F,F,F]. */
+/** Quiz block segment: index <= step = on. EXAMPLE: (0,5) → [T,F,F,F,F]. */
 export function getQuizSegState(step: number, total: number): boolean[] {
   return Array.from({ length: total }, (_, i) => i <= step);
 }
 
-/** Pertanyaan pada step ini (step di luar rentang → pertanyaan pertama). Daftar kosong = error. */
+/** The question at this step (step out of range → first question). Empty list = error. */
 export function getQuestion(
   questions: QuizQuestion[],
   step: number,

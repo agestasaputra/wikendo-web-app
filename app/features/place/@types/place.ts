@@ -1,10 +1,10 @@
 /**
- * features/tempat/@types/tempat.ts — KONTRAK UI mode Tempat.
+ * features/place/@types/place.ts — UI contract for the place mode.
  *
- * APA: ResultTempatMeta (token kartu R3b: strip ember + best lime + aksi ink) + TempatHero (kartu hero deck).
- * Dipakai: getResultTempatMeta() + buildTempatHero() di features/tempat/utils + TempatResultPage.vue.
+ * WHAT: ResultPlaceMeta (R3b card tokens: ember strip + best lime + action ink) + PlaceHero (hero deck card).
+ * Used by: getResultPlaceMeta() + buildPlaceHero() in features/place/utils + PlaceResultPage.vue.
  */
-export interface ResultTempatMeta {
+export interface ResultPlaceMeta {
   strip: string;
   bestBg: string;
   bestColor: string;
@@ -16,7 +16,7 @@ export interface ResultTempatMeta {
   moreColor: string;
 }
 
-export interface TempatHero {
+export interface PlaceHero {
   name: string;
   category: string;
   reason: string;

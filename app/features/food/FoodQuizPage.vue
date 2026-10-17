@@ -1,7 +1,7 @@
-<!-- features/makan/MakanQuizPage.vue → GET /makan (Quiz MAKAN swipe, mockup E-F kombo 5+15).
-APA: engine swipe SAMA kayak quiz tempat, Q beda (mall wajib → misi → budget → rombongan+toggle), aksen Merah #ee2c4b.
-KENAPA: codebase 1x, bukan 2x (reuse engine ~10 jam hemat). Q1 mall wajib biar hasil murni tenant situ (Split PRD).
-Contoh: dibuka dari direktori (/makan?mall=gi) → Q1 di-skip otomatis via getMakanStartStep. -->
+<!-- features/food/FoodQuizPage.vue → GET /food (FOOD quiz swipe, mockup E-F combo 5+15).
+WHAT: swipe engine SAME as the place quiz, different Q (mall required → mission → budget → group+toggle), Red accent #ee2c4b.
+WHY: codebase 1x, not 2x (reuse engine ~10 hours saved). Q1 mall required so the result is purely that mall's tenants (Split PRD).
+EXAMPLE: opened from the directory (/food?mall=gi) → Q1 is skipped automatically via getFoodStartStep. -->
 <script setup lang="ts">
 import QuizHeader from "~/common/components/QuizHeader.vue";
 import QuizOptionList from "~/common/components/QuizOptionList.vue";
@@ -13,20 +13,17 @@ import {
   isLastStep,
 } from "~/common/utils/quiz";
 import {
-  MAKAN_MALL_SLUGS,
-  MAKAN_QUESTIONS,
-} from "~/features/makan/constants/questions";
-import {
-  getMakanHint,
-  getMakanStartStep,
-} from "~/features/makan/utils/makanQuiz";
+  FOOD_MALL_SLUGS,
+  FOOD_QUESTIONS,
+} from "~/features/food/constants/questions";
+import { getFoodHint, getFoodStartStep } from "~/features/food/utils/foodQuiz";
 
 const route = useRoute();
 const router = useRouter();
-const questions = MAKAN_QUESTIONS;
+const questions = FOOD_QUESTIONS;
 const mallQuery =
   typeof route.query.mall === "string" ? route.query.mall : undefined;
-const startStep = getMakanStartStep(mallQuery, MAKAN_MALL_SLUGS);
+const startStep = getFoodStartStep(mallQuery, FOOD_MALL_SLUGS);
 const step = ref(startStep);
 const answers = reactive<Record<string, string>>(
   mallQuery ? { mall_slug: mallQuery } : {},
@@ -34,8 +31,8 @@ const answers = reactive<Record<string, string>>(
 const halalOnly = ref(false);
 const kidsFriendly = ref(false);
 const q = computed(() => getQuestion(questions, step.value));
-// M3d: header ink + label putih + dot rose, segmen blok lime + chip mall (helper tested).
-const headMeta = getQuizHeaderMeta("makan");
+// M3d: ink header + white label + rose dot, lime block segment + mall chip (tested helper).
+const headMeta = getQuizHeaderMeta("food");
 const segState = computed(() => getQuizSegState(step.value, questions.length));
 const mallShort = computed(() =>
   answers.mall_slug ? getMallShortLabel(answers.mall_slug) : "",
@@ -59,7 +56,7 @@ function select(v: string): void {
     return;
   }
   router.push({
-    path: "/result-makan",
+    path: "/result-food",
     query: {
       ...answers,
       halal_only: String(halalOnly.value),
@@ -80,16 +77,16 @@ function select(v: string): void {
         >{{ step + 1 }}/{{ questions.length }} • ⏱ 20 dtk</span
       >
     </div>
-    <!-- M3d ink header: label PUTIH + dot rose-terang, question putih, segmen blok lime -->
+    <!-- M3d ink header: WHITE label + bright-rose dot, white question, lime block segment -->
     <QuizHeader
       :meta="headMeta"
       :seg-state="segState"
       :question="q.question"
       :suffix="headerSuffix"
     />
-    <p class="text-[13px] text-gray-500 mb-2 mt-2">{{ getMakanHint(q.id) }}</p>
+    <p class="text-[13px] text-gray-500 mb-2 mt-2">{{ getFoodHint(q.id) }}</p>
 
-    <!-- Q1 mall: chip mall horizontal (mockup E) + kartu terpilih -->
+    <!-- Q1 mall: horizontal mall chips (mockup E) + selected card -->
     <div v-if="q.id === 'mall_slug'" class="flex gap-2 overflow-x-auto py-3">
       <button
         v-for="o in q.options"
@@ -113,7 +110,7 @@ function select(v: string): void {
       @select="select"
     />
 
-    <!-- Q4 toggle halal/kids (mockup F) -->
+    <!-- Q4 halal/kids toggle (mockup F) -->
     <div v-if="q.toggles" class="flex gap-2 mt-2">
       <button
         class="flex-1 rounded-full py-2.5 font-bold text-xs bg-white border-[1.5px]"

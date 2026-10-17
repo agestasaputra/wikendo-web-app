@@ -2,17 +2,17 @@ import { describe, it, expect } from "vitest";
 import { readSource } from "~/test/utils";
 
 /**
- * CheckEmailPage.spec.ts — Opsi B magic-link: halaman /check-email (lock Agesta 10 Okt 2026, "Gas B").
- * KENAPA: signUp langsung masuk = bot lolos + typo email = reset gagal.
- * Magic-link: Daftar → Cek email → klik 1 link → HOME.
+ * CheckEmailPage.spec.ts — Option B magic-link: /check-email page (Agesta lock Oct 10 2026, "Gas B").
+ * WHY: instant signUp entry = bots slip through + email typo = failed reset.
+ * Magic-link: Daftar → Cek email → click 1 link → HOME.
  */
 const C = readSource(
   "features/auth/CheckEmailPage.vue",
   "features/auth/components/AuthBanner.vue",
 );
 
-describe("opsi B magic-link — halaman /check-email", () => {
-  it("judul Cek email + tampilkan email dari query + font + paper 1:1 register", () => {
+describe("option B magic-link — /check-email page", () => {
+  it("Cek email title + shows email from query + font + paper matching register 1:1", () => {
     expect(C).toContain("Cek email");
     expect(C).toContain("route.query.email");
     expect(C).toContain("Plus Jakarta Sans");
@@ -20,12 +20,12 @@ describe("opsi B magic-link — halaman /check-email", () => {
     expect(C).toContain("max-w-md mx-auto px-4 pb-10");
   });
 
-  it("tanpa header lokal (ikut global AppHeader) + ada link balik login", () => {
+  it("no local header (follows global AppHeader) + back-to-login link present", () => {
     expect(C).not.toContain("<header");
     expect(C).toContain("/login");
   });
 
-  it("tombol Kirim ulang via resend type signup + pesan sukses/error inline", () => {
+  it("Kirim ulang button via resend type signup + inline success/error message", () => {
     expect(C).toContain("Kirim ulang");
     expect(C).toContain("resend");
     expect(C).toMatch(/["']signup["']/);
@@ -33,7 +33,7 @@ describe("opsi B magic-link — halaman /check-email", () => {
     expect(C).toContain("successMsg");
   });
 
-  it("banner ink 1:1 register (strip ember + radius 12 + angka lime)", () => {
+  it("ink banner matching register 1:1 (ember strip + 12 radius + lime numbers)", () => {
     expect(C).toContain("#0c0a09");
     expect(C).toContain("#ea580c");
     expect(C).toContain("border-radius:12px");

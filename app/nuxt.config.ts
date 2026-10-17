@@ -1,7 +1,7 @@
-// nuxt.config.ts — Konfigurasi Nuxt: modules, runtimeConfig (secret vs public), SEO head.
-// runtimeConfig.X (hermesApiKey, supabaseServiceKey) = SERVER ONLY, jangan dibaca dari pages/.
-// runtimeConfig.public.* (supabaseUrl, supabaseAnonKey, gaId) = boleh dibaca browser.
-// Nilai diambil dari env (.env lokal / Vercel env prod). Lihat .env.example.
+// nuxt.config.ts — Nuxt config: modules, runtimeConfig (secret vs public), SEO head.
+// runtimeConfig.X (hermesApiKey, supabaseServiceKey) = SERVER ONLY, don't read from pages/.
+// runtimeConfig.public.* (supabaseUrl, supabaseAnonKey, gaId) = safe to read from the browser.
+// Values come from env (local .env / prod Vercel env). See .env.example.
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   modules: ["@nuxtjs/tailwindcss", "@nuxt/eslint", "@pinia/nuxt"],
@@ -44,6 +44,12 @@ export default defineNuxtConfig({
       ],
     },
   },
+  // Redirect old URLs (Bahasa) → new (English) — permanent, keeps back-compat + SEO.
+  routeRules: {
+    "/makan": { redirect: { to: "/food", statusCode: 301 } },
+    "/result-makan": { redirect: { to: "/result-food", statusCode: 301 } },
+    "/riwayat": { redirect: { to: "/history", statusCode: 301 } },
+  },
   runtimeConfig: {
     hermesApiUrl: process.env.HERMES_API_URL || "http://127.0.0.1:20128",
     hermesApiKey: process.env.HERMES_API_KEY || "",
@@ -56,8 +62,8 @@ export default defineNuxtConfig({
       gaId: process.env.NUXT_PUBLIC_GA_ID || "",
     },
   },
-  // Tidak ada CSS nesting di project ini (hanya utility Tailwind di template). Plugin bawaan modul
-  // `tailwindcss/nesting` dimatikan: resolver Nuxt tidak bisa me-resolve-nya di pnpm (warning B5010/B7007).
+  // There is no CSS nesting in this project (only Tailwind utilities in templates). The built-in
+  // `tailwindcss/nesting` plugin is disabled: the Nuxt resolver can't resolve it under pnpm (warning B5010/B7007).
   postcss: { plugins: { "tailwindcss/nesting": false } },
   tailwindcss: {
     configPath: "tailwind.config",

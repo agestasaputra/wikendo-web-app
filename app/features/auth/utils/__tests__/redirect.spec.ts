@@ -1,8 +1,8 @@
 import { describe, it, expect } from "vitest";
 import { buildOriginUrl, getRedirectQuery } from "../redirect";
 
-describe("getRedirectQuery (?redirect= → path aman)", () => {
-  it('string valid dipakai, selain itu "/"', () => {
+describe("getRedirectQuery (?redirect= → safe path)", () => {
+  it('valid string used, otherwise "/"', () => {
     expect(getRedirectQuery("/quiz")).toBe("/quiz");
     expect(getRedirectQuery(undefined)).toBe("/");
     expect(getRedirectQuery("")).toBe("/");
@@ -10,8 +10,8 @@ describe("getRedirectQuery (?redirect= → path aman)", () => {
   });
 });
 
-describe("buildOriginUrl (origin browser + path)", () => {
-  it("di happy-dom (ada window) → origin + path", () => {
+describe("buildOriginUrl (browser origin + path)", () => {
+  it("in happy-dom (window present) → origin + path", () => {
     expect(buildOriginUrl("/quiz")).toBe(`${window.location.origin}/quiz`);
   });
 });

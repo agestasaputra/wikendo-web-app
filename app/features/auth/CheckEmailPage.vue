@@ -1,15 +1,15 @@
-<!-- features/auth/CheckEmailPage.vue → GET /check-email (Opsi B magic-link, lock Agesta 10 Okt 2026).
-  APA: halaman tunggu verifikasi — judul Cek email + tampilkan email dari query + tombol Kirim ulang + pesan inline.
-  KENAPA: signUp langsung masuk = bot lolos + typo email = reset gagal. Magic-link: Daftar → Cek email → klik 1 link → HOME.
-  Style 1:1 register (paper #F5F5F4 + banner ink #0C0A09 + strip ember #EA580C + radius 12 + angka lime #D9F99D).
-  Contoh: daftar A@mail.com → /check-email?email=A@mail.com → klik link di inbox → HOME /. -->
+<!-- features/auth/CheckEmailPage.vue → GET /check-email (Option B magic-link, Agesta lock 10 Oct 2026).
+  WHAT: waiting-for-verification page — title Cek email + show email from query + Kirim ulang button + inline message.
+  WHY: signUp going straight in = bots pass + email typo = reset fails. Magic-link: Daftar → Cek email → click 1 link → HOME.
+  Style 1:1 register (paper #F5F5F4 + ink banner #0C0A09 + ember strip #EA580C + radius 12 + lime number #D9F99D).
+  EXAMPLE: register A@mail.com → /check-email?email=A@mail.com → click link in inbox → HOME /. -->
 <script setup lang="ts">
 import AppSpinner from "~/common/components/AppSpinner.vue";
 import { useSupabaseBrowser } from "~/common/composables/useSupabaseBrowser";
 import AuthBanner from "~/features/auth/components/AuthBanner.vue";
 import { buildOriginUrl } from "~/features/auth/utils/redirect";
 
-// SSR-safe: useRoute, bukan router.currentRoute (pitfall 500 Vercel).
+// SSR-safe: useRoute, not router.currentRoute (Vercel 500 pitfall).
 const route = useRoute();
 const displayEmail = computed(
   () => (route.query.email as string) || "email kamu",
@@ -19,7 +19,7 @@ const errorMsg = ref("");
 const successMsg = ref("");
 const loading = ref(false);
 
-// Kirim ulang link verifikasi via Supabase resend type signup → balik ke HOME (/).
+// Resend the verification link via Supabase resend type signup → back to HOME (/).
 async function handleResend(): Promise<void> {
   if (loading.value) return;
   errorMsg.value = "";
@@ -58,14 +58,14 @@ async function handleResend(): Promise<void> {
         sans-serif;
     "
   >
-    <!-- 1. Banner hitam — 1:1 register (strip ember + radius 12 + angka lime-muda) -->
+    <!-- 1. Black banner — 1:1 register (ember strip + radius 12 + light-lime number) -->
     <AuthBanner
       title="HAMPIR SELESAI"
       value="1 klik lagi"
       footer="verifikasi email biar quota 2 • 5 aktif 🎟️"
     />
 
-    <!-- 2. Kartu instruksi putih -->
+    <!-- 2. White instruction card -->
     <div class="bg-white rounded-3xl mt-3 p-5 shadow-sm text-center">
       <div class="text-3xl">📩</div>
       <h1 class="text-lg font-extrabold text-black mt-2">Cek email kamu</h1>

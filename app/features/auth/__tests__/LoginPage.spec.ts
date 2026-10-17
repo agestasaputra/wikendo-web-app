@@ -2,9 +2,9 @@ import { describe, it, expect } from "vitest";
 import { readSource } from "~/test/utils";
 
 /**
- * LoginPage.spec.ts — Slicing 100% halaman /login ikut screenshot terakhir (9 Okt 2026).
- * APA: baca LoginPage + komponen auth sebagai teks, assert 9 elemen image 1:1 + wiring fitur.
- * KENAPA: SOP slicing 100% — beda 1 teks = BELUM DONE. Urutan image: banner hitam quota → Google → Email →
+ * LoginPage.spec.ts — 100% /login slicing per the latest screenshot (Oct 9 2026).
+ * WHAT: read LoginPage + auth components as text, assert 9 image elements 1:1 + feature wiring.
+ * WHY: 100% slicing SOP — 1 text difference = NOT DONE. Image order: black quota banner → Google → Email →
  * Password•Lupa? → Masuk → pill → Daftar.
  */
 const L = readSource(
@@ -18,49 +18,49 @@ const WIRING = readSource(
   "features/auth/composables/useGoogleSignIn.ts",
 );
 
-describe("login revamp 100% image — struktur + teks persis", () => {
-  it("container mobile max-w-md + background abu muda #F2F2F2 (bukan body/root)", () => {
+describe("login revamp 100% image — structure + exact text", () => {
+  it("mobile container max-w-md + light gray background #F2F2F2 (not body/root)", () => {
     expect(L).toContain("max-w-md mx-auto px-4 pb-10");
     expect(L).toContain("#f2f2f2");
   });
 
-  it("tanpa header lokal duplikat (header global sudah di AppHeader, image mulai dari banner)", () => {
+  it("no duplicate local header (global header already in AppHeader, image starts from the banner)", () => {
     expect(L).not.toContain("<header");
   });
 
-  it("banner hitam: QUOTA HABIS • reset 00.00 + angka sisa + Login gratis → buka 2 + 5", () => {
+  it("black banner: QUOTA HABIS • reset 00.00 + remaining numbers + Login gratis → buka 2 + 5", () => {
     expect(L).toContain("QUOTA HABIS");
     expect(L).toContain("reset 00.00");
     expect(L).toContain("Login gratis");
     expect(L).toContain("buka 2 + 5");
-    // angka sisa dinamis ikut quota real (fallback 0 • 0 kayak image)
+    // remaining numbers dynamic per real quota (fallback 0 • 0 like the image)
     expect(L).toContain("/api/quota");
     expect(L).toContain("0 • 0");
   });
 
-  it("tombol Lanjutkan dengan Google (putih, rounded pill)", () => {
+  it("Lanjutkan dengan Google button (white, rounded pill)", () => {
     expect(L).toContain("Lanjutkan dengan Google");
     expect(L).toContain("rounded-full");
   });
 
-  it("field Email + field Password • Lupa? (Lupa? underline)", () => {
+  it("Email field + Password • Lupa? field (Lupa? underline)", () => {
     expect(L).toContain("Email");
     expect(L).toContain("Password");
     expect(L).toContain("Lupa?");
     expect(L).toContain("underline");
   });
 
-  it("CTA utama hitam: Masuk → (panah kanan)", () => {
+  it("main black CTA: Masuk → (right arrow)", () => {
     expect(L).toContain("Masuk →");
   });
 
-  it("pill info: 10 detik • quota reset tiap hari • gratis", () => {
+  it("info pill: 10 detik • quota reset every day • gratis", () => {
     expect(L).toContain("10 detik");
     expect(L).toContain("quota reset tiap hari");
     expect(L).toContain("gratis");
   });
 
-  it("footer: Belum punya akun? Daftar (link ke /register, preservasi ?redirect=)", () => {
+  it("footer: Belum punya akun? Daftar (link to /register, preserves ?redirect=)", () => {
     expect(L).toContain("Belum punya akun?");
     expect(L).toContain("Daftar");
     expect(L).toContain("/register");
@@ -68,7 +68,7 @@ describe("login revamp 100% image — struktur + teks persis", () => {
 });
 
 describe("login revamp — banner 1:1 L1 EMBER HERO (token lock v9)", () => {
-  it("banner ink #0C0A09 + strip kiri ember #EA580C + radius 12px (bukan rounded-3xl)", () => {
+  it("ink banner #0C0A09 + ember left strip #EA580C + 12px radius (not rounded-3xl)", () => {
     expect(L).toContain("#0c0a09");
     expect(L).toContain("#ea580c");
     expect(L).toContain("border-left");
@@ -76,14 +76,14 @@ describe("login revamp — banner 1:1 L1 EMBER HERO (token lock v9)", () => {
     expect(L).not.toContain("rounded-3xl");
   });
 
-  it("angka sisa warna lime-muda L1 #D9F99D 17px (bukan #FBBF24 / text-3xl)", () => {
+  it("remaining numbers light lime L1 #D9F99D 17px (not #FBBF24 / text-3xl)", () => {
     expect(L).toContain("#d9f99d");
     expect(L).toContain("17px");
     expect(L).not.toContain("#fbbf24");
     expect(L).not.toContain("text-3xl");
   });
 
-  it("copy hero 10px extrabold (QUOTA HABIS • reset 00.00 / Login gratis → buka 2 + 5)", () => {
+  it("hero copy 10px extrabold (QUOTA HABIS • reset 00.00 / Login gratis → buka 2 + 5)", () => {
     expect(L).toContain("QUOTA HABIS");
     expect(L).toContain("reset 00.00");
     expect(L).toContain("Login gratis");
@@ -91,13 +91,13 @@ describe("login revamp — banner 1:1 L1 EMBER HERO (token lock v9)", () => {
   });
 });
 
-describe("login revamp — wiring fitur app (bukan mock)", () => {
-  it("login email+password via Supabase signInWithPassword + hormati ?redirect=", () => {
+describe("login revamp — app feature wiring (not a mock)", () => {
+  it("email+password login via Supabase signInWithPassword + respects ?redirect=", () => {
     expect(WIRING).toContain("signInWithPassword");
     expect(WIRING).toContain("redirect");
   });
 
-  it("tombol Google via Supabase signInWithOAuth provider google", () => {
+  it("Google button via Supabase signInWithOAuth provider google", () => {
     expect(WIRING).toContain("signInWithOAuth");
     expect(WIRING).toContain("google");
   });

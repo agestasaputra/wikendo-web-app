@@ -1,9 +1,9 @@
 /**
- * common/types/history.ts — Entry riwayat (localStorage `wikendo_history`, E1).
+ * common/types/history.ts — History entry (localStorage `wikendo_history`, E1).
  *
- * APA: 1 baris riwayat hasil quiz tempat/makan. Dipakai HistoryStore + HistoryPage.
+ * WHAT: 1 history row for a place/food quiz result. Used by HistoryStore + HistoryPage.
  */
-export type HistoryKind = "tempat" | "makan";
+export type HistoryKind = "place" | "food";
 
 export interface HistoryEntry {
   kind: HistoryKind;

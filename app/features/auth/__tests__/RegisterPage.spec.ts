@@ -2,9 +2,9 @@ import { describe, it, expect } from "vitest";
 import { readSource } from "~/test/utils";
 
 /**
- * RegisterPage.spec.ts — Slicing 100% /register ikut image (10 Okt 2026) + Opsi B magic-link (lock Agesta 10 Okt).
- * APA: baca RegisterPage + komponen auth sebagai teks. TAKEOUT 10 Okt: field Nama dihapus (Email + Password saja).
- * Opsi B: Daftar → /check-email?email= → klik 1 link → HOME. Google OAuth tetap langsung.
+ * RegisterPage.spec.ts — 100% /register slicing per image (Oct 10 2026) + Option B magic-link (Agesta lock Oct 10).
+ * WHAT: read RegisterPage + auth components as text. TAKEOUT Oct 10: Nama field removed (Email + Password only).
+ * Option B: Daftar → /check-email?email= → click 1 link → HOME. Google OAuth stays immediate.
  */
 const R = readSource(
   "features/auth/RegisterPage.vue",
@@ -19,30 +19,30 @@ const WIRING = readSource(
   "features/auth/composables/useGoogleSignIn.ts",
 );
 
-describe("register revamp 100% image — struktur + teks persis", () => {
-  it("container mobile max-w-md + background paper #F5F5F4 (bukan body/root)", () => {
+describe("register revamp 100% image — structure + exact text", () => {
+  it("mobile container max-w-md + paper background #F5F5F4 (not body/root)", () => {
     expect(R).toContain("max-w-md mx-auto px-4 pb-10");
     expect(R).toContain("#f5f5f4");
   });
 
-  it("tanpa header lokal duplikat (header global sudah di AppHeader, image mulai dari banner)", () => {
+  it("no duplicate local header (global header already in AppHeader, image starts from the banner)", () => {
     expect(R).not.toContain("<header");
   });
 
-  it("banner hitam: DAFTAR GRATIS + angka 2 • 5 + quota full + voucher", () => {
+  it("black banner: DAFTAR GRATIS + 2 • 5 numbers + quota full + voucher", () => {
     expect(R).toContain("DAFTAR GRATIS");
     expect(R).toContain("2 • 5");
     expect(R).toContain("quota full + voucher");
   });
 
-  it("tombol Lanjutkan dengan Google (outline abu resmi + divider ATAU, Opsi A board v10)", () => {
+  it("Lanjutkan dengan Google button (official gray outline + ATAU divider, Option A board v10)", () => {
     expect(R).toContain("Lanjutkan dengan Google");
     expect(R).toContain("rounded-full");
     expect(R).toContain("#dadce0");
     expect(R).toContain("ATAU");
   });
 
-  it("field Email + Password SAJA (Nama di-takeout): placeholder persis + ikon kiri", () => {
+  it("Email + Password fields ONLY (Nama taken out): exact placeholder + left icon", () => {
     expect(R).not.toContain('placeholder="Nama"');
     expect(R).not.toContain("👤");
     expect(R).not.toMatch(/nama\s*=\s*ref\(/);
@@ -53,24 +53,24 @@ describe("register revamp 100% image — struktur + teks persis", () => {
     expect(R).toContain("🔒");
   });
 
-  it("meter kekuatan di bawah field password: • pemisah + label kata (bukan inline sesak)", () => {
+  it("strength meter below the password field: • separator + word label (not cramped inline)", () => {
     expect(R).toContain("strengthLabel");
     expect(R).toContain("•");
   });
 
-  it("checkbox: Setuju Syarat & Privasi (checked by default kayak image)", () => {
+  it("checkbox: Setuju Syarat & Privasi (checked by default like the image)", () => {
     expect(R).toContain("Setuju Syarat & Privasi");
     expect(R).toContain("checkbox");
   });
 
-  it("CTA utama hitam: Daftar → (panah kanan)", () => {
+  it("main black CTA: Daftar → (right arrow)", () => {
     expect(R).toContain("Daftar →");
     expect(R).toContain("#0c0a09");
   });
 });
 
 describe("register revamp — banner 1:1 R1 (token lock v9)", () => {
-  it("banner ink #0C0A09 + strip kiri ember #EA580C + radius 12px (bukan rose/rounded-3xl)", () => {
+  it("ink banner #0C0A09 + ember left strip #EA580C + 12px radius (not rose/rounded-3xl)", () => {
     expect(R).toContain("#0c0a09");
     expect(R).toContain("#ea580c");
     expect(R).toContain("border-left");
@@ -80,48 +80,48 @@ describe("register revamp — banner 1:1 R1 (token lock v9)", () => {
     expect(R).not.toContain("bg-orange-600");
   });
 
-  it("angka 2 • 5 warna lime-muda #D9F99D 17px (bukan putih 24px)", () => {
+  it("2 • 5 numbers in light lime #D9F99D 17px (not white 24px)", () => {
     expect(R).toContain("#d9f99d");
     expect(R).toContain("17px");
   });
 
-  it("tanpa footer lokal 10-detik (image bawah CTA kosong, footer ikut global app.vue)", () => {
+  it("no local 10-second footer (image bottom after CTA is empty, footer follows global app.vue)", () => {
     expect(R).not.toContain("10 detik");
   });
 });
 
-describe("register revamp — wiring fitur app (bukan mock)", () => {
-  it("daftar email+password via Supabase signUp + redirect cek-email (Opsi B, bukan langsung /)", () => {
+describe("register revamp — app feature wiring (not a mock)", () => {
+  it("email+password signup via Supabase signUp + check-email redirect (Option B, not straight to /)", () => {
     expect(PAGE).toContain("signUp");
     expect(PAGE).toContain("useSupabaseBrowser");
     expect(PAGE).toContain("/check-email");
   });
 
-  it("tombol Google via Supabase signInWithOAuth provider google", () => {
+  it("Google button via Supabase signInWithOAuth provider google", () => {
     expect(WIRING).toContain("signInWithOAuth");
     expect(WIRING).toContain("google");
   });
 
-  it("error inline (bukan alert) + font Plus Jakarta Sans", () => {
+  it("inline error (not alert) + Plus Jakarta Sans font", () => {
     expect(PAGE).toContain("errorMsg");
     expect(PAGE).toContain("Plus Jakarta Sans");
   });
 });
 
-describe("opsi B magic-link — register redirect ke cek-email", () => {
-  it("signUp pakai emailRedirectTo ke HOME (link verifikasi balik ke /)", () => {
+describe("option B magic-link — register redirects to check-email", () => {
+  it("signUp uses emailRedirectTo to HOME (verification link back to /)", () => {
     expect(PAGE).toContain("signUp");
     expect(PAGE).toContain("emailRedirectTo");
   });
 
-  it("sukses daftar → /check-email?email= (BUKAN langsung /)", () => {
+  it("signup success → /check-email?email= (NOT straight to /)", () => {
     expect(PAGE).toContain("/check-email");
     expect(PAGE).toMatch(/path:\s*["']\/check-email["']/);
-    // handleRegister tidak boleh lempar langsung ke home lagi
+    // handleRegister must no longer redirect straight to home
     expect(PAGE).not.toMatch(/handleRegister[\s\S]*router\.push\(["']\/["']\)/);
   });
 
-  it("Google OAuth tetap langsung (tanpa cek-email, Google sudah verifikasi)", () => {
+  it("Google OAuth stays immediate (no check-email, Google already verifies)", () => {
     expect(WIRING).toContain("signInWithOAuth");
     expect(WIRING).toContain("google");
   });

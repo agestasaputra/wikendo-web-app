@@ -1,15 +1,15 @@
 /**
- * POST /api/tempat/recommend — Generate 5 rekomendasi TEMPAT (mode Plan).
- * Body: QuizTempatInput (mood, companion, budget, location, time?).
- * Quota MVP: cookie quota_used (anon 1x; habis → 403 LOGIN_REQUIRED).
- * Flow: cek quota → generateTempat() [LLM] → INSERT generations {type:'tempat'} → set cookie.
- * Result TIDAK campur tenant — kontrak split total (Addendum v1.1).
+ * POST /api/place/recommend — Generate 5 PLACE recommendations (Plan mode).
+ * Body: QuizPlaceInput (mood, companion, budget, location, time?).
+ * MVP quota: quota_used cookie (anon 1x; used up → 403 LOGIN_REQUIRED).
+ * Flow: check quota → generatePlace() [LLM] → INSERT generations {type:'place'} → set cookie.
+ * Result NEVER mixes in tenants — total split contract (Addendum v1.1).
  */
-import type { QuizTempatInput } from "../../../common/types/api";
+import type { QuizPlaceInput } from "../../../common/types/api";
 import { supabaseAdmin } from "../../utils/db";
 
 export default defineEventHandler(async (event) => {
-  const body = await readBody<QuizTempatInput>(event);
+  const body = await readBody<QuizPlaceInput>(event);
   const sessionId = getCookie(event, "session_id") || crypto.randomUUID();
   setCookie(event, "session_id", sessionId, { maxAge: 86400 * 30 });
 
@@ -22,13 +22,13 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const { generateTempat } = await import("../../utils/llm");
-  const recommendations = await generateTempat(body);
+  const { generatePlace } = await import("../../utils/llm");
+  const recommendations = await generatePlace(body);
 
   const db = supabaseAdmin();
   await db.from("generations").insert({
     session_id: sessionId,
-    quiz_input: { ...body, type: "tempat" },
+    quiz_input: { ...body, type: "place" },
     recommendations,
   });
   setCookie(event, "quota_used", "1", { maxAge: 86400 });

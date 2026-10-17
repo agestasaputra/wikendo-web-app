@@ -1,10 +1,10 @@
 /**
- * common/utils/quota.ts — Quota split v1.3: parsing cookie + bangun status + label wallet.
+ * common/utils/quota.ts — Quota split v1.3: cookie parsing + status builder + wallet label.
  *
- * APA: parseAnon*Used, buildQuotaStatus, buildWalletLabel. PURE: caller yang baca cookie/API.
- * KENAPA: dipakai server (GET /api/quota) + pages (wallet) → 1 interpretasi, bukan duplikat.
- * Kontrak response: ../../docs/05-API-Specification.md. Anon 1+2, register 2+5.
- * Contoh: buildQuotaStatus({ tempatUsed: 0, makanUsed: 1, isLoggedIn: false })
+ * WHAT: parseAnon*Used, buildQuotaStatus, buildWalletLabel. PURE: the caller reads cookie/API.
+ * WHY: used by server (GET /api/quota) + pages (wallet) → 1 interpretation, not duplicated.
+ * Response contract: ../../docs/05-API-Specification.md. Anonymous 1+2, register 2+5.
+ * EXAMPLE: buildQuotaStatus({ placeUsed: 0, foodUsed: 1, isLoggedIn: false })
  */
 import type {
   QuotaStatus,
@@ -12,31 +12,31 @@ import type {
   WalletLabel,
 } from "../types/quota";
 
-/** Cookie `quota_used` (tempat, anon 1x) → 0|1. Nilai ngaco = 0 (aman). */
-export function parseAnonTempatUsed(cookieValue: string | undefined): number {
+/** Cookie `quota_used` (place, anonymous 1x) → 0|1. Wrong value = 0 (safe). */
+export function parseAnonPlaceUsed(cookieValue: string | undefined): number {
   return cookieValue === "1" ? 1 : 0;
 }
 
-/** Cookie `makan_quota_used` (makan, anon 2x) → 0|1|2. Dijepit 0–2, ngaco = 0. */
-export function parseAnonMakanUsed(cookieValue: string | undefined): number {
+/** Cookie `food_quota_used` (food, anonymous 2x) → 0|1|2. Clamped 0–2, wrong = 0. */
+export function parseAnonFoodUsed(cookieValue: string | undefined): number {
   const n = parseInt(cookieValue || "0", 10);
   if (Number.isNaN(n) || n <= 0) return 0;
   return Math.min(n, 2);
 }
 
-/** Bangun response quota split: anon (1+2 + login_cta) vs register (2+5). */
+/** Build the quota split response: anonymous (1+2 + login_cta) vs register (2+5). */
 export function buildQuotaStatus(input: QuotaStatusInput): QuotaStatus {
   if (!input.isLoggedIn) {
     return {
-      tempat: {
-        used: input.tempatUsed,
+      place: {
+        used: input.placeUsed,
         limit: 1,
-        remaining: 1 - input.tempatUsed,
+        remaining: 1 - input.placeUsed,
       },
-      makan: {
-        used: input.makanUsed,
+      food: {
+        used: input.foodUsed,
         limit: 2,
-        remaining: 2 - input.makanUsed,
+        remaining: 2 - input.foodUsed,
       },
       is_logged_in: false,
       reset_at: null,
@@ -44,29 +44,29 @@ export function buildQuotaStatus(input: QuotaStatusInput): QuotaStatus {
     };
   }
   return {
-    tempat: {
-      used: input.tempatUsed,
+    place: {
+      used: input.placeUsed,
       limit: 2,
-      remaining: 2 - input.tempatUsed,
+      remaining: 2 - input.placeUsed,
     },
-    makan: {
-      used: input.makanUsed,
+    food: {
+      used: input.foodUsed,
       limit: 5,
-      remaining: 5 - input.makanUsed,
+      remaining: 5 - input.foodUsed,
     },
     is_logged_in: true,
     reset_at: input.resetAt ?? null,
   };
 }
 
-/** QuotaStatus → label wallet: headline sisa + chip "sisa/limit" + flag habis. */
+/** QuotaStatus → wallet label: remaining headline + "remaining/limit" chip + exhausted flag. */
 export function buildWalletLabel(status: QuotaStatus): WalletLabel {
-  const t = status.tempat.remaining;
-  const m = status.makan.remaining;
+  const t = status.place.remaining;
+  const m = status.food.remaining;
   return {
     headline: `${t} tempat • ${m} makan`,
-    tempatChip: `${t}/${status.tempat.limit} tempat`,
-    makanChip: `${m}/${status.makan.limit} makan`,
+    placeChip: `${t}/${status.place.limit} tempat`,
+    foodChip: `${m}/${status.food.limit} makan`,
     exhausted: t <= 0 && m <= 0,
   };
 }

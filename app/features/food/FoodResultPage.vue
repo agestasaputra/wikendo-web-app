@@ -1,7 +1,7 @@
-<!-- features/makan/MakanResultPage.vue → GET /result-makan (Result TENANT + gift di hero).
-APA: header Hasil + 5 rekomendasi + deck BEST MATCH (badge BEST lime + Halal mint) + gift di hero (Ada -20% + Buka) + Maps tenant + chips + rank #1-3 + quota makan.
-KENAPA gift di hero 1:1 request Agesta 11 Okt: 1 CTA saja di atas, bawah bersih tanpa dobel, klaim WAJIB login (anti-farming), token lock paper #F5F5F4 + ink #0C0A09 + lime/rose/mint via getResultMakanMeta (1 sumber, tested).
-Contoh: hero Kopi Kekinian — GI L2 Halal 50-100rb kids → gift Buka lalu Maps tenant. Lock: TENANT saja, 0 tempat wisata. -->
+<!-- features/food/FoodResultPage.vue → GET /result-food (TENANT result + gift in the hero).
+WHAT: Result header + 5 recommendations + BEST MATCH deck (BEST lime badge + Halal mint) + gift in the hero (Ada -20% + Buka) + tenant Maps + chips + rank #1-3 + food quota.
+WHY gift in the hero 1:1 Agesta request Oct 11: just 1 CTA on top, clean bottom without duplication, claim REQUIRES login (anti-farming), token lock paper #F5F5F4 + ink #0C0A09 + lime/rose/mint via getResultFoodMeta (1 source, tested).
+EXAMPLE: Kopi Kekinian hero — GI L2 Halal 50-100rb kids → gift Buka then tenant Maps. Lock: TENANT only, 0 tourist places. -->
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
 import AppLoader from "~/common/components/AppLoader.vue";
@@ -9,26 +9,26 @@ import ResultError from "~/common/components/ResultError.vue";
 import { useHistoryStore } from "~/common/store/HistoryStore";
 import type { TenantRecommendation } from "~/common/types/api";
 import { getMallShortLabel } from "~/common/utils/mall";
-import VoucherSheet from "~/features/makan/components/VoucherSheet.vue";
-import { MAKAN_PROMOS } from "~/features/makan/constants/questions";
-import { useVoucherStore } from "~/features/makan/store/VoucherStore";
+import VoucherSheet from "~/features/food/components/VoucherSheet.vue";
+import { FOOD_PROMOS } from "~/features/food/constants/questions";
+import { useVoucherStore } from "~/features/food/store/VoucherStore";
 import {
-  buildMakanChips,
-  buildMakanHero,
+  buildFoodChips,
+  buildFoodHero,
   buildRankItems,
-} from "~/features/makan/utils/resultHero";
-import { getResultMakanMeta } from "~/features/makan/utils/resultMeta";
-import { getVoucherCardMeta } from "~/features/makan/utils/voucherCard";
+} from "~/features/food/utils/resultHero";
+import { getResultFoodMeta } from "~/features/food/utils/resultMeta";
+import { getVoucherCardMeta } from "~/features/food/utils/voucherCard";
 import { getErrorMessage, getErrorStatus } from "~/utils/error";
 
-interface MakanResponse {
+interface FoodResponse {
   recommendations: TenantRecommendation[];
   quota_remaining?: number;
 }
 
 const route = useRoute();
-const { data, pending, error, refresh } = await useFetch<MakanResponse>(
-  "/api/makan/recommend",
+const { data, pending, error, refresh } = await useFetch<FoodResponse>(
+  "/api/food/recommend",
   { method: "POST", body: route.query },
 );
 const list = computed(() => data.value?.recommendations || []);
@@ -42,7 +42,7 @@ const isWall = computed(
   () =>
     /login/i.test(errorMessage.value) || getErrorStatus(error.value) === 403,
 );
-// Quota real: sisa dari response POST (quota_remaining). Anon limit makan 2x.
+// Real quota: remaining from the POST response (quota_remaining). Anon food limit 2x.
 const quotaLeft = computed(() => data.value?.quota_remaining);
 const quotaLabel = computed(() =>
   isWall.value ? "0/2 habis 🔒" : (quotaLeft.value ?? 2) + "/2",
@@ -53,28 +53,28 @@ const mallSlug = computed(() =>
 const mallLabel = computed(() =>
   mallSlug.value ? getMallShortLabel(mallSlug.value) : "Mall",
 );
-// F1b token lock (tested): tiket ink + diskon lime + Klaim rose + halal mint.
-const meta = getResultMakanMeta();
-// V12 gift surprise: meta grad cream-rose + pill rose (helper tested).
+// F1b token lock (tested): ink ticket + lime discount + Claim rose + halal mint.
+const meta = getResultFoodMeta();
+// V12 gift surprise: cream-rose grad meta + rose pill (tested helper).
 const vGift = getVoucherCardMeta("gift");
-const hero = computed(() => buildMakanHero(list.value[idx.value]));
-const chips = computed(() => buildMakanChips(list.value));
+const hero = computed(() => buildFoodHero(list.value[idx.value]));
+const chips = computed(() => buildFoodChips(list.value));
 const rankItems = computed(() => buildRankItems(list.value));
 
 function next(): void {
   if (list.value.length) idx.value = (idx.value + 1) % list.value.length;
 }
 
-// V13A/B wiring (Addendum 23 v1.1): hero best-1 + link +2 promo → sheet 3 row.
+// V13A/B wiring (Addendum 23 v1.1): hero best-1 + link +2 more promos → 3-row sheet.
 // Endpoint: /api/voucher/claim via VoucherStore ($fetch + Bearer access_token getSession).
 const voucherStore = useVoucherStore();
 const { claiming, claimError } = storeToRefs(voucherStore);
 const showSheet = ref(false);
 const claimingCode = ref("");
 
-// F1b ticket-based claim: solid Klaim, anon → wall login (anti-farming).
+// F1b ticket-based claim: solid Claim, anon → login wall (anti-farming).
 async function claimRow(code: string): Promise<void> {
-  // UX lock: early-return guard anti double-klik (keyboard Enter bypass :disabled).
+  // UX lock: early-return guard against double-click (keyboard Enter bypasses :disabled).
   if (claiming.value) return;
   claimingCode.value = code;
   try {
@@ -89,15 +89,15 @@ async function claimRow(code: string): Promise<void> {
   }
 }
 
-// E1 riwayat: tulis 1 entry pas data sukses (store: guard window + cap 20 + dedupe).
+// E1 history: write 1 entry when data succeeds (store: window guard + cap 20 + dedupe).
 function pushHistory(): void {
   const r = list.value[0];
   if (!r) return;
-  const lantai = r.lantai ? "L" + r.lantai : "";
+  const floor = r.floor ? "L" + r.floor : "";
   useHistoryStore().push({
-    kind: "makan",
+    kind: "food",
     title: r.name || "—",
-    sub: lantai + (mallLabel.value ? " · " + mallLabel.value : ""),
+    sub: floor + (mallLabel.value ? " · " + mallLabel.value : ""),
     at: Date.now(),
   });
 }
@@ -119,7 +119,7 @@ watch(
       Quota makan {{ quotaLabel }} tersisa · {{ mallLabel }}
     </p>
 
-    <AppLoader v-if="pending" variant="makan" />
+    <AppLoader v-if="pending" variant="food" />
     <ResultError
       v-else-if="error"
       :is-wall="isWall"
@@ -170,8 +170,8 @@ watch(
             💰 {{ hero.price }} · {{ hero.kids }} · 📍 L{{ hero.floor }}
           </p>
 
-          <!-- Voucher gift di dalam hero (pindahan dari bawah, 11 Okt 2026): banner Ada -20% + Buka, model lama atas dihapus -->
-          <!-- V13A best-1 + link +2 promo lain → sheet V13B (Addendum 23 v1.1). 1 CTA dominan, sisanya di sheet. -->
+          <!-- Voucher gift inside the hero (moved from below, Oct 11 2026): Ada -20% + Buka banner, old top model removed -->
+          <!-- V13A best-1 + link +2 other promos → V13B sheet (Addendum 23 v1.1). 1 dominant CTA, the rest in the sheet. -->
           <div
             class="rounded-[14px] p-3 flex gap-2 items-center mt-3"
             :style="{
@@ -222,10 +222,10 @@ watch(
             {{ claimNote }}
           </p>
 
-          <!-- V13B sheet picker di atas result: Pilih 1 dari 3 + sisa cap + Klaim per row -->
+          <!-- V13B sheet picker above the result: Pick 1 of 3 + remaining cap + Claim per row -->
           <VoucherSheet
             v-if="showSheet"
-            :vouchers="MAKAN_PROMOS"
+            :vouchers="FOOD_PROMOS"
             :hero-name="hero.name"
             :claiming="claiming"
             :claiming-code="claimingCode"
@@ -288,7 +288,7 @@ watch(
           </p>
         </div>
       </div>
-      <!-- end F1b (voucher bawah dihapus 11 Okt 2026: gift sudah pindah ke dalam hero di atas) -->
+      <!-- end F1b (bottom voucher removed Oct 11 2026: gift has moved into the hero above) -->
 
       <p class="text-[11.5px] text-gray-500 mt-2 text-center">
         <u>Lapor tutup/buka</u> · <u>Share ke temen</u> · Quota makan

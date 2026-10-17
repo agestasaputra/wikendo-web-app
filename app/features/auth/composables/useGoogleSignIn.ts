@@ -1,10 +1,10 @@
 /**
- * features/auth/composables/useGoogleSignIn.ts — Login/daftar Google 1-klik (satu pintu, Supabase OAuth).
+ * features/auth/composables/useGoogleSignIn.ts — 1-click Google login/register (single door, Supabase OAuth).
  *
- * APA: googleLoading + signInWithGoogle() → pesan error | null. signInWithOAuth SAMA untuk login & register
- *   (Supabase auto create-vs-login by email); redirect hormati ?redirect= (konteks quiz tidak hilang).
- * KENAPA: handler identik di LoginPage + RegisterPage → 1 composable.
- * Contoh: const { googleLoading, signInWithGoogle } = useGoogleSignIn(redirect)
+ * WHAT: googleLoading + signInWithGoogle() → error message | null. signInWithOAuth is THE SAME for login & register
+ *   (Supabase auto create-vs-login by email); redirect respects ?redirect= (the quiz context is not lost).
+ * WHY: identical handler in LoginPage + RegisterPage → 1 composable.
+ * EXAMPLE: const { googleLoading, signInWithGoogle } = useGoogleSignIn(redirect)
  */
 import { ref, type Ref } from "vue";
 import { useSupabaseBrowser } from "~/common/composables/useSupabaseBrowser";

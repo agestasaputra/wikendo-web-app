@@ -1,11 +1,11 @@
 /**
- * utils/url.ts — Builder URL murni.
+ * utils/url.ts — Pure URL builder.
  *
- * APA: buildMapsUrl(tenant, mall) → link Google Maps search. PURE.
- * Contoh: buildMapsUrl("Kopi Kenangan", "grand-indonesia").
+ * WHAT: buildMapsUrl(tenant, mall) → Google Maps search link. PURE.
+ * EXAMPLE: buildMapsUrl("Kopi Kenangan", "grand-indonesia").
  */
 
-/** Bikin link Google Maps buat 1 tenant. Dipakai server makan/recommend. */
+/** Build a Google Maps link for 1 tenant. Used by the server food/recommend. */
 export function buildMapsUrl(tenantName: string, mallSlug: string): string {
   return (
     "https://www.google.com/maps/search/" +

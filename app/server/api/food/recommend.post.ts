@@ -1,29 +1,29 @@
 /**
- * POST /api/makan/recommend — Generate 5 rekomendasi TENANT (mode Mall).
- * Body: QuizMakanInput (mall_slug, mission, budget_tier, companion, halal_only?, kids_friendly?).
- * Quota MVP: cookie makan_quota_used (anon max 2; habis → 403 MAKAN_QUOTA_EXCEEDED). Terpisah dari quota tempat.
- * Flow: cek quota → kandidat tenants Supabase (server/utils/makanCandidates, GRATIS, limit 30)
- * → rankTenants() [LLM ranking Top 5] → gabung data tenant + maps_url → INSERT generations {type:'makan'} → quota +1.
- * ATURAN NULL (tri-state): halal/kids/hype NULL = belum riset (lihat server/utils/tenantFilters.ts).
+ * POST /api/food/recommend — Generate 5 TENANT recommendations (Mall mode).
+ * Body: QuizFoodInput (mall_slug, mission, budget_tier, companion, halal_only?, kids_friendly?).
+ * MVP quota: food_quota_used cookie (anon max 2; used up → 403 FOOD_QUOTA_EXCEEDED). Separate from the place quota.
+ * Flow: check quota → Supabase tenant candidates (server/utils/foodCandidates, FREE, limit 30)
+ * → rankTenants() [LLM Top 5 ranking] → merge tenant data + maps_url → INSERT generations {type:'food'} → quota +1.
+ * NULL RULE (tri-state): halal/kids/hype NULL = not researched yet (see server/utils/tenantFilters.ts).
  */
-import type { QuizMakanInput } from "../../../common/types/api";
+import type { QuizFoodInput } from "../../../common/types/api";
 import { supabaseAdmin } from "../../utils/db";
 import {
-  fetchMakanCandidates,
+  fetchFoodCandidates,
   pickCandidate,
   toTenantRecommendation,
-} from "../../utils/makanCandidates";
+} from "../../utils/foodCandidates";
 
-const ANON_MAKAN_LIMIT = 2;
+const ANON_FOOD_LIMIT = 2;
 
 export default defineEventHandler(async (event) => {
-  const body = await readBody<QuizMakanInput>(event);
-  const used = parseInt(getCookie(event, "makan_quota_used") || "0");
+  const body = await readBody<QuizFoodInput>(event);
+  const used = parseInt(getCookie(event, "food_quota_used") || "0");
 
-  if (used >= ANON_MAKAN_LIMIT) {
+  if (used >= ANON_FOOD_LIMIT) {
     throw createError({
       statusCode: 403,
-      statusMessage: "MAKAN_QUOTA_EXCEEDED",
+      statusMessage: "FOOD_QUOTA_EXCEEDED",
       data: {
         message: "Quota makan habis. Login untuk 5x/hari, reset 00:00 WIB.",
       },
@@ -31,7 +31,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const db = supabaseAdmin();
-  const candidates = await fetchMakanCandidates(db, body);
+  const candidates = await fetchFoodCandidates(db, body);
   const { rankTenants } = await import("../../utils/llm");
   const ranking = await rankTenants(body, candidates);
 
@@ -45,10 +45,10 @@ export default defineEventHandler(async (event) => {
 
   await db.from("generations").insert({
     session_id: getCookie(event, "session_id") || "anon",
-    quiz_input: { ...body, type: "makan" },
+    quiz_input: { ...body, type: "food" },
     recommendations,
   });
-  setCookie(event, "makan_quota_used", String(used + 1), { maxAge: 86400 });
+  setCookie(event, "food_quota_used", String(used + 1), { maxAge: 86400 });
 
-  return { recommendations, quota_remaining: ANON_MAKAN_LIMIT - (used + 1) };
+  return { recommendations, quota_remaining: ANON_FOOD_LIMIT - (used + 1) };
 });

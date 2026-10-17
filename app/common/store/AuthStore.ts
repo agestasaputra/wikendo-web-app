@@ -1,10 +1,10 @@
 /**
- * common/store/AuthStore.ts — Session auth sumber kebenaran (Pinia, ganti composable useAuth).
+ * common/store/AuthStore.ts — Auth session single source of truth (Pinia, replaces the useAuth composable).
  *
- * APA: isLoggedIn/email/displayName/initial + init() (getSession + onAuthStateChange) + signOut().
- * KENAPA store: dipakai AppHeader + Home + Akun → state bersama lintas feature (hub-chat: common/store).
- *   init() idempotent — dulu tiap pemanggil useAuth() pasang listener baru.
- * Contoh: const auth = useAuthStore(); auth.init(); auth.isLoggedIn
+ * WHAT: isLoggedIn/email/displayName/initial + init() (getSession + onAuthStateChange) + signOut().
+ * WHY store: used by AppHeader + Home + Akun → shared state across features (hub-chat: common/store).
+ *   init() is idempotent — previously every useAuth() caller attached a new listener.
+ * EXAMPLE: const auth = useAuthStore(); auth.init(); auth.isLoggedIn
  */
 import { computed, ref } from "vue";
 import { defineStore } from "pinia";
@@ -29,11 +29,11 @@ export const useAuthStore = defineStore("authStore", () => {
       const { data } = await useSupabaseBrowser().auth.getSession();
       applyUser(data.session?.user ?? null);
     } catch {
-      // offline / SSR tanpa session → tetap anon, jangan crash
+      // offline / SSR without session → stay anonymous, don't crash
     }
   }
 
-  // Load session + dengar perubahan auth (sekali). getSession + onAuthStateChange wajib ada.
+  // Load session + listen to auth changes (once). getSession + onAuthStateChange are required.
   function init(): void {
     if (listening || typeof window === "undefined") return;
     listening = true;
@@ -43,7 +43,7 @@ export const useAuthStore = defineStore("authStore", () => {
         applyUser(session?.user ?? null);
       });
     } catch {
-      // abaikan — anon tetap jalan
+      // ignore — anonymous still works
     }
   }
 

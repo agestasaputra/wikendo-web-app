@@ -1,20 +1,20 @@
 /**
- * features/makan/utils/__tests__/resultMeta.spec.ts — Test token kartu result MAKAN F1b (tiket ink + diskon lime).
- * Token lock Agesta: ink + lime + rose + mint.
+ * features/food/utils/__tests__/resultMeta.spec.ts — FOOD result card token test F1b (ink ticket + lime discount).
+ * Agesta token lock: ink + lime + rose + mint.
  */
 import { describe, it, expect } from "vitest";
-import { getResultMakanMeta } from "../resultMeta";
+import { getResultFoodMeta } from "../resultMeta";
 
-describe("getResultMakanMeta (F1b tiket voucher)", () => {
-  it("tiket ink #0C0A09 + diskon lime #A3E635 + border dashed pink #FECDD3", () => {
-    const m = getResultMakanMeta();
+describe("getResultFoodMeta (F1b voucher ticket)", () => {
+  it("ink ticket #0C0A09 + lime discount #A3E635 + pink dashed border #FECDD3", () => {
+    const m = getResultFoodMeta();
     expect(m.ticketBg).toBe("#0C0A09");
     expect(m.discountColor).toBe("#A3E635");
     expect(m.ticketBorder).toBe("#FECDD3");
   });
 
-  it("tombol Klaim rose #E11D48 + BEST lime + halal mint", () => {
-    const m = getResultMakanMeta();
+  it("Klaim button rose #E11D48 + lime BEST + mint halal", () => {
+    const m = getResultFoodMeta();
     expect(m.claimBg).toBe("#E11D48");
     expect(m.claimColor).toBe("#fff");
     expect(m.bestBg).toBe("#A3E635");
@@ -22,8 +22,8 @@ describe("getResultMakanMeta (F1b tiket voucher)", () => {
     expect(m.halalColor).toBe("#047857");
   });
 
-  it("page paper #F5F5F4 + kartu putih (token lock)", () => {
-    const m = getResultMakanMeta();
+  it("page paper #F5F5F4 + white card (token lock)", () => {
+    const m = getResultFoodMeta();
     expect(m.pageBg).toBe("#F5F5F4");
     expect(m.cardBg).toBe("#fff");
   });

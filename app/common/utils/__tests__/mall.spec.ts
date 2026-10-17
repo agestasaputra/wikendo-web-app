@@ -1,12 +1,12 @@
 /**
- * common/utils/__tests__/mall.spec.ts — Test helper nama mall.
- * Mapping slug→nama dipakai 3 tempat → 1 helper; mall ke-6 cukup edit constants.
+ * common/utils/__tests__/mall.spec.ts — Mall name helper test.
+ * The slug→name mapping is used in 3 places → 1 helper; the 6th mall just needs a constants edit.
  */
 import { describe, it, expect } from "vitest";
 import { getMallName, getMallShortLabel } from "../mall";
 
-describe("getMallName (slug → nama lengkap)", () => {
-  it("5 slug valid → nama lengkap", () => {
+describe("getMallName (slug → full name)", () => {
+  it("5 valid slugs → full name", () => {
     expect(getMallName("grand-indonesia")).toBe("Grand Indonesia");
     expect(getMallName("central-park")).toBe("Central Park");
     expect(getMallName("kota-kasablanka")).toBe("Kota Kasablanka");
@@ -14,13 +14,13 @@ describe("getMallName (slug → nama lengkap)", () => {
     expect(getMallName("aeon-bsd")).toBe("Aeon BSD");
   });
 
-  it("slug ngaco → fallback slug as-is (tidak crash)", () => {
+  it("bogus slug → fallback to slug as-is (no crash)", () => {
     expect(getMallName("mall-ngaco")).toBe("mall-ngaco");
   });
 });
 
-describe("getMallShortLabel (slug → label chip/pendek)", () => {
-  it("nama panjang disingkat (GI, CP, Kokas, PIM, Aeon)", () => {
+describe("getMallShortLabel (slug → chip/short label)", () => {
+  it("long names shortened (GI, CP, Kokas, PIM, Aeon)", () => {
     expect(getMallShortLabel("grand-indonesia")).toBe("GI");
     expect(getMallShortLabel("central-park")).toBe("CP");
     expect(getMallShortLabel("kota-kasablanka")).toBe("Kokas");
@@ -28,7 +28,7 @@ describe("getMallShortLabel (slug → label chip/pendek)", () => {
     expect(getMallShortLabel("aeon-bsd")).toBe("Aeon");
   });
 
-  it("slug ngaco → fallback slug as-is", () => {
+  it("bogus slug → fallback to slug as-is", () => {
     expect(getMallShortLabel("mall-ngaco")).toBe("mall-ngaco");
   });
 });

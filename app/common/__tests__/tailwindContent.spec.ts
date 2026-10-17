@@ -4,11 +4,11 @@ import { describe, it, expect } from "vitest";
 import { fromRoot, readSource } from "~/test/utils";
 
 /**
- * tailwindContent.spec.ts — Regression: SETIAP folder yang berisi .vue harus ikut discan Tailwind.
- * KENAPA: @nuxtjs/tailwindcss hanya scan folder default Nuxt (components, layouts, pages, plugins,
- * composables, utils, app.vue). Saat template dipindah ke features/ + common/ tanpa mendaftarkannya,
- * Tailwind membuang semua class → desain polos tanpa style (kejadian 16 Okt 2026).
- * Test ini gagal kalau ada folder baru ber-.vue yang belum didaftarkan di tailwind.config.ts.
+ * tailwindContent.spec.ts — Regression: EVERY folder containing .vue must be scanned by Tailwind.
+ * WHY: @nuxtjs/tailwindcss only scans Nuxt's default folders (components, layouts, pages, plugins,
+ * composables, utils, app.vue). When templates moved to features/ + common/ without registering them,
+ * Tailwind dropped all classes → plain design with no styles (happened Oct 16, 2026).
+ * This test fails if a new folder with .vue isn't registered in tailwind.config.ts.
  */
 const NUXT_DEFAULT_DIRS = [
   "components",
@@ -49,7 +49,7 @@ function hasVue(dir: string): boolean {
 describe("Tailwind content scan", () => {
   const config = readSource("tailwind.config.ts");
 
-  it("setiap folder ber-.vue = folder default Nuxt ATAU terdaftar di tailwind.config.ts content", () => {
+  it("every folder with .vue = a Nuxt default folder OR registered in tailwind.config.ts content", () => {
     const missing = topLevelDirsWithVue().filter(
       (dir) =>
         !NUXT_DEFAULT_DIRS.includes(dir) && !config.includes(`./${dir}/**`),
@@ -60,7 +60,7 @@ describe("Tailwind content scan", () => {
     ).toEqual([]);
   });
 
-  it("features/ dan common/ (tempat template hidup) terdaftar", () => {
+  it("features/ and common/ (where templates live) are registered", () => {
     expect(config).toContain("./features/**");
     expect(config).toContain("./common/**");
   });

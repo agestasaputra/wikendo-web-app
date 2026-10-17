@@ -3,45 +3,53 @@ import { addHistoryEntry, parseHistory, timeAgo } from "../history";
 import type { HistoryEntry } from "../../types/history";
 
 /**
- * history.spec.ts — Test logic murni riwayat (E1 localStorage wikendo_history).
- * Aturan: cap 20 newest-first, dedupe judul, storage rusak = list kosong (tidak crash).
+ * history.spec.ts — Pure history logic test (E1 localStorage wikendo_history).
+ * Rules: cap 20 newest-first, dedupe title, broken storage = empty list (no crash).
  */
 const entry = (title: string, at = 1): HistoryEntry => ({
-  kind: "tempat",
+  kind: "place",
   title,
   sub: "",
   at,
 });
 
 describe("parseHistory (string localStorage → list)", () => {
-  it("null/kosong → []", () => {
+  it("null/empty → []", () => {
     expect(parseHistory(null)).toEqual([]);
     expect(parseHistory("")).toEqual([]);
   });
 
-  it("JSON rusak / bukan array → [] (aman)", () => {
+  it("broken JSON / not an array → [] (safe)", () => {
     expect(parseHistory("{rusak")).toEqual([]);
     expect(parseHistory('{"a":1}')).toEqual([]);
   });
 
-  it("array valid → dipakai, maksimal 20", () => {
+  it("valid array → used, max 20", () => {
     const many = Array.from({ length: 30 }, (_, i) => entry(`T${i}`));
     expect(parseHistory(JSON.stringify(many))).toHaveLength(20);
   });
+
+  it("legacy kind (tempat/makan) → migrates to place/food", () => {
+    const legacy = JSON.stringify([
+      { kind: "tempat", title: "A", sub: "", at: 1 },
+      { kind: "makan", title: "B", sub: "", at: 2 },
+    ]);
+    expect(parseHistory(legacy).map((e) => e.kind)).toEqual(["place", "food"]);
+  });
 });
 
-describe("addHistoryEntry (tambah di depan, dedupe, cap 20)", () => {
-  it("entry baru di depan", () => {
+describe("addHistoryEntry (prepend, dedupe, cap 20)", () => {
+  it("new entry at the front", () => {
     const res = addHistoryEntry([entry("A")], entry("B"));
     expect(res.map((e) => e.title)).toEqual(["B", "A"]);
   });
 
-  it("judul sama → tidak ganda (list tidak berubah)", () => {
+  it("same title → no duplicate (list unchanged)", () => {
     const list = [entry("A")];
     expect(addHistoryEntry(list, entry("A", 99))).toBe(list);
   });
 
-  it("lebih dari 20 → entry paling lama dibuang", () => {
+  it("more than 20 → oldest entry dropped", () => {
     const list = Array.from({ length: 20 }, (_, i) => entry(`T${i}`));
     const res = addHistoryEntry(list, entry("BARU"));
     expect(res).toHaveLength(20);
@@ -50,19 +58,19 @@ describe("addHistoryEntry (tambah di depan, dedupe, cap 20)", () => {
   });
 });
 
-describe("timeAgo (selisih waktu → label)", () => {
+describe("timeAgo (time difference → label)", () => {
   const now = 1_000_000_000_000;
 
-  it("< 1 menit → barusan", () => {
+  it("< 1 minute → barusan", () => {
     expect(timeAgo(now - 30_000, now)).toBe("barusan");
   });
 
-  it('menit → "5m lalu", jam → "2j lalu"', () => {
+  it('minutes → "5m lalu", hours → "2j lalu"', () => {
     expect(timeAgo(now - 5 * 60_000, now)).toBe("5m lalu");
     expect(timeAgo(now - 2 * 3_600_000, now)).toBe("2j lalu");
   });
 
-  it("> 1 hari → tanggal lokal id-ID", () => {
+  it("> 1 day → local date id-ID", () => {
     expect(timeAgo(now - 2 * 86_400_000, now)).toBe(
       new Date(now - 2 * 86_400_000).toLocaleDateString("id-ID"),
     );

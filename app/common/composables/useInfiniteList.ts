@@ -1,11 +1,11 @@
 /**
- * common/composables/useInfiniteList.ts — State infinity scroll S2b (1 composable, 2 halaman).
+ * common/composables/useInfiniteList.ts — Infinity scroll state S2b (1 composable, 2 pages).
  *
- * APA: start (page-1, SSR-friendly) + loadMore (append dedupe) + reset (ganti filter);
+ * WHAT: start (page-1, SSR-friendly) + loadMore (append dedupe) + reset (change filters);
  *   state items/total/hasMore/pending/loadingMore/error.
- * KENAPA: mall list + mall detail polanya SAMA → bukan duplikat state per halaman.
- *   Math paging (merge/hasMore) di utils/pagination (pure, tested). Spec S2b: 10/page.
- * Contoh: const { items, hasMore, start, loadMore } = useInfiniteList({ fetchPage }).
+ * WHY: mall list + mall detail follow the SAME pattern → no duplicated state per page.
+ *   Paging math (merge/hasMore) in utils/pagination (pure, tested). Spec S2b: 10/page.
+ * EXAMPLE: const { items, hasMore, start, loadMore } = useInfiniteList({ fetchPage }).
  */
 import { ref, shallowRef, type Ref } from "vue";
 import type { InfiniteFetchPage } from "../types/pagination";
