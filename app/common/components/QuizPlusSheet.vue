@@ -18,7 +18,7 @@ const emit = defineEmits<{ go: [path: string]; close: [] }>();
     <div
       role="dialog"
       aria-label="Pilih quiz tempat atau makan"
-      class="absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl"
+      class="absolute bottom-0 left-0 right-0 max-w-md mx-auto bg-white rounded-t-2xl"
       style="border-top: 4px solid #0c0a09"
     >
       <div class="max-w-md mx-auto px-4 pt-2 pb-6">

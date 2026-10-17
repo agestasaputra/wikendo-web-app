@@ -25,12 +25,7 @@ async function handleLogout(): Promise<void> {
 </script>
 
 <template>
-  <div class="max-w-md mx-auto px-4 pb-10">
-    <div class="flex justify-between items-center font-bold text-[13px] py-3">
-      <span class="font-extrabold">👤 Akun</span>
-      <NuxtLink to="/" class="text-gray-500 underline text-xs">Home →</NuxtLink>
-    </div>
-
+  <div class="max-w-md mx-auto px-4 p-5">
     <!-- Anonymous state -->
     <div
       v-if="!isLoggedIn"
@@ -118,8 +113,5 @@ async function handleLogout(): Promise<void> {
         <span>ℹ️ Tentang</span><span class="text-gray-400">→</span>
       </a>
     </div>
-    <p class="text-[11px] text-gray-400 text-center mt-3">
-      Wishlist segera hadir · Hubungi kami via WhatsApp · Tentang di footer
-    </p>
   </div>
 </template>

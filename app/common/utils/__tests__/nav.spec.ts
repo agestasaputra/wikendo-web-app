@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { isNavActive } from "../nav";
+import { isHomePath, isNavActive } from "../nav";
 
 describe("isNavActive (active BottomNav tab)", () => {
   it('Home only active at exactly "/"', () => {
@@ -15,5 +15,17 @@ describe("isNavActive (active BottomNav tab)", () => {
   it("similar prefix but not a child → not active", () => {
     expect(isNavActive("/mall", "/mallx")).toBe(false);
     expect(isNavActive("/history", "/account")).toBe(false);
+  });
+});
+
+describe("isHomePath (header shows logo vs back button)", () => {
+  it('true only at exactly "/"', () => {
+    expect(isHomePath("/")).toBe(true);
+  });
+
+  it("false on every other route", () => {
+    expect(isHomePath("/mall")).toBe(false);
+    expect(isHomePath("/mall/grand-indonesia")).toBe(false);
+    expect(isHomePath("/result-food")).toBe(false);
   });
 });

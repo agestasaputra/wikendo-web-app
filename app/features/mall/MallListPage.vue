@@ -45,7 +45,6 @@ function mallArea(m: MallItem): string {
 
 <template>
   <div class="max-w-md mx-auto px-4 pb-10" style="background: #f5f5f4">
-    <p class="text-xs text-gray-500 pt-3 mb-1">Home / Mall</p>
     <div
       class="flex justify-between items-center sticky top-0 py-2"
       style="background: #f5f5f4"
@@ -55,11 +54,6 @@ function mallArea(m: MallItem): string {
         pending ? "…" : "5 mall"
       }}</span>
     </div>
-
-    <p class="text-[13px] text-gray-500">
-      Pilih mall → direktori tenant curated · tanpa login/quota
-    </p>
-
     <AppLoader v-if="pending" variant="mall" />
     <div
       v-else-if="error"
@@ -130,12 +124,6 @@ function mallArea(m: MallItem): string {
       >
         Muat mall berikut…
       </div>
-      <p
-        v-else-if="malls.length"
-        class="text-center text-xs text-gray-400 py-2"
-      >
-        Semua {{ malls.length }} mall tampil ✅
-      </p>
     </div>
   </div>
 </template>

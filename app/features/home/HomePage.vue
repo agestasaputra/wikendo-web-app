@@ -262,7 +262,7 @@ const wallet = computed(() => buildWalletLabel(quotaStatus.value));
         Belum ada riwayat — mulai quiz pertamamu →
       </p>
     </div>
-    <p class="mt-2 text-[9.5px] font-bold opacity-55 text-center">
+    <p class="mt-6 text-[9.5px] font-bold opacity-55 text-center">
       Result tidak dicampur: tempat ya tempat, makan ya makan.
     </p>
   </div>

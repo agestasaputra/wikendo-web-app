@@ -57,8 +57,31 @@ describe("app.vue — thin global layout", () => {
     expect(APP).toContain("auth.init()");
   });
 
-  it("anti-overlap for fixed nav: pb-24 + footer id tentang for the Account anchor", () => {
-    expect(APP).toMatch(/pb-24|padding-bottom|pb-20|pb-28/i);
-    expect(APP).toMatch(/id=.tentang.|#tentang/);
+  it("BottomNav is sticky in the flex column (page stretches to its top, no padding hack)", () => {
+    expect(APP).toMatch(/flex-col/);
+    expect(APP).toMatch(/flex-1/);
+    expect(readSource("common/components/BottomNav.vue")).toMatch(
+      /sticky bottom-0/,
+    );
+  });
+});
+
+describe("AppHeader left slot (logo vs back button)", () => {
+  it("shows the logo on the index page only (isHomePath)", () => {
+    expect(HEADER).toContain("isHomePath");
+    expect(HEADER).toMatch(/v-if="isHome"/);
+    expect(HEADER).toContain("/brand-icon-day.png");
+  });
+
+  it("shows a circular back button with an arrow icon on every other page", () => {
+    expect(HEADER).toMatch(/v-else[\s\S]*aria-label="Kembali"/);
+    expect(HEADER).toContain("rounded-full");
+    expect(HEADER).toContain("<svg");
+    expect(HEADER).toContain('@click="goBack"');
+  });
+
+  it("back falls back to Home when there is no in-app history", () => {
+    expect(HEADER).toContain("router.back()");
+    expect(HEADER).toContain('router.push("/")');
   });
 });

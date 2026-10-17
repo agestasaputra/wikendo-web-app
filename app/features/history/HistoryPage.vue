@@ -13,11 +13,7 @@ onMounted(() => history.load());
 </script>
 
 <template>
-  <div class="max-w-md mx-auto px-4 pb-10">
-    <div class="flex justify-between items-center font-bold text-[13px] py-3">
-      <span class="font-extrabold">🕒 Riwayat</span>
-      <NuxtLink to="/" class="text-gray-500 underline text-xs">Home →</NuxtLink>
-    </div>
+  <div class="max-w-md mx-auto px-4 pb-10 py-5">
     <p class="text-[11px] font-bold text-gray-500 mb-3">
       Terakhir dilihat — max 20 · simpan di HP ini
     </p>

@@ -81,18 +81,13 @@ const promoStrip = computed(() =>
 </script>
 
 <template>
-  <div class="max-w-md mx-auto px-4 pb-10" style="background: #f5f5f4">
-    <p class="text-xs text-gray-500 pt-3 mb-1">Home / Mall / {{ mallShort }}</p>
+  <div class="max-w-md mx-auto px-4 py-2 pb-10" style="background: #f5f5f4">
     <div class="flex justify-between items-center">
       <h1 class="text-xl font-extrabold">🏢 {{ mallName }}</h1>
       <span class="text-xs font-bold text-gray-500">{{
         pending ? "…" : `${total || tenants.length} tenant`
       }}</span>
     </div>
-
-    <p class="text-[13px] text-gray-500">
-      Direktori kuliner curated · tanpa login/quota
-    </p>
 
     <!-- Sticky: search + chips + CTA (S2b spec: not thrown off by scroll) -->
     <div class="sticky top-0 pt-2 pb-2" style="background: #f5f5f4">

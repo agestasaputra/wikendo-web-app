@@ -1,20 +1,25 @@
 <!-- common/components/AppHeader.vue → GLOBAL sticky 2-state header, AS6 wallet-card (Addendum 22 APPROVED).
-WHAT: anonymous = Login/Register; logged in = avatar initial + Bell + dropdown (email, Riwayat, Wishlist Segera, Keluar).
+WHAT: left = Wikendo logo on "/", circular back button on every other route; anonymous = Login/Register; logged in = avatar initial + Bell + dropdown (email, Riwayat, Wishlist Segera, Keluar).
 WHY: this block previously lived in app.vue; split out so the layout stays thin + the header is testable. State from AuthStore (Pinia).
 EXAMPLE: mounted once in app.vue above <NuxtPage />. -->
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
 import AppSpinner from "~/common/components/AppSpinner.vue";
 import { useAuthStore } from "~/common/store/AuthStore";
+import { isHomePath } from "~/common/utils/nav";
 
 const auth = useAuthStore();
-const { isLoggedIn, email, displayName, initial } = storeToRefs(auth);
+const { isLoggedIn, email } = storeToRefs(auth);
 const router = useRouter();
+const route = useRoute();
+const isHome = computed(() => isHomePath(route.path));
 const showMenu = ref(false);
 const loggingOut = ref(false);
 
-function toggleMenu(): void {
-  showMenu.value = !showMenu.value;
+// Back = previous page; on a direct visit (no in-app history) fall back to Home so the button is never a dead end.
+function goBack(): void {
+  if (window.history.state?.back) router.back();
+  else router.push("/");
 }
 
 // Real logout: Supabase signOut → close menu → back to / as anonymous. Anti double-click guard + "Keluar" spinner.
@@ -36,7 +41,12 @@ async function handleLogout(): Promise<void> {
     <div
       class="container mx-auto px-4 py-3 flex justify-between items-center max-w-md"
     >
-      <NuxtLink to="/" class="flex items-center" aria-label="Wikendo — beranda">
+      <NuxtLink
+        v-if="isHome"
+        to="/"
+        class="flex items-center"
+        aria-label="Wikendo — beranda"
+      >
         <img
           src="/brand-icon-day.png"
           alt="Wikendo"
@@ -45,34 +55,27 @@ async function handleLogout(): Promise<void> {
           class="rounded-lg"
         />
       </NuxtLink>
-      <div v-if="!isLoggedIn" class="flex gap-3 items-center">
-        <button
-          type="button"
-          aria-label="Login"
-          class="text-sm font-bold leading-none text-red-600 hover:text-orange-500"
-          @click="router.push('/login')"
+      <button
+        v-else
+        type="button"
+        aria-label="Kembali"
+        class="w-8 h-8 rounded-full bg-stone-100 hover:bg-stone-200 flex items-center justify-center"
+        @click="goBack"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          class="w-4 h-4"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
         >
-          Login
-        </button>
-        <button
-          type="button"
-          aria-label="Register"
-          class="text-sm font-bold leading-none text-orange-600 hover:text-red-500"
-          @click="router.push('/register')"
-        >
-          Register
-        </button>
-      </div>
-      <div v-else class="flex gap-2 items-center">
-        <button
-          type="button"
-          :aria-label="'Menu profil ' + displayName"
-          class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-extrabold text-white avatar-initial"
-          :style="{ background: '#0C0A09' }"
-          @click="toggleMenu"
-        >
-          {{ initial }}
-        </button>
+          <path d="M19 12H5M12 19l-7-7 7-7" />
+        </svg>
+      </button>
+      <div v-if="isLoggedIn" class="flex gap-2 items-center">
         <button
           type="button"
           aria-label="Notifikasi"

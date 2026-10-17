@@ -1,5 +1,5 @@
 <!-- common/components/BottomNav.vue → E1 bottom nav Home-Mall-Quiz+-Riwayat-Akun (Addendum docs/24).
-WHAT: 5 tabs in a fixed max-w-md bottom bar (active lime #A3E635 + dot) + Quiz+ in the center is NOT a route → sheet with 2 honest quota intents.
+WHAT: 5 tabs in a sticky bottom-0 bar (last child of the app.vue flex column) (active lime #A3E635 + dot) + Quiz+ in the center is NOT a route → sheet with 2 honest quota intents.
 WHY: thumbs can't reach the header; quota follows GET /api/quota (on failure = fallback to fresh anonymous 1 • 2, not fake numbers).
 EXAMPLE: tap + → sheet → Cari Tempat (remaining 1/1) → /quiz; empty → disabled Besok lagi 00.00. -->
 <script setup lang="ts">
@@ -50,7 +50,7 @@ function go(path: string): void {
 <template>
   <nav
     aria-label="Pilih jenis quiz dan navigasi"
-    class="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-stone-200"
+    class="sticky bottom-0 z-40 w-full bg-white border-t border-stone-200"
   >
     <div
       class="max-w-md mx-auto px-2 pt-1.5 flex items-end justify-between"

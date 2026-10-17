@@ -34,15 +34,9 @@ function select(v: string): void {
 
 <template>
   <div
-    class="max-w-md mx-auto px-4 pb-10 min-h-[80vh] flex flex-col"
+    class="max-w-md mx-auto px-4 pb-10 py-5 min-h-[80vh] flex flex-col"
     style="background: #f5f5f4"
   >
-    <div class="flex justify-between items-center font-bold text-[13px] py-3">
-      <NuxtLink to="/" class="text-ink">← 🗺️ Quiz tempat</NuxtLink>
-      <span class="text-gray-500"
-        >{{ step + 1 }}/{{ questions.length }} • ⏱ 30 dtk</span
-      >
-    </div>
     <!-- Q2d ink header: WHITE label + bright-ember dot, white question, lime block segment -->
     <QuizHeader
       :meta="headMeta"

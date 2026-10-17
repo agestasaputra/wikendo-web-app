@@ -14,7 +14,7 @@ code:
 
 ## TL;DR
 
-`app.vue` is a thin global layout: `AppHeader` (sticky, 2-state) + `<NuxtPage />` + `#tentang` footer + `BottomNav` (5 fixed tabs, thumb zone) with `pb-24` so content is not covered. The centre **Quiz+** tab is not a route: it opens `QuizPlusSheet` with 2 intents (Tempat/Makan) along with the honest remaining quota.
+`app.vue` is a thin global layout: `AppHeader` (sticky, 2-state) + `<NuxtPage />` (wrapped in a flex-1 `<main>`, so the page root stretches down to the top of `BottomNav`) + `BottomNav` (5 tabs, `sticky bottom-0`, thumb zone; in flow, so no bottom padding is needed). The centre **Quiz+** tab is not a route: it opens `QuizPlusSheet` with 2 intents (Tempat/Makan) along with the honest remaining quota.
 
 ## Entry Points
 

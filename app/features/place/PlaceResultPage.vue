@@ -82,11 +82,10 @@ watch(
 </script>
 
 <template>
-  <div class="max-w-md mx-auto px-4 pb-10" :style="{ background: meta.pageBg }">
-    <div class="flex justify-between items-center font-bold text-[13px] py-3">
-      <NuxtLink to="/" class="font-extrabold">← Hasil 🎉/📍</NuxtLink>
-      <span class="text-gray-500">{{ list.length || 5 }} rekomendasi</span>
-    </div>
+  <div
+    class="max-w-md mx-auto px-4 pb-10 py-5"
+    :style="{ background: meta.pageBg }"
+  >
     <p class="text-[11.5px] text-gray-500 -mt-1 mb-2">
       Quota tempat {{ quotaLabel }}
     </p>
