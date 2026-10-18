@@ -141,23 +141,18 @@ async function handleForgot(): Promise<void> {
           class="flex-1 bg-transparent outline-none text-sm font-bold text-black placeholder:text-gray-400"
         />
       </div>
-      <PasswordField v-model="password">
-        <template #trailing>
-          <button
-            type="button"
-            :disabled="busy"
-            class="text-sm font-bold text-black underline disabled:opacity-60 inline-flex items-center gap-1"
-            @click="handleForgot"
-          >
-            <AppSpinner
-              v-if="forgotLoading"
-              color="#0C0A09"
-              size="w-3.5 h-3.5"
-            />
-            {{ forgotLoading ? "Mengirim…" : "Lupa?" }}
-          </button>
-        </template>
-      </PasswordField>
+      <PasswordField v-model="password" />
+      <div class="text-right mt-1">
+        <button
+          type="button"
+          :disabled="busy"
+          class="text-sm font-bold text-black underline disabled:opacity-60"
+          @click="handleForgot"
+        >
+          <AppSpinner v-if="forgotLoading" color="#0C0A09" size="w-3.5 h-3.5" />
+          {{ forgotLoading ? "Mengirim…" : "Lupa Password?" }}
+        </button>
+      </div>
       <p v-if="errorMsg" class="text-center text-xs font-bold text-red-600">
         {{ errorMsg }}
       </p>
