@@ -272,4 +272,4 @@ Full spec: `docs/05-API-Specification.md`
 ---
 
 **Last Updated:** 2026-10-05
-**Version:** 1.0
+**Version:** 1.0Deploy trigger
