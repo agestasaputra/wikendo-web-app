@@ -44,19 +44,15 @@ onMounted(() => history.load());
     </div>
 
     <div v-else class="flex flex-col gap-2">
-      <div
-        v-for="(it, i) in items"
-        :key="i"
-        class="rounded-2xl p-3 bg-white border border-stone-200 flex gap-2 items-center"
-      >
-        <span class="text-xl">{{ it.kind === "food" ? "🍜" : "🗺️" }}</span>
-        <div class="flex-1 min-w-0">
-          <p class="font-extrabold text-[13px] truncate">{{ it.title }}</p>
-          <p class="text-[11px] text-gray-500 truncate">{{ it.sub }}</p>
+      <div class="grid3">
+        <div v-for="(it, i) in items" :key="i" class="card">
+          <div class="thumb"></div>
+          <div class="info">
+            <div class="title">{{ it.title }}</div>
+            <div class="sub">{{ it.sub }}</div>
+            <div class="time">{{ timeAgo(it.at) }}</div>
+          </div>
         </div>
-        <span class="text-[10px] font-bold text-gray-400 whitespace-nowrap">{{
-          timeAgo(it.at)
-        }}</span>
       </div>
       <button
         type="button"
