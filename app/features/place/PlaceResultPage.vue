@@ -3,7 +3,7 @@ WHAT: header Hasil + 5 recommendations + hero photo + BEST lime badge + ember st
 WHY R3b 1:1: lime=value (best/rating) + ember=strip + ink=action (footnote spec), token lock via getResultPlaceMeta (1 source, tested). Lock Split: PLACE only, 0 tenant. Save = login wall moment #2.
 EXAMPLE: hero Rooftop Senayan — Senayan 4.8 sunset+live music → Navigate → Lainnya chips shift the deck 1→5 without refetching. -->
 <script setup lang="ts">
-import AppLoader from "~/common/components/AppLoader.vue";
+import { onMounted, watch } from "vue";
 import ResultError from "~/common/components/ResultError.vue";
 import { useHistoryStore } from "~/common/store/HistoryStore";
 import type { PlaceRecommendation } from "~/common/types/api";
@@ -73,12 +73,7 @@ function pushHistory(): void {
     at: Date.now(),
   });
 }
-watch(
-  () => list.value.length,
-  (n) => {
-    if (n) pushHistory();
-  },
-);
+onMounted(() => { watch(() => list.value.length, (n) => { if (n) pushHistory(); }, { immediate: true }); });
 </script>
 
 <template>

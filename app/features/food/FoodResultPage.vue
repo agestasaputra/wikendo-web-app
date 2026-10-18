@@ -3,7 +3,7 @@ WHAT: Result header + 5 recommendations + BEST MATCH deck (BEST lime badge + Hal
 WHY gift in the hero 1:1 Agesta request Oct 11: just 1 CTA on top, clean bottom without duplication, claim REQUIRES login (anti-farming), token lock paper #F5F5F4 + ink #0C0A09 + lime/rose/mint via getResultFoodMeta (1 source, tested).
 EXAMPLE: Kopi Kekinian hero — GI L2 Halal 50-100rb kids → gift Buka then tenant Maps. Lock: TENANT only, 0 tourist places. -->
 <script setup lang="ts">
-import { storeToRefs } from "pinia";
+import { onMounted, watch } from "vue";
 import AppLoader from "~/common/components/AppLoader.vue";
 import ResultError from "~/common/components/ResultError.vue";
 import { useHistoryStore } from "~/common/store/HistoryStore";
@@ -101,12 +101,7 @@ function pushHistory(): void {
     at: Date.now(),
   });
 }
-watch(
-  () => list.value.length,
-  (n) => {
-    if (n) pushHistory();
-  },
-);
+onMounted(() => { watch(() => list.value.length, (n) => { if (n) pushHistory(); }, { immediate: true }); });
 </script>
 
 <template>

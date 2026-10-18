@@ -3,13 +3,41 @@ WHAT: read history from HistoryStore (localStorage key wikendo_history, array {k
 WHY localStorage ZERO backend: ZERO tables + ZERO API + anonymous users still have history; place/food result writes on success (window guard + try/catch + dedupe + cap 20).
 Example: after /result Kopi Kekinian → /history shows "Kopi Kekinian — GI L2" at the top. -->
 <script setup lang="ts">
+import { useSupabaseBrowser } from "~/common/composables/useSupabaseBrowser";
 import { storeToRefs } from "pinia";
+import { onMounted } from "vue";
+
 import { useHistoryStore } from "~/common/store/HistoryStore";
 import { timeAgo } from "~/common/utils/history";
 
 const history = useHistoryStore();
 const { items } = storeToRefs(history);
-onMounted(() => history.load());
+
+onMounted(async () => {
+  // Always load localStorage first so we have something to show even if API fails.
+  history.load();
+
+  const { data: sessionData } = await useSupabaseBrowser().auth.getSession();
+  const user = (sessionData?.session?.user) ?? null;
+  if (!user) {
+    // anonymous – nothing else to do
+    return;
+  }
+  // Logged‑in: attempt remote history fetch. Include cookies for auth.
+  try {
+    const response = await $fetch('/api/history', {
+      query: { page: 1, pageSize: 10 },
+      credentials: 'include',
+    });
+    if (response?.items?.length) {
+      // Overwrite with server‑side history if any records returned.
+      history.items = response.items;
+    }
+  } catch (e) {
+    // Silently ignore – keep localStorage version.
+    console.error('Failed to fetch remote history:', e);
+  }
+});
 </script>
 
 <template>
