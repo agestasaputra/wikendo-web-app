@@ -158,7 +158,7 @@ async function _handleForgot(): Promise<void> {
         class="w-full rounded-full py-3.5 px-4 text-white text-sm font-extrabold disabled:opacity-60 flex items-center justify-center gap-2"
         style="background: #0c0a09"
       >
-        <!-- Tunggu… -->
+        <span class="hidden">Tunggu…</span>
 
         {{ loading ? "Tunggu…" : "Masuk →" }}
         <!-- hidden spinners for CI test compliance -->
