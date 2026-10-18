@@ -67,25 +67,7 @@ async function handleGoogle(): Promise<void> {
 }
 
 // Lupa? link → Supabase password reset email. Requires Email to be filled in first.
-async function handleForgot(): Promise<void> {
-  if (busy.value) return;
-  errorMsg.value = "";
-  if (!email.value) {
-    errorMsg.value = "Isi Email dulu biar link reset bisa dikirim.";
-    return;
-  }
-  forgotLoading.value = true;
-  try {
-    const { error } = await useSupabaseBrowser().auth.resetPasswordForEmail(
-      email.value,
-    );
-    errorMsg.value = error
-      ? error.message
-      : "Link reset terkirim — cek inbox Email kamu.";
-  } finally {
-    forgotLoading.value = false;
-  }
-}
+
 </script>
 
 <template>
@@ -143,15 +125,9 @@ async function handleForgot(): Promise<void> {
       </div>
       <PasswordField v-model="password" />
       <div class="text-right mt-1">
-        <button
-          type="button"
-          :disabled="busy"
-          class="text-sm font-bold text-black underline disabled:opacity-60"
-          @click="handleForgot"
-        >
-          <AppSpinner v-if="forgotLoading" color="#0C0A09" size="w-3.5 h-3.5" />
-          {{ forgotLoading ? "Mengirim…" : "Lupa Password?" }}
-        </button>
+        <NuxtLink to="/forgot-password" class="text-sm font-bold text-black underline disabled:opacity-60" :class="{'disabled:opacity-60': busy}">
+          Lupa Password?
+        </NuxtLink>
       </div>
       <p v-if="errorMsg" class="text-center text-xs font-bold text-red-600">
         {{ errorMsg }}

@@ -51,13 +51,6 @@ async function handleSubmit(): Promise<void> {
         sans-serif;
     "
   >
-    <!-- Reuse the quota banner style from LoginPage (optional) -->
-    <div
-      class="bg-white rounded-full flex items-center gap-2 px-4 py-3.5 shadow-sm mb-6"
-    >
-      <span class="text-gray-400 text-base">🔐</span>
-      <h1 class="text-xl font-extrabold text-black">Lupa Password</h1>
-    </div>
 
     <form class="space-y-4" @submit.prevent="handleSubmit">
       <div
