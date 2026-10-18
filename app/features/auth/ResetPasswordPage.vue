@@ -70,22 +70,8 @@ async function handleSubmit(): Promise<void> {
 <template>
   <div
     class="max-w-md mx-auto px-4 pb-10 min-h-screen"
-    style="
-      background: #f2f2f2;
-      font-family:
-        Plus Jakarta Sans,
-        system-ui,
-        sans-serif;
-    "
+    style="padding-top: 2rem"
   >
-    <!-- Optional quota banner -->
-    <div
-      class="bg-white rounded-full flex items-center gap-2 px-4 py-3.5 shadow-sm mb-6"
-    >
-      <span class="text-gray-400 text-base">🔐</span>
-      <h1 class="text-xl font-extrabold text-black">Reset Password</h1>
-    </div>
-
     <form class="space-y-4" @submit.prevent="handleSubmit">
       <div
         class="bg-white rounded-full flex items-center gap-2 px-4 py-3.5 shadow-sm"
