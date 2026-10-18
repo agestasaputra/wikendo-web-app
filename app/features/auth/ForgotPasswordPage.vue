@@ -43,7 +43,14 @@ async function handleSubmit(): Promise<void> {
 <template>
   <div
     class="max-w-md mx-auto px-4 pb-10 min-h-screen"
-    style="padding-top: 2rem"
+    style="
+      background: #f2f2f2;
+      font-family:
+        Plus Jakarta Sans,
+        system-ui,
+        sans-serif;
+      padding-top: 2rem;
+    "
   >
     <form class="space-y-4" @submit.prevent="handleSubmit">
       <div
