@@ -159,6 +159,7 @@ async function _handleForgot(): Promise<void> {
         style="background: #0c0a09"
       >
         <AppSpinner v-if="loading" color="#fff" />
+        {{ loading ? "Tunggu…" : "Masuk →" }}
         <!-- hidden spinners for CI test compliance -->
         <AppSpinner v-if="false" class="hidden" />
         <AppSpinner v-if="false" class="hidden" />
