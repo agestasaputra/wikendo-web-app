@@ -18,16 +18,16 @@ onMounted(async () => {
   history.load();
 
   const { data: sessionData } = await useSupabaseBrowser().auth.getSession();
-  const user = (sessionData?.session?.user) ?? null;
+  const user = sessionData?.session?.user ?? null;
   if (!user) {
     // anonymous – nothing else to do
     return;
   }
   // Logged‑in: attempt remote history fetch. Include cookies for auth.
   try {
-    const response = await $fetch('/api/history', {
+    const response = await $fetch("/api/history", {
       query: { page: 1, pageSize: 10 },
-      credentials: 'include',
+      credentials: "include",
     });
     if (response?.items?.length) {
       // Overwrite with server‑side history if any records returned.
@@ -35,7 +35,7 @@ onMounted(async () => {
     }
   } catch (e) {
     // Silently ignore – keep localStorage version.
-    console.error('Failed to fetch remote history:', e);
+    console.error("Failed to fetch remote history:", e);
   }
 });
 </script>

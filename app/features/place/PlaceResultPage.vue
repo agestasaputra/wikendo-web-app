@@ -73,7 +73,15 @@ function pushHistory(): void {
     at: Date.now(),
   });
 }
-onMounted(() => { watch(() => list.value.length, (n) => { if (n) pushHistory(); }, { immediate: true }); });
+onMounted(() => {
+  watch(
+    () => list.value.length,
+    (n) => {
+      if (n) pushHistory();
+    },
+    { immediate: true },
+  );
+});
 </script>
 
 <template>

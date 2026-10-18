@@ -9,23 +9,25 @@ import type { QuizPlaceInput } from "../../../common/types/api";
 import { supabaseAdmin } from "../../utils/db";
 import { getCookie, setCookie, createError, readBody } from "h3";
 
-
 /* eslint-disable max-lines-per-function, complexity */
 export default defineEventHandler(async (event) => {
-
   const sessionId = getCookie(event, "session_id") || crypto.randomUUID();
   setCookie(event, "session_id", sessionId, { maxAge: 86400 * 30 });
 
   // Determine if user is logged in via Supabase access token
   const token = getCookie(event, "sb-access-token");
-  const { data: authData, error: authErr } = token ? await supabaseAdmin().auth.getUser(token) : { data: null, error: null };
-  const userId = (!authErr && authData?.user) ? authData.user.id : null;
+  const { data: authData, error: authErr } = token
+    ? await supabaseAdmin().auth.getUser(token)
+    : { data: null, error: null };
+  const userId = !authErr && authData?.user ? authData.user.id : null;
   const body = await readBody<QuizPlaceInput>(event);
 
   if (userId) {
     // Logged‑in: use server‑side quota via DB function
-    const { data: result, error: quotaErr } = await supabaseAdmin()
-      .rpc("check_and_increment_quota", { p_user_id: userId });
+    const { data: result, error: quotaErr } = await supabaseAdmin().rpc(
+      "check_and_increment_quota",
+      { p_user_id: userId },
+    );
     if (quotaErr) {
       throw createError({
         statusCode: 500,
@@ -46,7 +48,7 @@ export default defineEventHandler(async (event) => {
     const { generatePlace } = await import("../../utils/llm");
     const recommendations = await generatePlace(body);
     const db = supabaseAdmin();
-    await db.from('generations').insert({
+    await db.from("generations").insert({
       session_id: sessionId,
       user_id: userId,
       quiz_input: { ...body, type: "place" },
@@ -69,7 +71,7 @@ export default defineEventHandler(async (event) => {
   const recommendations = await generatePlace(body);
 
   const db = supabaseAdmin();
-  await db.from('generations').insert({
+  await db.from("generations").insert({
     session_id: sessionId,
     user_id: null,
     quiz_input: { ...body, type: "place" },

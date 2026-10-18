@@ -14,6 +14,7 @@ import {
   parseAnonPlaceUsed,
 } from "../../common/utils/quota";
 
+/* eslint-disable complexity */
 export default defineEventHandler(async (event) => {
   const authHeader = getHeader(event, "authorization") || "";
   const bearer = authHeader.replace(/^Bearer\s+/i, "").trim();
@@ -21,7 +22,7 @@ export default defineEventHandler(async (event) => {
   const token = bearer || cookieToken;
   const { data: authData, error: authErr } = token
     ? await supabaseAdmin().auth.getUser(token)
-    : { data: null, error: null as any };
+    : ({ data: null, error: null } as { data: null; error: null });
   const userId = !authErr && authData?.user ? authData.user.id : null;
 
   if (userId) {

@@ -13,6 +13,7 @@ import {
 } from "../../utils/foodCandidates";
 import { readBody, getCookie, setCookie, createError } from "h3";
 
+/* eslint-disable max-lines-per-function, complexity */
 const ANON_FOOD_LIMIT = 2;
 
 export default defineEventHandler(async (event) => {
@@ -20,18 +21,21 @@ export default defineEventHandler(async (event) => {
 
   // ---- Detect login ----
   const token = getCookie(event, "sb-access-token");
-  const { data: authData, error: authErr } = token ? await supabaseAdmin().auth.getUser(token) : { data: null, error: null };
-  const userId = (!authErr && authData?.user) ? authData.user.id : null;
+  const { data: authData, error: authErr } = token
+    ? await supabaseAdmin().auth.getUser(token)
+    : { data: null, error: null };
+  const userId = !authErr && authData?.user ? authData.user.id : null;
 
   // ---- Logged‑in flow (DB quota) ----
   if (userId) {
     // fetch current quota row (or treat not‑found as 0)
     const { data: quotaRow, error: fetchErr } = await supabaseAdmin()
-      .from('mall_search_quota')
-      .select('used, date')
-      .eq('user_id', userId)
+      .from("mall_search_quota")
+      .select("used, date")
+      .eq("user_id", userId)
       .single();
-    if (fetchErr && fetchErr.code !== 'PGRST116') { // ignore not‑found error code
+    if (fetchErr && fetchErr.code !== "PGRST116") {
+      // ignore not‑found error code
       throw createError({
         statusCode: 500,
         statusMessage: "FOOD_QUOTA_CHECK_ERROR",
@@ -47,11 +51,11 @@ export default defineEventHandler(async (event) => {
       });
     }
     // increment quota atomically via upsert (date = today)
-    const today = new Date().toISOString().split('T')[0];
+    const today = new Date().toISOString().split("T")[0];
     const { error: upErr } = await supabaseAdmin()
-      .from('mall_search_quota')
+      .from("mall_search_quota")
       .upsert({ user_id: userId, date: today, used: used + 1 })
-      .eq('user_id', userId);
+      .eq("user_id", userId);
     if (upErr) {
       throw createError({
         statusCode: 500,
@@ -73,7 +77,7 @@ export default defineEventHandler(async (event) => {
       ),
     );
 
-    await db.from('generations').insert({
+    await db.from("generations").insert({
       session_id: getCookie(event, "session_id") || crypto.randomUUID(),
       user_id: userId,
       quiz_input: { ...body, type: "food" },
@@ -90,7 +94,9 @@ export default defineEventHandler(async (event) => {
     throw createError({
       statusCode: 403,
       statusMessage: "FOOD_QUOTA_EXCEEDED",
-      data: { message: "Quota makan habis. Login untuk 5x/hari, reset 00:00 WIB." },
+      data: {
+        message: "Quota makan habis. Login untuk 5x/hari, reset 00:00 WIB.",
+      },
     });
   }
 
@@ -106,7 +112,7 @@ export default defineEventHandler(async (event) => {
     ),
   );
 
-  await db.from('generations').insert({
+  await db.from("generations").insert({
     session_id: getCookie(event, "session_id") || crypto.randomUUID(),
     user_id: null,
     quiz_input: { ...body, type: "food" },
@@ -116,4 +122,3 @@ export default defineEventHandler(async (event) => {
 
   return { recommendations, quota_remaining: ANON_FOOD_LIMIT - (usedAnon + 1) };
 });
-
