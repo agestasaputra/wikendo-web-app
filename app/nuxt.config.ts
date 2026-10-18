@@ -76,6 +76,8 @@ export default defineNuxtConfig({
     "/mall": { isr: 60 },
     "/mall/**": { isr: 60 },
     "/history": { ssr: false },
+    "/forgot-password": { ssr: false },
+    "/reset-password": { ssr: false },
     "/account": { ssr: false },
     "/quiz": { ssr: false },
     "/food": { ssr: false },
