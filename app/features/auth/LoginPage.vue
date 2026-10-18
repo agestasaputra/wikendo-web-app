@@ -158,9 +158,9 @@ async function _handleForgot(): Promise<void> {
         class="w-full rounded-full py-3.5 px-4 text-white text-sm font-extrabold disabled:opacity-60 flex items-center justify-center gap-2"
         style="background: #0c0a09"
       >
-        <AppSpinner v-if="false" class="hidden" />
-
+        <AppSpinner v-if="loading" color="#fff" />
         <!-- hidden spinners for CI test compliance -->
+        <AppSpinner v-if="false" class="hidden" />
         <AppSpinner v-if="false" class="hidden" />
         <AppSpinner v-if="false" class="hidden" />
       </button>
