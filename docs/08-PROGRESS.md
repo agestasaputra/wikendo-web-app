@@ -115,6 +115,13 @@
 
 ---
 
+## 2026-10-18 — Fitur lupa password 🔐
+
+- **Why:** Menambahkan alur reset password untuk meningkatkan retensi dan kepercayaan pengguna.
+- **Done:** Halaman `/forgot-password` dan `/reset-password` dengan komponen di `features/auth/`. Menggunakan `supabase.auth.resetPasswordForEmail` dan `updateUser`.
+- **Verifikasi:** Halaman berhasil render, form submit memicu email reset melalui Supabase Auth (cek console/network).
+- **Next:** Uji end-to-end dengan email aktif, kemudian tambahkan fitur lihat/ubah profil.
+
 ## 🧾 LOG (newest first)
 ## 2026-10-17 — Gas SEO P0 share-ready DONE local ✅ — RE-APPLIED on the English-refactor structure (user: "Gas eksekusi semua di p0")
 - **Why:** pre-share review found 6 blocker gaps for social sharing: ZERO robots/sitemap (Google can't discover `/mall/:slug` = the long-tail SEO asset), ZERO og:image/twitter:card (share = grey link, no thumbnail), ZERO canonical (www vs non-www duplicate), dev-jargon footer ("MVP $0/month" = side-project feel), ZERO Privacy/Terms (Google OAuth review gate), GA4 not wired (share→quiz funnel blind). First pass was built pre-refactor, then re-applied on top of origin/main's 10 refactor commits (routes renamed ID→EN: `/history` `/food` `/result-food`).
