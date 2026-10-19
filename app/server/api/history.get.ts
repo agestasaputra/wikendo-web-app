@@ -1,22 +1,12 @@
-import {
-  defineEventHandler,
-  getQuery,
-  createError,
-  getCookie,
-  getHeader,
-} from "h3";
+import { defineEventHandler, getQuery, createError, getCookie } from "h3";
 import { supabaseAdmin } from "../utils/db";
+import { extractAccessToken } from "../utils/authToken";
 
 /* eslint-disable max-lines-per-function, complexity */
 export default defineEventHandler(async (event) => {
-  // Auth: Bearer header (primary) + legacy sb-access-token cookie (fallback).
-  // WHY both: Supabase browser client stores session in localStorage, not cookie;
-  // the client sends Authorization: Bearer <access_token>. Cookie path is kept
-  // for backward compat / SSR if ever set via setCookie.
-  const authHeader = getHeader(event, "authorization") || "";
-  const bearerToken = authHeader.replace(/^Bearer\s+/i, "").trim();
-  const cookieToken = getCookie(event, "sb-access-token") || "";
-  const accessToken = bearerToken || cookieToken;
+  // Auth: Authorization: Bearer (primary — the browser session lives in localStorage, NOT a
+  // cookie) + legacy `sb-access-token` cookie fallback (SSR / old sessions).
+  const accessToken = extractAccessToken(event);
   if (!accessToken) {
     throw createError({
       statusCode: 401,

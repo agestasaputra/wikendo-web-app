@@ -12,15 +12,18 @@ import {
   toTenantRecommendation,
 } from "../../utils/foodCandidates";
 import { readBody, getCookie, setCookie, createError } from "h3";
+import { extractAccessToken } from "../../utils/authToken";
+import { ensureSessionId } from "../../utils/sessionId";
 
 /* eslint-disable max-lines-per-function, complexity */
 const ANON_FOOD_LIMIT = 2;
 
 export default defineEventHandler(async (event) => {
   const body = await readBody<QuizFoodInput>(event);
+  const sessionId = ensureSessionId(event);
 
-  // ---- Detect login ----
-  const token = getCookie(event, "sb-access-token");
+  // ---- Detect login (Bearer first — the browser client has no auth cookie) ----
+  const token = extractAccessToken(event);
   const { data: authData, error: authErr } = token
     ? await supabaseAdmin().auth.getUser(token)
     : { data: null, error: null };
@@ -78,7 +81,7 @@ export default defineEventHandler(async (event) => {
     );
 
     await db.from("generations").insert({
-      session_id: getCookie(event, "session_id") || crypto.randomUUID(),
+      session_id: sessionId,
       user_id: userId,
       quiz_input: { ...body, type: "food" },
       recommendations,
@@ -113,7 +116,7 @@ export default defineEventHandler(async (event) => {
   );
 
   await db.from("generations").insert({
-    session_id: getCookie(event, "session_id") || crypto.randomUUID(),
+    session_id: sessionId,
     user_id: null,
     quiz_input: { ...body, type: "food" },
     recommendations,

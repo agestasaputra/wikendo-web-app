@@ -7,15 +7,16 @@
  */
 import type { QuizPlaceInput } from "../../../common/types/api";
 import { supabaseAdmin } from "../../utils/db";
+import { extractAccessToken } from "../../utils/authToken";
+import { ensureSessionId } from "../../utils/sessionId";
 import { getCookie, setCookie, createError, readBody } from "h3";
 
 /* eslint-disable max-lines-per-function, complexity */
 export default defineEventHandler(async (event) => {
-  const sessionId = getCookie(event, "session_id") || crypto.randomUUID();
-  setCookie(event, "session_id", sessionId, { maxAge: 86400 * 30 });
+  const sessionId = ensureSessionId(event);
 
-  // Determine if user is logged in via Supabase access token
-  const token = getCookie(event, "sb-access-token");
+  // Determine if user is logged in (Bearer first — the browser client has no auth cookie)
+  const token = extractAccessToken(event);
   const { data: authData, error: authErr } = token
     ? await supabaseAdmin().auth.getUser(token)
     : { data: null, error: null };

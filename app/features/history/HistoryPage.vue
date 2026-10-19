@@ -1,14 +1,16 @@
 <!-- features/history/HistoryPage.vue → GET /history (History E1 localStorage wikendo_history).
-WHAT: read history from HistoryStore (localStorage key wikendo_history, array {kind,title,sub,at} max 20 newest-first) + honest empty state 1:1 home + card list + quiz CTA.
-WHY localStorage ZERO backend: ZERO tables + ZERO API + anonymous users still have history; place/food result writes on success (window guard + try/catch + dedupe + cap 20).
-Example: after /result Kopi Kekinian → /history shows "Kopi Kekinian — GI L2" at the top. -->
+WHAT: read history from HistoryStore (localStorage key wikendo_history, array {kind,title,sub,at} max 20 newest-first) + logged-in server page merged (Bearer auth + row→entry mapping) + honest empty state 1:1 home + Image Cards (option 9) list + quiz CTA.
+WHY localStorage ZERO backend for anon: anonymous users still have history; place/food result writes on success (window guard + try/catch + dedupe + cap 20).
+WHY merge (never overwrite): a logged-in user has BOTH device entries and server rows; overwriting silently loses entries.
+Example: after /result Kopi Kekinian → /history shows "Kopi Kenangan — L2 · GI" at the top. -->
 <script setup lang="ts">
 import { useSupabaseBrowser } from "~/common/composables/useSupabaseBrowser";
 import { storeToRefs } from "pinia";
 import { onMounted } from "vue";
 
 import { useHistoryStore } from "~/common/store/HistoryStore";
-import { timeAgo } from "~/common/utils/history";
+import { timeAgo, mergeHistory } from "~/common/utils/history";
+import { toHistoryEntries } from "~/common/utils/historyRow";
 
 const history = useHistoryStore();
 const { items } = storeToRefs(history);
@@ -18,20 +20,21 @@ onMounted(async () => {
   history.load();
 
   const { data: sessionData } = await useSupabaseBrowser().auth.getSession();
-  const user = sessionData?.session?.user ?? null;
-  if (!user) {
-    // anonymous – nothing else to do
+  const accessToken = sessionData?.session?.access_token;
+  if (!accessToken) {
+    // anonymous – localStorage only
     return;
   }
-  // Logged‑in: attempt remote history fetch. Include cookies for auth.
+  // Logged-in: fetch the server page with Bearer auth (session lives in localStorage,
+  // so cookies carry no auth) and MERGE – never overwrite the device list.
   try {
     const response = await $fetch("/api/history", {
-      query: { page: 1, pageSize: 10 },
-      credentials: "include",
+      query: { page: 1, pageSize: 20 },
+      headers: { Authorization: `Bearer ${accessToken}` },
     });
-    if (response?.items?.length) {
-      // Overwrite with server‑side history if any records returned.
-      history.items = response.items;
+    const remote = toHistoryEntries(response?.items);
+    if (remote.length) {
+      history.items = mergeHistory(history.items, remote);
     }
   } catch (e) {
     // Silently ignore – keep localStorage version.
@@ -71,15 +74,29 @@ onMounted(async () => {
       </div>
     </div>
 
-    <div v-else class="flex flex-col gap-2">
-      <div class="grid3">
-        <div v-for="(it, i) in items" :key="i" class="card">
-          <div class="thumb"></div>
-          <div class="info">
-            <div class="title">{{ it.title }}</div>
-            <div class="sub">{{ it.sub }}</div>
-            <div class="time">{{ timeAgo(it.at) }}</div>
+    <!-- Image Cards (option 9) — vertical cards, 120px image band, info p-4 -->
+    <div v-else class="flex flex-col gap-3">
+      <div
+        v-for="(it, i) in items"
+        :key="i"
+        class="rounded-2xl overflow-hidden bg-white border border-stone-200"
+      >
+        <div
+          class="h-[120px] w-full bg-stone-100 flex items-center justify-center text-[32px]"
+        >
+          {{ it.kind === "food" ? "🍜" : "📍" }}
+        </div>
+        <div class="p-4">
+          <div
+            class="font-bold text-stone-900 line-clamp-1"
+            style="font-size: 1.1rem"
+          >
+            {{ it.title }}
           </div>
+          <div class="text-[12px] text-gray-500 mt-0.5 line-clamp-1">
+            {{ it.sub }}
+          </div>
+          <div class="text-[11px] text-gray-400 mt-1">{{ timeAgo(it.at) }}</div>
         </div>
       </div>
       <button

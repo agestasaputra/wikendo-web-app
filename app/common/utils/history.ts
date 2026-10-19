@@ -61,3 +61,25 @@ export function timeAgo(at: number, now: number = Date.now()): string {
   if (d < 86_400_000) return `${Math.floor(d / 3_600_000)}j lalu`;
   return new Date(at).toLocaleDateString("id-ID");
 }
+
+/**
+ * Device history (localStorage) + server page → one list.
+ *
+ * WHAT: union by title (server row wins — it has the canonical sub/time), newest first, cap 20.
+ * WHY: a logged-in user can have BOTH device-local entries (written while anon/offline) and
+ *   server rows. Overwriting one side with the other silently loses entries.
+ * EXAMPLE: mergeHistory([{title:"A",at:1}], [{title:"B",at:2}]) → ["B","A"]
+ */
+export function mergeHistory(
+  local: HistoryEntry[],
+  remote: HistoryEntry[],
+): HistoryEntry[] {
+  const byTitle = new Map<string, HistoryEntry>();
+  for (const entry of remote) byTitle.set(entry.title, entry);
+  for (const entry of local) {
+    if (!byTitle.has(entry.title)) byTitle.set(entry.title, entry);
+  }
+  return Array.from(byTitle.values())
+    .sort((a, b) => b.at - a.at)
+    .slice(0, HISTORY_MAX_ENTRIES);
+}

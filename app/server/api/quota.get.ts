@@ -6,8 +6,9 @@
  * WHY: anon 1+2 vs login 2+5 — must be honest per user.
  * EXAMPLE: empty cookie → { place:{limit:1}, food:{limit:2}, is_logged_in:false }.
  */
-import { defineEventHandler, getCookie, getHeader } from "h3";
+import { defineEventHandler, getCookie } from "h3";
 import { supabaseAdmin } from "../utils/db";
+import { extractAccessToken } from "../utils/authToken";
 import {
   buildQuotaStatus,
   parseAnonFoodUsed,
@@ -16,10 +17,7 @@ import {
 
 /* eslint-disable complexity */
 export default defineEventHandler(async (event) => {
-  const authHeader = getHeader(event, "authorization") || "";
-  const bearer = authHeader.replace(/^Bearer\s+/i, "").trim();
-  const cookieToken = getCookie(event, "sb-access-token") || "";
-  const token = bearer || cookieToken;
+  const token = extractAccessToken(event);
   const { data: authData, error: authErr } = token
     ? await supabaseAdmin().auth.getUser(token)
     : ({ data: null, error: null } as { data: null; error: null });
