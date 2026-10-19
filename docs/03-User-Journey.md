@@ -623,7 +623,7 @@ Place | Food tab. JSONB snapshot + `type: 'place'|'food'` so they don't get mixe
 **Analytics:** `gtag('event','voucher_claimed',{tenant_id,mall_slug})` + `login_prompted{reason:'claim_voucher'}`.
 
 ### Step 14: Superapp Home Combo 5+10+15 (visual ref `design/revamp-combo-5-10-15.html`)
-Wallet quota 2-state in the hero ("🎁 1 tempat • 2 makan free — Login buat buka 2+5" vs registered countdown 00.00) + 2 CTAs "Cari Tempat" / "Cari Makan" + Event/Promo/Wishlist/History grid (2 padlocked for anonymous) + mall strip GI/CP/Kokas/PIM/Aeon → `/mall/:slug` → `/food?mall=` pre-fill.
+Wallet quota 2-state in the hero ("🎁 1 tempat • 1 makan free — Login buat buka 2+5" vs registered countdown 00.00) + 2 CTAs "Cari Tempat" / "Cari Makan" + Event/Promo/Wishlist/History grid (2 padlocked for anonymous) + mall strip GI/CP/Kokas/PIM/Aeon → `/mall/:slug` → `/food?mall=` pre-fill.
 
 ---
 

@@ -115,7 +115,7 @@ This checklist breaks down Weekend Planner MVP into actionable tasks with priori
   - Tap Simpan/Klaim voucher (anonymous) → login bottom sheet
   - Open Wishlist/Riwayat (anonymous) → login prompt
   - Voucher claim REQUIRES login (`POST /api/voucher/claim` anonymous → 401): check active promo → check `voucher_claims` (user_id, tenant_id, today) → code `WKD-XXXXXX` → double-claim 409
-  - Home wallet: anonymous "🎁 1 tempat • 2 makan free" vs registered countdown 00.00
+  - Home wallet: anonymous "🎁 1 tempat • 1 makan free" vs registered countdown 00.00
   - Analytics: `login_prompted{reason}` 5 values + `anon_quota_exhausted{type}` + `voucher_claimed`
 
 **Subtotal:** ~5 hours (was ~3.5)
@@ -359,7 +359,7 @@ This checklist breaks down Weekend Planner MVP into actionable tasks with priori
 ### 3.7 Error & Edge Case Pages (Addendum 09 v1.3 patch — 2-state wallet + voucher gate)
 - [ ] **P0** `pages/quota-exhausted.vue` - Quota modal/page SPLIT place|food - *1 hour*
   - Countdown to reset 00:00 WIB (separate place 2 vs food 5)
-  - 2-state wallet: anonymous shows "1 tempat • 2 makan free" + 1-tap login CTA vs registered shows remaining + countdown
+  - 2-state wallet: anonymous shows "1 tempat • 1 makan free" + 1-tap login CTA vs registered shows remaining + countdown
   - Copy: "Login 10 detik → quota reset tiap hari, gratis"
   - Alternative actions (history login, share read-only)
   - CTA to return tomorrow

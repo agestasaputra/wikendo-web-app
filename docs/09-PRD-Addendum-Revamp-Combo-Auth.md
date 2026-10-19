@@ -14,7 +14,7 @@
 
 **WHAT?** One complete flow, not 3 separate apps. Visual reference: `design/revamp-combo-5-10-15.html` (31KB, 8 phone mockups). That HTML file is NOT changed in v1.3 — it is sufficient as the visual spec.
 
-- **A. Home Superapp (Option 10)** — `/`: 2 big CTAs (🗺️ Cari Tempat / 🍜 Cari Makan) + quota wallet (`2 tempat • 5 makan` for registered, `1 tempat • 2 makan free` for anon) + Event/Promo/Wishlist/Riwayat grid.
+- **A. Home Superapp (Option 10)** — `/`: 2 big CTAs (🗺️ Cari Tempat / 🍜 Cari Makan) + quota wallet (`2 tempat • 5 makan` for registered, `1 tempat • 1 makan free` for anon) + Event/Promo/Wishlist/Riwayat grid.
 - **B-C. Swipe place quiz (Option 5)** — `/quiz`: 6Q (mood/companion/conditional child/budget/location/optional time), 1 question per screen, 56px thumb-zone buttons.
 - **D. Result deck (Option 5)** — `/result`: hero #1 + Navigasi/save/share + mini deck ②③ tap "Lainnya". Best Match is purely score-based. Slot #1 may be sponsored BUT the "Sponsored" badge is mandatory.
 - **E-F. Food quiz (5+15)** — `/food`: 4Q (mall required GI/CP/Kokas/PIM/Aeon + mission + budget + companions/Halal/Kids), ~20 seconds, pre-filled `?mall=` from the directory.
@@ -60,7 +60,7 @@
 - **Primary: Google OAuth 1-tap** (zero friction). Secondary: Email+password.
 - **Email verification? OPTIONAL for now** (answers PRD open question §4.5). Don't block registration. Google OAuth is automatically verified.
 - **Phone mandatory? DROP** (answers PRD §7 assumption "Phone doesn't hurt conversion" → turns out it does hurt, so drop it). WHY? Phone kills conversion + SMS cost. Keep it as optional for Phase 2 (promo broadcast). Implication: `user_profiles.phone` becomes NULL-able, +62 validation only when filled in. Google OAuth has NO "Masukkan nomor HP" modal anymore.
-- **Home wallet 2 states:** anon (*"1 tempat • 2 makan free, login buat full"*) vs registered (*"2 • 5"*). Result: the Simpan/Klaim buttons get a small lock icon.
+- **Home wallet 2 states:** anon (*"1 tempat • 1 makan free, login buat full"*) vs registered (*"2 • 5"*). Result: the Simpan/Klaim buttons get a small lock icon.
 
 ---
 
@@ -78,7 +78,7 @@
 Non-breaking, downstream patch after v1.3 is APPROVED:
 - `user_quota`: split `quota_type='place'|'food'` or table `mall_search_quota(user_id,date,used)` (already exists in 8.1, just use it).
 - `user_profiles.phone`: NOT NULL → NULL-able (drop mandatory).
-- `GET /api/quota`: anon response = `{place:{used,limit:1}, food:{used,limit:2}}`, registered = `{place:{limit:2}, food:{limit:5}}`.
+- `GET /api/quota`: anon response = `{place:{used,limit:1}, food:{used,limit:1}}`, registered = `{place:{limit:2}, food:{limit:5}}`.
 - `POST /api/place/recommend` → anon 2nd = `403 LOGIN_REQUIRED`. `POST /api/food/recommend` → anon 3rd = `403 LOGIN_REQUIRED`. New voucher claim endpoint = `401` if anon.
 - `POST /api/vote` + `POST /api/report-tenant`: stay login-free + IP rate-limit.
 - Analytics: `login_prompted{reason}`, `user_registered{method}`, `voucher_claimed`, `anon_quota_exhausted{type}`.
