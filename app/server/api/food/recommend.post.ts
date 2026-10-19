@@ -72,23 +72,7 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    // Increment today's row. `upsert` MUST declare the composite PK; chaining `.eq()`
-    // after `upsert` (the old code) is invalid on a write query.
-    const { error: upErr } = await db
-      .from("mall_search_quota")
-      .upsert(
-        { user_id: userId, date: today, used: used + 1 },
-        { onConflict: "user_id,date" },
-      );
-    if (upErr) {
-      throw createError({
-        statusCode: 500,
-        statusMessage: "FOOD_QUOTA_UPDATE_ERROR",
-        data: { message: upErr.message },
-      });
-    }
-
-    // ---- Generate recommendations ----
+    // ---- Generate FIRST: a failed generate (404 no tenant, LLM error) must not burn a slot ----
     const candidates = await fetchFoodCandidates(db, body);
     const { rankTenants } = await import("../../utils/llm");
     const ranking = await rankTenants(body, candidates);
@@ -100,6 +84,30 @@ export default defineEventHandler(async (event) => {
       ),
     );
 
+    // Generate succeeded → consume the slot now. Re-read so the number stays honest if
+    // another tab incremented meanwhile (`upsert` MUST declare the composite PK; chaining
+    // `.eq()` after `upsert` — the old code — is invalid on a write query).
+    const { data: fresh } = await db
+      .from("mall_search_quota")
+      .select("used")
+      .eq("user_id", userId)
+      .eq("date", today)
+      .maybeSingle();
+    const usedNow = fresh?.used ?? used;
+    const { error: upErr } = await db
+      .from("mall_search_quota")
+      .upsert(
+        { user_id: userId, date: today, used: usedNow + 1 },
+        { onConflict: "user_id,date" },
+      );
+    if (upErr) {
+      throw createError({
+        statusCode: 500,
+        statusMessage: "FOOD_QUOTA_UPDATE_ERROR",
+        data: { message: upErr.message },
+      });
+    }
+
     await db.from("generations").insert({
       session_id: sessionId,
       user_id: userId,
@@ -110,7 +118,7 @@ export default defineEventHandler(async (event) => {
     await claimAnonRows(db, sessionId, userId);
     return {
       recommendations,
-      quota_remaining: LOGGED_IN_FOOD_LIMIT - (used + 1),
+      quota_remaining: LOGGED_IN_FOOD_LIMIT - (usedNow + 1),
     };
   }
 

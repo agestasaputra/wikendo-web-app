@@ -10,6 +10,7 @@ import { supabaseAdmin } from "../../utils/db";
 import { extractAccessToken } from "../../utils/authToken";
 import { ensureSessionId } from "../../utils/sessionId";
 import { claimAnonRows } from "../../utils/claimAnonRows";
+import { refundPlaceQuota } from "../../utils/refundPlaceQuota";
 import { getCookie, setCookie, createError, readBody } from "h3";
 
 /**
@@ -75,7 +76,15 @@ export default defineEventHandler(async (event) => {
     const remaining = row.remaining ?? 0;
 
     const { generatePlace } = await import("../../utils/llm");
-    const recommendations = await generatePlace(body);
+    // The slot was consumed above (atomic check). If the LLM fails, refund it so the
+    // user does not lose a slot for a request that returned nothing.
+    let recommendations;
+    try {
+      recommendations = await generatePlace(body);
+    } catch (err) {
+      await refundPlaceQuota(supabaseAdmin(), userId);
+      throw err;
+    }
     const db = supabaseAdmin();
     // Adopt rows this browser generated while anonymous (quiz first, login at the quota wall).
     await claimAnonRows(db, sessionId, userId);

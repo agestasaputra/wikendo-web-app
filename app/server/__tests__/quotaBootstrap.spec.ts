@@ -55,6 +55,30 @@ describe("food recommend uses a WIB date + composite upsert (user_id, date)", ()
   });
 });
 
+describe("food quota is only consumed by a SUCCESSFUL generate", () => {
+  it("generates candidates BEFORE incrementing (a 404 'no tenant' must not burn a slot)", () => {
+    const genAt = FOOD.indexOf("await fetchFoodCandidates");
+    const incAt = FOOD.indexOf("upsert");
+    expect(genAt).toBeGreaterThan(-1);
+    expect(incAt).toBeGreaterThan(-1);
+    expect(genAt).toBeLessThan(incAt);
+  });
+
+  it("ranks BEFORE incrementing too (an LLM failure must not burn a slot)", () => {
+    const rankAt = FOOD.indexOf("await rankTenants");
+    const incAt = FOOD.indexOf("upsert");
+    expect(rankAt).toBeGreaterThan(-1);
+    expect(rankAt).toBeLessThan(incAt);
+  });
+});
+
+describe("place recommend refunds the slot when the LLM fails after the atomic increment", () => {
+  it("has a best-effort refund wired into the generate failure path", () => {
+    expect(PLACE).toContain("refundPlaceQuota");
+    expect(PLACE).toMatch(/catch\s*\(\w+\)\s*\{[^}]*refundPlaceQuota/);
+  });
+});
+
 describe("GET /api/quota reads today's food row safely", () => {
   it("filters mall_search_quota by date and tolerates a missing row", () => {
     expect(QUOTA).toMatch(/\.eq\(\s*["']date["']/);
