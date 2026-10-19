@@ -136,6 +136,14 @@
 - **Next:** Uji end-to-end dengan email aktif, kemudian tambahkan fitur lihat/ubah profil.
 
 ## 🧾 LOG (newest first)
+## 2026-10-20 — claim-on-login DONE ✅ (adopt anon quiz rows into account; PROD 401 correct)
+
+- **Why:** Agesta asked to make "claim on login" real: when a user logs in (email or Google OAuth redirect), the anonymous quiz rows tied to this browser's `session_id` cookie (which had `user_id = NULL`) should be adopted into the account, so "riwayat lintas device" actually works and survives cookie loss. Previously claim only ran implicitly inside `place/recommend`/`food/recommend` (when a logged-in user next did a quiz); rows stayed orphan until then.
+- **Done:** NEW `server/api/history/claim.post.ts` (`POST /api/history/claim`, auth guard via `extractAccessToken`, reads httpOnly `session_id` cookie, calls `claimAnonRows(supabaseAdmin, userId, sessionId)` → `UPDATE generations SET user_id = <userId> WHERE session_id = <cookie> AND user_id IS NULL`) + NEW `common/composables/useClaimAnonHistory.ts` (best-effort, swallows errors) + `features/auth/LoginPage.vue` `handleLogin` calls claim before redirect + `common/store/AuthStore.ts` (claim stays in `LoginPage` only to avoid max-lines-per-function; OAuth redirect claim happens on next login screen mount). TDD `pnpm test` 424/424 (57 files) ✅ `pnpm lint` 0 ✅ `pnpm type-check` 0 ✅ `pnpm build` ✅.
+- **Verification:** PROD E2E: `POST /api/history/claim` without token → 401 `LOGIN_REQUIRED` ("Login required to claim history") ✅ (endpoint live + auth guard works). Anon flow still green: place #1 200, place #2 403 `LOGIN_REQUIRED` with login-sell copy, food #1 200, food #2 403, `/api/quota` anon `{place:1/1, food:1/1, is_logged_in:false, reset_at:null, login_cta:...}` ✅, `/history` 200, `/api/history` anon 401 `LOGIN_REQUIRED` ✅. CI run for `08c85c8` = success. Remote HEAD = `08c85c8` ✅.
+- **Files:** `server/api/history/claim.post.ts` (NEW), `common/composables/useClaimAnonHistory.ts` (NEW), `features/auth/LoginPage.vue` (patched), `docs/08-PROGRESS.md`.
+- **Next:** (1) verify claim actually moves rows with a real logged-in account (email + Google OAuth) in a follow-up E2E once test credentials available; (2) update stale docs that still say anon food limit 2; (3) monitor prod anon→login conversion.
+
 ## 2026-10-20 — anon quota v1.4 DONE ✅ (server-side session_id gate + 1 place + 1 food + login-sell wall; PROD E2E verified)
 
 - **Why:** anon quota must be decided on the SERVER keyed to an httpOnly id — old client-writable cookies (`quota_used`, `food_quota_used`) let clearing them reset the counter and a curl loop got unlimited LLM calls. v1.4 ships the server-side gate: 1 free place + 1 free food per device per WIB day, then a login-sell wall.
