@@ -44,12 +44,13 @@ const errorMessage = computed(() =>
 );
 const isWall = computed(
   () =>
-    /login/i.test(errorMessage.value) || getErrorStatus(error.value) === 403,
+    getErrorStatus(error.value) === 403 && /login/i.test(errorMessage.value),
 );
+const loginCta = isWall;
 // Real quota: remaining from the POST response (quota_remaining). Anon food limit 2x.
 const quotaLeft = computed(() => data.value?.quota_remaining);
 const quotaLabel = computed(() =>
-  isWall.value ? "0/2 habis 🔒" : (quotaLeft.value ?? 2) + "/2",
+  isWall.value ? "0/1 habis 🔒" : (quotaLeft.value ?? 1) + "/1",
 );
 const mallSlug = computed(() =>
   String(route.query.mall_slug || route.query.mall || ""),
@@ -129,9 +130,10 @@ onMounted(() => {
     <ResultError
       v-else-if="error"
       :is-wall="isWall"
+      :login-cta="loginCta"
       :message="errorMessage"
       :pending="pending"
-      wall-text="🔒 Quota makan anon habis (2x/hari). Login 10 detik → quota jadi 5x/hari, gratis."
+      wall-text="🔒 Kuota makan anon habis (1x/hari). Login 10 detik → quota jadi 5x/hari, gratis."
       @retry="refresh()"
     />
     <div v-else-if="list.length" class="flex flex-col">

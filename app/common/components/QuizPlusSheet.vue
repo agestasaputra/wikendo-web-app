@@ -1,13 +1,15 @@
 <!-- common/components/QuizPlusSheet.vue → Quiz+ sheet with 2 explicit intents (Addendum docs/24 E1).
-WHAT: backdrop + dialog with 2 cards (Cari Tempat → /quiz, Cari Makan → /food) showing honest remaining quota; empty = disabled "Besok lagi 00.00".
-WHY: 1 "+" button can't carry 2 different quota intents (place 2/day vs food 5/day) without lying → the 2-tap cost is accepted. ZERO new API.
-EXAMPLE: <QuizPlusSheet :place-left="1" :place-limit="1" :food-left="2" :food-limit="2" @go="go" @close="close" /> -->
+WHAT: backdrop + dialog with 2 cards (Cari Tempat → /quiz, Cari Makan → /food) showing the REAL remaining/limit from GET /api/quota (anon 1•1, member 2•5) + login upsell for anonymous; empty = disabled "Besok lagi 00.00".
+WHY: 1 "+" button can't carry 2 different quota intents without lying → the 2-tap cost is accepted. ZERO new API.
+WHY dynamic numbers: a hardcoded per-tier number was a lie for anonymous users (1•1) and could disagree with the wallet after a refresh.
+EXAMPLE: <QuizPlusSheet :place-left="1" :place-limit="1" :food-left="0" :food-limit="1" :is-logged-in="false" @go="go" @close="close" /> -->
 <script setup lang="ts">
 defineProps<{
   placeLeft: number;
   placeLimit: number;
   foodLeft: number;
   foodLimit: number;
+  isLoggedIn: boolean;
 }>();
 const emit = defineEmits<{ go: [path: string]; close: [] }>();
 </script>
@@ -52,7 +54,7 @@ const emit = defineEmits<{ go: [path: string]; close: [] }>();
             <span class="flex-1 text-[13px] font-extrabold">
               Cari Tempat<br />
               <small class="font-bold text-gray-500">
-                Quiz 30 dtk · 2/hari · sisa {{ placeLeft }}/{{ placeLimit }}
+                Quiz 30 dtk · sisa {{ placeLeft }}/{{ placeLimit }}
               </small>
             </span>
             <span
@@ -73,7 +75,7 @@ const emit = defineEmits<{ go: [path: string]; close: [] }>();
             <span class="flex-1 text-[13px] font-extrabold">
               Cari Makan<br />
               <small class="font-bold text-gray-500">
-                Quiz 20 dtk · 5/hari · sisa {{ foodLeft }}/{{ foodLimit }}
+                Quiz 20 dtk · sisa {{ foodLeft }}/{{ foodLimit }}
               </small>
             </span>
             <span
@@ -84,6 +86,13 @@ const emit = defineEmits<{ go: [path: string]; close: [] }>();
             </span>
           </button>
         </div>
+        <NuxtLink
+          v-if="!isLoggedIn"
+          to="/login"
+          class="block text-center text-[11px] font-extrabold underline mt-2.5"
+          >Login gratis: 2 tempat + 5 makan/hari + riwayat lintas device
+          →</NuxtLink
+        >
       </div>
     </div>
   </div>

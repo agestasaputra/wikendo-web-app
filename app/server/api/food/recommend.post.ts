@@ -1,8 +1,9 @@
 /**
  * POST /api/food/recommend — Generate 5 TENANT recommendations (Mall mode).
  * Body: QuizFoodInput (mall_slug, mission, budget_tier, companion, halal_only?, kids_friendly?).
- * Kuota untuk pengguna ter-login disimpan di tabel `mall_search_quota` (5 per hari, PK user_id+date).
- * Untuk anonim tetap gunakan cookie `food_quota_used` (max 2).
+ * Kuota member disimpan di `mall_search_quota` (5/hari, PK user_id+date). Untuk anonim kuota
+ * dihitung di SERVER dari ledger `generations` (session_id httpOnly + IP soft cap) — cookie
+ * lama `food_quota_used` sudah tidak dipakai lagi dan tidak pernah ditulis.
  */
 import type { QuizFoodInput } from "../../../common/types/api";
 import { supabaseAdmin } from "../../utils/db";
@@ -11,14 +12,26 @@ import {
   pickCandidate,
   toTenantRecommendation,
 } from "../../utils/foodCandidates";
-import { readBody, getCookie, setCookie, createError } from "h3";
+import { readBody, getRequestIP, createError } from "h3";
 import { extractAccessToken } from "../../utils/authToken";
 import { ensureSessionId } from "../../utils/sessionId";
 import { claimAnonRows } from "../../utils/claimAnonRows";
 import { todayWIB } from "../../utils/voucherClaim";
+import {
+  ANON_FOOD_LIMIT,
+  canUse,
+  hashIp,
+  ipSalt,
+  loginWallMessage,
+  remainingFor,
+} from "../../utils/anonQuotaPolicy";
+import {
+  getAnonUsage,
+  recordAnonGeneration,
+  wibDay,
+} from "../../utils/anonQuotaStore";
 
 /* eslint-disable max-lines-per-function, complexity */
-const ANON_FOOD_LIMIT = 2;
 const LOGGED_IN_FOOD_LIMIT = 5;
 
 export default defineEventHandler(async (event) => {
@@ -65,10 +78,15 @@ export default defineEventHandler(async (event) => {
     }
     const used = quotaRow?.used ?? 0;
     if (used >= LOGGED_IN_FOOD_LIMIT) {
+      // Already logged in → no "login" upsell, just an honest reset time.
       throw createError({
         statusCode: 403,
         statusMessage: "FOOD_QUOTA_EXCEEDED",
-        data: { message: "Kuota makan Anda habis. Reset jam 00:00 WIB" },
+        data: {
+          message:
+            "Kuota makan kamu habis hari ini — reset jam 00.00 WIB ya. " +
+            "Cari tempat tetap bisa (2/hari).",
+        },
       });
     }
 
@@ -119,22 +137,26 @@ export default defineEventHandler(async (event) => {
     return {
       recommendations,
       quota_remaining: LOGGED_IN_FOOD_LIMIT - (usedNow + 1),
+      quota_limit: LOGGED_IN_FOOD_LIMIT,
+      is_logged_in: true,
     };
   }
 
-  // ---- Anonymous flow (cookie based) ----
-  const usedAnon = parseInt(getCookie(event, "food_quota_used") || "0");
-  if (usedAnon >= ANON_FOOD_LIMIT) {
+  /** Anonymous flow: quota is decided on the SERVER (httpOnly session_id + IP soft cap). */
+  const db = supabaseAdmin();
+  const ipHash = hashIp(
+    getRequestIP(event, { xForwardedFor: true }) || "unknown",
+    ipSalt(wibDay()),
+  );
+  const usage = await getAnonUsage(db, sessionId, ipHash);
+  if (!canUse("food", usage)) {
     throw createError({
       statusCode: 403,
-      statusMessage: "FOOD_QUOTA_EXCEEDED",
-      data: {
-        message: "Quota makan habis. Login untuk 5x/hari, reset 00:00 WIB.",
-      },
+      statusMessage: "LOGIN_REQUIRED",
+      data: { message: loginWallMessage(), login_cta: true },
     });
   }
 
-  const db = supabaseAdmin();
   const candidates = await fetchFoodCandidates(db, body);
   const { rankTenants } = await import("../../utils/llm");
   const ranking = await rankTenants(body, candidates);
@@ -152,10 +174,13 @@ export default defineEventHandler(async (event) => {
     quiz_input: { ...body, type: "food" },
     recommendations,
   });
-  setCookie(event, "food_quota_used", String(usedAnon + 1), {
-    maxAge: 86400,
-    path: "/",
-  });
+  await recordAnonGeneration(db, { sessionId, ipHash, kind: "food" });
+  // No client-readable quota cookie: the counter is derived from the row above.
 
-  return { recommendations, quota_remaining: ANON_FOOD_LIMIT - (usedAnon + 1) };
+  return {
+    recommendations,
+    quota_remaining: Math.max(0, remainingFor("food", usage) - 1),
+    quota_limit: ANON_FOOD_LIMIT,
+    is_logged_in: false,
+  };
 });

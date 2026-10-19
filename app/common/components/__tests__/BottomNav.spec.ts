@@ -4,6 +4,8 @@ import { readSource } from "~/test/utils";
 /**
  * BottomNav.spec.ts — Gas E1 BottomNav Home-Mall-Quiz+-History-Account (Addendum docs/24).
  * Pinned: 5 tabs + Quiz+ sheet with 2 honest quota intents. Read as text (nav + sheet = 2 components).
+ * v1.4: the sheet must render the REAL limit from GET /api/quota (anon 1•1, member 2•5)
+ * instead of a hardcoded "2/hari / 5/hari" that lies to anonymous users.
  */
 const NAV = readSource(
   "common/components/BottomNav.vue",
@@ -43,9 +45,17 @@ describe("E1 Quiz+ sheet with 2 honest quota intents", () => {
     expect(NAV).toMatch(/Cari Makan|Makan/i);
   });
 
-  it("honest quota: 2/day place + 5/day food or real remaining", () => {
-    expect(NAV).toMatch(/2\/hari|2x|1\/1|x\/2/i);
-    expect(NAV).toMatch(/5\/hari|5x|2\/2|x\/5/i);
+  it("honest quota: renders the real remaining/limit from the API, not a hardcoded 2/hari", () => {
+    expect(NAV).toMatch(/placeLeft[\s\S]{0,40}placeLimit/);
+    expect(NAV).toMatch(/foodLeft[\s\S]{0,40}foodLimit/);
+    expect(NAV).not.toMatch(/2\/hari/);
+    expect(NAV).not.toMatch(/5\/hari/);
+  });
+
+  it("anonymous gets the login upsell inside the sheet", () => {
+    expect(NAV).toMatch(/Login gratis/i);
+    expect(NAV).toMatch(/riwayat/i);
+    expect(NAV).toContain("isLoggedIn");
   });
 
   it("exhausted honestly disabled Come back tomorrow 00.00", () => {

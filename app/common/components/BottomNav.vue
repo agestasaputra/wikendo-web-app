@@ -29,11 +29,13 @@ const RIGHT_TABS: NavTab[] = [
 const route = useRoute();
 const showSheet = ref(false);
 
-const authFetch = useAuthFetch();
+// Server render has no Bearer token but MUST forward the incoming cookies, or the anonymous
+// gate would count a brand-new device on every SSR render (0/1 forever). Browser = authFetch.
+const quotaFetch = import.meta.server ? useRequestFetch() : useAuthFetch();
 const { data: quotaData } = await useFetch<QuotaStatus>("/api/quota", {
   key: "quota",
   lazy: true,
-  $fetch: authFetch,
+  $fetch: quotaFetch,
 });
 // SSR/ISR renders the shared "quota" cache with anonymous numbers → re-fetch with the Bearer
 // token whenever auth flips (login, logout, F5 with an existing session) so the wallet is honest.
@@ -126,6 +128,7 @@ function go(path: string): void {
     :place-limit="placeLimit"
     :food-left="foodLeft"
     :food-limit="foodLimit"
+    :is-logged-in="auth.isLoggedIn"
     @go="go"
     @close="showSheet = false"
   />

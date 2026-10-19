@@ -1,13 +1,15 @@
 <!-- common/components/ResultError.vue → Recommendation result error box (quota wall vs regular error).
-WHAT: isWall = orange box "Quota habis → Login"; otherwise red box + message + "Coba lagi" button (disabled while pending).
+WHAT: isWall = orange box selling the login (copy from the server wall message); otherwise red box + message + "Coba lagi" button (disabled while pending). loginCta=false hides the login link for users who ARE logged in (their 403 is "reset 00.00", not "please login").
 WHY: place result + food result are identical except the wall text → 1 component; wall text via prop.
-EXAMPLE: <ResultError :is-wall="isWall" :message="errorMessage" :pending="pending" wall-text="..." @retry="refresh()" /> -->
+EXAMPLE: <ResultError :is-wall="isWall" :login-cta="isLoginWall" :message="errorMessage" :pending="pending" :wall-text="wallText" @retry="refresh()" /> -->
 <script setup lang="ts">
 defineProps<{
   isWall: boolean;
   message: string;
   pending: boolean;
   wallText: string;
+  /** Show the "Login gratis" link (false for a logged-in user whose quota simply reset tomorrow). */
+  loginCta?: boolean;
 }>();
 const emit = defineEmits<{ retry: [] }>();
 </script>
@@ -23,7 +25,9 @@ const emit = defineEmits<{ retry: [] }>();
   >
     <template v-if="isWall">
       {{ wallText }}<br />
-      <NuxtLink to="/" class="underline">Login / balik Home →</NuxtLink>
+      <NuxtLink v-if="loginCta !== false" to="/login" class="underline"
+        >Login gratis → 2 tempat + 5 makan + riwayat →</NuxtLink
+      >
     </template>
     <template v-else>
       {{ message }}<br />

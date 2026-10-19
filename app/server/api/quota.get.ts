@@ -1,21 +1,23 @@
 /**
- * GET /api/quota — Place+food split quota status (API contract §2, Addendum v1.3).
+ * GET /api/quota — Place+food split quota status (API contract §2, Addendum v1.4).
  *
- * WHAT: read anon cookies (quota_used 1x place, food_quota_used 2x food) or the logged-in
- *   rows from DB → build response via buildQuotaStatus() (same pure helper as wallet).
- * WHY: anon 1+2 vs login 2+5 — must be honest per user. The food row is WIB-dated
- *   (PK user_id+date), so it MUST be filtered by today or `.single()` throws on day 2.
- * EXAMPLE: empty cookie → { place:{limit:1}, food:{limit:2}, is_logged_in:false }.
+ * WHAT: read the logged-in rows from DB, or count anonymous usage on the SERVER from the
+ *   `generations` ledger (httpOnly `session_id` + salted-IP soft cap) → build the response
+ *   via buildQuotaStatus() (same pure helper as the wallet).
+ * WHY: anon 1+1 vs login 2+5 — must be honest per user. The old version trusted cookies
+ *   (`quota_used`, `food_quota_used`) that the client could clear, so the wallet could say
+ *   "still full" while the gate refused (or the reverse).
+ * WHY the food row is WIB-dated (PK user_id+date): it MUST be filtered by today or
+ *   `.single()` throws on day 2.
+ * EXAMPLE: fresh visitor → { place:{limit:1}, food:{limit:1}, is_logged_in:false }.
  */
-import { defineEventHandler, getCookie } from "h3";
+import { defineEventHandler, getRequestIP } from "h3";
 import { supabaseAdmin } from "../utils/db";
 import { extractAccessToken } from "../utils/authToken";
-import { todayWIB } from "../utils/voucherClaim";
-import {
-  buildQuotaStatus,
-  parseAnonFoodUsed,
-  parseAnonPlaceUsed,
-} from "../../common/utils/quota";
+import { ensureSessionId } from "../utils/sessionId";
+import { getAnonUsage, wibDay } from "../utils/anonQuotaStore";
+import { hashIp, ipSalt } from "../utils/anonQuotaPolicy";
+import { buildQuotaStatus } from "../../common/utils/quota";
 
 /* eslint-disable complexity */
 export default defineEventHandler(async (event) => {
@@ -44,17 +46,25 @@ export default defineEventHandler(async (event) => {
         .eq("date", todayWIB())
         .maybeSingle(),
     ]);
-    const placeUsed = place?.quota_used ?? 0;
-    const foodUsed = food?.used ?? 0;
     return buildQuotaStatus({
-      placeUsed,
-      foodUsed,
+      placeUsed: place?.quota_used ?? 0,
+      foodUsed: food?.used ?? 0,
       isLoggedIn: true,
       resetAt: place?.last_reset_at ?? null,
     });
   }
 
-  const placeUsed = parseAnonPlaceUsed(getCookie(event, "quota_used"));
-  const foodUsed = parseAnonFoodUsed(getCookie(event, "food_quota_used"));
-  return buildQuotaStatus({ placeUsed, foodUsed, isLoggedIn: false });
+  // Anonymous: count what this browser actually generated today (same source as the gate,
+  // so the wallet can never disagree with the wall).
+  const sessionId = ensureSessionId(event);
+  const ipHash = hashIp(
+    getRequestIP(event, { xForwardedFor: true }) || "unknown",
+    ipSalt(wibDay()),
+  );
+  const usage = await getAnonUsage(supabaseAdmin(), sessionId, ipHash);
+  return buildQuotaStatus({
+    placeUsed: usage.place,
+    foodUsed: usage.food,
+    isLoggedIn: false,
+  });
 });

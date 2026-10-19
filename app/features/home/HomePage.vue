@@ -37,9 +37,11 @@ useHead({
 });
 // Hero tokens I17 V2 Ember P1 — single source of truth, not hardcoded hex in the template.
 const hero = getHomeHeroMeta();
-// Real quota: GET /api/quota with the Bearer token (authFetch) → logged-in 2•5, anonymous 1•2.
-// Failed fetch = fresh anonymous fallback (1 • 2), not a fake register number.
-const authFetch = useAuthFetch();
+// Real quota: GET /api/quota → logged-in 2•5, anonymous 1•1 (server-counted from `generations`).
+// WHY 2 fetchers: in the browser the Bearer token is REQUIRED (the Supabase session lives in
+// localStorage); during SSR there is no token but the incoming cookies MUST be forwarded or the
+// anonymous gate would count a brand-new device on every render. Failed fetch = fresh anon fallback.
+const quotaFetch = import.meta.server ? useRequestFetch() : useAuthFetch();
 const {
   data: quotaData,
   pending: quotaPending,
@@ -47,12 +49,19 @@ const {
 } = await useFetch<QuotaStatus>("/api/quota", {
   key: "quota",
   lazy: true,
-  $fetch: authFetch,
+  $fetch: quotaFetch,
 });
 const quotaStatus = computed(
   () =>
     quotaData.value ||
     buildQuotaStatus({ placeUsed: 0, foodUsed: 0, isLoggedIn: false }),
+);
+// The payload can be SWR-cached; re-read on mount + whenever auth flips so the wallet (and
+// BottomNav's copy of it) never shows a stale number after a quiz success.
+onMounted(() => void refreshNuxtData("quota"));
+watch(
+  () => isLoggedIn.value,
+  () => void refreshNuxtData("quota"),
 );
 const wallet = computed(() => buildWalletLabel(quotaStatus.value));
 </script>
@@ -98,7 +107,7 @@ const wallet = computed(() => buildWalletLabel(quotaStatus.value));
         {{
           isLoggedIn
             ? "Sisa kamu hari ini — reset 00.00"
-            : "Gratis hari ini — login buka 2 + 5"
+            : "Gratis hari ini — login dapat 2 tempat + 5 makan + riwayat lintas device"
         }}
       </p>
       <div class="flex gap-1.5 mt-2">
@@ -123,9 +132,10 @@ const wallet = computed(() => buildWalletLabel(quotaStatus.value));
       >
       <NuxtLink
         v-if="!quotaPending && !quotaError && wallet.exhausted"
-        to="/quiz"
+        to="/login"
         class="block text-center text-xs font-extrabold mt-2.5 underline"
-        >🔒 Quota habis — Login gratis → buka 2 tempat + 5 makan/hari</NuxtLink
+        >🔒 Gratis hari ini sudah dipakai — Login gratis → 2 tempat + 5 makan +
+        riwayat lintas device</NuxtLink
       >
     </div>
 

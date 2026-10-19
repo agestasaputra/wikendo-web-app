@@ -56,13 +56,23 @@ describe("quiz result pages send the Bearer token (orphan-row fix)", () => {
 });
 
 describe("quota wallet call sites send the Bearer token", () => {
-  it("BottomNav, HomePage and LoginPage pass $fetch: authFetch", () => {
-    expect(readSource("common/components/BottomNav.vue")).toMatch(
-      /\$fetch\s*:\s*authFetch/,
-    );
-    expect(readSource("features/home/HomePage.vue")).toMatch(
-      /\$fetch\s*:\s*authFetch/,
-    );
+  it("BottomNav + HomePage build the fetcher from useAuthFetch (browser) / forward cookies on SSR", () => {
+    // Browser: useAuthFetch() carries `Authorization: Bearer …` (the session lives in
+    // localStorage). Server: useRequestFetch() forwards the httpOnly session_id cookie, or the
+    // anonymous gate would count a brand-new device on every SSR render. Both pages must pass
+    // the resulting fetcher to useFetch — that is the contract this test locks.
+    for (const page of [
+      "common/components/BottomNav.vue",
+      "features/home/HomePage.vue",
+    ]) {
+      const SRC = readSource(page);
+      expect(SRC).toContain("useAuthFetch");
+      expect(SRC).toContain("useRequestFetch");
+      expect(SRC).toMatch(/\$fetch\s*:\s*(authFetch|quotaFetch)/);
+    }
+  });
+
+  it("LoginPage passes $fetch: authFetch", () => {
     expect(readSource("features/auth/LoginPage.vue")).toMatch(
       /\$fetch\s*:\s*authFetch/,
     );

@@ -1,7 +1,8 @@
 /**
  * POST /api/place/recommend — Generate 5 PLACE recommendations (Plan mode).
  * Body: QuizPlaceInput (mood, companion, budget, location, time?).
- * MVP quota: logged-in 2/day (DB), anonymous 1/day (cookie `quota_used`).
+ * Quota: member 2/day (DB `user_quota`), anonymous 1/day counted on the SERVER from the
+ *   `generations` ledger (httpOnly `session_id` + salted-IP soft cap) — never a client cookie.
  * Flow: resolve user → bootstrap quota rows → increment quota → generatePlace() [LLM] → INSERT generations.
  * Result NEVER mixes in tenants — total split contract (Addendum v1.1).
  */
@@ -11,7 +12,20 @@ import { extractAccessToken } from "../../utils/authToken";
 import { ensureSessionId } from "../../utils/sessionId";
 import { claimAnonRows } from "../../utils/claimAnonRows";
 import { refundPlaceQuota } from "../../utils/refundPlaceQuota";
-import { getCookie, setCookie, createError, readBody } from "h3";
+import { getRequestIP, createError, readBody } from "h3";
+import {
+  ANON_PLACE_LIMIT,
+  canUse,
+  hashIp,
+  ipSalt,
+  loginWallMessage,
+  remainingFor,
+} from "../../utils/anonQuotaPolicy";
+import {
+  getAnonUsage,
+  recordAnonGeneration,
+  wibDay,
+} from "../../utils/anonQuotaStore";
 
 /**
  * Read the single row returned by the `RETURNS TABLE` quota function.
@@ -67,10 +81,15 @@ export default defineEventHandler(async (event) => {
     }
     const row = firstRow<{ allowed: boolean; remaining: number }>(result);
     if (!row || !row.allowed) {
+      // Already logged in → never sell them a login they already have.
       throw createError({
         statusCode: 403,
         statusMessage: "QUOTA_EXCEEDED",
-        data: { message: "Kuota place Anda habis. Reset jam 00:00 WIB" },
+        data: {
+          message:
+            "Kuota tempat kamu habis hari ini — reset jam 00.00 WIB ya. " +
+            "Cari makan tetap bisa (5/hari).",
+        },
       });
     }
     const remaining = row.remaining ?? 0;
@@ -94,30 +113,45 @@ export default defineEventHandler(async (event) => {
       quiz_input: { ...body, type: "place" },
       recommendations,
     });
-    return { recommendations, quota_remaining: remaining };
+    return {
+      recommendations,
+      quota_remaining: remaining,
+      quota_limit: 2,
+      is_logged_in: true,
+    };
   }
 
-  // Anonymous flow (cookie based)
-  const used = getCookie(event, "quota_used");
-  if (used === "1") {
+  // ---- Anonymous flow: quota is decided on the SERVER (httpOnly session_id + IP soft cap) ----
+  const db = supabaseAdmin();
+  const ipHash = hashIp(
+    getRequestIP(event, { xForwardedFor: true }) || "unknown",
+    ipSalt(wibDay()),
+  );
+  const usage = await getAnonUsage(db, sessionId, ipHash);
+  if (!canUse("place", usage)) {
     throw createError({
       statusCode: 403,
       statusMessage: "LOGIN_REQUIRED",
-      data: { message: "Login untuk generate lagi" },
+      data: { message: loginWallMessage(), login_cta: true },
     });
   }
 
   const { generatePlace } = await import("../../utils/llm");
   const recommendations = await generatePlace(body);
 
-  const db = supabaseAdmin();
   await db.from("generations").insert({
     session_id: sessionId,
     user_id: null,
     quiz_input: { ...body, type: "place" },
     recommendations,
   });
-  setCookie(event, "quota_used", "1", { maxAge: 86400, path: "/" });
+  await recordAnonGeneration(db, { sessionId, ipHash, kind: "place" });
+  // No client-readable quota cookie: the counter is derived from the row above.
 
-  return { recommendations, quota_remaining: 0 };
+  return {
+    recommendations,
+    quota_remaining: Math.max(0, remainingFor("place", usage) - 1),
+    quota_limit: ANON_PLACE_LIMIT,
+    is_logged_in: false,
+  };
 });

@@ -1,9 +1,12 @@
 /**
- * common/utils/quota.ts — Quota split v1.3: cookie parsing + status builder + wallet label.
+ * common/utils/quota.ts — Quota split v1.4: status builder + wallet label.
  *
- * WHAT: parseAnon*Used, buildQuotaStatus, buildWalletLabel. PURE: the caller reads cookie/API.
+ * WHAT: buildQuotaStatus, buildWalletLabel. PURE: the caller supplies the counts.
  * WHY: used by server (GET /api/quota) + pages (wallet) → 1 interpretation, not duplicated.
- * Response contract: ../../docs/05-API-Specification.md. Anonymous 1+2, register 2+5.
+ * WHY no cookie parsers any more: anonymous usage is counted on the SERVER from the
+ *   `generations` ledger (httpOnly session_id + IP soft cap). A client-writable cookie is
+ *   not trusted — clearing it used to reset the free trial and a curl loop got unlimited LLM.
+ * Response contract: ../../docs/05-API-Specification.md. Anonymous 1+1, register 2+5.
  * EXAMPLE: buildQuotaStatus({ placeUsed: 0, foodUsed: 1, isLoggedIn: false })
  */
 import type {
@@ -12,50 +15,42 @@ import type {
   WalletLabel,
 } from "../types/quota";
 
-/** Cookie `quota_used` (place, anonymous 1x) → 0|1. Wrong value = 0 (safe). */
-export function parseAnonPlaceUsed(cookieValue: string | undefined): number {
-  return cookieValue === "1" ? 1 : 0;
+/** Per-type limits that mirror server/utils/anonQuotaPolicy (kept in sync by a unit test). */
+export const ANON_PLACE_LIMIT = 1;
+export const ANON_FOOD_LIMIT = 1;
+export const MEMBER_PLACE_LIMIT = 2;
+export const MEMBER_FOOD_LIMIT = 5;
+
+/** Slots left (never negative — a stale counter must not render "-1"). */
+function left(limit: number, used: number): number {
+  return Math.max(0, limit - Math.max(0, used));
 }
 
-/** Cookie `food_quota_used` (food, anonymous 2x) → 0|1|2. Clamped 0–2, wrong = 0. */
-export function parseAnonFoodUsed(cookieValue: string | undefined): number {
-  const n = parseInt(cookieValue || "0", 10);
-  if (Number.isNaN(n) || n <= 0) return 0;
-  return Math.min(n, 2);
-}
-
-/** Build the quota split response: anonymous (1+2 + login_cta) vs register (2+5). */
+/** Build the quota split response: anonymous (1+1 + login_cta) vs member (2+5). */
 export function buildQuotaStatus(input: QuotaStatusInput): QuotaStatus {
-  if (!input.isLoggedIn) {
-    return {
-      place: {
-        used: input.placeUsed,
-        limit: 1,
-        remaining: 1 - input.placeUsed,
-      },
-      food: {
-        used: input.foodUsed,
-        limit: 2,
-        remaining: 2 - input.foodUsed,
-      },
-      is_logged_in: false,
-      reset_at: null,
-      login_cta: "Login gratis → buka 2 tempat + 5 makan/hari",
-    };
-  }
+  const isLoggedIn = input.isLoggedIn;
+  const placeLimit = isLoggedIn ? MEMBER_PLACE_LIMIT : ANON_PLACE_LIMIT;
+  const foodLimit = isLoggedIn ? MEMBER_FOOD_LIMIT : ANON_FOOD_LIMIT;
+
   return {
     place: {
       used: input.placeUsed,
-      limit: 2,
-      remaining: 2 - input.placeUsed,
+      limit: placeLimit,
+      remaining: left(placeLimit, input.placeUsed),
     },
     food: {
       used: input.foodUsed,
-      limit: 5,
-      remaining: 5 - input.foodUsed,
+      limit: foodLimit,
+      remaining: left(foodLimit, input.foodUsed),
     },
-    is_logged_in: true,
-    reset_at: input.resetAt ?? null,
+    is_logged_in: isLoggedIn,
+    reset_at: isLoggedIn ? (input.resetAt ?? null) : null,
+    ...(isLoggedIn
+      ? {}
+      : {
+          login_cta:
+            "Login gratis: 2 tempat + 5 makan per hari + riwayat lintas device",
+        }),
   };
 }
 

@@ -34,10 +34,13 @@ const wallNote = ref(false);
 const errorMessage = computed(() =>
   getErrorMessage(error.value, "Gagal generate."),
 );
+// isWall: server says LOGIN_REQUIRED (anonymous wall) → true. A logged-in user whose quota reset
+// tomorrow also gets 403 QUOTA_EXCEEDED — must NOT be treated as a login wall.
 const isWall = computed(
   () =>
-    /login/i.test(errorMessage.value) || getErrorStatus(error.value) === 403,
+    getErrorStatus(error.value) === 403 && /login/i.test(errorMessage.value),
 );
+const loginCta = isWall;
 // Real quota: remaining from the POST response (quota_remaining). Anon place limit 1x → success = 0/1 (used up today, honest).
 const quotaLeft = computed(() => data.value?.quota_remaining);
 const quotaLabel = computed(() =>
@@ -101,9 +104,10 @@ onMounted(() => {
     <ResultError
       v-else-if="error"
       :is-wall="isWall"
+      :login-cta="loginCta"
       :message="errorMessage"
       :pending="pending"
-      wall-text="🔒 Quota anon habis (1x/hari). Login 10 detik → quota jadi 2x/hari, gratis."
+      wall-text="🔒 Kuota anon habis (1x/hari). Login 10 detik → quota jadi 2x/hari, gratis."
       @retry="refresh()"
     />
     <div v-else-if="list.length" class="flex flex-col">
