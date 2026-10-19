@@ -10,6 +10,7 @@ import { computed, ref } from "vue";
 import { defineStore } from "pinia";
 import { useSupabaseBrowser } from "../composables/useSupabaseBrowser";
 import { buildDisplayName, getInitial, type AuthUser } from "../utils/authUser";
+import { useClaimAnonHistory } from "../composables/useClaimAnonHistory";
 
 export const useAuthStore = defineStore("authStore", () => {
   const isLoggedIn = ref(false);
@@ -41,6 +42,8 @@ export const useAuthStore = defineStore("authStore", () => {
     try {
       useSupabaseBrowser().auth.onAuthStateChange((_event, session) => {
         applyUser(session?.user ?? null);
+        if (session?.user && typeof $fetch !== "undefined")
+          void useClaimAnonHistory()().catch(() => {});
       });
     } catch {
       // ignore — anonymous still works
