@@ -6,6 +6,7 @@
   EXAMPLE: anonymous exhausted sees 0 • 0 → Lanjutkan dengan Google / fill Email+Password → Masuk → back to ?redirect=. -->
 <script setup lang="ts">
 import AppSpinner from "~/common/components/AppSpinner.vue";
+import { useAuthFetch } from "~/common/composables/useAuthFetch";
 import { useSupabaseBrowser } from "~/common/composables/useSupabaseBrowser";
 import type { QuotaStatus } from "~/common/types/quota";
 import AuthBanner from "~/features/auth/components/AuthBanner.vue";
@@ -14,11 +15,14 @@ import PasswordField from "~/features/auth/components/PasswordField.vue";
 import { useGoogleSignIn } from "~/features/auth/composables/useGoogleSignIn";
 import { getRedirectQuery } from "~/features/auth/utils/redirect";
 
-// Real quota: GET /api/quota (anonymous cookie). Fetch failure = fallback to anonymous exhausted 0 • 0 like the image.
+// Real quota: GET /api/quota with the Bearer token (authFetch) → logged-in 2•5, anonymous 1•2.
 // key + lazy: same key as the layout's fetch (shared, one request) and never blocks navigation.
+// Fetch failure = fallback to anonymous exhausted 0 • 0 like the image.
+const authFetch = useAuthFetch();
 const { data: quotaData } = await useFetch<QuotaStatus>("/api/quota", {
   key: "quota",
   lazy: true,
+  $fetch: authFetch,
 });
 const placeRemaining = computed(() => quotaData.value?.place.remaining ?? 0);
 const foodRemaining = computed(() => quotaData.value?.food.remaining ?? 0);

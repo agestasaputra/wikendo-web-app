@@ -3,8 +3,10 @@ WHAT: 5 tabs in a sticky bottom-0 bar (last child of the app.vue flex column) (a
 WHY: thumbs can't reach the header; quota follows GET /api/quota (on failure = fallback to fresh anonymous 1 • 2, not fake numbers).
 EXAMPLE: tap + → sheet → Cari Tempat (remaining 1/1) → /quiz; empty → disabled Besok lagi 00.00. -->
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 import QuizPlusSheet from "~/common/components/QuizPlusSheet.vue";
+import { useAuthFetch } from "~/common/composables/useAuthFetch";
+import { useAuthStore } from "~/common/store/AuthStore";
 import type { QuotaStatus } from "~/common/types/quota";
 import { isNavActive } from "~/common/utils/nav";
 import { buildQuotaStatus } from "~/common/utils/quota";
@@ -27,10 +29,19 @@ const RIGHT_TABS: NavTab[] = [
 const route = useRoute();
 const showSheet = ref(false);
 
+const authFetch = useAuthFetch();
 const { data: quotaData } = await useFetch<QuotaStatus>("/api/quota", {
   key: "quota",
   lazy: true,
+  $fetch: authFetch,
 });
+// SSR/ISR renders the shared "quota" cache with anonymous numbers → re-fetch with the Bearer
+// token whenever auth flips (login, logout, F5 with an existing session) so the wallet is honest.
+const auth = useAuthStore();
+watch(
+  () => auth.isLoggedIn,
+  () => void refreshNuxtData("quota"),
+);
 const quotaStatus = computed(
   () =>
     quotaData.value ||

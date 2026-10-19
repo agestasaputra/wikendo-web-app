@@ -6,6 +6,7 @@ Tokens via getHomeHeroMeta(): ink #0C0A09 + ember strip #EA580C + number #D9F99D
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
 import { useAuthStore } from "~/common/store/AuthStore";
+import { useAuthFetch } from "~/common/composables/useAuthFetch";
 import type { QuotaStatus } from "~/common/types/quota";
 import { buildQuotaStatus, buildWalletLabel } from "~/common/utils/quota";
 import { getHomeHeroMeta } from "~/features/home/utils/homeHero";
@@ -36,12 +37,18 @@ useHead({
 });
 // Hero tokens I17 V2 Ember P1 — single source of truth, not hardcoded hex in the template.
 const hero = getHomeHeroMeta();
-// Real quota: GET /api/quota (anonymous cookie). Failed fetch = fresh anonymous fallback (1 • 2), not a fake register number.
+// Real quota: GET /api/quota with the Bearer token (authFetch) → logged-in 2•5, anonymous 1•2.
+// Failed fetch = fresh anonymous fallback (1 • 2), not a fake register number.
+const authFetch = useAuthFetch();
 const {
   data: quotaData,
   pending: quotaPending,
   error: quotaError,
-} = await useFetch<QuotaStatus>("/api/quota", { key: "quota", lazy: true });
+} = await useFetch<QuotaStatus>("/api/quota", {
+  key: "quota",
+  lazy: true,
+  $fetch: authFetch,
+});
 const quotaStatus = computed(
   () =>
     quotaData.value ||

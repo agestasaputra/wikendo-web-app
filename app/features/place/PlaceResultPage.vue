@@ -4,6 +4,7 @@ WHY R3b 1:1: lime=value (best/rating) + ember=strip + ink=action (footnote spec)
 EXAMPLE: hero Rooftop Senayan — Senayan 4.8 sunset+live music → Navigate → Lainnya chips shift the deck 1→5 without refetching. -->
 <script setup lang="ts">
 import { onMounted, watch } from "vue";
+import { useAuthFetch } from "~/common/composables/useAuthFetch";
 import ResultError from "~/common/components/ResultError.vue";
 import { useHistoryStore } from "~/common/store/HistoryStore";
 import type { PlaceRecommendation } from "~/common/types/api";
@@ -20,9 +21,12 @@ interface PlaceResponse {
 }
 
 const route = useRoute();
+// Bearer token REQUIRED: the Supabase session lives in localStorage (no auth cookie), so a plain
+// useFetch reaches the server anonymously → row saved with user_id NULL. authFetch fixes attribution.
+const authFetch = useAuthFetch();
 const { data, pending, error, refresh } = await useFetch<PlaceResponse>(
   "/api/place/recommend",
-  { method: "POST", body: route.query },
+  { method: "POST", body: route.query, $fetch: authFetch },
 );
 const list = computed(() => data.value?.recommendations || []);
 const idx = ref(0);

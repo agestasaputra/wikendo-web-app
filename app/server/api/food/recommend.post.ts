@@ -1,7 +1,7 @@
 /**
  * POST /api/food/recommend — Generate 5 TENANT recommendations (Mall mode).
  * Body: QuizFoodInput (mall_slug, mission, budget_tier, companion, halal_only?, kids_friendly?).
- * Kuota untuk pengguna ter‑login disimpan di tabel `mall_search_quota` (5 per hari).
+ * Kuota untuk pengguna ter-login disimpan di tabel `mall_search_quota` (5 per hari, PK user_id+date).
  * Untuk anonim tetap gunakan cookie `food_quota_used` (max 2).
  */
 import type { QuizFoodInput } from "../../../common/types/api";
@@ -14,9 +14,12 @@ import {
 import { readBody, getCookie, setCookie, createError } from "h3";
 import { extractAccessToken } from "../../utils/authToken";
 import { ensureSessionId } from "../../utils/sessionId";
+import { claimAnonRows } from "../../utils/claimAnonRows";
+import { todayWIB } from "../../utils/voucherClaim";
 
 /* eslint-disable max-lines-per-function, complexity */
 const ANON_FOOD_LIMIT = 2;
+const LOGGED_IN_FOOD_LIMIT = 5;
 
 export default defineEventHandler(async (event) => {
   const body = await readBody<QuizFoodInput>(event);
@@ -29,16 +32,31 @@ export default defineEventHandler(async (event) => {
     : { data: null, error: null };
   const userId = !authErr && authData?.user ? authData.user.id : null;
 
-  // ---- Logged‑in flow (DB quota) ----
+  // ---- Logged-in flow (DB quota) ----
   if (userId) {
-    // fetch current quota row (or treat not‑found as 0)
-    const { data: quotaRow, error: fetchErr } = await supabaseAdmin()
+    const db = supabaseAdmin();
+    // Bootstrap the profile + today's quota row (idempotent; no trigger on auth.users).
+    const { error: bootErr } = await db.rpc("initialize_new_user", {
+      p_user_id: userId,
+    });
+    if (bootErr) {
+      throw createError({
+        statusCode: 500,
+        statusMessage: "FOOD_QUOTA_BOOTSTRAP_ERROR",
+        data: { message: bootErr.message },
+      });
+    }
+
+    // The PK is (user_id, date) → every read MUST pin today's date or `.single()`
+    // breaks as soon as yesterday's row still exists. Date is WIB (browser + users are GMT+7).
+    const today = todayWIB();
+    const { data: quotaRow, error: fetchErr } = await db
       .from("mall_search_quota")
-      .select("used, date")
+      .select("used")
       .eq("user_id", userId)
-      .single();
-    if (fetchErr && fetchErr.code !== "PGRST116") {
-      // ignore not‑found error code
+      .eq("date", today)
+      .maybeSingle();
+    if (fetchErr) {
       throw createError({
         statusCode: 500,
         statusMessage: "FOOD_QUOTA_CHECK_ERROR",
@@ -46,19 +64,22 @@ export default defineEventHandler(async (event) => {
       });
     }
     const used = quotaRow?.used ?? 0;
-    if (used >= 5) {
+    if (used >= LOGGED_IN_FOOD_LIMIT) {
       throw createError({
         statusCode: 403,
         statusMessage: "FOOD_QUOTA_EXCEEDED",
         data: { message: "Kuota makan Anda habis. Reset jam 00:00 WIB" },
       });
     }
-    // increment quota atomically via upsert (date = today)
-    const today = new Date().toISOString().split("T")[0];
-    const { error: upErr } = await supabaseAdmin()
+
+    // Increment today's row. `upsert` MUST declare the composite PK; chaining `.eq()`
+    // after `upsert` (the old code) is invalid on a write query.
+    const { error: upErr } = await db
       .from("mall_search_quota")
-      .upsert({ user_id: userId, date: today, used: used + 1 })
-      .eq("user_id", userId);
+      .upsert(
+        { user_id: userId, date: today, used: used + 1 },
+        { onConflict: "user_id,date" },
+      );
     if (upErr) {
       throw createError({
         statusCode: 500,
@@ -68,7 +89,6 @@ export default defineEventHandler(async (event) => {
     }
 
     // ---- Generate recommendations ----
-    const db = supabaseAdmin();
     const candidates = await fetchFoodCandidates(db, body);
     const { rankTenants } = await import("../../utils/llm");
     const ranking = await rankTenants(body, candidates);
@@ -86,9 +106,12 @@ export default defineEventHandler(async (event) => {
       quiz_input: { ...body, type: "food" },
       recommendations,
     });
-    // Update anon cookie for consistency (optional, not used for logged‑in)
-    setCookie(event, "food_quota_used", String(used + 1), { maxAge: 86400 });
-    return { recommendations, quota_remaining: 5 - (used + 1) };
+    // Adopt rows this browser generated while anonymous (quiz first, login at the quota wall).
+    await claimAnonRows(db, sessionId, userId);
+    return {
+      recommendations,
+      quota_remaining: LOGGED_IN_FOOD_LIMIT - (used + 1),
+    };
   }
 
   // ---- Anonymous flow (cookie based) ----
@@ -121,7 +144,10 @@ export default defineEventHandler(async (event) => {
     quiz_input: { ...body, type: "food" },
     recommendations,
   });
-  setCookie(event, "food_quota_used", String(usedAnon + 1), { maxAge: 86400 });
+  setCookie(event, "food_quota_used", String(usedAnon + 1), {
+    maxAge: 86400,
+    path: "/",
+  });
 
   return { recommendations, quota_remaining: ANON_FOOD_LIMIT - (usedAnon + 1) };
 });

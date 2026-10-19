@@ -5,6 +5,7 @@ EXAMPLE: Kopi Kekinian hero — GI L2 Halal 50-100rb kids → gift Buka then ten
 <script setup lang="ts">
 import { onMounted, watch } from "vue";
 import AppLoader from "~/common/components/AppLoader.vue";
+import { useAuthFetch } from "~/common/composables/useAuthFetch";
 import ResultError from "~/common/components/ResultError.vue";
 import { useHistoryStore } from "~/common/store/HistoryStore";
 import type { TenantRecommendation } from "~/common/types/api";
@@ -27,9 +28,12 @@ interface FoodResponse {
 }
 
 const route = useRoute();
+// Bearer token REQUIRED: the Supabase session lives in localStorage (no auth cookie), so a plain
+// useFetch reaches the server anonymously → row saved with user_id NULL. authFetch fixes attribution.
+const authFetch = useAuthFetch();
 const { data, pending, error, refresh } = await useFetch<FoodResponse>(
   "/api/food/recommend",
-  { method: "POST", body: route.query },
+  { method: "POST", body: route.query, $fetch: authFetch },
 );
 const list = computed(() => data.value?.recommendations || []);
 const idx = ref(0);
