@@ -13,6 +13,7 @@ import AuthBanner from "~/features/auth/components/AuthBanner.vue";
 import GoogleButton from "~/features/auth/components/GoogleButton.vue";
 import PasswordField from "~/features/auth/components/PasswordField.vue";
 import { useGoogleSignIn } from "~/features/auth/composables/useGoogleSignIn";
+import { useClaimAnonHistory } from "~/common/composables/useClaimAnonHistory";
 import { getRedirectQuery } from "~/features/auth/utils/redirect";
 
 // Real quota: GET /api/quota with the Bearer token (authFetch) → logged-in 2•5, anonymous 1•2.
@@ -56,6 +57,8 @@ async function handleLogin(): Promise<void> {
       errorMsg.value = error.message;
       return;
     }
+    // Claim this browser's anonymous quiz rows into the account (best-effort).
+    await useClaimAnonHistory()();
     router.push(redirect);
   } finally {
     loading.value = false;
