@@ -14,7 +14,11 @@
 
 ---
 
-## 📌 BOARD — position as of 20 Oct 2026 (Stored-result flow LIVE ✅ — 1 hasil = 1 URL `?id=<uuid>`; refresh/back/bookmark/share jadi GET gratis 0 quota 0 LLM; history card clickable; tests 451/451 lint 0 build 10.3s)
+## 📌 BOARD — position as of 20 Oct 2026 (Stored-result flow LIVE ✅ + history newest-deck-wins ✅ — tests 459/459 lint 0 build 10.3s, pushed d3b1fd6)
+
+### 🔥 NOW (in progress)
+
+- [ ] **Voucher claim P0** — endpoint `POST /api/voucher/claim` sudah 401-correct untuk anon; belum ada UI claim + state "sudah diklaim" (next up)
 
 ### 🔥 NOW (in progress)
 
@@ -111,6 +115,7 @@
 ### ✅ DONE (summary — details in the LOG below)
 
 - [x] Stored-result flow DONE ✅ 20 Oct: 1 hasil = 1 URL `?id=<uuid>`; GET gratis (0 quota, 0 LLM), share kirim URL kanonik, history card clickable. Tests 451/451, lint 0, build 10.3s, prod audit green (`/api/result/<uuid>` 200, junk 400, share note OK) — commit `a64b82f` + `ed8a4fc`.
+- [x] History newest-deck-wins DONE ✅ 20 Oct: 1 kartu per tempat, kartu terbaru menggantikan kartu lama (bukan di-drop); merge server+device memilih deck terbaru & clickable. Tests 459/459, lint 0, build 10.3s, prod audit green — commit `d3b1fd6`.
 - [x] Supabase DB integration (DONE ✅ 8 Oct): project `wikendo-production` → run base + migration + seed 5×40 verified → local `.env` ✅ → 3 Vercel Production envs ✅ → prod `/api/malls` 200 (5 malls) + `/api/malls/grand-indonesia/tenants` 200 (40 tenants) ✅
 - [x] Addendum v1.3 Revamp+Auth APPROVED by Agesta 7 Oct 2026 — LOCKED (`docs/09-PRD-Addendum-Revamp-Combo-Auth.md` DRAFT → Approved) ✅
 - [x] Revamp combo 5+10+15 (`design/revamp-combo-5-10-15.html`) — 1 whole flow Home→Quiz→Result→Food→Voucher→Directory, visuals unified, waiting for Agesta's approval ✅
