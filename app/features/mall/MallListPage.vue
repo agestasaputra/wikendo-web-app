@@ -113,17 +113,8 @@ function mallArea(m: MallItem): string {
           </NuxtLink>
         </div>
       </div>
-      <!-- 2-row skeleton when adding a page (S2b spec) -->
-      <div v-if="loadingMore" class="flex flex-col gap-2.5" aria-live="polite">
-        <div
-          v-for="i in 2"
-          :key="i"
-          class="bg-white rounded-2xl border border-gray-100 p-4 animate-pulse"
-        >
-          <div class="h-4 rounded w-2/3 bg-stone-100" />
-          <div class="h-3 rounded w-1/3 mt-2 bg-stone-100" />
-        </div>
-      </div>
+      <!-- 2-row skeleton when adding a page (S2b spec) — same bones as the card above -->
+      <AppLoader v-if="loadingMore" variant="mall" :count="2" />
       <!-- Infinity scroll sentinel -->
       <div
         v-if="hasMore"

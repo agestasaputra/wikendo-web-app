@@ -176,7 +176,7 @@ const promoStrip = computed(() =>
     />
 
     <!-- Tenant card (S2c Tenant Photo mockup): 46px photo thumb + promo badge overlay -->
-    <AppLoader v-if="pending" variant="mall" />
+    <AppLoader v-if="pending" variant="mall" layout="tenant-list" />
     <div
       v-else-if="error"
       class="rounded-2xl p-4 text-sm font-bold mt-3"
@@ -195,20 +195,13 @@ const promoStrip = computed(() =>
       <p v-if="!filtered.length" class="text-center text-sm text-gray-500 py-8">
         Tidak ada tenant cocok. Coba ubah filter.
       </p>
-      <!-- 2-row skeleton when adding a page (S2b spec) -->
-      <div v-if="loadingMore" class="flex flex-col gap-2.5" aria-live="polite">
-        <div
-          v-for="i in 2"
-          :key="i"
-          class="border border-gray-100 rounded-2xl p-2.5 bg-white flex gap-2.5 items-center animate-pulse"
-        >
-          <div class="w-[46px] h-[46px] flex-none rounded-xl bg-stone-100" />
-          <div class="flex-1">
-            <div class="h-4 rounded w-2/3 bg-stone-100" />
-            <div class="h-3 rounded w-1/3 mt-1.5 bg-stone-100" />
-          </div>
-        </div>
-      </div>
+      <!-- 2-row skeleton when adding a page (S2b spec) — same row as TenantCard above -->
+      <AppLoader
+        v-if="loadingMore"
+        variant="mall"
+        layout="tenant-list"
+        :count="2"
+      />
       <!-- Infinity scroll sentinel -->
       <div
         v-if="hasMore"

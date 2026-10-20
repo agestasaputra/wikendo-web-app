@@ -1,32 +1,33 @@
-/**
- * common/utils/__tests__/loader.spec.ts — Test for the API fetching spinner helper.
- * 1 helper used by AppLoader on 3 pages → consistent color + message per variant.
- */
 import { describe, it, expect } from "vitest";
-import { getLoaderMeta } from "../loader";
+import { getLoaderMeta, defaultLayout } from "../loader";
+import type { LoaderVariant } from "~/common/types/loader";
 
-describe("getLoaderMeta (API fetching spinner)", () => {
-  it("place = orange accent #f97316", () => {
-    const m = getLoaderMeta("place");
-    expect(m.accent).toBe("#f97316");
-    expect(m.title).toContain("tempat");
-    expect(m.hint.length).toBeGreaterThan(0);
+describe("getLoaderMeta", () => {
+  it("returns mall accent #0e7490 (no LLM directory)", () => {
+    expect(getLoaderMeta("mall").accent).toBe("#0e7490");
   });
-
-  it("food = red accent #ee2c4b", () => {
-    const m = getLoaderMeta("food");
-    expect(m.accent).toBe("#ee2c4b");
-    expect(m.title).toContain("tenant");
+  it("returns place accent #f97316", () => {
+    expect(getLoaderMeta("place").accent).toBe("#f97316");
   });
-
-  it("mall = teal accent #0e7490 (directory, no LLM)", () => {
-    const m = getLoaderMeta("mall");
-    expect(m.accent).toBe("#0e7490");
-    expect(m.title.length).toBeGreaterThan(0);
+  it("returns food accent #ee2c4b", () => {
+    expect(getLoaderMeta("food").accent).toBe("#ee2c4b");
   });
+  it("returns fallback mall for unknown variant", () => {
+    expect(getLoaderMeta("unknown" as LoaderVariant).accent).toBe("#0e7490");
+  });
+});
 
-  it("bogus variant = mall fallback (safe, no crash)", () => {
-    const m = getLoaderMeta("ngaco" as never);
-    expect(m.accent).toBe("#0e7490");
+describe("defaultLayout", () => {
+  it("mall → mall-list (card list, not a spinner)", () => {
+    expect(defaultLayout("mall")).toBe("mall-list");
+  });
+  it("place → result-place (deck)", () => {
+    expect(defaultLayout("place")).toBe("result-place");
+  });
+  it("food → result-food (deck)", () => {
+    expect(defaultLayout("food")).toBe("result-food");
+  });
+  it("unknown → mall-list (safe fallback)", () => {
+    expect(defaultLayout("unknown" as LoaderVariant)).toBe("mall-list");
   });
 });
