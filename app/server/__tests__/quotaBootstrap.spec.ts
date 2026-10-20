@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { readSource } from "~/test/utils";
+import { readCode } from "~/test/utils";
 
 /**
  * quotaBootstrap.spec.ts — RED test (TDD) for the LOGGED-IN quota bootstrap contract.
@@ -13,9 +13,9 @@ import { readSource } from "~/test/utils";
  *   `result?.allowed ?? false` = false → 403 LOGIN_REQUIRED on the very first logged-in quiz.
  * EXAMPLE: logged-in place recommend -> initialize_new_user (idempotent) -> quota increment works.
  */
-const PLACE = readSource("server/api/place/recommend.post.ts");
-const FOOD = readSource("server/api/food/recommend.post.ts");
-const QUOTA = readSource("server/api/quota.get.ts");
+const PLACE = readCode("server/api/place/recommend.post.ts");
+const FOOD = readCode("server/api/food/recommend.post.ts");
+const QUOTA = readCode("server/api/quota.get.ts");
 
 describe("place recommend bootstraps the quota row before incrementing", () => {
   it("calls initialize_new_user for the logged-in user (idempotent, ON CONFLICT DO NOTHING)", () => {
@@ -57,18 +57,25 @@ describe("food recommend uses a WIB date + composite upsert (user_id, date)", ()
 
 describe("food quota is only consumed by a SUCCESSFUL generate", () => {
   it("generates candidates BEFORE incrementing (a 404 'no tenant' must not burn a slot)", () => {
-    const genAt = FOOD.indexOf("await fetchFoodCandidates");
-    const incAt = FOOD.indexOf("upsert");
-    expect(genAt).toBeGreaterThan(-1);
+    // Candidates + ranking moved into rank(); the handler must CALL it before consumeSlot().
+    const rankAt = FOOD.indexOf("await rank(db, body)");
+    const incAt = FOOD.indexOf("await consumeSlot(");
+    expect(rankAt).toBeGreaterThan(-1);
     expect(incAt).toBeGreaterThan(-1);
-    expect(genAt).toBeLessThan(incAt);
+    expect(rankAt).toBeLessThan(incAt);
+    // and rank() really fetches candidates + asks the LLM, in that order
+    const RANKER = readCode("server/utils/foodCandidates.ts");
+    expect(RANKER).toContain("fetchFoodCandidates");
   });
 
   it("ranks BEFORE incrementing too (an LLM failure must not burn a slot)", () => {
-    const rankAt = FOOD.indexOf("await rankTenants");
-    const incAt = FOOD.indexOf("upsert");
-    expect(rankAt).toBeGreaterThan(-1);
-    expect(rankAt).toBeLessThan(incAt);
+    const rankFn = FOOD.slice(FOOD.indexOf("async function rank"));
+    expect(rankFn.indexOf("fetchFoodCandidates")).toBeLessThan(
+      rankFn.indexOf("rankTenants"),
+    );
+    expect(FOOD.indexOf("await rank(db, body)")).toBeLessThan(
+      FOOD.indexOf("await consumeSlot("),
+    );
   });
 });
 

@@ -1,198 +1,191 @@
 /**
- * POST /api/food/recommend — Generate 5 TENANT recommendations (Mall mode).
- * Body: QuizFoodInput (mall_slug, mission, budget_tier, companion, halal_only?, kids_friendly?).
- * Kuota member disimpan di `mall_search_quota` (5/hari, PK user_id+date). Untuk anonim kuota
- * dihitung di SERVER dari ledger `generations` (session_id httpOnly + IP soft cap) — cookie
- * lama `food_quota_used` sudah tidak dipakai lagi dan tidak pernah ditulis.
+ * POST /api/food/recommend — generate 5 TENANT recommendations (Mall mode).
+ *
+ * WHAT: gate (member 5/day in `mall_search_quota`, or the anonymous trial) → fetch candidate
+ *   tenants → rank them with the LLM → store the deck → return deck + id + quota numbers.
+ * WHY the quota is consumed AFTER a successful generate: a 404 ("no tenants match") or an LLM
+ *   error must not burn a slot the user never received value for.
+ * WHY the date is WIB and the upsert declares the composite PK: the row is keyed
+ *   (user_id, date); reading without pinning today breaks `.single()` on day 2, and `.eq()`
+ *   after `upsert()` is silently invalid on a write query.
+ * EXAMPLE: POST { mall_slug, mission, budget_tier, companion } → { id, recommendations: [5] }.
  */
-import type { QuizFoodInput } from "../../../common/types/api";
+import type {
+  QuizFoodInput,
+  RecommendationResponse,
+  TenantRecommendation,
+} from "../../../common/types/api";
+import { createError, readBody, type H3Event } from "h3";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { supabaseAdmin } from "../../utils/db";
+import { getOptionalUserId } from "../../utils/requireUser";
+import { ensureSessionId } from "../../utils/sessionId";
+import { claimAnonRows } from "../../utils/claimAnonRows";
+import { todayWIB } from "../../utils/voucherClaim";
+import { MEMBER_FOOD_LIMIT } from "../../../common/constants/quota";
+import { ANON_FOOD_LIMIT, remainingFor } from "../../utils/anonQuotaPolicy";
+import { anonGate } from "../../utils/anonGate";
+import { recordAnonGeneration } from "../../utils/anonQuotaStore";
+import { insertGeneration } from "../../utils/insertGeneration";
 import {
   fetchFoodCandidates,
   pickCandidate,
   toTenantRecommendation,
 } from "../../utils/foodCandidates";
-import { readBody, getRequestIP, createError } from "h3";
-import { extractAccessToken } from "../../utils/authToken";
-import { ensureSessionId } from "../../utils/sessionId";
-import { claimAnonRows } from "../../utils/claimAnonRows";
-import { todayWIB } from "../../utils/voucherClaim";
-import {
-  ANON_FOOD_LIMIT,
-  canUse,
-  hashIp,
-  ipSalt,
-  loginWallMessage,
-  remainingFor,
-} from "../../utils/anonQuotaPolicy";
-import {
-  getAnonUsage,
-  recordAnonGeneration,
-  wibDay,
-} from "../../utils/anonQuotaStore";
 
-/* eslint-disable max-lines-per-function, complexity */
-const LOGGED_IN_FOOD_LIMIT = 5;
-
-export default defineEventHandler(async (event) => {
-  const body = await readBody<QuizFoodInput>(event);
-  const sessionId = ensureSessionId(event);
-
-  // ---- Detect login (Bearer first — the browser client has no auth cookie) ----
-  const token = extractAccessToken(event);
-  const { data: authData, error: authErr } = token
-    ? await supabaseAdmin().auth.getUser(token)
-    : { data: null, error: null };
-  const userId = !authErr && authData?.user ? authData.user.id : null;
-
-  // ---- Logged-in flow (DB quota) ----
-  if (userId) {
-    const db = supabaseAdmin();
-    // Bootstrap the profile + today's quota row (idempotent; no trigger on auth.users).
-    const { error: bootErr } = await db.rpc("initialize_new_user", {
-      p_user_id: userId,
-    });
-    if (bootErr) {
-      throw createError({
-        statusCode: 500,
-        statusMessage: "FOOD_QUOTA_BOOTSTRAP_ERROR",
-        data: { message: bootErr.message },
-      });
-    }
-
-    // The PK is (user_id, date) → every read MUST pin today's date or `.single()`
-    // breaks as soon as yesterday's row still exists. Date is WIB (browser + users are GMT+7).
-    const today = todayWIB();
-    const { data: quotaRow, error: fetchErr } = await db
-      .from("mall_search_quota")
-      .select("used")
-      .eq("user_id", userId)
-      .eq("date", today)
-      .maybeSingle();
-    if (fetchErr) {
-      throw createError({
-        statusCode: 500,
-        statusMessage: "FOOD_QUOTA_CHECK_ERROR",
-        data: { message: fetchErr.message },
-      });
-    }
-    const used = quotaRow?.used ?? 0;
-    if (used >= LOGGED_IN_FOOD_LIMIT) {
-      // Already logged in → no "login" upsell, just an honest reset time.
-      throw createError({
-        statusCode: 403,
-        statusMessage: "FOOD_QUOTA_EXCEEDED",
-        data: {
-          message:
-            "Kuota makan kamu habis hari ini — reset jam 00.00 WIB ya. " +
-            "Cari tempat tetap bisa (2/hari).",
-        },
-      });
-    }
-
-    // ---- Generate FIRST: a failed generate (404 no tenant, LLM error) must not burn a slot ----
-    const candidates = await fetchFoodCandidates(db, body);
-    const { rankTenants } = await import("../../utils/llm");
-    const ranking = await rankTenants(body, candidates);
-    const recommendations = ranking.map((r) =>
-      toTenantRecommendation(
-        pickCandidate(candidates, r.name),
-        r.reason,
-        body.mall_slug,
-      ),
-    );
-
-    // Generate succeeded → consume the slot now. Re-read so the number stays honest if
-    // another tab incremented meanwhile (`upsert` MUST declare the composite PK; chaining
-    // `.eq()` after `upsert` — the old code — is invalid on a write query).
-    const { data: fresh } = await db
-      .from("mall_search_quota")
-      .select("used")
-      .eq("user_id", userId)
-      .eq("date", today)
-      .maybeSingle();
-    const usedNow = fresh?.used ?? used;
-    const { error: upErr } = await db
-      .from("mall_search_quota")
-      .upsert(
-        { user_id: userId, date: today, used: usedNow + 1 },
-        { onConflict: "user_id,date" },
-      );
-    if (upErr) {
-      throw createError({
-        statusCode: 500,
-        statusMessage: "FOOD_QUOTA_UPDATE_ERROR",
-        data: { message: upErr.message },
-      });
-    }
-
-    const { data: saved, error: saveErr } = await db
-      .from("generations")
-      .insert({
-        session_id: sessionId,
-        user_id: userId,
-        quiz_input: { ...body, type: "food" },
-        recommendations,
-      })
-      .select("id")
-      .single();
-    if (saveErr) console.error("food recommend: save failed", saveErr.message);
-    // Adopt rows this browser generated while anonymous (quiz first, login at the quota wall).
-    await claimAnonRows(db, sessionId, userId);
-    return {
-      id: saved?.id,
-      recommendations,
-      quota_remaining: LOGGED_IN_FOOD_LIMIT - (usedNow + 1),
-      quota_limit: LOGGED_IN_FOOD_LIMIT,
-      is_logged_in: true,
-    };
-  }
-
-  /** Anonymous flow: quota is decided on the SERVER (httpOnly session_id + IP soft cap). */
-  const db = supabaseAdmin();
-  const ipHash = hashIp(
-    getRequestIP(event, { xForwardedFor: true }) || "unknown",
-    ipSalt(wibDay()),
-  );
-  const usage = await getAnonUsage(db, sessionId, ipHash);
-  if (!canUse("food", usage)) {
+/** Read today's slot usage for a member (missing row = 0). */
+async function readUsed(db: SupabaseClient, userId: string): Promise<number> {
+  const { data, error } = await db
+    .from("mall_search_quota")
+    .select("used")
+    .eq("user_id", userId)
+    .eq("date", todayWIB())
+    .maybeSingle();
+  if (error) {
     throw createError({
-      statusCode: 403,
-      statusMessage: "LOGIN_REQUIRED",
-      data: { message: loginWallMessage(), login_cta: true },
+      statusCode: 500,
+      statusMessage: "FOOD_QUOTA_CHECK_ERROR",
+      data: { message: error.message },
     });
   }
+  return data?.used ?? 0;
+}
 
+/** Take one member slot (composite-PK upsert). Returns the new used count. */
+async function consumeSlot(
+  db: SupabaseClient,
+  userId: string,
+): Promise<number> {
+  // Re-read so the number stays honest when another tab incremented meanwhile.
+  const usedNow = await readUsed(db, userId);
+  const { error } = await db
+    .from("mall_search_quota")
+    .upsert(
+      { user_id: userId, date: todayWIB(), used: usedNow + 1 },
+      { onConflict: "user_id,date" },
+    );
+  if (error) {
+    throw createError({
+      statusCode: 500,
+      statusMessage: "FOOD_QUOTA_UPDATE_ERROR",
+      data: { message: error.message },
+    });
+  }
+  return usedNow + 1;
+}
+
+/** Candidates → LLM ranking → renderable recommendations (shared by both branches). */
+async function rank(
+  db: SupabaseClient,
+  body: QuizFoodInput,
+): Promise<ReturnType<typeof toTenantRecommendation>[]> {
   const candidates = await fetchFoodCandidates(db, body);
   const { rankTenants } = await import("../../utils/llm");
   const ranking = await rankTenants(body, candidates);
-  const recommendations = ranking.map((r) =>
+  return ranking.map((r) =>
     toTenantRecommendation(
       pickCandidate(candidates, r.name),
       r.reason,
       body.mall_slug,
     ),
   );
+}
 
-  const { data: saved, error: saveErr } = await db
-    .from("generations")
-    .insert({
-      session_id: sessionId,
-      user_id: null,
-      quiz_input: { ...body, type: "food" },
-      recommendations,
-    })
-    .select("id")
-    .single();
-  if (saveErr) console.error("food recommend: save failed", saveErr.message);
-  await recordAnonGeneration(db, { sessionId, ipHash, kind: "food" });
-  // No client-readable quota cookie: the counter is derived from the row above.
+/**
+ * Bootstrap the profile + today's quota row, then enforce the member wall.
+ * WHY a helper: the handler reads as the happy path; the two failure modes (500 bootstrap,
+ * 403 wall) are one concern and live together.
+ */
+async function assertMemberQuota(
+  db: SupabaseClient,
+  userId: string,
+): Promise<void> {
+  // Idempotent; there is no trigger on auth.users to create the quota rows.
+  const { error: bootErr } = await db.rpc("initialize_new_user", {
+    p_user_id: userId,
+  });
+  if (bootErr) {
+    throw createError({
+      statusCode: 500,
+      statusMessage: "FOOD_QUOTA_BOOTSTRAP_ERROR",
+      data: { message: bootErr.message },
+    });
+  }
+
+  if ((await readUsed(db, userId)) >= MEMBER_FOOD_LIMIT) {
+    // Already logged in → no "login" upsell, just an honest reset time.
+    throw createError({
+      statusCode: 403,
+      statusMessage: "FOOD_QUOTA_EXCEEDED",
+      data: {
+        message:
+          "Kuota makan kamu habis hari ini — reset jam 00.00 WIB ya. " +
+          "Cari tempat tetap bisa (2/hari).",
+      },
+    });
+  }
+}
+
+/** Logged-in branch: check the wall, generate, then consume the slot. */
+async function memberRecommend(
+  event: H3Event,
+  userId: string,
+): Promise<RecommendationResponse<TenantRecommendation>> {
+  const body = await readBody<QuizFoodInput>(event);
+  const db = supabaseAdmin();
+  const sessionId = ensureSessionId(event);
+
+  await assertMemberQuota(db, userId);
+
+  const recommendations = await rank(db, body);
+  // Generate succeeded → this request earned its slot.
+  const used = await consumeSlot(db, userId);
+  await claimAnonRows(db, sessionId, userId);
+  const id = await insertGeneration(db, {
+    sessionId,
+    userId,
+    kind: "food",
+    body,
+    recommendations,
+  });
 
   return {
-    id: saved?.id,
+    id,
+    recommendations,
+    quota_remaining: Math.max(0, MEMBER_FOOD_LIMIT - used),
+    quota_limit: MEMBER_FOOD_LIMIT,
+    is_logged_in: true,
+  };
+}
+
+/** Anonymous branch: server-side trial, generate, persist, record the IP soft cap. */
+async function anonRecommend(
+  event: H3Event,
+): Promise<RecommendationResponse<TenantRecommendation>> {
+  const body = await readBody<QuizFoodInput>(event);
+  const db = supabaseAdmin();
+  const { usage, ipHash, sessionId } = await anonGate(event, db, "food");
+
+  const recommendations = await rank(db, body);
+  const id = await insertGeneration(db, {
+    sessionId,
+    userId: null,
+    kind: "food",
+    body,
+    recommendations,
+  });
+  await recordAnonGeneration(db, { sessionId, ipHash, kind: "food" });
+
+  return {
+    id,
     recommendations,
     quota_remaining: Math.max(0, remainingFor("food", usage) - 1),
     quota_limit: ANON_FOOD_LIMIT,
     is_logged_in: false,
   };
+}
+
+export default defineEventHandler(async (event) => {
+  const userId = await getOptionalUserId(event);
+  return userId ? memberRecommend(event, userId) : anonRecommend(event);
 });

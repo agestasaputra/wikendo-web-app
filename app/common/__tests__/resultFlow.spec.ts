@@ -12,13 +12,13 @@
  * EXAMPLE: /result-place?id=0f8fad5b-… → GET /api/result/0f8fad5b-… → deck, quota untouched.
  */
 import { describe, it, expect } from "vitest";
-import { readSource, sourceExists } from "~/test/utils";
+import { readCode, readSource, sourceExists } from "~/test/utils";
 
 const ENDPOINT = sourceExists("server/api/result/[id].get.ts")
   ? readSource("server/api/result/[id].get.ts")
   : "";
-const PLACE_POST = readSource("server/api/place/recommend.post.ts");
-const FOOD_POST = readSource("server/api/food/recommend.post.ts");
+const PLACE_POST = readCode("server/api/place/recommend.post.ts");
+const FOOD_POST = readCode("server/api/food/recommend.post.ts");
 const PLACE_PAGE = readSource("features/place/PlaceResultPage.vue");
 const FOOD_PAGE = readSource("features/food/FoodResultPage.vue");
 const HISTORY = readSource("features/history/HistoryPage.vue");
@@ -59,18 +59,22 @@ describe("GET /api/result/[id] — reading a stored result is free", () => {
 });
 
 describe("POST recommend returns the stored id", () => {
-  it("place inserts and reads the id back", () => {
-    expect(PLACE_POST).toMatch(
-      /\.insert\([\s\S]{0,400}?\.select\(\s*["']id["']\s*\)/,
-    );
-    expect(PLACE_POST).toMatch(/id:\s*(row|saved|inserted)/);
+  it("both endpoints delegate the save to insertGeneration", () => {
+    expect(PLACE_POST).toContain("insertGeneration(");
+    expect(FOOD_POST).toContain("insertGeneration(");
+    // ...and carry the id into the response under `id`
+    expect(PLACE_POST).toMatch(/return\s*\{[\s\S]{0,200}?id,/);
+    expect(FOOD_POST).toMatch(/return\s*\{[\s\S]{0,200}?id,/);
   });
 
-  it("food inserts and reads the id back", () => {
-    expect(FOOD_POST).toMatch(
+  it("insertGeneration is the ONE place that inserts + reads the id back", () => {
+    const HELPER = readCode("server/utils/insertGeneration.ts");
+    expect(HELPER).toMatch(
       /\.insert\([\s\S]{0,400}?\.select\(\s*["']id["']\s*\)/,
     );
-    expect(FOOD_POST).toMatch(/id:\s*(row|saved|inserted)/);
+    expect(HELPER).toContain("quiz_input");
+    // the kind discriminator must be stamped, or history/anon counting can't see the row
+    expect(HELPER).toMatch(/personality|type:\s*input\.kind/);
   });
 });
 

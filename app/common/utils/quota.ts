@@ -15,11 +15,24 @@ import type {
   WalletLabel,
 } from "../types/quota";
 
-/** Per-type limits that mirror server/utils/anonQuotaPolicy (kept in sync by a unit test). */
-export const ANON_PLACE_LIMIT = 1;
-export const ANON_FOOD_LIMIT = 1;
-export const MEMBER_PLACE_LIMIT = 2;
-export const MEMBER_FOOD_LIMIT = 5;
+/**
+ * Limits come from the ONE owner (`common/constants/quota.ts`) that the server gate also
+ * imports — a wallet can no longer advertise a number the gate does not enforce.
+ * Re-exported because this module is the historical import site for the wallet.
+ */
+import {
+  ANON_FOOD_LIMIT,
+  ANON_PLACE_LIMIT,
+  MEMBER_FOOD_LIMIT,
+  MEMBER_PLACE_LIMIT,
+} from "../constants/quota";
+
+export {
+  ANON_FOOD_LIMIT,
+  ANON_PLACE_LIMIT,
+  MEMBER_FOOD_LIMIT,
+  MEMBER_PLACE_LIMIT,
+};
 
 /** Slots left (never negative — a stale counter must not render "-1"). */
 function left(limit: number, used: number): number {

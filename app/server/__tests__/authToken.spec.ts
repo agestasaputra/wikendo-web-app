@@ -11,13 +11,13 @@
  * EXAMPLE: extractAccessToken(event) → bearer header, else the legacy cookie, else "".
  */
 import { describe, it, expect } from "vitest";
-import { readSource, sourceExists } from "~/test/utils";
+import { readCode, readSource, sourceExists } from "~/test/utils";
 
 const TOKEN = readSource("server/utils/authToken.ts");
 const SESSION = readSource("server/utils/sessionId.ts");
 
 /** Files that resolve a Supabase user from an incoming request. */
-const ROUTES = readSource(
+const ROUTES = readCode(
   "server/api/history.get.ts",
   "server/api/quota.get.ts",
   "server/api/place/recommend.post.ts",
@@ -60,10 +60,18 @@ describe("every authenticated route uses the shared helpers", () => {
     );
   });
 
-  it("history + quota + place + food all call extractAccessToken", () => {
-    const count = ROUTES.split("extractAccessToken").length - 1;
-    // 4 imports/uses minimum (one per route)
+  it("history + quota + place + food all resolve the user through the shared helper", () => {
+    // SOC: routes no longer call extractAccessToken themselves — the token→user step lives in
+    // requireUser.ts. Each route must DELEGATE (getOptionalUserId | requireAuthUser).
+    const count =
+      ROUTES.split("getOptionalUserId").length -
+      1 +
+      (ROUTES.split("requireAuthUser").length - 1);
     expect(count).toBeGreaterThanOrEqual(4);
+    // ...and the helper is the only place that reads the header + calls auth.getUser
+    const HELPER = readCode("server/utils/requireUser.ts");
+    expect(HELPER).toContain("extractAccessToken");
+    expect(HELPER).toContain("getUser");
   });
 
   it("both quiz endpoints call ensureSessionId (anon rows claimable)", () => {

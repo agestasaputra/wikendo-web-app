@@ -15,12 +15,16 @@
  * EXAMPLE: canUse("food", { place: 1, food: 0, ipTotal: 1 }) → true (1 of 2 used).
  */
 import { createHash } from "node:crypto";
+import {
+  ANON_FOOD_LIMIT,
+  ANON_PLACE_LIMIT,
+  FREE_TRIAL_TOTAL,
+} from "../../common/constants/quota";
 
-/** Per-type hard caps for a single browser (device). */
-export const ANON_PLACE_LIMIT = 1;
-export const ANON_FOOD_LIMIT = 1;
-/** Total free generations per device per WIB day — the headline number in the UI. */
-export const FREE_TRIAL_TOTAL = 2;
+// Re-exported so the gate and its callers keep one import site, while the NUMBER itself
+// has exactly one owner (common/constants/quota.ts) shared with the browser wallet.
+export { ANON_FOOD_LIMIT, ANON_PLACE_LIMIT, FREE_TRIAL_TOTAL };
+
 /** An IP may serve up to N devices' worth of free trials (CGNAT/hotspot safe). */
 export const IP_MULTIPLIER = 25;
 
@@ -84,8 +88,8 @@ export function loginWallMessage(): string {
   );
 }
 
-/** Short label for chips ("2 gratis"). */
-export const FREE_TRIAL_LABEL = `${FREE_TRIAL_TOTAL} gratis`;
+/** Short label for chips ("2 gratis") — re-exported from the single owner. */
+export { FREE_TRIAL_LABEL } from "../../common/constants/quota";
 
 /** Salted SHA-256 of an IP — 64 hex chars, stable per salt, never reversible to the IP. */
 export function hashIp(ip: string, salt: string): string {

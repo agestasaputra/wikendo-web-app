@@ -14,7 +14,7 @@
  *      IP-hash SOFT cap from `analytics_events`.
  *   3. Both recommend endpoints import the gate and set NO client-readable quota cookies.
  */
-import { readSource } from "~/test/utils";
+import { readCode, readSource } from "~/test/utils";
 import { describe, expect, it } from "vitest";
 
 const FREE_TRIAL_TOTAL = 2;
@@ -142,26 +142,33 @@ describe("anon quota store reads the existing ledger (no DDL needed)", () => {
 });
 
 describe("recommend endpoints use the server gate, not client cookies", () => {
-  it("place/recommend gates anon via anonQuotaStore + sets no quota cookie", () => {
-    const src = readSource("server/api/place/recommend.post.ts");
-    expect(src).toContain("getAnonUsage");
-    expect(src).toContain("anonQuotaPolicy");
+  it("place/recommend gates anon via the shared anonGate + sets no quota cookie", () => {
+    const src = readCode("server/api/place/recommend.post.ts");
+    // The gate itself (usage read + policy) lives in anonGate — the endpoint must DELEGATE,
+    // not re-implement. Asserting the helper's own imports keeps the policy single-sourced.
+    expect(src).toContain("anonGate(");
     expect(src).not.toMatch(/setCookie\([^)]*"quota_used"/);
     // the response must carry the real limit so the UI never hardcodes "1/1"
     expect(src).toContain("quota_limit");
   });
 
-  it("food/recommend gates anon via anonQuotaStore + sets no quota cookie", () => {
-    const src = readSource("server/api/food/recommend.post.ts");
-    expect(src).toContain("getAnonUsage");
-    expect(src).toContain("anonQuotaPolicy");
+  it("the gate is the ONE place that reads usage and applies the policy", () => {
+    const gate = readCode("server/utils/anonGate.ts");
+    expect(gate).toContain("getAnonUsage");
+    expect(gate).toContain("canUse");
+    expect(gate).toContain("loginWallMessage");
+  });
+
+  it("food/recommend gates anon via the shared anonGate + sets no quota cookie", () => {
+    const src = readCode("server/api/food/recommend.post.ts");
+    expect(src).toContain("anonGate(");
     expect(src).not.toMatch(/setCookie\([^)]*"food_quota_used"/);
     expect(src).not.toMatch(/ANON_FOOD_LIMIT\s*=\s*2/);
     expect(src).toContain("quota_limit");
   });
 
   it("quota.get reports anon usage from the server, not cookies", () => {
-    const src = readSource("server/api/quota.get.ts");
+    const src = readCode("server/api/quota.get.ts");
     expect(src).not.toMatch(/parseAnonPlaceUsed|parseAnonFoodUsed/);
     expect(src).toContain("getAnonUsage");
     expect(src).toContain("ensureSessionId");

@@ -1,64 +1,63 @@
-import { defineEventHandler, getQuery, createError, getCookie } from "h3";
+/**
+ * GET /api/history — this user's generation history, newest first, paginated.
+ *
+ * WHAT: 401 wall → clamp page/pageSize → read `generations` for (user_id) OR (this browser's
+ *   session_id) → { items, pagination }.
+ * WHY the session_id OR: rows created before login are still owned by nobody; the browser that
+ *   made them must keep seeing them until `POST /api/history/claim` adopts them.
+ * WHY the pageSize clamp: `?pageSize=100000` would be a free full-table dump of the deck text.
+ * EXAMPLE: /api/history?page=1&pageSize=10 + Bearer → { items: [...], pagination: {...} }.
+ */
+import { defineEventHandler, getQuery, getCookie, createError } from "h3";
 import { supabaseAdmin } from "../utils/db";
-import { extractAccessToken } from "../utils/authToken";
+import { requireAuthUser } from "../utils/requireUser";
 
-/* eslint-disable max-lines-per-function, complexity */
+const DEFAULT_PAGE_SIZE = 10;
+/** Hard cap: one page can never request the whole table. */
+const MAX_PAGE_SIZE = 50;
+
+/** `?page&pageSize` → safe positive numbers (garbage → defaults, never NaN). */
+function readPaging(query: Record<string, unknown>): {
+  page: number;
+  pageSize: number;
+  offset: number;
+} {
+  const page = Math.max(1, Number(query.page) || 1);
+  const pageSize = Math.min(
+    MAX_PAGE_SIZE,
+    Math.max(1, Number(query.pageSize) || DEFAULT_PAGE_SIZE),
+  );
+  return { page, pageSize, offset: (page - 1) * pageSize };
+}
+
 export default defineEventHandler(async (event) => {
-  // Auth: Authorization: Bearer (primary — the browser session lives in localStorage, NOT a
-  // cookie) + legacy `sb-access-token` cookie fallback (SSR / old sessions).
-  const accessToken = extractAccessToken(event);
-  if (!accessToken) {
-    throw createError({
-      statusCode: 401,
-      statusMessage: "LOGIN_REQUIRED",
-      data: { message: "Login required to view history" },
-    });
-  }
+  const userId = await requireAuthUser(event, "Login required to view history");
+  const { page, pageSize, offset } = readPaging(
+    getQuery(event) as Record<string, unknown>,
+  );
 
-  const { data: authData, error: authErr } =
-    await supabaseAdmin().auth.getUser(accessToken);
-  if (authErr || !authData?.user) {
-    throw createError({
-      statusCode: 401,
-      statusMessage: "LOGIN_REQUIRED",
-      data: { message: "Invalid session. Please login again." },
-    });
-  }
-  const userId = authData.user.id;
-
-  // Pagination – defaults 1 / 10, clamp pageSize 1..50
-  const { page = "1", pageSize = "10" } = getQuery(event);
-  const p = Math.max(1, Number(page) || 1);
-  const ps = Math.min(50, Math.max(1, Number(pageSize) || 10));
-  const offset = (p - 1) * ps;
-
+  // Anonymous rows made by THIS browser are visible until they are claimed.
   const sessionId = getCookie(event, "session_id") || "";
-  const db = supabaseAdmin();
-  // Logged-in: user_id match + anon rows on same browser (session_id) for claim
-  const filters: string[] = [`user_id.eq.${userId}`];
+  const filters = [`user_id.eq.${userId}`];
   if (sessionId) filters.push(`session_id.eq.${sessionId}`);
 
-  const {
-    data,
-    error: dbError,
-    count,
-  } = await db
+  const { data, error, count } = await supabaseAdmin()
     .from("generations")
     .select("*", { count: "exact" })
     .or(filters.join(","))
     .order("created_at", { ascending: false })
-    .range(offset, offset + ps - 1);
+    .range(offset, offset + pageSize - 1);
 
-  if (dbError) {
+  if (error) {
     throw createError({
       statusCode: 500,
       statusMessage: "DB_ERROR",
-      data: { message: dbError.message },
+      data: { message: error.message },
     });
   }
 
   return {
     items: data ?? [],
-    pagination: { page: p, pageSize: ps, total: count ?? 0 },
+    pagination: { page, pageSize, total: count ?? 0 },
   };
 });

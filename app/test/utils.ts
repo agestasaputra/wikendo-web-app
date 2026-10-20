@@ -49,3 +49,26 @@ export function rootTag(raw: string): string {
   const tagEnd = raw.indexOf(">", tagStart);
   return raw.slice(tagStart, tagEnd + 1);
 }
+
+/**
+ * Strip comments so structural asserts test CODE, not prose.
+ * WHY: a file-assert like `indexOf("check_and_increment_quota")` used to match the header
+ *   comment first, so the assertion silently compared comment offsets. Renaming/moving code
+ *   while the doc still mentioned it kept the test green — a false pass.
+ * WHY it must run on the RAW text: `readSource` collapses newlines into spaces, so
+ *   `//[^\n]*` would swallow the whole rest of the file (the "code" would be empty).
+ */
+export function stripComments(raw: string): string {
+  return raw
+    .replace(/\/\*[\s\S]*?\*\//g, " ")
+    .replace(/(^|[^:])\/\/[^\n]*/g, "$1 ");
+}
+
+/** Same as readSource(), but comments removed (for order/structure asserts). */
+export function readCode(...rels: string[]): string {
+  return rels
+    .map((rel) =>
+      normalizeSource(stripComments(fs.readFileSync(fromRoot(rel), "utf-8"))),
+    )
+    .join("\n");
+}
