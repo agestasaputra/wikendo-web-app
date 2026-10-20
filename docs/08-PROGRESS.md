@@ -1074,3 +1074,12 @@
 - **Done:** Agesta ran the full file in the Dashboard (the AI only fixed the semicolon on line 30).
 - **Verification (real Agesta output):** `vouchers → 3` ✅ (WKD-7X2K9A/4Y5B3C/L8M2N1) + `voucher_claims → 0` ✅ (expected: empty table, no user has claimed yet — not an error).
 - **Next:** "gas fix V13" — AI backend slice (align claim.post.ts to the real schema) + V13A/B/C UI → TDD GREEN → push → auto-deploy → re-audit 200/401/409/429.
+
+## 2026-10-20 — Voucher claim v13D FINAL ✅ (hero diskon asli, link +N dinamis, klaim lokal) — commit `0af0ed2` pushed → Vercel auto-deploy
+
+- **Why:** Hero banner hard-coded `-20%` untuk semua tenant → user di mall tanpa promo pun lihat diskon claimable; link "+2 promo lain" statis; `claimed` string menyebabkan type-check gagal; `Authorization` header salah format.
+- **Done:** `pickHeroOffer` & `promoLinkLabel` + `otherOffers` di `voucherOffers.ts`; `heroDiscount`/`heroCountdown`/`otherOfferList`/`promoLink`/`sheetOffers` computed di `FoodResultPage.vue`; `claimedRows` lokal; `VoucherStore` Authorization Bearer; VoucherSheet header fix; test disesuaikan; lint+prettier+type-check+test 498/498.
+- **Files:** `app/features/food/{FoodResultPage.vue,components/VoucherSheet.vue,utils/voucherOffers.ts,utils/__tests__/voucherOffers.spec.ts,__tests__/FoodResultPage.spec.ts,store/VoucherStore.ts}`.
+- **Verification:** `pnpm lint` 0 · `pnpm type-check` 0 · `pnpm test` 64/64 (498) ✅ · prod API `/api/vouchers?mall_slug=grand-indonesia` 200 (3 HokBen offers) ✅ · prod `/` 200.
+- **Commit:** `0af0ed2` — `fix(voucher): hero discount dinamis, link promo dinamis, klaim lokal`.
+- **Next:** monitor prod E2E claim flow + tambah test VoucherSheet UI.
