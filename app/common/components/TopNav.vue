@@ -83,10 +83,12 @@ async function handleLogout(): Promise<void> {
           <path d="M19 12H5M12 19l-7-7 7-7" />
         </svg>
       </button>
-      <!-- Page title: a <p> (not <h1>) so it never competes with the page's own <h1> for SEO/outline. -->
+      <!-- Page title: a <p> (not <h1>) so it never competes with the page's own <h1> for SEO/outline.
+           justify-self-center is REQUIRED: max-w-[220px] stops the grid's default stretch, and without it
+           the label would sit at the LEFT edge of the middle column (measured 575px vs bar centre 633px). -->
       <p
         v-if="title"
-        class="col-start-2 text-sm font-extrabold text-ink text-center truncate max-w-[220px]"
+        class="col-start-2 justify-self-center text-sm font-extrabold text-ink text-center truncate max-w-[220px]"
       >
         {{ title }}
       </p>

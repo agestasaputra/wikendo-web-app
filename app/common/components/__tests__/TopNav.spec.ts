@@ -96,6 +96,9 @@ describe("TopNav centre title (which page am I on?)", () => {
   it("the 3-slot grid keeps the title optically centred between back button and bell", () => {
     expect(HEADER).toMatch(/grid-cols-\[/);
     expect(HEADER).toContain("justify-self-end");
+    // Real bug caught in prod geometry: a grid item with max-w-[220px] stops the default stretch,
+    // so the label rendered at the column's LEFT edge (575px vs 633px bar centre). Centre it explicitly.
+    expect(HEADER).toContain("justify-self-center");
   });
 });
 
