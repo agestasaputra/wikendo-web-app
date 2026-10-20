@@ -44,9 +44,21 @@ describe("addHistoryEntry (prepend, dedupe, cap 20)", () => {
     expect(res.map((e) => e.title)).toEqual(["B", "A"]);
   });
 
-  it("same title → no duplicate (list unchanged)", () => {
-    const list = [entry("A")];
-    expect(addHistoryEntry(list, entry("A", 99))).toBe(list);
+  it("same title → one card, refreshed to the newest time", () => {
+    const list = [entry("A", 1)];
+    const res = addHistoryEntry(list, entry("A", 99));
+    expect(res).toHaveLength(1);
+    expect(res[0]?.at).toBe(99);
+  });
+
+  it("same deck id → list unchanged (same reference, no duplicate)", () => {
+    const id = "11111111-1111-4111-8111-111111111111";
+    const list: HistoryEntry[] = [
+      { kind: "place", id, title: "A", sub: "", at: 1 },
+    ];
+    expect(
+      addHistoryEntry(list, { kind: "place", id, title: "A", sub: "", at: 99 }),
+    ).toBe(list);
   });
 
   it("more than 20 → oldest entry dropped", () => {
