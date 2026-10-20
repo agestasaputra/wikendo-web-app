@@ -14,11 +14,7 @@
 
 ---
 
-## 📌 BOARD — position as of 20 Oct 2026 (Stored-result flow LIVE ✅ + history newest-deck-wins ✅ — tests 459/459 lint 0 build 10.3s, pushed d3b1fd6)
-
-### 🔥 NOW (in progress)
-
-- [ ] **Voucher claim P0** — endpoint `POST /api/voucher/claim` sudah 401-correct untuk anon; belum ada UI claim + state "sudah diklaim" (next up)
+## 📌 BOARD — position as of 20 Oct 2026 (Stored-result flow LIVE ✅ + history newest-deck-wins ✅ + one page canvas + one type ramp + coding principles as repo rule ✅ — tests 464/464 lint 0 build ok, pushed c31b2ea)
 
 ### 🔥 NOW (in progress)
 
@@ -116,6 +112,7 @@
 
 - [x] Stored-result flow DONE ✅ 20 Oct: 1 hasil = 1 URL `?id=<uuid>`; GET gratis (0 quota, 0 LLM), share kirim URL kanonik, history card clickable. Tests 451/451, lint 0, build 10.3s, prod audit green (`/api/result/<uuid>` 200, junk 400, share note OK) — commit `a64b82f` + `ed8a4fc`.
 - [x] History newest-deck-wins DONE ✅ 20 Oct: 1 kartu per tempat, kartu terbaru menggantikan kartu lama (bukan di-drop); merge server+device memilih deck terbaru & clickable. Tests 459/459, lint 0, build 10.3s, prod audit green — commit `d3b1fd6`.
+- [x] One page canvas + one type ramp + coding principles as repo rule DONE ✅ 20 Oct: kanvas `#F5F5F4` dipunya `app.vue` (PAGE_BG) untuk semua route termasuk footer; font-family dipusatkan di `tailwind.css`; 11 tempat background lokal + `pageBg` field dibersihkan; skeleton pakai `bg-stone-100`; prinsip koding (SOC/KISS/DRY/single responsibility/document) dikunci di `docs/26-Coding-Principles.md` + `AGENTS.md` + GLOSSARY. Tests 464/464, lint 0, build ok — commit `c31b2ea`.
 - [x] Supabase DB integration (DONE ✅ 8 Oct): project `wikendo-production` → run base + migration + seed 5×40 verified → local `.env` ✅ → 3 Vercel Production envs ✅ → prod `/api/malls` 200 (5 malls) + `/api/malls/grand-indonesia/tenants` 200 (40 tenants) ✅
 - [x] Addendum v1.3 Revamp+Auth APPROVED by Agesta 7 Oct 2026 — LOCKED (`docs/09-PRD-Addendum-Revamp-Combo-Auth.md` DRAFT → Approved) ✅
 - [x] Revamp combo 5+10+15 (`design/revamp-combo-5-10-15.html`) — 1 whole flow Home→Quiz→Result→Food→Voucher→Directory, visuals unified, waiting for Agesta's approval ✅
@@ -154,6 +151,17 @@
 - **Next:** Uji end-to-end dengan email aktif, kemudian tambahkan fitur lihat/ubah profil.
 
 ## 🧾 LOG (newest first)
+
+## 2026-10-20 — One page canvas + one type ramp + coding principles as repo rule DONE ✅ (Agesta directive: "termasuk footer memiliki background yang berbeda, tolong samakan seperti background home page" + "Tolong masukan rule prinsip koding ke docs repo wikendo")
+
+- **Why (canvas):** 11 tempat mendeklarasikan background kanvas sendiri — home `#F5F5F4`, auth `#f2f2f2`, history/account fallback `bg-base #fffdf9`, quiz/mall/legal hardcode `#f5f5f4`, skeleton bones hex. Konsekuensi: footer strip & area bawah halaman tampil band warna berbeda (terlihat di prod: home page `rgb(245,245,244)` vs history `rgba(0,0,0,0)` sebelum fix). Prinsip: SATU kanvas = SATU sumber kebenaran — layout (`app.vue`) yang mengecat, feature hanya mengisi konten. Pelanggaran SOC/DRY.
+- **Why (font):** 5 halaman auth masing-masing mengulang `font-family: "Plus Jakarta Sans"` inline → DRY violation. Dipindah ke `assets/css/tailwind.css` `@layer base body`.
+- **Done (canvas):** NEW `common/constants/theme.ts` (`PAGE_BG = "#F5F5F4"` + header WHAT/WHY/EXAMPLE) · `app.vue` import `PAGE_BG` dan mengecat kanvas global untuk semua route · hapus `:style`/`style` background dari `HomePage`, `PlaceResultPage`, `FoodResultPage`, `MallListPage`, `MallDetailPage`, `LegalPage`, `PlaceQuizPage`, `FoodQuizPage` · 5 auth pages dibersihkan · `pageBg` dihapus dari `HomeHeroMeta`/`ResultPlaceMeta`/`ResultFoodMeta` + meta utils + spec · skeleton bones mall pakai `bg-stone-100` (neutral token, bukan hex kanvas) · sticky header mall pakai `:style="{ background: PAGE_BG }"`.
+- **Done (font):** `assets/css/tailwind.css` ditambah `@layer base { body { font-family: "Plus Jakarta Sans", system-ui, sans-serif; } }` (3 direktif Tailwind tetap); 5 auth pages tidak lagi mengulang font-family.
+- **Done (principles):** NEW `docs/26-Coding-Principles.md` (SOC, KISS, DRY, single responsibility, document your code — +DoD + worked anti-patterns) · `AGENTS.md` step 0 "coding principles locked" + summary table + Definition of Done items · `docs/architecture/GLOSSARY.md` entri `PAGE_BG` + `Coding principles`.
+- **Verification:** `pnpm vitest run` **464/464 (62 files)** ✅ · `pnpm lint` 0 (Prettier bersih) ✅ · `pnpm build` ok ✅ · TDD `theme.spec.ts` baru (RED→GREEN: kontrak `PAGE_BG` + larangan background kanvas di root feature + larangan canvas hex di features + larangan field `pageBg` di `@types`) · auth specs disesuaikan (`not.toMatch(/background:/)` pada root tag + font owned globally) · prod audit: semua route (/, /history, /account, /mall, /privacy, /place, /food, /login, /register) kanvas `rgb(245,245,244)` ✅, footer `rgba(0,0,0,0)` menumpang kanvas ✅.
+- **Files:** `app/common/constants/theme.ts` (NEW) + `__tests__/theme.spec.ts` (NEW) + `app/app.vue` · `app/assets/css/tailwind.css` · `features/{home,place,food,mall,legal,auth}/*` · `features/{home,place,food}/utils/*Meta.ts` + `@types/*` · `features/{home,place,food}/utils/__tests__/*` · `features/auth/__tests__/*` · `test/utils.ts` (shared `rootTag`) · `docs/26-Coding-Principles.md` (NEW) · `AGENTS.md` · `docs/architecture/GLOSSARY.md` · `docs/08-PROGRESS.md`.
+- **Commit:** `c31b2ea` pushed → Vercel auto-deploy; `www.wikendo.id` kanvas seragam `#F5F5F4` di semua route termasuk footer ✅.
 
 ## 2026-10-20 — Stored-result flow DONE ✅ (1 hasil = 1 URL `?id=<uuid>`; refresh/share/history gratis, 0 quota 0 LLM)
 
