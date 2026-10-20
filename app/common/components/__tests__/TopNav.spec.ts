@@ -2,14 +2,14 @@ import { describe, it, expect } from "vitest";
 import { readSource } from "~/test/utils";
 
 /**
- * AppHeader.spec.ts — Global 2-state header AS6 wallet-card (Addendum 22) + app.vue layout.
+ * TopNav.spec.ts — Global 2-state header AS6 wallet-card (Addendum 22) + app.vue layout.
  * Combines header-layout (Oct 9: width = content, nav menu removed, 🔔 on the right) +
  * auth-state-home (avatar + dropdown + real logout). Read as text: ZERO network, deterministic in CI.
  */
-const HEADER = readSource("common/components/AppHeader.vue");
+const HEADER = readSource("common/components/TopNav.vue");
 const APP = readSource("app.vue");
 
-describe("global header (AppHeader.vue)", () => {
+describe("global header (TopNav.vue)", () => {
   it("header width = content (max-w-md, not max-w-4xl)", () => {
     expect(HEADER).toContain("max-w-md");
     expect(HEADER).not.toContain("max-w-4xl");
@@ -50,8 +50,8 @@ describe("auth-state-home — 2-state header (avatar + dropdown)", () => {
 });
 
 describe("app.vue — thin global layout", () => {
-  it("mounts AppHeader + NuxtPage + BottomNav + Supabase session init", () => {
-    expect(APP).toContain("<AppHeader");
+  it("mounts TopNav + NuxtPage + BottomNav + Supabase session init", () => {
+    expect(APP).toContain("<TopNav");
     expect(APP).toContain("<NuxtPage");
     expect(APP).toContain("<BottomNav");
     expect(APP).toContain("auth.init()");
@@ -66,7 +66,7 @@ describe("app.vue — thin global layout", () => {
   });
 });
 
-describe("AppHeader left slot (logo vs back button)", () => {
+describe("TopNav left slot (logo vs back button)", () => {
   it("shows the logo on the index page only (isHomePath)", () => {
     expect(HEADER).toContain("isHomePath");
     expect(HEADER).toMatch(/v-if="isHome"/);

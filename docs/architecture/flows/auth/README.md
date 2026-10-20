@@ -13,7 +13,7 @@ code:
   - app/features/auth/utils/redirect.ts
   - app/features/auth/utils/passwordStrength.ts
   - app/features/account/AccountPage.vue
-  - app/common/components/AppHeader.vue
+  - app/common/components/TopNav.vue
 ---
 
 # Auth

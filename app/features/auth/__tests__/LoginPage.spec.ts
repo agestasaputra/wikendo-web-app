@@ -25,7 +25,7 @@ describe("login revamp 100% image — structure + exact text", () => {
     expect(rootTag(L)).not.toMatch(/background/i);
   });
 
-  it("no duplicate local header (global header already in AppHeader, image starts from the banner)", () => {
+  it("no duplicate local header (global header already in TopNav, image starts from the banner)", () => {
     expect(L).not.toContain("<header");
   });
 

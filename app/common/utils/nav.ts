@@ -9,7 +9,7 @@ export function isNavActive(tabPath: string, currentPath: string): boolean {
   return currentPath === tabPath || currentPath.startsWith(tabPath + "/");
 }
 
-/** True only on the index page; the AppHeader shows the logo there and a back button everywhere else. */
+/** True only on the index page; the TopNav shows the logo there and a back button everywhere else. */
 export function isHomePath(currentPath: string): boolean {
   return currentPath === "/";
 }

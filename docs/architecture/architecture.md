@@ -108,7 +108,7 @@ The quiz does not fetch; answers are passed via the query string. Result reads `
 | [quota](./flows/quota/README.md)                                     | Anon quota (cookie), `GET /api/quota`, wall                 |
 | [voucher-claim](./flows/voucher-claim/README.md)                     | Voucher claim: VoucherStore + `POST /api/voucher/claim`    |
 | [history](./flows/history/README.md)                                 | localStorage history                                        |
-| [layout-navigation](./flows/layout-navigation/README.md)             | `app.vue`, AppHeader, BottomNav, QuizPlusSheet               |
+| [layout-navigation](./flows/layout-navigation/README.md)             | `app.vue`, TopNav, BottomNav, QuizPlusSheet               |
 | [llm](./flows/llm/README.md)                                         | CF vs Hermes provider, retry, validation, fallback         |
 | [state-management](./flows/cross-cutting/state-management/README.md) | When to use Pinia vs composable vs `useFetch`              |
 | [security](./flows/cross-cutting/security/README.md)                 | Secrets, XSS, auth, rate-limit, scan                         |

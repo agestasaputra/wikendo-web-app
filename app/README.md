@@ -85,7 +85,7 @@ Nuxt project location: **`wikendo-web-app/app/`** (not the repo root — the roo
 
 ```text
 app/
-├── app.vue                  # Thin global layout: AppHeader + <NuxtPage/> + footer + BottomNav
+├── app.vue                  # Thin global layout: TopNav + <NuxtPage/> + footer + BottomNav
 ├── nuxt.config.ts           # Modules (tailwind, eslint, pinia), runtimeConfig, head/SEO
 ├── eslint.config.mjs        # ESLint flat config + Prettier + size/module/security limits
 ├── .prettierrc              # semi, double quote, printWidth 80

@@ -1,4 +1,4 @@
-<!-- common/components/AppHeader.vue → GLOBAL sticky 2-state header, AS6 wallet-card (Addendum 22 APPROVED).
+<!-- common/components/TopNav.vue → GLOBAL sticky 2-state header, AS6 wallet-card (Addendum 22 APPROVED).
 WHAT: left = Wikendo logo on "/", circular back button on every other route; anonymous = Login/Register; logged in = avatar initial + Bell + dropdown (email, Riwayat, Wishlist Segera, Keluar).
 WHY: this block previously lived in app.vue; split out so the layout stays thin + the header is testable. State from AuthStore (Pinia).
 EXAMPLE: mounted once in app.vue above <NuxtPage />. -->

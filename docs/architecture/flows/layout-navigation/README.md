@@ -4,7 +4,7 @@ status: ready
 related: [auth, quota, shared-ui]
 code:
   - app/app.vue
-  - app/common/components/AppHeader.vue
+  - app/common/components/TopNav.vue
   - app/common/components/BottomNav.vue
   - app/common/components/QuizPlusSheet.vue
   - app/common/utils/nav.ts
@@ -14,7 +14,7 @@ code:
 
 ## TL;DR
 
-`app.vue` is a thin global layout: `AppHeader` (sticky, 2-state) + `<NuxtPage />` (wrapped in a flex-1 `<main>`, so the page root stretches down to the top of `BottomNav`) + `BottomNav` (5 tabs, `sticky bottom-0`, thumb zone; in flow, so no bottom padding is needed). The centre **Quiz+** tab is not a route: it opens `QuizPlusSheet` with 2 intents (Tempat/Makan) along with the honest remaining quota.
+`app.vue` is a thin global layout: `TopNav` (sticky, 2-state) + `<NuxtPage />` (wrapped in a flex-1 `<main>`, so the page root stretches down to the top of `BottomNav`) + `BottomNav` (5 tabs, `sticky bottom-0`, thumb zone; in flow, so no bottom padding is needed). The centre **Quiz+** tab is not a route: it opens `QuizPlusSheet` with 2 intents (Tempat/Makan) along with the honest remaining quota.
 
 ## Entry Points
 
@@ -39,7 +39,7 @@ sequenceDiagram
 
 | Component       | File                                      | Role                                           |
 | --------------- | ----------------------------------------- | ---------------------------------------------- |
-| `AppHeader`     | `app/common/components/AppHeader.vue`     | Anon: Login/Register; login: avatar + dropdown |
+| `TopNav`     | `app/common/components/TopNav.vue`     | Anon: Login/Register; login: avatar + dropdown |
 | `BottomNav`     | `app/common/components/BottomNav.vue`     | 5 tabs, active = lime + dot                    |
 | `QuizPlusSheet` | `app/common/components/QuizPlusSheet.vue` | 2 kartu intent; habis → "Besok lagi 00.00"     |
 | `isNavActive`   | `app/common/utils/nav.ts`                 | Active-tab resolver (pure, tested)            |

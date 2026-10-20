@@ -2,7 +2,7 @@
  * common/store/AuthStore.ts — Auth session single source of truth (Pinia, replaces the useAuth composable).
  *
  * WHAT: isLoggedIn/email/displayName/initial + init() (getSession + onAuthStateChange) + signOut().
- * WHY store: used by AppHeader + Home + Akun → shared state across features (hub-chat: common/store).
+ * WHY store: used by TopNav + Home + Akun → shared state across features (hub-chat: common/store).
  *   init() is idempotent — previously every useAuth() caller attached a new listener.
  * EXAMPLE: const auth = useAuthStore(); auth.init(); auth.isLoggedIn
  */

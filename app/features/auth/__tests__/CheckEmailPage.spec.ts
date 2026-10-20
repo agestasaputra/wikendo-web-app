@@ -19,7 +19,7 @@ describe("option B magic-link — /check-email page", () => {
     expect(C).toContain("max-w-md mx-auto px-4 pb-10");
   });
 
-  it("no local header (follows global AppHeader) + back-to-login link present", () => {
+  it("no local header (follows global TopNav) + back-to-login link present", () => {
     expect(C).not.toContain("<header");
     expect(C).toContain("/login");
   });
