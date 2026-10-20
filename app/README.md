@@ -45,10 +45,10 @@ Written for **beginners**: each section explains **what it is, why it exists, an
 
 There are **2 totally separate modes** (their results are never mixed):
 
-| Mode                | Route                    | Input                     | Output                           | Quota                                                 |
-| ------------------- | ------------------------ | ------------------------- | -------------------------------- | ----------------------------------------------------- |
-| 🗺️ **Plan** (place) | `/quiz` → `/result`      | 5 questions (~30 seconds) | 5 **place** recommendations      | Anonymous 1x (cookie; login 2x target for production) |
-| 🍜 **Mall** (food)  | `/food` → `/result-food` | 4 questions (~20 seconds) | 5 **F&B tenant** recommendations | Anonymous 2x (cookie; login 5x target for production) |
+| Mode                | Route                      | Input                     | Output                           | Quota                                                 |
+| ------------------- | -------------------------- | ------------------------- | -------------------------------- | ----------------------------------------------------- |
+| 🗺️ **Plan** (place) | `/place` → `/result-place` | 5 questions (~30 seconds) | 5 **place** recommendations      | Anonymous 1x (cookie; login 2x target for production) |
+| 🍜 **Mall** (food)  | `/food` → `/result-food`   | 4 questions (~20 seconds) | 5 **F&B tenant** recommendations | Anonymous 2x (cookie; login 5x target for production) |
 
 Plus 1 directory page (no login, no quota, no LLM):
 
@@ -137,12 +137,12 @@ pnpm dev
 **Try the main flows:**
 
 1. `http://localhost:3000/` — landing, click 🗺️ or 🍜
-2. `http://localhost:3000/quiz` — answer 5Q → redirect to `/result`
+2. `http://localhost:3000/place` — answer 5Q → redirect to `/result-place`
 3. `http://localhost:3000/food` — answer 4Q → redirect to `/result-food`
 4. `http://localhost:3000/mall/grand-indonesia` — directory (needs the Supabase DB populated)
 5. `http://localhost:3000/food?mall=grand-indonesia` — Q1 mall is auto-skipped (pre-filled from the directory)
 
-> Note: `/result`, `/result-food`, and `/mall/:slug` need Supabase + Hermes-combo running.
+> Note: `/result-place`, `/result-food`, and `/mall/:slug` need Supabase + Hermes-combo running.
 > Without them, the quiz pages still open, but generating recommendations will error (see Section 15).
 
 ---
@@ -183,18 +183,18 @@ All in `pages/`. **The file name = the URL automatically** (file-based routing, 
 
 ### `pages/index.vue` → `/` (Landing, SSR)
 
-Hero "Bingung Weekend Mau Kemana?" + **2 CTAs**: 🗺️ Cari Tempat (`/quiz`) and 🍜 Lagi di Mall (`/food`).
+Hero "Bingung Weekend Mau Kemana?" + **2 CTAs**: 🗺️ Cari Tempat (`/place`) and 🍜 Lagi di Mall (`/food`).
 A static page, great for SSR + SEO.
 
-### `pages/quiz.vue` → `/quiz` (Place Quiz — 5 questions, ~30 seconds)
+### `pages/place.vue` → `/place` (Place Quiz — 5 questions, ~30 seconds)
 
 - Concept: **1 screen, 1 question** + progress bar + Back button.
 - Local state: `step` (question index), `answers` (reactive object), `q` & `progress` (computed).
 - Questions: `mood` → `companion` → `budget` → `location` → `time`.
-- On finish → `router.push({ path: '/result', query: { ...answers } })` — answers are sent via a **query string**.
+- On finish → `router.push({ path: '/result-place', query: { ...answers } })` — answers are sent via a **query string**.
 - No fetch here — the quiz just collects answers in the browser.
 
-### `pages/result.vue` → `/result` (Place Result)
+### `pages/result-place.vue` → `/result-place` (Place Result)
 
 ```ts
 const { data, pending, error } = await useFetch("/api/place/recommend", {
@@ -302,15 +302,15 @@ Column filters run in Supabase SQL; the `mission` filter (array) runs in memory 
 
 File: `common/types/api.ts` (+ `common/types/quota.ts` etc.; UI types in `features/<x>/@types/`) — **the source of truth for data shapes**. If you add a field, change it here first, then in the feature/server that uses it.
 
-| Interface              | Used in                                  | Contents                                                                                                      |
-| ---------------------- | ---------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| `QuizPlaceInput`       | `quiz.vue` → `POST /api/place/recommend` | mood, companion, budget, location, time?                                                                      |
-| `QuizFoodInput`        | `food.vue` → `POST /api/food/recommend`  | mall_slug, mission, budget_tier, companion, halal_only?, kids_friendly?                                       |
-| `PlaceRecommendation`  | `result.vue`                             | name, category, reason, estimated_cost, location_area, best_time, confidence                                  |
-| `TenantRecommendation` | `result-food.vue`                        | name, category, floor, halal, budget_tier, price_min, price_max, kids_friendly, hype_tiktok, reason, maps_url |
-| `TenantRow`            | server food/malls                        | Raw shape of 1 `tenants` table row (+ mission?, mall_id?, is_open?)                                           |
-| `RankResult`           | `rankTenants()`                          | name + reason (LLM ranking output)                                                                            |
-| `LLMChatResponse`      | `callLLM()`                              | choices[0].message.content                                                                                    |
+| Interface              | Used in                                   | Contents                                                                                                      |
+| ---------------------- | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `QuizPlaceInput`       | `place.vue` → `POST /api/place/recommend` | mood, companion, budget, location, time?                                                                      |
+| `QuizFoodInput`        | `food.vue` → `POST /api/food/recommend`   | mall_slug, mission, budget_tier, companion, halal_only?, kids_friendly?                                       |
+| `PlaceRecommendation`  | `result.vue`                              | name, category, reason, estimated_cost, location_area, best_time, confidence                                  |
+| `TenantRecommendation` | `result-food.vue`                         | name, category, floor, halal, budget_tier, price_min, price_max, kids_friendly, hype_tiktok, reason, maps_url |
+| `TenantRow`            | server food/malls                         | Raw shape of 1 `tenants` table row (+ mission?, mall_id?, is_open?)                                           |
+| `RankResult`           | `rankTenants()`                           | name + reason (LLM ranking output)                                                                            |
+| `LLMChatResponse`      | `callLLM()`                               | choices[0].message.content                                                                                    |
 
 ---
 
@@ -366,7 +366,7 @@ pnpm type-check   # vue-tsc
 
 ```text
 [quiz.vue] answer 5Q (browser only)
-   │  router.push /result?mood=..&companion=..&...
+   │  router.push /result-place?mood=..&companion=..&...
    ▼
 [result.vue] useFetch POST /api/place/recommend (body = query)
    │  ┌─ check cookie quota_used → 403 if exhausted
@@ -419,7 +419,7 @@ render 5 tenant cards + Maps button
 2. In Vercel: **New Project → import repo → Framework: Nuxt.js** (auto-detect).
 3. Fill in the **Environment Variables** (see Section 5 — PROD values, not local).
 4. Deploy. Every push to `main` = an automatic deploy + a preview URL per PR.
-5. Check: `/` → `/quiz` → `/result`, `/food` → `/result-food`, `/mall/grand-indonesia`.
+5. Check: `/` → `/place` → `/result-place`, `/food` → `/result-food`, `/mall/grand-indonesia`.
 
 ---
 

@@ -16,7 +16,7 @@ describe("global header (AppHeader.vue)", () => {
   });
 
   it("nav menu Place/Food/Mall removed from the header", () => {
-    expect(HEADER).not.toContain('to="/quiz"');
+    expect(HEADER).not.toContain('to="/place"');
     expect(HEADER).not.toContain('to="/food"');
     expect(HEADER).not.toContain('to="/mall"');
   });

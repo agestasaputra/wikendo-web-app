@@ -77,7 +77,7 @@ Solo founder building first startup, AI-assisted development, limited budget, gr
 
 **Anonymous user generates recommendation (Place):**
 ```
-1. User → Nuxt page (/quiz) → Submit quiz
+1. User → Nuxt page (/place) → Submit quiz
 2. Client → POST /api/place/recommend → Nuxt server route
 3. Server checks place quota (Supabase) → Allow if <1 used
 4. Server → 9router API (Hermes-combo) → Get recommendations
@@ -468,6 +468,25 @@ Reason: the tenant list is static from the DB (free), and a hallucinating LLM mu
 (metric: hallucinated tenant complaints = 0). Separate system prompt: `FOOD_SYSTEM` in `app/server/utils/llm.ts`.
 The food quota of 5/day is SEPARATE from the place quota of 2/day (different behaviour: food can be 2-3x a day).
 
+### Amendment Oct 20, 2026 — Entity-first URL convention (routes renamed)
+
+**Decision:** quiz routes name the entity, results name the quiz they belong to:
+`/place` → `/result-place`, `/food` → `/result-food`. The generic `/quiz` and `/result` are retired
+and 301-redirect (`server/middleware/legacyRouteRedirect.ts`, exact match, **query string preserved**)
+because the place answers travel in `?mood=…&companion=…` — a redirect that drops the query lands on
+an empty result deck with no error.
+
+**Why now:** a generic segment is only correct while exactly one type exists. `/food` already forced
+the `/result-food` twin; keeping `/result` for place made two URLs mean the same thing and would need
+a redirect chain the day a third quiz (e.g. `/event`) ships. Renaming now costs 0 data risk — the
+`generations` table already stores `type='place'` — and frees `/quiz` for a future quiz-picker hub.
+
+**Rejected:** prefix redirect (`/result*` → `/result-place`) — it would swallow `/result-food`.
+
+**Consequences:** ✅ naming never rots again · ✅ old bookmarks/share links keep working (301, query intact,
+Google transfers the ranking signal) · ⚠️ `page_path` in GA4 splits into two historical rows at cutover —
+note the date, don't chase a phantom funnel drop · ⚠️ docs keep literal old URLs until the docs sweep.
+
 ---
 
 ## 6. Authentication
@@ -574,7 +593,7 @@ if (isFirstLogin) {
 ### Decision: Dual Quota — Place 2/day + Food 5/day, Daily Reset, DB-Enforced (Addendum 07 v1.1 Approved Oct 6, 2026; anonymous progressive Addendum 09 v1.3 Approved Oct 7, 2026)
 
 **Rules (Split Quiz — never mixed):**
-- Place Quiz (`/quiz` → `/result`): **2 quota/day** (unchanged from PRD v2.0). Anonymous 1x (cookie `quota_used`), login 2x.
+- Place Quiz (`/place` → `/result-place`): **2 quota/day** (unchanged from PRD v2.0). Anonymous 1x (cookie `quota_used`), login 2x.
 - Food Quiz (`/food` → `/result-food`): **5 quota/day separate** (does not consume the place quota). Anonymous 2x (cookie `food_quota_used`), login 5x.
 - Each generate: **5 recommendations** (pure place / pure tenant, no mixing 3+2 — removed per Agesta's feedback).
 - Reset: Every day at **00:00 WIB** (UTC+7). Table `user_quota` + `mall_search_quota(user_id, date, used)`.
@@ -737,8 +756,8 @@ SELECT cron.schedule(
 ```typescript
 // Page views (automatic)
 pageview('/') // Landing
-pageview('/quiz') // Quiz started
-pageview('/result') // Result viewed
+pageview('/place') // Quiz started
+pageview('/result-place') // Result viewed
 
 // Custom events
 gtag('event', 'quiz_started')

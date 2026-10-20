@@ -47,7 +47,7 @@ There are **2 modes that are completely separate** (their results are never mixe
 
 | Mode | Route | Input | Output | Quota |
 |------|-------|-------|--------|-------|
-| 🗺️ **Plan** (place) | `/quiz` → `/result` | 5 questions (~30 seconds) | 5 **place** recommendations | Anonymous 1x (cookie; login 2x production target) |
+| 🗺️ **Plan** (place) | `/place` → `/result-place` | 5 questions (~30 seconds) | 5 **place** recommendations | Anonymous 1x (cookie; login 2x production target) |
 | 🍜 **Mall** (food) | `/food` → `/result-food` | 4 questions (~20 seconds) | 5 **F&B tenant** recommendations | Anonymous 2x (cookie; login 5x production target) |
 
 Plus 1 directory page (no login, no quota, no LLM):
@@ -95,8 +95,8 @@ app/
 │
 ├── pages/                   # FILE-BASED ROUTING: file name = URL automatically
 │   ├── index.vue            #        → GET /
-│   ├── quiz.vue             #        → GET /quiz        (place quiz, 5Q)
-│   ├── result.vue           #        → GET /result      (place result)
+│   ├── place.vue            #        → GET /place        (place quiz, 5Q)
+│   ├── result-place.vue     #        → GET /result-place      (place result)
 │   ├── food.vue             #        → GET /food       (food quiz, 4Q)
 │   ├── result-food.vue      #        → GET /result-food (tenant result)
 │   └── mall/
@@ -149,12 +149,12 @@ pnpm dev
 **Try the main flow:**
 
 1. `http://localhost:3000/` — landing, click 🗺️ or 🍜
-2. `http://localhost:3000/quiz` — answer 5Q → redirect to `/result`
+2. `http://localhost:3000/place` — answer 5Q → redirect to `/result-place`
 3. `http://localhost:3000/food` — answer 4Q → redirect to `/result-food`
 4. `http://localhost:3000/mall/grand-indonesia` — directory (needs the Supabase DB to be populated)
 5. `http://localhost:3000/food?mall=grand-indonesia` — Q1 mall is skipped automatically (pre-filled from the directory)
 
-> Note: `/result`, `/result-food`, and `/mall/:slug` need Supabase + Hermes-combo running.
+> Note: `/result-place`, `/result-food`, and `/mall/:slug` need Supabase + Hermes-combo running.
 > Without them, the quiz pages still open, but generating recommendations will error (see Chapter 15).
 
 ---
@@ -195,18 +195,18 @@ All under `pages/`. **File name = URL automatically** (file-based routing, no ma
 
 ### `pages/index.vue` → `/` (Landing, SSR)
 
-Hero "Bingung Weekend Mau Kemana?" + **2 CTAs**: 🗺️ Cari Tempat (`/quiz`) and 🍜 Lagi di Mall (`/food`).
+Hero "Bingung Weekend Mau Kemana?" + **2 CTAs**: 🗺️ Cari Tempat (`/place`) and 🍜 Lagi di Mall (`/food`).
 Static page, good for SSR + SEO.
 
-### `pages/quiz.vue` → `/quiz` (Place Quiz — 5 questions, ~30 seconds)
+### `pages/place.vue` → `/place` (Place Quiz — 5 questions, ~30 seconds)
 
 - Concept: **1 screen 1 question** + progress bar + Back button.
 - Local state: `step` (question index), `answers` (reactive object), `q` & `progress` (computed).
 - Questions: `mood` → `companion` → `budget` → `location` → `time`.
-- Done → `router.push({ path: '/result', query: { ...answers } })` — answers are sent via the **query string**.
+- Done → `router.push({ path: '/result-place', query: { ...answers } })` — answers are sent via the **query string**.
 - No fetch here — the quiz purely collects answers in the browser.
 
-### `pages/result.vue` → `/result` (Place Result)
+### `pages/result-place.vue` → `/result-place` (Place Result)
 
 ```ts
 const { data, pending, error } = await useFetch('/api/place/recommend', {
@@ -312,7 +312,7 @@ File: `types/index.ts` — **the single source of truth for data shapes**. If yo
 
 | Interface | Used in | Contents |
 |-----------|------------|-----|
-| `QuizPlaceInput` | `quiz.vue` → `POST /api/place/recommend` | mood, companion, budget, location, time? |
+| `QuizPlaceInput` | `place.vue` → `POST /api/place/recommend` | mood, companion, budget, location, time? |
 | `QuizFoodInput` | `food.vue` → `POST /api/food/recommend` | mall_slug, mission, budget_tier, companion, halal_only?, kids_friendly? |
 | `PlaceRecommendation` | `result.vue` | name, category, reason, estimated_cost, location_area, best_time, confidence |
 | `TenantRecommendation` | `result-food.vue` | name, category, floor, halal, budget_tier, price_min, price_max, kids_friendly, hype_tiktok, reason, maps_url |
@@ -371,7 +371,7 @@ pnpm lint:fix   # check + auto-fix what it can (Vue attribute order, etc.)
 
 ```text
 [quiz.vue] answer 5Q (browser only)
-   │  router.push /result?mood=..&companion=..&...
+   │  router.push /result-place?mood=..&companion=..&...
    ▼
 [result.vue] useFetch POST /api/place/recommend (body = query)
    │  ┌─ check cookie quota_used → 403 if exhausted
@@ -424,7 +424,7 @@ render 5 tenant cards + Maps button
 2. In Vercel: **New Project → import repo → Framework: Nuxt.js** (auto-detected).
 3. Fill in **Environment Variables** (see Chapter 5 — PROD values, not local).
 4. Deploy. Every push to `main` = automatic deploy + preview URL per PR.
-5. Check: `/` → `/quiz` → `/result`, `/food` → `/result-food`, `/mall/grand-indonesia`.
+5. Check: `/` → `/place` → `/result-place`, `/food` → `/result-food`, `/mall/grand-indonesia`.
 
 ---
 

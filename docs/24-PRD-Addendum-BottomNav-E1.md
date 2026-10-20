@@ -40,7 +40,7 @@ Mobile-app-style 5-tab bottom-nav, 100% within the `max-w-md` thumb-zone:
 
 - Tap → a bottom-sheet slides up from the bottom + dark backdrop. ZERO page navigation. ZERO new API calls (quota uses the existing `GET /api/quota` if needed, anon fallback `1•2`).
 - The sheet holds 2 cards:
-  - `🗺️ Cari Tempat (2/hari) → /quiz` — honest quota: anon remaining `1/1`, real login `x/2`. Exhausted → disabled `Besok lagi 00.00`.
+  - `🗺️ Cari Tempat (2/hari) → /place` — honest quota: anon remaining `1/1`, real login `x/2`. Exhausted → disabled `Besok lagi 00.00`.
   - `🍜 Cari Makan (5/hari) → /food` — honest quota: anon remaining `2/2`, real login `x/5`. Exhausted → disabled `Besok lagi 00.00`.
 - Close: tap backdrop / swipe down / X button. Light focus trap, `aria-label` on the sheet + close button.
 - Tokens: white rounded-2xl sheet, handle bar `#d6d3d1`, card border `#e7e5e4`, ink CTA `#0C0A09`, 4px ink top-border (consistent with the V13B sheet).
@@ -80,7 +80,7 @@ Mobile-app-style 5-tab bottom-nav, 100% within the `max-w-md` thumb-zone:
 ## 5. DONE criteria
 
 - [ ] NEW `app/components/BottomNav.vue`: 5 tabs Home/Mall/Quiz+/Riwayat/Akun, `max-w-md`, fixed bottom, active lime+dot, center Quiz+ opens the sheet (not a route).
-- [ ] Quiz+ sheet with 2 cards Tempat→`/quiz` + Makan→`/food`, honest quota, exhausted = disabled `Besok lagi 00.00`, close via backdrop/X, `aria-label`.
+- [ ] Quiz+ sheet with 2 cards Tempat→`/place` + Makan→`/food`, honest quota, exhausted = disabled `Besok lagi 00.00`, close via backdrop/X, `aria-label`.
 - [ ] NEW `app/pages/account.vue`: 2-state anon/login mirroring AS6 + 4 hub rows (Riwayat/Wishlist Segera/WA/Tentang) + Keluar with spinner+guard → `/`.
 - [ ] NEW `app/pages/history.vue`: reads `wikendo_history`, honestly empty, newest-first list.
 - [ ] `result.vue` + `result-food.vue` write `wikendo_history` (window guard, cap 20, dedupe).

@@ -234,7 +234,7 @@ This checklist breaks down Weekend Planner MVP into actionable tasks with priori
 ---
 
 ### 3.2 Landing Page
-- [x] **P0** `pages/index.vue` - Landing page - *2 hours* ✅ CODE-COMPLETE (hero + dual CTA 🗺️/quiz + 🍜/food; value-prop/how-it-works/SEO ⏳ to follow)
+- [x] **P0** `pages/index.vue` - Landing page - *2 hours* ✅ CODE-COMPLETE (hero + dual CTA 🗺️/place + 🍜/food; value-prop/how-it-works/SEO ⏳ to follow)
   - Hero section with headline + CTA
   - Value proposition (3 benefits)
   - How it works (3 steps)
@@ -248,7 +248,7 @@ This checklist breaks down Weekend Planner MVP into actionable tasks with priori
 ---
 
 ### 3.3 Quiz Flow
-- [x] **P0** `pages/quiz.vue` - Quiz page - *3 hours* ✅ CODE-COMPLETE Oct 6 (5Q place, 1 question per screen + progress + Kembali; localStorage resume ⏳ NOT YET — built during 8.4)
+- [x] **P0** `pages/place.vue` - Quiz page - *3 hours* ✅ CODE-COMPLETE Oct 6 (5Q place, 1 question per screen + progress + Kembali; localStorage resume ⏳ NOT YET — built during 8.4)
   - Multi-step form (1 question per screen)
   - Progress indicator
   - Question components:

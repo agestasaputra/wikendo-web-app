@@ -15,8 +15,8 @@
 **WHAT?** One complete flow, not 3 separate apps. Visual reference: `design/revamp-combo-5-10-15.html` (31KB, 8 phone mockups). That HTML file is NOT changed in v1.3 — it is sufficient as the visual spec.
 
 - **A. Home Superapp (Option 10)** — `/`: 2 big CTAs (🗺️ Cari Tempat / 🍜 Cari Makan) + quota wallet (`2 tempat • 5 makan` for registered, `1 tempat • 1 makan free` for anon) + Event/Promo/Wishlist/Riwayat grid.
-- **B-C. Swipe place quiz (Option 5)** — `/quiz`: 6Q (mood/companion/conditional child/budget/location/optional time), 1 question per screen, 56px thumb-zone buttons.
-- **D. Result deck (Option 5)** — `/result`: hero #1 + Navigasi/save/share + mini deck ②③ tap "Lainnya". Best Match is purely score-based. Slot #1 may be sponsored BUT the "Sponsored" badge is mandatory.
+- **B-C. Swipe place quiz (Option 5)** — `/place`: 6Q (mood/companion/conditional child/budget/location/optional time), 1 question per screen, 56px thumb-zone buttons.
+- **D. Result deck (Option 5)** — `/result-place`: hero #1 + Navigasi/save/share + mini deck ②③ tap "Lainnya". Best Match is purely score-based. Slot #1 may be sponsored BUT the "Sponsored" badge is mandatory.
 - **E-F. Food quiz (5+15)** — `/food`: 4Q (mall required GI/CP/Kokas/PIM/Aeon + mission + budget + companions/Halal/Kids), ~20 seconds, pre-filled `?mall=` from the directory.
 - **G. Food result + voucher (15)** — `/result-food`: 5 pure tenants + -20%/Halal badge + Klaim voucher button (login REQUIRED, see §2).
 - **H. Directory (15)** — `/mall/:slug`: list of 40 tenants + no-LLM SSR SEO filters, organic funnel → `/food?mall=`.
@@ -37,7 +37,7 @@
 
 | Track | Anon | Registered |
 |---|---|---|
-| 🗺️ Tempat (`/quiz→/result`) | **1x generate/day**, full 5-card result, Maps clickable | **2/2 full** |
+| 🗺️ Tempat (`/place→/result-place`) | **1x generate/day**, full 5-card result, Maps clickable | **2/2 full** |
 | 🍜 Makan (`/food→/result-food`) | **2x generate/day**, full 5-tenant result, Maps clickable | **5/5 full** |
 | 💾 Simpan / ❤️ Wishlist / 🕘 Riwayat | 🔒 locked → login prompt | ✅ works |
 | 🎟️ Claim food voucher | 🔒 **login REQUIRED** (anti voucher farming) | ✅ works |

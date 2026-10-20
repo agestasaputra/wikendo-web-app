@@ -51,7 +51,7 @@ Nuxt 4 SSR app: quiz → Jabodetabek weekend recommendations. Stack: Vue 3 Compo
 
 | Mode (UI label) | Feature slice | Route | API | Anon quota (cookie) | Production target |
 | --------------- | ------------- | ----- | --- | ------------------- | ----------------- |
-| 🗺️ Place (Tempat) | `features/place` | `/quiz` → `/result` | `POST /api/place/recommend` | 1x/day | 2x/day logged in (`user_quota`) |
+| 🗺️ Place (Tempat) | `features/place` | `/place` → `/result-place` | `POST /api/place/recommend` | 1x/day | 2x/day logged in (`user_quota`) |
 | 🍜 Food (Makan) | `features/food` | `/food` → `/result-food` | `POST /api/food/recommend` | 2x/day | 5x/day logged in (`mall_search_quota`) |
 | 🏬 Directory | `features/mall` | `/mall`, `/mall/:slug` | `GET /api/malls`, `GET /api/malls/:slug/tenants` | no quota/login/LLM | same |
 

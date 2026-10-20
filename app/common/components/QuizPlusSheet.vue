@@ -1,5 +1,5 @@
 <!-- common/components/QuizPlusSheet.vue → Quiz+ sheet with 2 explicit intents (Addendum docs/24 E1).
-WHAT: backdrop + dialog with 2 cards (Cari Tempat → /quiz, Cari Makan → /food) showing the REAL remaining/limit from GET /api/quota (anon 1•1, member 2•5) + login upsell for anonymous; empty = disabled "Besok lagi 00.00".
+WHAT: backdrop + dialog with 2 cards (Cari Tempat → /place, Cari Makan → /food) showing the REAL remaining/limit from GET /api/quota (anon 1•1, member 2•5) + login upsell for anonymous; empty = disabled "Besok lagi 00.00".
 WHY: 1 "+" button can't carry 2 different quota intents without lying → the 2-tap cost is accepted. ZERO new API.
 WHY dynamic numbers: a hardcoded per-tier number was a lie for anonymous users (1•1) and could disagree with the wallet after a refresh.
 EXAMPLE: <QuizPlusSheet :place-left="1" :place-limit="1" :food-left="0" :food-limit="1" :is-logged-in="false" @go="go" @close="close" /> -->
@@ -48,7 +48,7 @@ const emit = defineEmits<{ go: [path: string]; close: [] }>();
             :disabled="placeLeft <= 0"
             class="rounded-xl p-3 flex gap-2 items-center bg-white text-left disabled:opacity-60"
             style="border: 1.5px solid #e7e5e4"
-            @click="emit('go', '/quiz')"
+            @click="emit('go', '/place')"
           >
             <span class="text-2xl">🗺️</span>
             <span class="flex-1 text-[13px] font-extrabold">

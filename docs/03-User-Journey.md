@@ -13,7 +13,7 @@ Weekend Planner has 2 main user types with distinct journeys:
 2. **Registered Users** (logged-in)
 
 **Quota Rules (patch Addendum 09 v1.3 — split + progressive, LOCKED):**
-- **Place** (`/quiz`→`/result`): 2/day (anonymous 1x cookie `quota_used`, logged in 2x)
+- **Place** (`/place`→`/result-place`): 2/day (anonymous 1x cookie `quota_used`, logged in 2x)
 - **Food** (`/food`→`/result-food`): 5/day SEPARATE (anonymous 2x cookie `food_quota_used`, logged in 5x, does not eat into place quota)
 - **Food voucher claims REQUIRE login** (1 user per tenant/day, anti-farming)
 - **Locked for anonymous:** Save/Wishlist/History. **Allowed for anonymous:** full result + Maps + Report closed/open + Vote + read-only share
@@ -38,7 +38,7 @@ Weekend Planner has 2 main user types with distinct journeys:
 
 **User Action:**
 → Click "Mulai Sekarang"  
-→ Navigate to `/quiz`
+→ Navigate to `/place`
 
 **Analytics:**
 ```javascript
@@ -47,7 +47,7 @@ gtag('event', 'landing_cta_clicked')
 
 ---
 
-### Step 2: Quiz Page (`/quiz`)
+### Step 2: Quiz Page (`/place`)
 
 **Goal:** Collect enough context for quality recommendations
 
@@ -97,7 +97,7 @@ gtag('event', 'landing_cta_clicked')
 **User Action:**
 → Answer all required questions  
 → Click "Generate Rekomendasi"  
-→ Navigate to loading state → `/result`
+→ Navigate to loading state → `/result-place`
 
 **Analytics:**
 ```javascript
@@ -146,7 +146,7 @@ gtag('event', 'quiz_completed', {
 
 ---
 
-### Step 4: Result Page - First Generation (`/result?session=xxx`)
+### Step 4: Result Page - First Generation (`/result-place?session=xxx`)
 
 **Header:**
 - Title: "Ini Rekomendasi Weekend Buat Kamu!"
@@ -222,7 +222,7 @@ gtag('event', 'quiz_completed', {
 
 #### Path C: Not Satisfied, Changes Quiz
 - User clicks "Ubah Jawaban"
-- Returns to `/quiz` with pre-filled data
+- Returns to `/place` with pre-filled data
 - But: already used 1 quota → Can't generate again without login
 
 ---
@@ -262,7 +262,7 @@ Actions:
 4. Redirect to /auth/callback
 5. Profile auto-created phone=NULL via initialize_new_user trigger (WITHOUT "Masukkan nomor HP" modal)
 6. Initialize place quota 2 + food quota 5 for today
-7. Redirect back to /quiz or previous page
+7. Redirect back to /place or previous page
 ```
 
 **Why is phone optional?** Every extra field = drop-off. Phone is only used for the Phase 2 broadcast (not built yet) — asking for it now = paying the cost with no benefit. Google 1-tap without a modal = highest conversion.
@@ -270,7 +270,7 @@ Actions:
 **Success:**
 - Set session cookie (httpOnly)
 - Show toast: "Selamat datang! Kamu punya 1x generate lagi hari ini"
-- Redirect to `/quiz` or `/result` (if came from there)
+- Redirect to `/place` or `/result-place` (if came from there)
 
 **Analytics:**
 ```javascript
@@ -282,7 +282,7 @@ gtag('event', 'user_logged_in', { method: 'email' | 'google' })
 
 ## Journey 2: Registered User (Logged In)
 
-### Step 6: Returning User - Quiz (`/quiz`)
+### Step 6: Returning User - Quiz (`/place`)
 
 **Differences from Anonymous:**
 
@@ -472,7 +472,7 @@ The request is taking longer than expected...
 
 ### Case 4: Shared Result Link
 
-**Scenario:** User copies `/result?session=xxx` and sends it to a friend
+**Scenario:** User copies `/result-place?session=xxx` and sends it to a friend
 
 **Behavior:**
 - Friend opens link → Can view results (read-only)
@@ -521,8 +521,8 @@ The request is taking longer than expected...
 ### Page Views (Automatic)
 ```javascript
 pageview('/') // Landing
-pageview('/quiz') // Quiz started
-pageview('/result') // Result viewed
+pageview('/place') // Quiz started
+pageview('/result-place') // Result viewed
 pageview('/login') // Auth page
 pageview('/register')
 pageview('/history')

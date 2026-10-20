@@ -32,7 +32,7 @@ describe("quota wall copy (Addendum 26 v1.4) — sell the login, never punish", 
     expect(HOME).toMatch(/riwayat lintas device/i);
   });
 
-  it("wall links to /login (a /quiz link would just 403 again)", () => {
+  it("wall links to /login (a /place link would just 403 again)", () => {
     const wall = HOME.slice(HOME.indexOf("wallet.exhausted"));
     expect(wall).toContain('to="/login"');
   });

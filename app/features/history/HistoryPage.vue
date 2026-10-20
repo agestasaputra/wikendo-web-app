@@ -2,7 +2,7 @@
 WHAT: read history from HistoryStore (localStorage key wikendo_history, array {kind,title,sub,at} max 20 newest-first) + logged-in server page merged (Bearer auth + row→entry mapping) + honest empty state 1:1 home + Image Cards (option 9) list + quiz CTA.
 WHY localStorage ZERO backend for anon: anonymous users still have history; place/food result writes on success (window guard + try/catch + dedupe + cap 20).
 WHY merge (never overwrite): a logged-in user has BOTH device entries and server rows; overwriting silently loses entries.
-Example: after /result Kopi Kekinian → /history shows "Kopi Kenangan — L2 · GI" at the top. -->
+Example: after /result-place Kopi Kekinian → /history shows "Kopi Kenangan — L2 · GI" at the top. -->
 <script setup lang="ts">
 import { useSupabaseBrowser } from "~/common/composables/useSupabaseBrowser";
 import { storeToRefs } from "pinia";
@@ -61,7 +61,7 @@ onMounted(async () => {
       </p>
       <div class="flex gap-2 mt-3">
         <NuxtLink
-          to="/quiz"
+          to="/place"
           class="flex-1 text-center text-white rounded-2xl py-3 font-extrabold text-sm"
           style="background: #0c0a09"
           >Cari Tempat →</NuxtLink

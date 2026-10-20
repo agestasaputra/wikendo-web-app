@@ -31,7 +31,7 @@ sequenceDiagram
     participant Sheet as QuizPlusSheet
     Nav->>API: useFetch (fresh-anon fallback)
     Nav->>Sheet: showSheet = true (tap +)
-    Sheet-->>Nav: emit go("/quiz" | "/food")
+    Sheet-->>Nav: emit go("/place" | "/food")
     Nav->>Nav: showSheet=false + navigateTo(path)
 ```
 

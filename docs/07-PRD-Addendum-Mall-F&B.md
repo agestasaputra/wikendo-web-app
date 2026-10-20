@@ -45,7 +45,7 @@ New decision per your input: **don't mix them**. Why the CTO agrees:
 One foundation dataset (`malls → tenants`, 200 rows already prepared in `data/tenants-seed.csv`), two separate quizzes, two separate result pages.
 
 Landing `/` has 2 big CTAs:
-- 🗺️ "Cari Tempat Weekend" → `/quiz` (existing)
+- 🗺️ "Cari Tempat Weekend" → `/place` (existing)
 - 🍜 "Cari Makan di Mall" → `/food` (new)
 
 ---
@@ -54,7 +54,7 @@ Landing `/` has 2 big CTAs:
 
 No Q6 mall. No tenants in the place result. 100% per PRD v2.0:
 
-Q1 mood → Q2 companion → Q3 budget → Q4 location → Q5 time → `/result` 5 tempat (implemented in `features/place/constants/questions.ts`; the conditional child-age question from PRD v2.0 was not built in V1).
+Q1 mood → Q2 companion → Q3 budget → Q4 location → Q5 time → `/result-place` 5 tempat (implemented in `features/place/constants/questions.ts`; the conditional child-age question from PRD v2.0 was not built in V1).
 
 ---
 

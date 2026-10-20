@@ -28,7 +28,7 @@ describe("robots.txt + sitemap (SEO teknis)", () => {
     expect(robots).toContain("Disallow: /account");
     expect(robots).toContain("Disallow: /login");
     expect(robots).toContain("Disallow: /register");
-    expect(robots).toContain("Disallow: /result");
+    expect(robots).toContain("Disallow: /result-place");
     expect(robots).toContain("Disallow: /result-food");
     expect(robots).toContain("/check-email");
     expect(robots).toContain("/api/");
@@ -41,10 +41,10 @@ describe("robots.txt + sitemap (SEO teknis)", () => {
     expect(sitemap).toContain("supabaseAdmin");
     expect(sitemap).toContain("s-maxage=3600");
     expect(sitemap).toContain("lastmod");
-    // Rute personal (history/account/result) DILARANG masuk sitemap.
+    // Rute personal (history/account/result-*) DILARANG masuk sitemap.
     expect(sitemap).not.toContain('"/history"');
     expect(sitemap).not.toContain('"/account"');
-    expect(sitemap).not.toContain('"/result"');
+    expect(sitemap).not.toContain('"/result-place"');
   });
 });
 

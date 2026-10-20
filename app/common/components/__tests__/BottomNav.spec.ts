@@ -31,15 +31,15 @@ describe("E1 BottomNav component 5-tab", () => {
     expect(NAV).toMatch(/a3e635|lime/i);
   });
 
-  it("Quiz+ center is NOT a route (opens a sheet, not a direct NuxtLink to /quiz or /food)", () => {
+  it("Quiz+ center is NOT a route (opens a sheet, not a direct NuxtLink to /place or /food)", () => {
     expect(NAV).toMatch(/<button/i);
     expect(NAV).toMatch(/sheet|showSheet|sheetOpen/i);
   });
 });
 
 describe("E1 Quiz+ sheet with 2 honest quota intents", () => {
-  it("2-card sheet: Find Place → /quiz + Find Food → /food", () => {
-    expect(NAV).toContain("/quiz");
+  it("2-card sheet: Find Place → /place + Find Food → /food", () => {
+    expect(NAV).toContain("/place");
     expect(NAV).toContain("/food");
     expect(NAV).toMatch(/Cari Tempat|Tempat/i);
     expect(NAV).toMatch(/Cari Makan|Makan/i);

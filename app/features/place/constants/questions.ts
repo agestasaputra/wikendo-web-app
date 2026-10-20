@@ -2,7 +2,7 @@
  * features/place/constants/questions.ts — 5 PLACE quiz questions (mood → companion → budget → area → time).
  *
  * WHAT: question + option data. WHY separate: data isn't logic; the quiz page stays thin.
- * Answers are sent via query string to /result (id = QuizPlaceInput field name).
+ * Answers are sent via query string to /result-place (id = QuizPlaceInput field name).
  */
 import type { QuizQuestion } from "~/common/types/quiz";
 

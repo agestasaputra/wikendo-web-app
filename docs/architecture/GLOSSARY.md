@@ -9,7 +9,7 @@ Single source of truth for terminology used across `docs/architecture/`. Use the
 | Term          | Definition                                                                                                                                     |
 | ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Wikendo**   | Product: quiz → weekend recommendations in Jabodetabek. Two fully separate modes: **Tempat** (Place) and **Makan** (Food).                                              |
-| **Tempat**    | Mode that recommends 5 tourist/hangout places via LLM (slice `features/place`). Route `/quiz` → `/result`. Never mixed with tenants.                            |
+| **Tempat**    | Mode that recommends 5 tourist/hangout places via LLM (slice `features/place`). Route `/place` → `/result-place` (legacy `/quiz` → `/result` 301). Never mixed with tenants.                            |
 | **Makan**     | Mode that recommends 5 **Tenants** in 1 mall (slice `features/food`). Route `/food` → `/result-food`. Candidates come from the DB first; the LLM only ranks.                           |
 | **Mall**      | One of the 5 active malls (`grand-indonesia`, `central-park`, `kota-kasablanka`, `pondok-indah-mall`, `aeon-bsd`). Identity = **slug**.    |
 | **Tenant**    | Restaurant/cafe inside a mall (row of the `tenants` table). Has tri-state flags `halal`, `kids_friendly`, `hype_tiktok` (NULL = not yet researched).        |

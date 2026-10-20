@@ -3,8 +3,8 @@ topic: quiz-place
 status: ready
 related: [quiz-food, quota, llm, history]
 code:
-  - app/pages/quiz.vue
-  - app/pages/result.vue
+  - app/pages/place.vue
+  - app/pages/result-place.vue
   - app/features/place/PlaceQuizPage.vue
   - app/features/place/PlaceResultPage.vue
   - app/features/place/constants/questions.ts
@@ -20,12 +20,12 @@ code:
 
 ## TL;DR
 
-5 questions (mood → companion → budget → area → time), 1 question per screen, tapping an option = next. At the end, answers are sent via query string to `/result`, which calls `POST /api/place/recommend` and shows 5 places (hero deck + chips + rank). Anon gets only 1x/day.
+5 questions (mood → companion → budget → area → time), 1 question per screen, tapping an option = next. At the end, answers are sent via query string to `/result-place`, which calls `POST /api/place/recommend` and shows 5 places (hero deck + chips + rank). Anon gets only 1x/day.
 
 ## Entry Points
 
-- `app/pages/quiz.vue` → `PlaceQuizPage.vue` (local state `step` + `answers`).
-- `app/pages/result.vue` → `PlaceResultPage.vue` (`useFetch` POST, body = `route.query`).
+- `app/pages/place.vue` → `PlaceQuizPage.vue` (local state `step` + `answers`).
+- `app/pages/result-place.vue` → `PlaceResultPage.vue` (`useFetch` POST, body = `route.query`).
 - `app/server/api/place/recommend.post.ts` — POST handler.
 
 ## Sequence
@@ -38,7 +38,7 @@ sequenceDiagram
     participant API as POST /api/place/recommend
     participant LLM as generatePlace (server/utils/llm)
     participant DB as Supabase generations
-    Q->>R: router.push /result?mood&companion&budget&location&time
+    Q->>R: router.push /result-place?mood&companion&budget&location&time
     R->>API: useFetch POST body=route.query
     API->>API: cookie quota_used === "1" ? 403 LOGIN_REQUIRED
     API->>LLM: generatePlace(body) (retry 1x)
@@ -48,7 +48,7 @@ sequenceDiagram
     R->>R: HistoryStore.push (kind place)
 ```
 
-1. The quiz does not call the API; it only does `router.push({ path: "/result", query })`.
+1. The quiz does not call the API; it only does `router.push({ path: "/result-place", query })`.
 2. The server checks the `quota_used` cookie; `"1"` → 403 (`isWall` in the UI = orange box + login).
 3. `generatePlace` calls the LLM with 1 retry; the result is validated by `parsePlaceResults`.
 4. The hero card is computed by `buildPlaceHero(rec, idx)`; "Lainnya →" shifts `idx` without re-fetching.

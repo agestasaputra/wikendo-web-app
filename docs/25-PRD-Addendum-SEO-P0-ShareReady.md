@@ -20,8 +20,8 @@ Fitur solid, tapi **belum share-ready** — 6 gap:
 
 ## 2. Keputusan & Eksekusi (P0 + 2 bonus P1)
 
-1. **`app/public/robots.txt`** — allow publik; `Disallow` 7 rute personal (`/history` `/account` `/login` `/register` `/check-email` `/result` `/result-food`) + `/api/`; `Sitemap:` absolut `https://www.wikendo.id/sitemap.xml`. Alasan: hemat crawl budget + privasi user + konsisten dengan rute `ssr:false`.
-2. **`app/server/routes/sitemap.xml.ts` (dinamis)** — `/` (1.0) + `/mall` (0.9) + `/quiz` `/food` (0.8) + `/mall/:slug` dari DB (`is_active=true`, 0.7); `Cache-Control: s-maxage=3600`; DB down → fallback 4 halaman statis (jangan 500, crawler tetap dapat sitemap valid).
+1. **`app/public/robots.txt`** — allow publik; `Disallow` 7 rute personal (`/history` `/account` `/login` `/register` `/check-email` `/result-place` `/result-food`) + `/api/`; `Sitemap:` absolut `https://www.wikendo.id/sitemap.xml`. Alasan: hemat crawl budget + privasi user + konsisten dengan rute `ssr:false`.
+2. **`app/server/routes/sitemap.xml.ts` (dinamis)** — `/` (1.0) + `/mall` (0.9) + `/place` `/food` (0.8) + `/mall/:slug` dari DB (`is_active=true`, 0.7); `Cache-Control: s-maxage=3600`; DB down → fallback 4 halaman statis (jangan 500, crawler tetap dapat sitemap valid).
 3. **`app/public/og-default.png` 1200×630** — komposisi: icon dadu d16-night (transparan) di bg ink `#0C0A09` + strip ember `#EA580C` atas + eyebrow lime + headline "Bingung Weekend / Mau Kemana?" + pill lime `wikendo.id`. QA vision PASS.
 4. **Global head `app/nuxt.config.ts`** — `og:type/site_name/locale/url/image` (+width/height) + `twitter:card=summary_large_image` + `twitter:title/description/image`. Canonical TIDAK global (hindari duplikat di rute non-index).
 5. **Per-halaman `useHead`** — canonical + `og:url` di Home, `/mall`, `/mall/:slug`; `og:title` dinamis per mall di detail (share preview kontekstual).

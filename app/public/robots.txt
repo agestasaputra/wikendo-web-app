@@ -7,7 +7,7 @@ Disallow: /account
 Disallow: /login
 Disallow: /register
 Disallow: /check-email
-Disallow: /result
+Disallow: /result-place
 Disallow: /result-food
 Disallow: /api/
 

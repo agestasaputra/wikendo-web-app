@@ -121,7 +121,7 @@ const wallet = computed(() => buildWalletLabel(quotaStatus.value));
         >
       </div>
       <NuxtLink
-        to="/quiz"
+        to="/place"
         class="inline-block mt-2.5 rounded-full px-3.5 py-[7px] text-[11px] font-extrabold"
         :style="{ background: hero.pillBg, color: hero.pillColor }"
         >Mulai Quiz →</NuxtLink
@@ -142,7 +142,7 @@ const wallet = computed(() => buildWalletLabel(quotaStatus.value));
     <!-- 2 big ink CTAs — thumb-zone min 56px -->
     <div class="grid grid-cols-2 gap-1.5 mt-2">
       <NuxtLink
-        to="/quiz"
+        to="/place"
         class="rounded-xl p-2.5 font-extrabold text-[10.5px] text-center leading-snug"
         :style="{
           background: hero.ctaBg,

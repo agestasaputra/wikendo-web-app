@@ -42,7 +42,7 @@ export default defineEventHandler(async (event) => {
   const entries: SitemapEntry[] = [
     { loc: `${SITE}/`, priority: "1.0", changefreq: "daily" },
     { loc: `${SITE}/mall`, priority: "0.9", changefreq: "daily" },
-    { loc: `${SITE}/quiz`, priority: "0.8", changefreq: "monthly" },
+    { loc: `${SITE}/place`, priority: "0.8", changefreq: "monthly" },
     { loc: `${SITE}/food`, priority: "0.8", changefreq: "monthly" },
     ...mallSlugs.map((slug) => ({
       loc: `${SITE}/mall/${slug}`,

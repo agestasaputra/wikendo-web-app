@@ -1,4 +1,4 @@
-<!-- features/place/PlaceQuizPage.vue → GET /quiz (PLACE quiz swipe, mockup B-C combo 5+10+15).
+<!-- features/place/PlaceQuizPage.vue → GET /place (PLACE quiz swipe, mockup B-C combo 5+10+15).
 WHAT: 1 screen 1 question + progress + opt-card + 56px Orange #f97316 button, base #fffdf9.
 WHY: 1 small decision per screen = completion >70% (PRD §4). Same engine used by the food quiz → codebase 1x.
 EXAMPLE: tapping an option goes next immediately (no Next button) — quota is used at Generate, not per question. -->
@@ -28,7 +28,7 @@ const router = useRouter();
 function select(v: string): void {
   answers[q.value.id] = v;
   if (!isLastStep(step.value, questions.length)) step.value++;
-  else router.push({ path: "/result", query: { ...answers } });
+  else router.push({ path: "/result-place", query: { ...answers } });
 }
 </script>
 

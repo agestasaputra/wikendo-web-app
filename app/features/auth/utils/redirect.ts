@@ -3,7 +3,7 @@
  *
  * WHAT: getRedirectQuery(value) → safe path (fallback "/"); buildOriginUrl(path) → origin + path in the browser.
  * WHY: previously `typeof window` + a template string repeated in login/register/check-email.
- * EXAMPLE: buildOriginUrl("/quiz") → "https://wikendo.app/quiz" (browser) | "/quiz" (SSR).
+ * EXAMPLE: buildOriginUrl("/place") → "https://wikendo.app/place" (browser) | "/place" (SSR).
  */
 
 /** ?redirect= query value → path; not a string/empty → "/". */
