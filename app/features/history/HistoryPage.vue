@@ -11,6 +11,7 @@ import { onMounted } from "vue";
 import { useHistoryStore } from "~/common/store/HistoryStore";
 import { timeAgo, mergeHistory } from "~/common/utils/history";
 import { toHistoryEntries } from "~/common/utils/historyRow";
+import { buildResultUrl } from "~/common/utils/resultUrl";
 
 const history = useHistoryStore();
 const { items } = storeToRefs(history);
@@ -76,10 +77,12 @@ onMounted(async () => {
 
     <!-- Image Cards (option 9) — vertical cards, 120px image band, info p-4 -->
     <div v-else class="flex flex-col gap-3">
-      <div
+      <NuxtLink
         v-for="(it, i) in items"
         :key="i"
-        class="rounded-2xl overflow-hidden bg-white border border-stone-200"
+        :to="it.id ? buildResultUrl(it.kind, it.id) : undefined"
+        class="block rounded-2xl overflow-hidden bg-white border border-stone-200"
+        :class="it.id ? 'hover:shadow-md transition-shadow' : 'opacity-90'"
       >
         <div
           class="h-[120px] w-full bg-stone-100 flex items-center justify-center text-[32px]"
@@ -97,8 +100,14 @@ onMounted(async () => {
             {{ it.sub }}
           </div>
           <div class="text-[11px] text-gray-400 mt-1">{{ timeAgo(it.at) }}</div>
+          <div
+            v-if="it.id"
+            class="text-[11px] text-blue-600 mt-1 font-semibold"
+          >
+            Buka hasil →
+          </div>
         </div>
-      </div>
+      </NuxtLink>
       <button
         type="button"
         class="text-[11px] font-bold text-gray-500 underline mt-1"

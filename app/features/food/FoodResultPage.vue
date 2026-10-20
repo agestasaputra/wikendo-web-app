@@ -20,20 +20,52 @@ import {
 } from "~/features/food/utils/resultHero";
 import { getResultFoodMeta } from "~/features/food/utils/resultMeta";
 import { getVoucherCardMeta } from "~/features/food/utils/voucherCard";
+import { buildResultUrl, parseResultId } from "~/common/utils/resultUrl";
 import { getErrorMessage, getErrorStatus } from "~/utils/error";
 
 interface FoodResponse {
+  id?: string;
   recommendations: TenantRecommendation[];
   quota_remaining?: number;
+  mall_slug?: string;
 }
 
 const route = useRoute();
+const router = useRouter();
 // Bearer token REQUIRED: the Supabase session lives in localStorage (no auth cookie), so a plain
 // useFetch reaches the server anonymously → row saved with user_id NULL. authFetch fixes attribution.
 const authFetch = useAuthFetch();
-const { data, pending, error, refresh } = await useFetch<FoodResponse>(
-  "/api/food/recommend",
-  { method: "POST", body: route.query, $fetch: authFetch },
+// TWO modes, one page:
+//   `?id=<uuid>` → open a STORED result: GET only (0 quota, 0 LLM, free on refresh/share).
+//   no id        → a FRESH quiz submission: POST once, then the URL is replaced by its new id.
+// WHY: the query string used to BE the quiz state; every refresh re-generated the deck and burned
+// a quota slot (anon → login wall), and a shared link produced a different deck.
+// Snapshot the quiz answers ONCE: after `router.replace(?id=…)` the live query no longer carries
+// them, but the request body and the mall label still need them for this render.
+const quizQuery = { ...route.query };
+const storedId = parseResultId(quizQuery);
+const generatedId = ref("");
+const isStored = computed(() => Boolean(storedId));
+// The key MUST be unique per SUBMISSION: a stable `fresh` key would replay the previous deck from
+// Nuxt's payload cache on a second quiz (no POST → the user sees an old result).
+const submissionKey = storedId || `fresh:${Date.now()}`;
+const { data, pending, error, refresh } = await useAsyncData<FoodResponse>(
+  `food-result:${submissionKey}`,
+  async () => {
+    if (storedId) {
+      return await authFetch<FoodResponse>(`/api/result/${storedId}`);
+    }
+    const fresh = await authFetch<FoodResponse>("/api/food/recommend", {
+      method: "POST",
+      body: quizQuery,
+    });
+    if (fresh.id) {
+      generatedId.value = fresh.id;
+      // Swap answers → id without a reload: the address bar stops carrying personal answers.
+      void router.replace(buildResultUrl("food", fresh.id));
+    }
+    return fresh;
+  },
 );
 const list = computed(() => data.value?.recommendations || []);
 const idx = ref(0);
@@ -53,7 +85,7 @@ const quotaLabel = computed(() =>
   isWall.value ? "0/1 habis 🔒" : (quotaLeft.value ?? 1) + "/1",
 );
 const mallSlug = computed(() =>
-  String(route.query.mall_slug || route.query.mall || ""),
+  String(quizQuery.mall_slug || quizQuery.mall || data.value?.mall_slug || ""),
 );
 const mallLabel = computed(() =>
   mallSlug.value ? getMallShortLabel(mallSlug.value) : "Mall",
@@ -68,6 +100,22 @@ const rankItems = computed(() => buildRankItems(list.value));
 
 function next(): void {
   if (list.value.length) idx.value = (idx.value + 1) % list.value.length;
+}
+
+// Share the CANONICAL stored address, never the quiz answers: the recipient opens the same deck
+// for free (no quota burned). `storedId` covers a reader re-sharing a link they received.
+function share(): void {
+  const id = generatedId.value || storedId;
+  if (!id) return;
+  const name = hero.value.name || "Wikendo";
+  const t = name + " via Wikendo";
+  const url = location.origin + buildResultUrl("food", id);
+  if (navigator.share) {
+    navigator.share({ title: t, text: t, url }).catch(() => {});
+    return;
+  }
+  navigator.clipboard?.writeText(url);
+  claimNote.value = "Link hasil disalin ✅";
 }
 
 // V13A/B wiring (Addendum 23 v1.1): hero best-1 + link +2 more promos → 3-row sheet.
@@ -94,13 +142,17 @@ async function claimRow(code: string): Promise<void> {
   }
 }
 
-// E1 history: write 1 entry when data succeeds (store: window guard + cap 20 + dedupe).
+// E1 history: write 1 entry per NEW generation (store: window guard + cap 20 + dedupe).
+// A stored result is already in the list → re-opening it must not add a duplicate card.
+// No id = the row was not saved → no card, because a card that cannot be opened is a dead link.
 function pushHistory(): void {
+  if (!generatedId.value) return;
   const r = list.value[0];
   if (!r) return;
   const floor = r.floor ? "L" + r.floor : "";
   useHistoryStore().push({
     kind: "food",
+    id: generatedId.value,
     title: r.name || "—",
     sub: floor + (mallLabel.value ? " · " + mallLabel.value : ""),
     at: Date.now(),
@@ -123,7 +175,11 @@ onMounted(() => {
     :style="{ background: meta.pageBg }"
   >
     <p class="text-[11.5px] text-gray-500 -mt-1 mb-2">
-      Quota makan {{ quotaLabel }} tersisa · {{ mallLabel }}
+      {{
+        isStored
+          ? "Hasil tersimpan · buka gratis, quota nggak kepotong · " + mallLabel
+          : "Quota makan " + quotaLabel + " tersisa · " + mallLabel
+      }}
     </p>
 
     <AppLoader v-if="pending" variant="food" />
@@ -299,8 +355,16 @@ onMounted(() => {
       <!-- end F1b (bottom voucher removed Oct 11 2026: gift has moved into the hero above) -->
 
       <p class="text-[11.5px] text-gray-500 mt-2 text-center">
-        <u>Lapor tutup/buka</u> · <u>Share ke temen</u> · Quota makan
-        {{ quotaLabel }} tersisa
+        <u>Lapor tutup/buka</u> ·
+        <button type="button" class="underline" @click="share()">
+          Share ke temen
+        </button>
+        ·
+        {{
+          isStored
+            ? "hasil tersimpan, buka tanpa quota"
+            : "Quota makan " + quotaLabel + " tersisa"
+        }}
       </p>
     </div>
   </div>

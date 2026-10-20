@@ -7,6 +7,7 @@
  */
 import { HISTORY_MAX_ENTRIES } from "../constants/storage";
 import type { HistoryEntry, HistoryKind } from "../types/history";
+import { isResultId } from "./resultUrl";
 
 /** Old `kind` values (pre-rename flow) → new values. localStorage migration. */
 const LEGACY_KIND: Record<string, HistoryKind> = {
@@ -25,6 +26,8 @@ function normalizeEntry(raw: unknown): HistoryEntry {
   const e = (raw ?? {}) as Partial<HistoryEntry>;
   return {
     kind: normalizeKind(e.kind),
+    // Pre-change entries have no id; a junk id must not become a broken link.
+    ...(isResultId(e.id) ? { id: e.id } : {}),
     title: String(e.title ?? ""),
     sub: String(e.sub ?? ""),
     at: Number(e.at ?? 0),

@@ -107,13 +107,22 @@ export default defineEventHandler(async (event) => {
     const db = supabaseAdmin();
     // Adopt rows this browser generated while anonymous (quiz first, login at the quota wall).
     await claimAnonRows(db, sessionId, userId);
-    await db.from("generations").insert({
-      session_id: sessionId,
-      user_id: userId,
-      quiz_input: { ...body, type: "place" },
-      recommendations,
-    });
+    // Read the id back: the id IS the address of this result (`/result-place?id=<uuid>`).
+    // A failed save must not cost the user their slot — the deck still renders, it just
+    // cannot be reopened later (same behaviour as before, now logged instead of silent).
+    const { data: saved, error: saveErr } = await db
+      .from("generations")
+      .insert({
+        session_id: sessionId,
+        user_id: userId,
+        quiz_input: { ...body, type: "place" },
+        recommendations,
+      })
+      .select("id")
+      .single();
+    if (saveErr) console.error("place recommend: save failed", saveErr.message);
     return {
+      id: saved?.id,
       recommendations,
       quota_remaining: remaining,
       quota_limit: 2,
@@ -139,16 +148,22 @@ export default defineEventHandler(async (event) => {
   const { generatePlace } = await import("../../utils/llm");
   const recommendations = await generatePlace(body);
 
-  await db.from("generations").insert({
-    session_id: sessionId,
-    user_id: null,
-    quiz_input: { ...body, type: "place" },
-    recommendations,
-  });
+  const { data: saved, error: saveErr } = await db
+    .from("generations")
+    .insert({
+      session_id: sessionId,
+      user_id: null,
+      quiz_input: { ...body, type: "place" },
+      recommendations,
+    })
+    .select("id")
+    .single();
+  if (saveErr) console.error("place recommend: save failed", saveErr.message);
   await recordAnonGeneration(db, { sessionId, ipHash, kind: "place" });
   // No client-readable quota cookie: the counter is derived from the row above.
 
   return {
+    id: saved?.id,
     recommendations,
     quota_remaining: Math.max(0, remainingFor("place", usage) - 1),
     quota_limit: ANON_PLACE_LIMIT,

@@ -44,14 +44,20 @@ describe("common/composables/useAuthFetch.ts — Bearer token for client API cal
 });
 
 describe("quiz result pages send the Bearer token (orphan-row fix)", () => {
-  it("place result passes $fetch: authFetch to useFetch", () => {
+  it("place result passes authFetch to useAsyncData (Bearer, never anonymous)", () => {
     expect(PLACE).toContain("useAuthFetch");
-    expect(PLACE).toMatch(/\$fetch\s*:\s*authFetch/);
+    expect(PLACE).toMatch(
+      /authFetch<PlaceResponse>\(.*\/api\/(result\/\[id\]|place\/recommend)/s,
+    );
+    expect(PLACE).not.toMatch(/useFetch\s*\(/);
   });
 
-  it("food result passes $fetch: authFetch to useFetch", () => {
+  it("food result passes authFetch to useAsyncData (Bearer, never anonymous)", () => {
     expect(FOOD).toContain("useAuthFetch");
-    expect(FOOD).toMatch(/\$fetch\s*:\s*authFetch/);
+    expect(FOOD).toMatch(
+      /authFetch<FoodResponse>\(.*\/api\/(result\/\[id\]|food\/recommend)/s,
+    );
+    expect(FOOD).not.toMatch(/useFetch\s*\(/);
   });
 });
 

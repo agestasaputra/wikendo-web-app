@@ -26,6 +26,18 @@ export interface QuizFoodInput {
   kids_friendly?: boolean | string;
 }
 
+/** Response POST /api/place|food/recommend + GET /api/result/:id (a stored deck). */
+export interface RecommendationResponse<T> {
+  /** `generations.id` — the address of the stored deck (absent only if the INSERT failed). */
+  id?: string;
+  recommendations: T[];
+  quota_remaining?: number;
+  quota_limit?: number;
+  is_logged_in?: boolean;
+  /** Food only: the mall the deck belongs to (survives a stored GET). */
+  mall_slug?: string;
+}
+
 /** 1 place result card (output of generatePlace/LLM). */
 export interface PlaceRecommendation {
   name: string;

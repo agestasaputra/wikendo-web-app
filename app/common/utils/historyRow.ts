@@ -1,20 +1,24 @@
 /**
  * common/utils/historyRow.ts — Supabase `generations` row → HistoryEntry (PURE).
  *
- * WHAT: toHistoryEntry(row) + toHistoryEntries(rows). The DB stores `quiz_input` +
- *   `recommendations` (JSONB); the UI needs the flat `{ kind, title, sub, at }` shape.
+ * WHAT: toHistoryEntry(row) + toHistoryEntries(rows). The DB stores `id` + `quiz_input` +
+ *   `recommendations` (JSONB); the UI needs the flat `{ kind, id, title, sub, at }` shape.
  * WHY: /history used to assign raw rows into `history.items`, so every card rendered an
  *   `undefined` title and `timeAgo(undefined)` → NaN. One mapper keeps the API and the
  *   localStorage writer (PlaceResultPage / FoodResultPage) producing identical entries.
- * EXAMPLE: toHistoryEntry({ quiz_input: { type: "food", mall_slug: "grand-indonesia" },
- *   recommendations: [{ name: "Kopi", floor: "2" }], created_at: "2026-10-18T10:00:00Z" })
- *   → { kind: "food", title: "Kopi", sub: "L2 · GI", at: 1760781600000 }
+ *   `id` = `generations.id` = the address of the stored deck → the card is a free link.
+ * EXAMPLE: toHistoryEntry({ id: "0f8fad5b-…", quiz_input: { type: "food", mall_slug:
+ *   "grand-indonesia" }, recommendations: [{ name: "Kopi", floor: "2" }],
+ *   created_at: "2026-10-18T10:00:00Z" })
+ *   → { kind: "food", id: "0f8fad5b-…", title: "Kopi", sub: "L2 · GI", at: 1760781600000 }
  */
 import { getMallShortLabel } from "./mall";
+import { isResultId } from "./resultUrl";
 import type { HistoryEntry, HistoryKind } from "../types/history";
 
 /** Raw JSONB shape we read off a `generations` row (all fields optional). */
 export interface HistorySourceRow {
+  id?: string | null;
   quiz_input?: {
     type?: string | null;
     mall_slug?: string | null;
@@ -73,6 +77,8 @@ export function toHistoryEntry(row: HistorySourceRow): HistoryEntry {
   const kind = toKind(safe.quiz_input?.type);
   return {
     kind,
+    // Only a real UUID becomes a link; legacy rows without an id stay readable but not clickable.
+    ...(isResultId(safe.id) ? { id: safe.id as string } : {}),
     title: rec?.name || "—",
     sub:
       kind === "food"

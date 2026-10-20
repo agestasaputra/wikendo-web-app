@@ -126,15 +126,21 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    await db.from("generations").insert({
-      session_id: sessionId,
-      user_id: userId,
-      quiz_input: { ...body, type: "food" },
-      recommendations,
-    });
+    const { data: saved, error: saveErr } = await db
+      .from("generations")
+      .insert({
+        session_id: sessionId,
+        user_id: userId,
+        quiz_input: { ...body, type: "food" },
+        recommendations,
+      })
+      .select("id")
+      .single();
+    if (saveErr) console.error("food recommend: save failed", saveErr.message);
     // Adopt rows this browser generated while anonymous (quiz first, login at the quota wall).
     await claimAnonRows(db, sessionId, userId);
     return {
+      id: saved?.id,
       recommendations,
       quota_remaining: LOGGED_IN_FOOD_LIMIT - (usedNow + 1),
       quota_limit: LOGGED_IN_FOOD_LIMIT,
@@ -168,16 +174,22 @@ export default defineEventHandler(async (event) => {
     ),
   );
 
-  await db.from("generations").insert({
-    session_id: sessionId,
-    user_id: null,
-    quiz_input: { ...body, type: "food" },
-    recommendations,
-  });
+  const { data: saved, error: saveErr } = await db
+    .from("generations")
+    .insert({
+      session_id: sessionId,
+      user_id: null,
+      quiz_input: { ...body, type: "food" },
+      recommendations,
+    })
+    .select("id")
+    .single();
+  if (saveErr) console.error("food recommend: save failed", saveErr.message);
   await recordAnonGeneration(db, { sessionId, ipHash, kind: "food" });
   // No client-readable quota cookie: the counter is derived from the row above.
 
   return {
+    id: saved?.id,
     recommendations,
     quota_remaining: Math.max(0, remainingFor("food", usage) - 1),
     quota_limit: ANON_FOOD_LIMIT,
