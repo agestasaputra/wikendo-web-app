@@ -14,7 +14,7 @@
 
 ---
 
-## 📌 BOARD — position as of 20 Oct 2026 (Stored-result flow LIVE ✅ + history newest-deck-wins ✅ + one page canvas + one type ramp + coding principles as repo rule ✅ — tests 466/466 lint 0 build ok, pushed 0481a2d — prod verified all routes)
+## 📌 BOARD — position as of 20 Oct 2026 (Stored-result flow LIVE ✅ + history newest-deck-wins ✅ + one page canvas + one type ramp + coding principles as repo rule ✅ + `AppHeader` → `TopNav` rename ✅ — tests 467/467 lint 0 build ok, pushed — prod verified all routes)
 
 ### 🔥 NOW (in progress)
 
@@ -150,9 +150,14 @@
 - **Verifikasi:** Halaman berhasil render, form submit memicu email reset melalui Supabase Auth (cek console/network).
 - **Next:** Uji end-to-end dengan email aktif, kemudian tambahkan fitur lihat/ubah profil.
 
-## 🧾 LOG (newest first)
+## 2026-10-20 — Rename `AppHeader.vue` → `TopNav.vue` ✅ (component + spec + all references; tests 467/467, lint 0, build ok)
 
-## 2026-10-20 — One page canvas + one type ramp + coding principles as repo rule DONE ✅ (Agesta directive: "termasuk footer memiliki background yang berbeda, tolong samakan seperti background home page" + "Tolong masukan rule prinsip koding ke docs repo wikendo")
+- **Why:** Agesta request: rename component `AppHeader.vue` → `TopNav.vue` (nama lebih sesuai posisi/role: top navigation bar). Pure refactor, zero logic change.
+- **Done:** `git mv app/common/components/AppHeader.vue → TopNav.vue` + `git mv …/__tests__/AppHeader.spec.ts → TopNav.spec.ts`; replace all `AppHeader` literals across `app.vue`, `app/README.md`, `AuthStore.ts`, `nav.ts`, 3 auth page specs, `docs/architecture/*`. `docs/08-PROGRESS.md` historical line (commit message trace) left as-is.
+- **Verification:** `pnpm vitest run` 62 files **467/467** ✅ · `pnpm lint` 0 ✅ · `pnpm build` 12.0s 3.56MB (883kB gzip) ✅ · grep `AppHeader` in app/docs (non-historical) = 0 ✅.
+- **Files:** `app/common/components/TopNav.vue` (renamed) + `__tests__/TopNav.spec.ts` (renamed) + `app/app.vue` + `app/README.md` + `app/common/store/AuthStore.ts` + `app/common/utils/nav.ts` + `app/features/auth/__tests__/{LoginPage,CheckEmailPage,RegisterPage}.spec.ts` + `docs/architecture/{architecture,flows/auth/README,flows/layout-navigation/README}.md` + `docs/08-PROGRESS.md`.
+- **Commit:** `95f7735` — refactor(common): rename AppHeader.vue → TopNav.vue.
+- **Next:** push → Vercel auto-deploy + prod audit (no functional change, smoke test only). (Agesta directive: "termasuk footer memiliki background yang berbeda, tolong samakan seperti background home page" + "Tolong masukan rule prinsip koding ke docs repo wikendo")
 
 - **Why (canvas):** 11 tempat mendeklarasikan background kanvas sendiri — home `#F5F5F4`, auth `#f2f2f2`, history/account fallback `bg-base #fffdf9`, quiz/mall/legal hardcode `#f5f5f4`, skeleton bones hex. Konsekuensi: footer strip & area bawah halaman tampil band warna berbeda (terlihat di prod: home page `rgb(245,245,244)` vs history `rgba(0,0,0,0)` sebelum fix). Prinsip: SATU kanvas = SATU sumber kebenaran — layout (`app.vue`) yang mengecat, feature hanya mengisi konten. Pelanggaran SOC/DRY.
 - **Why (font):** 5 halaman auth masing-masing mengulang `font-family: "Plus Jakarta Sans"` inline → DRY violation. Dipindah ke `assets/css/tailwind.css` `@layer base body`.
