@@ -13,12 +13,14 @@ const meta = computed(() => getLoaderMeta(props.variant));
 
 <template>
   <div class="text-center py-16" role="status" aria-live="polite">
+    <!-- Skeleton placeholder (pulsing) -->
     <div
-      class="mx-auto mb-4 rounded-full animate-spin"
-      style="width: 56px; height: 56px; border: 5px solid #ececec"
-      :style="{ borderTopColor: meta.accent }"
+      class="mx-auto mb-4 rounded-md bg-gray-200 animate-pulse"
+      style="width: 56px; height: 56px"
     />
-    <p class="font-extrabold text-[15px]">{{ meta.title }}</p>
+    <p class="font-extrabold text-[15px]" :style="{ color: meta.accent }">
+      {{ meta.title }}
+    </p>
     <p class="text-[13px] text-gray-500 mt-1">{{ meta.hint }}</p>
   </div>
 </template>

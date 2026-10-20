@@ -10,25 +10,9 @@ withDefaults(defineProps<{ color?: string; size?: string }>(), {
 </script>
 
 <template>
-  <svg
-    :class="['animate-spin', size]"
-    viewBox="0 0 24 24"
-    fill="none"
+  <!-- Replace spinner with a skeleton placeholder (pulsing) -->
+  <div
+    :class="[size, 'bg-gray-200 rounded animate-pulse']"
     aria-hidden="true"
-  >
-    <circle
-      cx="12"
-      cy="12"
-      r="10"
-      :stroke="color"
-      stroke-opacity=".25"
-      stroke-width="4"
-    />
-    <path
-      d="M22 12a10 10 0 0 0-10-10"
-      :stroke="color"
-      stroke-width="4"
-      stroke-linecap="round"
-    />
-  </svg>
+  />
 </template>
