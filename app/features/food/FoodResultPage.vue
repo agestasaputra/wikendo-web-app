@@ -3,7 +3,7 @@ WHAT: Result header + 5 recommendations + BEST MATCH deck (BEST lime badge + Hal
 WHY gift in the hero 1:1 Agesta request Oct 11: just 1 CTA on top, clean bottom without duplication, claim REQUIRES login (anti-farming), token lock paper = PAGE_BG + ink #0C0A09 + lime/rose/mint via getResultFoodMeta (1 source, tested).
 EXAMPLE: Kopi Kekinian hero — GI L2 Halal 50-100rb kids → gift Buka then tenant Maps. Lock: TENANT only, 0 tourist places. -->
 <script setup lang="ts">
-import { onMounted, watch } from "vue";
+import { onMounted, watch, ref } from "vue";
 import AppLoader from "~/common/components/AppLoader.vue";
 import { useAuthFetch } from "~/common/composables/useAuthFetch";
 import ResultError from "~/common/components/ResultError.vue";
@@ -11,7 +11,10 @@ import { useHistoryStore } from "~/common/store/HistoryStore";
 import type { TenantRecommendation } from "~/common/types/api";
 import { getMallShortLabel } from "~/common/utils/mall";
 import VoucherSheet from "~/features/food/components/VoucherSheet.vue";
-import { FOOD_PROMOS } from "~/features/food/constants/questions";
+// NOTE: Previously we used a hard-coded `FOOD_PROMOS` list (static per tenant).
+// This caused vouchers from one mall to appear under another. We now fetch the
+// active offers for the current mall via the public `/api/vouchers` endpoint.
+import type { VoucherOffer } from "~/features/food/@types/food";
 import { useVoucherStore } from "~/features/food/store/VoucherStore";
 import {
   buildFoodChips,
@@ -87,6 +90,12 @@ const quotaLabel = computed(() =>
 const mallSlug = computed(() =>
   String(quizQuery.mall_slug || quizQuery.mall || data.value?.mall_slug || ""),
 );
+const offers = ref<VoucherOffer[]>([]);
+const { data: voucherData } = await useFetch<VoucherOffer[]>("/api/vouchers", {
+  query: { mall_slug: mallSlug },
+  default: () => [],
+});
+offers.value = voucherData.value ?? [];
 const mallLabel = computed(() =>
   mallSlug.value ? getMallShortLabel(mallSlug.value) : "Mall",
 );
@@ -135,6 +144,10 @@ async function claimRow(code: string): Promise<void> {
     claimed.value = res.claim_code;
     claimNote.value = "";
     showSheet.value = false;
+    // mark the claimed offer in the local list so the sheet shows "Sudah diklaim"
+    offers.value = offers.value.map((o) =>
+      o.code === code ? { ...o, claimed: true } : o,
+    );
   } catch {
     claimNote.value = claimError.value || "Gagal klaim. Coba lagi.";
   } finally {
@@ -286,7 +299,7 @@ onMounted(() => {
           <!-- V13B sheet picker above the result: Pick 1 of 3 + remaining cap + Claim per row -->
           <VoucherSheet
             v-if="showSheet"
-            :vouchers="FOOD_PROMOS"
+            :vouchers="offers"
             :hero-name="hero.name"
             :claiming="claiming"
             :claiming-code="claimingCode"

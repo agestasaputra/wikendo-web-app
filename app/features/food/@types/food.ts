@@ -50,6 +50,17 @@ export interface VoucherItem {
   cap: number;
 }
 
+/** V13D offer row returned by GET /api/vouchers (joined to tenant + mall). */
+export interface VoucherOffer {
+  code: string;
+  tenant_id: string;
+  tenant_name: string;
+  promo_text: string;
+  discount_percent: number;
+  expires_at: string;
+  claimed: boolean;
+}
+
 export interface VoucherClaimResult {
   status: string;
   claim_code: string;
