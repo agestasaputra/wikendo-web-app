@@ -110,6 +110,7 @@
 
 ### ✅ DONE (summary — details in the LOG below)
 
+- [x] Stored-result flow DONE ✅ 20 Oct: 1 hasil = 1 URL `?id=<uuid>`; GET gratis (0 quota, 0 LLM), share kirim URL kanonik, history card clickable. Tests 451/451, lint 0, build 10.3s, prod audit green (`/api/result/<uuid>` 200, junk 400, share note OK) — commit `a64b82f` + `ed8a4fc`.
 - [x] Supabase DB integration (DONE ✅ 8 Oct): project `wikendo-production` → run base + migration + seed 5×40 verified → local `.env` ✅ → 3 Vercel Production envs ✅ → prod `/api/malls` 200 (5 malls) + `/api/malls/grand-indonesia/tenants` 200 (40 tenants) ✅
 - [x] Addendum v1.3 Revamp+Auth APPROVED by Agesta 7 Oct 2026 — LOCKED (`docs/09-PRD-Addendum-Revamp-Combo-Auth.md` DRAFT → Approved) ✅
 - [x] Revamp combo 5+10+15 (`design/revamp-combo-5-10-15.html`) — 1 whole flow Home→Quiz→Result→Food→Voucher→Directory, visuals unified, waiting for Agesta's approval ✅
