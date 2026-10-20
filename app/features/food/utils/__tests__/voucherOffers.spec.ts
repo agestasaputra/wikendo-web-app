@@ -5,6 +5,7 @@ import {
   countdownLabel,
   otherOffers,
   pickHeroOffer,
+  promoLinkLabel,
 } from "../voucherOffers";
 import type { VoucherOffer } from "../../@types/food";
 
@@ -74,6 +75,54 @@ describe("pickHeroOffer", () => {
 
   it("empty tenant id → null", () => {
     expect(pickHeroOffer([offer()], "")).toBeNull();
+  });
+});
+
+describe("pickHeroOffer — name fallback for STORED decks", () => {
+  it("tenant_id missing (old stored deck) → matches by tenant name", () => {
+    const offers = [
+      offer({
+        code: "A",
+        tenant_id: "t-burgreens",
+        tenant_name: "Burger Greens",
+      }),
+    ];
+    expect(pickHeroOffer(offers, "", "Burger Greens")?.code).toBe("A");
+  });
+
+  it("name match ignores case + surrounding spaces", () => {
+    const offers = [offer({ code: "B", tenant_name: "HokBen" })];
+    expect(pickHeroOffer(offers, "", "  hokben ")?.code).toBe("B");
+  });
+
+  it("id wins over a same-name tenant in another row", () => {
+    const offers = [
+      offer({ code: "A", tenant_id: "t-x", tenant_name: "Kopi" }),
+      offer({ code: "B", tenant_id: "t-y", tenant_name: "Kopi" }),
+    ];
+    expect(pickHeroOffer(offers, "t-y", "Kopi")?.code).toBe("B");
+  });
+
+  it("neither id nor name matches → null (never borrow another tenant's code)", () => {
+    const offers = [
+      offer({ tenant_id: "t-burgreens", tenant_name: "Burger Greens" }),
+    ];
+    expect(pickHeroOffer(offers, "", "HokBen")).toBeNull();
+  });
+});
+
+describe("promoLinkLabel", () => {
+  it("0 other promos → empty string (no dead link)", () => {
+    expect(promoLinkLabel(0)).toBe("");
+  });
+
+  it("1 → '+1 promo lain'", () => {
+    expect(promoLinkLabel(1)).toBe("+1 promo lain");
+  });
+
+  it("2+ → '+2 promo lain'", () => {
+    expect(promoLinkLabel(2)).toBe("+2 promo lain");
+    expect(promoLinkLabel(4)).toBe("+4 promo lain");
   });
 });
 

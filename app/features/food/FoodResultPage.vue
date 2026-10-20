@@ -3,7 +3,7 @@ WHAT: Result header + 5 recommendations + BEST MATCH deck (BEST lime badge + Hal
 WHY gift in the hero 1:1 Agesta request Oct 11: just 1 CTA on top, clean bottom without duplication, claim REQUIRES login (anti-farming), token lock paper = PAGE_BG + ink #0C0A09 + lime/rose/mint via getResultFoodMeta (1 source, tested).
 EXAMPLE: Kopi Kekinian hero — GI L2 Halal 50-100rb kids → gift Buka then tenant Maps. Lock: TENANT only, 0 tourist places. -->
 <script setup lang="ts">
-import { onMounted, watch, ref } from "vue";
+import { onMounted, onUnmounted, watch, ref } from "vue";
 import AppLoader from "~/common/components/AppLoader.vue";
 import { useAuthFetch } from "~/common/composables/useAuthFetch";
 import ResultError from "~/common/components/ResultError.vue";
@@ -16,6 +16,13 @@ import VoucherSheet from "~/features/food/components/VoucherSheet.vue";
 // active offers for the current mall via the public `/api/vouchers` endpoint.
 import type { VoucherOffer } from "~/features/food/@types/food";
 import { useVoucherStore } from "~/features/food/store/VoucherStore";
+import {
+  buildDiscountLabel,
+  countdownLabel,
+  otherOffers,
+  pickHeroOffer,
+  promoLinkLabel,
+} from "~/features/food/utils/voucherOffers";
 import {
   buildFoodChips,
   buildFoodHero,
@@ -72,7 +79,8 @@ const { data, pending, error, refresh } = await useAsyncData<FoodResponse>(
 );
 const list = computed(() => data.value?.recommendations || []);
 const idx = ref(0);
-const claimed = ref("");
+const claimed = ref<string[]>([]);
+const claimedCode = computed(() => claimed.value[0] ?? "");
 const claimNote = ref("");
 const errorMessage = computed(() =>
   getErrorMessage(error.value, "Gagal generate."),
@@ -90,22 +98,70 @@ const quotaLabel = computed(() =>
 const mallSlug = computed(() =>
   String(quizQuery.mall_slug || quizQuery.mall || data.value?.mall_slug || ""),
 );
-const offers = ref<VoucherOffer[]>([]);
-const { data: voucherData } = await useFetch<VoucherOffer[]>("/api/vouchers", {
-  query: { mall_slug: mallSlug },
-  default: () => [],
-});
-offers.value = voucherData.value ?? [];
-const mallLabel = computed(() =>
-  mallSlug.value ? getMallShortLabel(mallSlug.value) : "Mall",
-);
 // F1b token lock (tested): ink ticket + lime discount + Claim rose + halal mint.
 const meta = getResultFoodMeta();
 // V12 gift surprise: cream-rose grad meta + rose pill (tested helper).
 const vGift = getVoucherCardMeta("gift");
 const hero = computed(() => buildFoodHero(list.value[idx.value]));
+const mallLabel = computed(() =>
+  mallSlug.value ? getMallShortLabel(mallSlug.value) : "Mall",
+);
 const chips = computed(() => buildFoodChips(list.value));
 const rankItems = computed(() => buildRankItems(list.value));
+
+// Countdown tick (30s) for the hero banner: `expires_at` is absolute, a static label goes stale.
+const nowMs = ref(Date.now());
+let countdownTimer: ReturnType<typeof setInterval> | null = null;
+onUnmounted(() => {
+  if (countdownTimer) clearInterval(countdownTimer);
+  countdownTimer = null;
+});
+onMounted(() => {
+  countdownTimer = setInterval(() => {
+    nowMs.value = Date.now();
+  }, 30_000);
+});
+
+// Offers are FETCHED per mall (V13D). `query` is a computed so a stored deck that only reveals
+// `mall_slug` after the result loads still fetches the right mall (previously the request went out
+// with an empty slug → 400 → ZERO promos on every shared link).
+const { data: voucherData } = await useFetch<VoucherOffer[]>("/api/vouchers", {
+  query: computed(() => ({ mall_slug: mallSlug.value })),
+  watch: [mallSlug],
+  default: () => [],
+});
+// Claimed rows are LOCAL (the public list cannot know per-user state); a claim flips the row here
+// so the sheet renders "Sudah diklaim" without re-fetching.
+const claimedRows = ref<string[]>([]);
+const offers = computed<VoucherOffer[]>(() =>
+  (voucherData.value ?? []).map((o) =>
+    claimedRows.value.includes(o.code) ? { ...o, claimed: true } : o,
+  ),
+);
+// The gift banner must describe the HERO tenant's OWN offer — the old UI printed a hardcoded
+// "-20%" for every tenant, so a user in a mall with no promo still saw a claimable discount.
+// Matching by name (not id) because a STORED deck carries no tenant id.
+const heroOffer = computed(() =>
+  pickHeroOffer(offers.value, "", hero.value.name),
+);
+const heroDiscount = computed(() =>
+  heroOffer.value ? buildDiscountLabel(heroOffer.value) : "",
+);
+const heroCountdown = computed(() =>
+  heroOffer.value
+    ? countdownLabel(heroOffer.value.expires_at, nowMs.value)
+    : "",
+);
+const otherOfferList = computed(() =>
+  otherOffers(offers.value, heroOffer.value?.tenant_id ?? "", 3),
+);
+const promoLink = computed(() => promoLinkLabel(otherOfferList.value.length));
+// The sheet always lists the hero offer first (already the best context), then the rest.
+const sheetOffers = computed<VoucherOffer[]>(() =>
+  heroOffer.value
+    ? [heroOffer.value, ...otherOfferList.value]
+    : otherOfferList.value,
+);
 
 function next(): void {
   if (list.value.length) idx.value = (idx.value + 1) % list.value.length;
@@ -141,13 +197,11 @@ async function claimRow(code: string): Promise<void> {
   claimingCode.value = code;
   try {
     const res = await voucherStore.claimVoucher(code);
-    claimed.value = res.claim_code;
+    claimed.value = [...claimed.value, res.claim_code];
     claimNote.value = "";
     showSheet.value = false;
     // mark the claimed offer in the local list so the sheet shows "Sudah diklaim"
-    offers.value = offers.value.map((o) =>
-      o.code === code ? { ...o, claimed: true } : o,
-    );
+    claimedRows.value = [...claimedRows.value, code];
   } catch {
     claimNote.value = claimError.value || "Gagal klaim. Coba lagi.";
   } finally {
@@ -246,7 +300,9 @@ onMounted(() => {
 
           <!-- Voucher gift inside the hero (moved from below, Oct 11 2026): Ada -20% + Buka banner, old top model removed -->
           <!-- V13A best-1 + link +2 other promos → V13B sheet (Addendum 23 v1.1). 1 dominant CTA, the rest in the sheet. -->
+          <!-- V13D: rendered ONLY when THIS tenant owns an active offer, with its REAL discount label. -->
           <div
+            v-if="heroOffer"
             class="rounded-[14px] p-3 flex gap-2 items-center mt-3"
             :style="{
               background: vGift.bg,
@@ -255,10 +311,10 @@ onMounted(() => {
           >
             <div class="text-[26px]">🎁</div>
             <div class="flex-1 text-[13px] font-bold">
-              Ada <b>-20%</b> buat lu<br /><small
+              Ada <b>{{ heroDiscount }}</b> buat lu<br /><small
                 class="font-normal text-gray-500"
-                >{{ hero.name }} · {{ mallLabel }} L{{ hero.floor }} · hari
-                ini</small
+                >{{ hero.name }} · {{ mallLabel }} L{{ hero.floor }} ·
+                {{ heroCountdown }}</small
               >
             </div>
             <button
@@ -271,10 +327,11 @@ onMounted(() => {
             </button>
           </div>
           <button
+            v-if="promoLink"
             class="w-full text-center text-[12px] font-extrabold mt-1.5 underline"
             @click="showSheet = true"
           >
-            +2 promo lain di sini
+            {{ promoLink }} di sini
             <span
               class="inline-block rounded-full px-2 py-0.5 no-underline"
               style="background: #a3e635"
@@ -286,7 +343,7 @@ onMounted(() => {
             class="text-xs text-center mt-2"
             style="color: #047857"
           >
-            🎟️ Kode: {{ claimed }} · s/d 23:59 WIB · 1 transaksi 1 kode
+            🎟️ Kode: {{ claimedCode }} · s/d 23:59 WIB · 1 transaksi 1 kode
           </p>
           <p
             v-else-if="claimNote"
@@ -299,7 +356,7 @@ onMounted(() => {
           <!-- V13B sheet picker above the result: Pick 1 of 3 + remaining cap + Claim per row -->
           <VoucherSheet
             v-if="showSheet"
-            :vouchers="offers"
+            :vouchers="sheetOffers"
             :hero-name="hero.name"
             :claiming="claiming"
             :claiming-code="claimingCode"

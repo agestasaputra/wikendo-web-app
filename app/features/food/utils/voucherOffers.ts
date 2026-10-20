@@ -38,9 +38,25 @@ export function countdownLabel(expiresAt: string, nowMs: number): string {
 export function pickHeroOffer(
   offers: VoucherOffer[],
   tenantId: string,
+  tenantName?: string,
 ): VoucherOffer | null {
-  if (!tenantId) return null;
-  return offers.find((o) => o.tenant_id === tenantId) ?? null;
+  if (tenantId) {
+    const byId = offers.find((o) => o.tenant_id === tenantId);
+    if (byId) return byId;
+  }
+  const name = (tenantName ?? "").trim().toLowerCase();
+  if (name) {
+    return (
+      offers.find((o) => o.tenant_name.trim().toLowerCase() === name) ?? null
+    );
+  }
+  return null;
+}
+
+/** Promo link label: '+N promo lain' for N other offers, '' when none. */
+export function promoLinkLabel(count: number): string {
+  if (count <= 0) return "";
+  return `+${count} promo lain`;
 }
 
 /** Every other active offer in the same mall (never the hero one), capped for the sheet. */

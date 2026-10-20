@@ -48,7 +48,7 @@ onBeforeUnmount(() => {
       class="w-10 h-1 rounded-full mx-auto mb-1.5"
       style="background: #d6d3d1"
     />
-    <p class="font-extrabold text-[13px]">🎁 Promo di {{ heroName }}</p>
+    <p class="font-extrabold text-[13px]">🎁 Promo di mall ini</p>
     <p class="text-[11px] font-bold text-gray-500 mb-1">
       Pilih 1 · 1 transaksi 1 kode · s/d 23:59 WIB
     </p>

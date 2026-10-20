@@ -53,8 +53,10 @@ describe("result-food voucher — top ticket removed", () => {
 });
 
 describe("V13A hero best-1 + '+2 promo' link", () => {
-  it("HAS a '+2 promo lain' link triggering the sheet", () => {
-    expect(PAGE).toContain("+2 promo lain");
+  it("HAS a '+N promo lain' link triggering the sheet", () => {
+    // V13D: the link label is now dynamic (+N promo lain), so the literal "+2 promo lain"
+    // can't live in the SFC source — assert the helper call shape instead.
+    expect(PAGE).toContain("promoLink");
   });
 
   it("HAS sheet state (showSheet)", () => {
