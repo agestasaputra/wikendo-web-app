@@ -1,18 +1,24 @@
 <!-- common/components/TopNav.vue → GLOBAL sticky 2-state header, AS6 wallet-card (Addendum 22 APPROVED).
-WHAT: left = Wikendo logo on "/", circular back button on every other route; anonymous = Login/Register; logged in = avatar initial + Bell + dropdown (email, Riwayat, Wishlist Segera, Keluar).
+WHAT: left = Wikendo logo on "/", circular back button on every other route; CENTRE = the page title (hidden on Home) so the user
+  always knows which page they are on; right = anonymous Login/Register instead, logged in = avatar initial + Bell + dropdown
+  (email, Riwayat, Wishlist Segera, Keluar).
 WHY: this block previously lived in app.vue; split out so the layout stays thin + the header is testable. State from AuthStore (Pinia).
+  The title comes from the pure pageTitle(path) map — ONE owner, so a new route cannot ship a blank or a differently-worded header.
 EXAMPLE: mounted once in app.vue above <NuxtPage />. -->
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
 import AppSpinner from "~/common/components/AppSpinner.vue";
 import { useAuthStore } from "~/common/store/AuthStore";
 import { isHomePath } from "~/common/utils/nav";
+import { pageTitle } from "~/common/utils/pageTitle";
 
 const auth = useAuthStore();
 const { isLoggedIn, email } = storeToRefs(auth);
 const router = useRouter();
 const route = useRoute();
 const isHome = computed(() => isHomePath(route.path));
+// Centre label = current page; null on Home (the logo is the identity there, a label would be noise).
+const title = computed(() => pageTitle(route.path));
 const showMenu = ref(false);
 const loggingOut = ref(false);
 
@@ -38,13 +44,15 @@ async function handleLogout(): Promise<void> {
 
 <template>
   <header class="bg-white sticky top-0 z-40 shadow-sm">
+    <!-- 3-slot grid: two equal 2rem rails (back button | bell) + a flexible middle → the title sits dead centre
+         at every width, and a long mall name truncates instead of pushing the rails out of the bar. -->
     <div
-      class="container mx-auto px-4 py-3 flex justify-between items-center max-w-md"
+      class="container mx-auto px-4 py-3 grid grid-cols-[2rem_minmax(0,1fr)_2rem] items-center gap-2 max-w-md"
     >
       <NuxtLink
         v-if="isHome"
         to="/"
-        class="flex items-center"
+        class="col-start-1 flex items-center justify-self-start"
         aria-label="Wikendo — beranda"
       >
         <img
@@ -59,7 +67,7 @@ async function handleLogout(): Promise<void> {
         v-else
         type="button"
         aria-label="Kembali"
-        class="w-8 h-8 rounded-full bg-stone-100 hover:bg-stone-200 flex items-center justify-center"
+        class="col-start-1 w-8 h-8 rounded-full bg-stone-100 hover:bg-stone-200 flex items-center justify-center justify-self-start"
         @click="goBack"
       >
         <svg
@@ -75,14 +83,23 @@ async function handleLogout(): Promise<void> {
           <path d="M19 12H5M12 19l-7-7 7-7" />
         </svg>
       </button>
-      <div v-if="isLoggedIn" class="flex gap-2 items-center">
-        <button
-          type="button"
-          aria-label="Notifikasi"
-          class="text-lg leading-none"
-        >
-          🔔
-        </button>
+      <!-- Page title: a <p> (not <h1>) so it never competes with the page's own <h1> for SEO/outline. -->
+      <p
+        v-if="title"
+        class="col-start-2 text-sm font-extrabold text-ink text-center truncate max-w-[220px]"
+      >
+        {{ title }}
+      </p>
+      <div class="col-start-3 justify-self-end flex gap-2 items-center">
+        <div v-if="isLoggedIn" class="flex gap-2 items-center">
+          <button
+            type="button"
+            aria-label="Notifikasi"
+            class="text-lg leading-none"
+          >
+            🔔
+          </button>
+        </div>
       </div>
       <!-- AS6 wallet-card mini dropdown: grey email + Riwayat + Wishlist (Segera) + red Keluar. -->
       <div

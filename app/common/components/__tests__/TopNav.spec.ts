@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { readSource } from "~/test/utils";
+import { pageTitle } from "~/common/utils/pageTitle";
 
 /**
  * TopNav.spec.ts — Global 2-state header AS6 wallet-card (Addendum 22) + app.vue layout.
@@ -63,6 +64,38 @@ describe("app.vue — thin global layout", () => {
     expect(readSource("common/components/BottomNav.vue")).toMatch(
       /sticky bottom-0/,
     );
+  });
+});
+
+describe("TopNav centre title (which page am I on?)", () => {
+  it("renders a centred title driven by the pure pageTitle(path) helper", () => {
+    expect(HEADER).toContain("pageTitle");
+    expect(HEADER).toContain('v-if="title"');
+    expect(HEADER).toContain("text-center");
+  });
+
+  it("is NOT rendered on the home page (title = null there)", () => {
+    // The home page keeps the logo as its identity — no label above the hero.
+    expect(pageTitle("/")).toBeNull();
+  });
+
+  it("never becomes a second <h1> next to the page content's own <h1>", () => {
+    // Strip HTML comments first: the doc comment may legitimately mention "<h1>" while the markup must not use it.
+    const markup = readSource("common/components/TopNav.vue").replace(
+      /<!--[\s\S]*?-->/g,
+      "",
+    );
+    expect(markup).not.toContain("<h1");
+    expect(markup).toContain("<p");
+  });
+
+  it("long mall names are truncated, not pushed into the bell", () => {
+    expect(HEADER).toContain("truncate");
+  });
+
+  it("the 3-slot grid keeps the title optically centred between back button and bell", () => {
+    expect(HEADER).toMatch(/grid-cols-\[/);
+    expect(HEADER).toContain("justify-self-end");
   });
 });
 
