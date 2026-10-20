@@ -66,4 +66,26 @@ describe("PAGE_BG — kanvas halaman tunggal", () => {
       );
     }
   });
+
+  it("footer global TIDAK punya background sendiri → ikut kanvas PAGE_BG", () => {
+    const app = readFileSync(join(APP_ROOT, "app.vue"), "utf8");
+    const start = app.indexOf("<footer");
+    const end = app.indexOf("</footer>");
+    expect(start).toBeGreaterThan(-1);
+    const footerTag = app.slice(start, app.indexOf(">", start) + 1);
+    // A footer with its own bg/colour band is what made it read as a different page.
+    expect(footerTag).not.toMatch(/background/i);
+    expect(footerTag).not.toMatch(/\bbg-/);
+    expect(end).toBeGreaterThan(start);
+  });
+
+  it("type ramp satu pemilik: tailwind.css @layer base, app.vue tanpa fontFamily inline", () => {
+    const css = readFileSync(join(APP_ROOT, "assets/css/tailwind.css"), "utf8");
+    expect(css).toMatch(/@layer base/);
+    expect(css).toContain("Plus Jakarta Sans");
+
+    const app = readFileSync(join(APP_ROOT, "app.vue"), "utf8");
+    expect(app).not.toMatch(/fontFamily/);
+    expect(app).not.toContain("Plus Jakarta Sans");
+  });
 });

@@ -3,6 +3,7 @@ WHAT: AppHeader sticky + <NuxtPage/> (stretched vertically down to the top of Bo
 WHY: 1 layout used by every page → consistent + saves work. Header/nav contents live in common/components (layout stays thin).
   Page canvas background is OWNED BY THIS LAYOUT via PAGE_BG: features only fill content, so every route
   (home, history, account, mall, legal, quiz, result) shares one colour and cannot drift apart again.
+  The type ramp is owned by assets/css/tailwind.css @layer base — no inline font here.
 EXAMPLE: short page (History) → main grows to the top of BottomNav; long page → nav stays stuck at the viewport bottom. -->
 <script setup lang="ts">
 import AppHeader from "~/common/components/AppHeader.vue";
@@ -21,10 +22,7 @@ useHead({ bodyAttrs: { class: "bg-stone-200" } });
 <template>
   <div
     class="max-w-md mx-auto min-h-dvh flex flex-col text-ink shadow-[0_0_32px_rgba(0,0,0,0.14)]"
-    :style="{
-      background: PAGE_BG,
-      fontFamily: 'Plus Jakarta Sans, system-ui, sans-serif',
-    }"
+    :style="{ background: PAGE_BG }"
   >
     <AppHeader class="w-full" />
     <!-- Page root grows to the top of BottomNav; w-full because the pages' mx-auto would otherwise shrink them in a flex column. -->
