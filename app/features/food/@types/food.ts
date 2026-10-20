@@ -14,7 +14,6 @@ export interface ResultFoodMeta {
   bestBg: string;
   halalBg: string;
   halalColor: string;
-  pageBg: string;
   cardBg: string;
 }
 

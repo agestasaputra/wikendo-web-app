@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { readSource } from "~/test/utils";
+import { readSource, rootTag } from "~/test/utils";
 
 /**
  * CheckEmailPage.spec.ts — Option B magic-link: /check-email page (Agesta lock Oct 10 2026, "Gas B").
@@ -12,11 +12,10 @@ const C = readSource(
 );
 
 describe("option B magic-link — /check-email page", () => {
-  it("Cek email title + shows email from query + font + paper matching register 1:1", () => {
+  it("Cek email title + shows email from query + canvas from PAGE_BG", () => {
     expect(C).toContain("Cek email");
     expect(C).toContain("route.query.email");
-    expect(C).toContain("Plus Jakarta Sans");
-    expect(C).toContain("#f5f5f4");
+    expect(rootTag(C)).not.toMatch(/background/i);
     expect(C).toContain("max-w-md mx-auto px-4 pb-10");
   });
 

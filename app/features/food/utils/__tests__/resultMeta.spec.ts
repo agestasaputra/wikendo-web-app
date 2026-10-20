@@ -22,9 +22,9 @@ describe("getResultFoodMeta (F1b voucher ticket)", () => {
     expect(m.halalColor).toBe("#047857");
   });
 
-  it("page paper #F5F5F4 + white card (token lock)", () => {
+  it("white card + no page canvas token (owned by app.vue PAGE_BG)", () => {
     const m = getResultFoodMeta();
-    expect(m.pageBg).toBe("#F5F5F4");
+    expect(Object.keys(m)).not.toContain("pageBg");
     expect(m.cardBg).toBe("#fff");
   });
 });

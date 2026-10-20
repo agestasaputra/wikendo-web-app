@@ -1,9 +1,10 @@
 <!-- features/mall/MallDetailPage.vue → GET /mall/:slug (SEO Directory, S2c Tenant Photo + S2b infinity).
-WHAT: search + filter chips (halal/budget/mission) + tenant photo card + pre-filled quiz CTA, 46px thumb + promo badge overlay, paper bg #F5F5F4 + infinity 10/page (sentinel + 2-row skeleton + sticky count "10/40").
+WHAT: search + filter chips (halal/budget/mission) + tenant photo card + pre-filled quiz CTA, 46px thumb + promo badge overlay, paper bg = PAGE_BG (app.vue) + infinity 10/page (sentinel + 2-row skeleton + sticky count "10/40").
 WHY: S2b infinity — 40 tenants at once is heavy on low-end phones → 10/page, page-1 SSR stays (SEO safe), continues on client. Quiz CTA + search + chips STICKY so they aren't thrown off by scroll. Server-side filter (reset page); client-side keyword on top of loaded items (spec S2b: filtered = keyword(client) + page(server)).
-Token lock: ink stays #0C0A09, rose stays #E11D48, paper stays #F5F5F4. -->
+Token lock: ink stays #0C0A09, rose stays #E11D48, paper = PAGE_BG (one owner). -->
 <script setup lang="ts">
 import AppLoader from "~/common/components/AppLoader.vue";
+import { PAGE_BG } from "~/common/constants/theme";
 import { useInfiniteList } from "~/common/composables/useInfiniteList";
 import { useSentinelObserver } from "~/common/composables/useSentinelObserver";
 import type { InfiniteFetchPage } from "~/common/types/pagination";
@@ -96,7 +97,7 @@ const promoStrip = computed(() =>
 </script>
 
 <template>
-  <div class="max-w-md mx-auto px-4 py-2 pb-10" style="background: #f5f5f4">
+  <div class="max-w-md mx-auto px-4 py-2 pb-10">
     <div class="flex justify-between items-center">
       <h1 class="text-xl font-extrabold">🏢 {{ mallName }}</h1>
       <span class="text-xs font-bold text-gray-500">{{
@@ -105,7 +106,7 @@ const promoStrip = computed(() =>
     </div>
 
     <!-- Sticky: search + chips + CTA (S2b spec: not thrown off by scroll) -->
-    <div class="sticky top-0 pt-2 pb-2" style="background: #f5f5f4">
+    <div class="sticky top-0 pt-2 pb-2" :style="{ background: PAGE_BG }">
       <div
         class="bg-white border border-[#e4e4e7] rounded-xl px-3.5 py-2.5 text-[13px] text-gray-500 flex gap-2 items-center"
       >
@@ -201,13 +202,10 @@ const promoStrip = computed(() =>
           :key="i"
           class="border border-gray-100 rounded-2xl p-2.5 bg-white flex gap-2.5 items-center animate-pulse"
         >
-          <div
-            class="w-[46px] h-[46px] flex-none rounded-xl"
-            style="background: #f5f5f4"
-          />
+          <div class="w-[46px] h-[46px] flex-none rounded-xl bg-stone-100" />
           <div class="flex-1">
-            <div class="h-4 rounded w-2/3" style="background: #f5f5f4" />
-            <div class="h-3 rounded w-1/3 mt-1.5" style="background: #f5f5f4" />
+            <div class="h-4 rounded w-2/3 bg-stone-100" />
+            <div class="h-3 rounded w-1/3 mt-1.5 bg-stone-100" />
           </div>
         </div>
       </div>

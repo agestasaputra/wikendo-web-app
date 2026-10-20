@@ -8,6 +8,7 @@
 
 ## Before you start
 
+0. **Coding principles are LOCKED.** Read [`docs/26-Coding-Principles.md`](docs/26-Coding-Principles.md) — **SOC · KISS · DRY · Single Responsibility · Document Your Code**. They are checklist items in [Definition of done](#definition-of-done), not suggestions. A diff that violates one of them is **not done**, even if tests pass.
 1. **Load context.** Read [`docs/architecture/architecture.md`](docs/architecture/architecture.md), then 1 spoke at `docs/architecture/flows/<topic>/README.md` that covers the area you are changing.
 2. **Green baseline.** Run `pnpm lint && pnpm type-check && pnpm test` (in `app/`) before touching any file. If it is already red, stop and report — don't fix unrelated things.
 3. **Scope check.** Make sure the task stays within 1 feature slice. Cross-feature → go through `common/`. If the task bleeds across features, flag it before continuing.
@@ -20,6 +21,11 @@
 - [ ] `pnpm type-check` exit 0
 - [ ] `pnpm test` green (at minimum `pnpm test path/to/x.spec.ts` for the changed code)
 - [ ] `pnpm build` exit 0 before a PR
+- [ ] **SOC** — the change sits in the right layer (component ≠ fetch, util pure, `server/` only on the server); no cross-feature import
+- [ ] **KISS** — no speculative option/flag/layer; the diff is the minimum that solves the stated problem
+- [ ] **DRY** — no second copy of an existing constant/limit/copy string; extracted to `common/constants/` or `features/<x>/constants/`
+- [ ] **Single responsibility** — no function/component/store doing two jobs; server functions ≤ 50 lines
+- [ ] **Document** — new/changed file has WHAT/WHY/EXAMPLE header, new exports have JSDoc; flow spoke + GLOSSARY + `08-PROGRESS.md` updated
 - [ ] Every new pure function / composable / store / util has a sibling `__tests__/<name>.spec.ts` (TDD: watch it go RED first)
 - [ ] Flow/store/composable/endpoint changed → the spoke in `docs/architecture/flows/` is updated, `status: ready`
 - [ ] No `console.log`, `v-html`, `any`, or secrets in code/logs
@@ -40,6 +46,24 @@
 Identifiers (tables, columns, API/JSON fields, RLS policy names, cookie/storage keys) are English too. The former `lantai` column is now `floor` and the "makan quota" policies are now "food quota" (`supabase/migration-v16-english-identifiers.sql`). Prices are stored as integer rupiah (`price_min`/`price_max`, `supabase/migration-v17-price-columns.sql`); display text like "Rp 30-80rb" is built in the UI by `utils/price.ts`.
 
 Stored old values are migrated by `supabase/migration-v15-english-values.sql` (mood, companion, budget, location, time, mission, tenant category + the `budget_tier` CHECK).
+
+---
+
+## Coding principles (LOCKED — non-negotiable)
+
+Full rules, worked examples, and anti-patterns: [`docs/26-Coding-Principles.md`](docs/26-Coding-Principles.md). Summary:
+
+| Principle | One-line rule for this repo |
+| --------- | --------------------------- |
+| **SOC** | Pages route · features render · utils are pure · stores own one state slice · `server/` owns secrets/DB/LLM. A component never fetches inline; a util never touches route/cookie/DB. |
+| **KISS** | Smallest diff that solves the stated problem. No "for later" flags/options/layers. A P1 idea goes to BACKLOG, not code. Extract on the second real caller, not the first. |
+| **DRY** | One owner per fact. Colors, limits, quota numbers, shared copy → `common/constants/` (or `features/<x>/constants/`). Same value twice = bug waiting to diverge. |
+| **Single responsibility** | One reason to change per module/function. "and" in the name → split. Server handler ≤ 50 lines; heavy work → `server/utils/`. |
+| **Document** | Every file: WHAT / WHY / EXAMPLE header. Every export: JSDoc. Comments explain WHY, not WHAT. Spoke + GLOSSARY + `08-PROGRESS.md` updated with the change. |
+
+**Known failure this rule prevents:** the page canvas colour had 4 owners (`homeHero.pageBg`, `resultMeta.pageBg` ×2, hardcoded `#f5f5f4` in mall/legal) while history/account set none and fell back to `bg-base` → 3 visibly different backgrounds. Fixed by one `PAGE_BG` in `common/constants/theme.ts` owned by `app.vue`, locked by `common/constants/__tests__/theme.spec.ts`.
+
+**Reviewer's 5 checks:** (1) name the layer of each hunk — wrong layer = request changes; (2) search the diff for duplicated literals; (3) look for new params with one call site; (4) check headers + JSDoc; (5) run lint → type-check → test → build.
 
 ---
 

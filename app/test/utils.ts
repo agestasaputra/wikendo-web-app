@@ -39,3 +39,13 @@ export function readSource(...rels: string[]): string {
     .map((rel) => normalizeSource(fs.readFileSync(fromRoot(rel), "utf-8")))
     .join("\n");
 }
+
+/** Root element of a page = the first tag after <template> (attributes only, no children).
+ * WHY: the page canvas belongs to app.vue (PAGE_BG); a feature root must not paint a background. */
+export function rootTag(raw: string): string {
+  const start = raw.indexOf("<template>");
+  if (start === -1) return "";
+  const tagStart = raw.indexOf("<", start);
+  const tagEnd = raw.indexOf(">", tagStart);
+  return raw.slice(tagStart, tagEnd + 1);
+}

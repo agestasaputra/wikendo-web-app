@@ -3,6 +3,8 @@
  *
  * WHAT: getResultPlaceMeta() → colors. PURE. Agesta token lock: lime=value, ember=strip, ink=action.
  * WHY: 1 source of truth, not hardcoded hex in the PlaceResultPage template.
+ *   `pageBg` is intentionally ABSENT — the page canvas belongs to app.vue via PAGE_BG
+ *   (common/constants/theme), so no feature can drift to its own background again.
  * EXAMPLE: getResultPlaceMeta().strip → "#EA580C".
  */
 import type { ResultPlaceMeta } from "../@types/place";
@@ -15,7 +17,6 @@ export function getResultPlaceMeta(): ResultPlaceMeta {
     bestColor: "#0C0A09",
     actionBg: "#0C0A09",
     actionColor: "#fff",
-    pageBg: "#F5F5F4",
     cardBg: "#fff",
     moreBg: "#0C0A09",
     moreColor: "#A3E635",

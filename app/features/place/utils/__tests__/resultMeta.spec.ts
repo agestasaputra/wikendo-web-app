@@ -13,11 +13,11 @@ describe("getResultPlaceMeta (R3b photo + lime)", () => {
     expect(m.bestColor).toBe("#0C0A09");
   });
 
-  it("action button ink #0C0A09 + page paper #F5F5F4 + white card", () => {
+  it("action button ink #0C0A09 + white card (page canvas owned by app.vue)", () => {
     const m = getResultPlaceMeta();
     expect(m.actionBg).toBe("#0C0A09");
     expect(m.actionColor).toBe("#fff");
-    expect(m.pageBg).toBe("#F5F5F4");
+    expect(Object.keys(m)).not.toContain("pageBg");
     expect(m.cardBg).toBe("#fff");
   });
 

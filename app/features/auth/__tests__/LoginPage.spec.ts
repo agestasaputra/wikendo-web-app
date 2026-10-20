@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { readSource } from "~/test/utils";
+import { readSource, rootTag } from "~/test/utils";
 
 /**
  * LoginPage.spec.ts — 100% /login slicing per the latest screenshot (Oct 9 2026).
@@ -19,9 +19,10 @@ const WIRING = readSource(
 );
 
 describe("login revamp 100% image — structure + exact text", () => {
-  it("mobile container max-w-md + light gray background #F2F2F2 (not body/root)", () => {
+  it("mobile container max-w-md; canvas comes from PAGE_BG (no local background)", () => {
     expect(L).toContain("max-w-md mx-auto px-4 pb-10");
-    expect(L).toContain("#f2f2f2");
+    expect(L).not.toContain("#f2f2f2");
+    expect(rootTag(L)).not.toMatch(/background/i);
   });
 
   it("no duplicate local header (global header already in AppHeader, image starts from the banner)", () => {

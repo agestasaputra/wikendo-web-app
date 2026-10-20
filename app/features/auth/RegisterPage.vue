@@ -78,16 +78,7 @@ async function handleGoogle(): Promise<void> {
 </script>
 
 <template>
-  <div
-    class="max-w-md mx-auto px-4 pb-10 min-h-screen"
-    style="
-      background: #f5f5f4;
-      font-family:
-        Plus Jakarta Sans,
-        system-ui,
-        sans-serif;
-    "
-  >
+  <div class="max-w-md mx-auto px-4 pb-10 min-h-screen">
     <!-- 1. Black promo banner — 1:1 image (ember strip + radius 12 + light-lime number) -->
     <AuthBanner
       title="DAFTAR GRATIS"

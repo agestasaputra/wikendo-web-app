@@ -93,16 +93,7 @@ async function _handleForgot(): Promise<void> {
 </script>
 
 <template>
-  <div
-    class="max-w-md mx-auto px-4 pb-10 min-h-screen"
-    style="
-      background: #f2f2f2;
-      font-family:
-        Plus Jakarta Sans,
-        system-ui,
-        sans-serif;
-    "
-  >
+  <div class="max-w-md mx-auto px-4 pb-10 min-h-screen">
     <!-- 1. Black quota banner — 1:1 L1 EMBER HERO (ember strip + radius 12 + light-lime number) -->
     <AuthBanner
       title="QUOTA HABIS • reset 00.00"

@@ -33,10 +33,7 @@ function select(v: string): void {
 </script>
 
 <template>
-  <div
-    class="max-w-md mx-auto px-4 pb-10 py-5 min-h-[80vh] flex flex-col"
-    style="background: #f5f5f4"
-  >
+  <div class="max-w-md mx-auto px-4 pb-10 py-5 min-h-[80vh] flex flex-col">
     <!-- Q2d ink header: WHITE label + bright-ember dot, white question, lime block segment -->
     <QuizHeader
       :meta="headMeta"

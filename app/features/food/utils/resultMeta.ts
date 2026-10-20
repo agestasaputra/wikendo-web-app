@@ -2,6 +2,8 @@
  * features/food/utils/resultMeta.ts — FOOD result card tokens F1b (ink ticket + lime discount).
  *
  * WHAT: getResultFoodMeta() → colors. PURE. Agesta token lock: ink + lime + rose + mint.
+ *   `pageBg` is intentionally ABSENT — the page canvas is owned by app.vue via PAGE_BG
+ *   (common/constants/theme), so a feature page can never drift to its own background again.
  * EXAMPLE: getResultFoodMeta().claimBg → "#E11D48".
  */
 import type { ResultFoodMeta } from "../@types/food";
@@ -17,7 +19,6 @@ export function getResultFoodMeta(): ResultFoodMeta {
     bestBg: "#A3E635",
     halalBg: "#ECFDF5",
     halalColor: "#047857",
-    pageBg: "#F5F5F4",
     cardBg: "#fff",
   };
 }

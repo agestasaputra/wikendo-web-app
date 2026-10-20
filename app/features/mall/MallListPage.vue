@@ -1,9 +1,10 @@
 <!-- features/mall/MallListPage.vue → GET /mall (Directory hub index, D1 Neutral Mall Hub ⭐ + S2b infinity).
-WHAT: mall card list (name + area + tenant count) + 2 CTAs per card (Lihat Tenant / Cariin yang cocok), mall label INK (#0C0A09), "Cariin" CTA rose (#E11D48), paper bg (#F5F5F4) + infinity scroll 10/page (sentinel + 2-row skeleton + sticky count).
+WHAT: mall card list (name + area + tenant count) + 2 CTAs per card (Lihat Tenant / Cariin yang cocok), mall label INK (#0C0A09), "Cariin" CTA rose (#E11D48), paper bg = PAGE_BG (app.vue) + infinity scroll 10/page (sentinel + 2-row skeleton + sticky count).
 WHY: D1 "Mall Hub · Neutral" + S2b infinity — 5 malls is light now, but the SAME pattern as detail (40 tenants) → 1 useInfiniteList composable, backward-compat API (no ?limit = legacy array). Page-1 SSR via await start() (SEO stays).
-Token lock: ink stays #0C0A09, rose stays #E11D48, paper stays #F5F5F4. -->
+Token lock: ink stays #0C0A09, rose stays #E11D48, paper = PAGE_BG (one owner). -->
 <script setup lang="ts">
 import AppLoader from "~/common/components/AppLoader.vue";
+import { PAGE_BG } from "~/common/constants/theme";
 import { useInfiniteList } from "~/common/composables/useInfiniteList";
 import { useSentinelObserver } from "~/common/composables/useSentinelObserver";
 import type { InfiniteFetchPage } from "~/common/types/pagination";
@@ -51,10 +52,10 @@ function mallArea(m: MallItem): string {
 </script>
 
 <template>
-  <div class="max-w-md mx-auto px-4 pb-10" style="background: #f5f5f4">
+  <div class="max-w-md mx-auto px-4 pb-10">
     <div
       class="flex justify-between items-center sticky top-0 py-2"
-      style="background: #f5f5f4"
+      :style="{ background: PAGE_BG }"
     >
       <h1 class="text-xl font-extrabold">🏢 Mall</h1>
       <span class="text-xs font-bold text-gray-500">{{
@@ -119,8 +120,8 @@ function mallArea(m: MallItem): string {
           :key="i"
           class="bg-white rounded-2xl border border-gray-100 p-4 animate-pulse"
         >
-          <div class="h-4 rounded w-2/3" style="background: #f5f5f4" />
-          <div class="h-3 rounded w-1/3 mt-2" style="background: #f5f5f4" />
+          <div class="h-4 rounded w-2/3 bg-stone-100" />
+          <div class="h-3 rounded w-1/3 mt-2 bg-stone-100" />
         </div>
       </div>
       <!-- Infinity scroll sentinel -->

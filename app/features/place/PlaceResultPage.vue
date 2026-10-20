@@ -1,5 +1,5 @@
 <!-- features/place/PlaceResultPage.vue → GET /result-place (PLACE result deck, R3b Photo + Lime 1:1 screenshot).
-WHAT: header Hasil + 5 recommendations + hero photo + BEST lime badge + ember strip + Navigate ink/Save/Share + chips + rank #1-3 + quota note. Base paper #F5F5F4, 24px cards.
+WHAT: header Hasil + 5 recommendations + hero photo + BEST lime badge + ember strip + Navigate ink/Save/Share + chips + rank #1-3 + quota note. Base paper = PAGE_BG (app.vue), 24px cards.
 WHY R3b 1:1: lime=value (best/rating) + ember=strip + ink=action (footnote spec), token lock via getResultPlaceMeta (1 source, tested). Lock Split: PLACE only, 0 tenant. Save = login wall moment #2.
 EXAMPLE: hero Rooftop Senayan — Senayan 4.8 sunset+live music → Navigate → Lainnya chips shift the deck 1→5 without refetching. -->
 <script setup lang="ts">
@@ -137,10 +137,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div
-    class="max-w-md mx-auto px-4 pb-10 py-5"
-    :style="{ background: meta.pageBg }"
-  >
+  <div class="max-w-md mx-auto px-4 pb-10 py-5">
     <p class="text-[11.5px] text-gray-500 -mt-1 mb-2">
       {{
         isStored

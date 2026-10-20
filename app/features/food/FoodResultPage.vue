@@ -1,6 +1,6 @@
 <!-- features/food/FoodResultPage.vue → GET /result-food (TENANT result + gift in the hero).
 WHAT: Result header + 5 recommendations + BEST MATCH deck (BEST lime badge + Halal mint) + gift in the hero (Ada -20% + Buka) + tenant Maps + chips + rank #1-3 + food quota.
-WHY gift in the hero 1:1 Agesta request Oct 11: just 1 CTA on top, clean bottom without duplication, claim REQUIRES login (anti-farming), token lock paper #F5F5F4 + ink #0C0A09 + lime/rose/mint via getResultFoodMeta (1 source, tested).
+WHY gift in the hero 1:1 Agesta request Oct 11: just 1 CTA on top, clean bottom without duplication, claim REQUIRES login (anti-farming), token lock paper = PAGE_BG + ink #0C0A09 + lime/rose/mint via getResultFoodMeta (1 source, tested).
 EXAMPLE: Kopi Kekinian hero — GI L2 Halal 50-100rb kids → gift Buka then tenant Maps. Lock: TENANT only, 0 tourist places. -->
 <script setup lang="ts">
 import { onMounted, watch } from "vue";
@@ -170,10 +170,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div
-    class="max-w-md mx-auto px-4 pb-10 py-5"
-    :style="{ background: meta.pageBg }"
-  >
+  <div class="max-w-md mx-auto px-4 pb-10 py-5">
     <p class="text-[11.5px] text-gray-500 -mt-1 mb-2">
       {{
         isStored

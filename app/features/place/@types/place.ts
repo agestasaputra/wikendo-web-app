@@ -10,7 +10,6 @@ export interface ResultPlaceMeta {
   bestColor: string;
   actionBg: string;
   actionColor: string;
-  pageBg: string;
   cardBg: string;
   moreBg: string;
   moreColor: string;

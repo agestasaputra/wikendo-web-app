@@ -25,11 +25,9 @@ describe("getHomeHeroMeta (I17 V2 Ember P1)", () => {
     expect(m.ctaColor).toBe("#fff");
   });
 
-  it("page paper #F5F5F4 + white card + mint badge", () => {
+  it("page canvas is NOT a feature token (owned by app.vue PAGE_BG)", () => {
     const m = getHomeHeroMeta();
-    expect(m.pageBg).toBe("#F5F5F4");
+    expect(Object.keys(m)).not.toContain("pageBg");
     expect(m.cardBg).toBe("#fff");
-    expect(m.tagBg).toBe("#ECFDF5");
-    expect(m.tagColor).toBe("#047857");
   });
 });

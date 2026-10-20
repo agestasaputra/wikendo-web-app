@@ -3,6 +3,8 @@
  *
  * WHAT: getHomeHeroMeta() → hero colors. PURE (reads no route/state).
  * WHY: single source of truth, not hardcoded hex in the HomePage template.
+ *   `pageBg` is intentionally ABSENT — the page canvas belongs to app.vue (common/constants/theme
+ *   PAGE_BG), so home cannot drift from history/account/mall any more.
  * Example: getHomeHeroMeta().strip → "#EA580C".
  */
 import type { HomeHeroMeta } from "../@types/home";
@@ -17,7 +19,6 @@ export function getHomeHeroMeta(): HomeHeroMeta {
     pillColor: "#0C0A09",
     ctaBg: "#0C0A09",
     ctaColor: "#fff",
-    pageBg: "#F5F5F4",
     cardBg: "#fff",
     tagBg: "#ECFDF5",
     tagColor: "#047857",

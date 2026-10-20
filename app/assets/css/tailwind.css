@@ -1,3 +1,14 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/*
+ * Global type ramp (single owner).
+ * WHY: previously 5 auth pages each repeated font-family: "Plus Jakarta Sans" inline.
+ * Keeping it here means a page declares only its content — never the canvas or the font.
+ */
+@layer base {
+  body {
+    font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+  }
+}

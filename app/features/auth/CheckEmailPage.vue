@@ -1,7 +1,7 @@
 <!-- features/auth/CheckEmailPage.vue → GET /check-email (Option B magic-link, Agesta lock 10 Oct 2026).
   WHAT: waiting-for-verification page — title Cek email + show email from query + Kirim ulang button + inline message.
   WHY: signUp going straight in = bots pass + email typo = reset fails. Magic-link: Daftar → Cek email → click 1 link → HOME.
-  Style 1:1 register (paper #F5F5F4 + ink banner #0C0A09 + ember strip #EA580C + radius 12 + lime number #D9F99D).
+  Style 1:1 register (canvas = PAGE_BG from app.vue + ink banner #0C0A09 + ember strip #EA580C + radius 12 + lime number #D9F99D).
   EXAMPLE: register A@mail.com → /check-email?email=A@mail.com → click link in inbox → HOME /. -->
 <script setup lang="ts">
 import AppSpinner from "~/common/components/AppSpinner.vue";
@@ -48,16 +48,7 @@ async function handleResend(): Promise<void> {
 </script>
 
 <template>
-  <div
-    class="max-w-md mx-auto px-4 pb-10 min-h-screen"
-    style="
-      background: #f5f5f4;
-      font-family:
-        Plus Jakarta Sans,
-        system-ui,
-        sans-serif;
-    "
-  >
+  <div class="max-w-md mx-auto px-4 pb-10 min-h-screen">
     <!-- 1. Black banner — 1:1 register (ember strip + radius 12 + light-lime number) -->
     <AuthBanner
       title="HAMPIR SELESAI"

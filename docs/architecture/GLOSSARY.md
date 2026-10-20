@@ -36,6 +36,8 @@ Single source of truth for terminology used across `docs/architecture/`. Use the
 | **Pure helper**        | Input → output function with no side effects/route/cookie/DB; the only place where logic can be tested without Nuxt (`utils/`, `*/utils/`).            |
 | **Setup store**        | Pinia store using setup syntax (`defineStore("x", () => {...})`), file `XStore.ts`, function `useXStore()`.                                      |
 | **File-assert test**   | Test that reads source as text (`test/utils.ts → readSource`) to lock UI copy/tokens. ZERO network, deterministic.               |
+| **PAGE_BG**            | Single page-canvas colour (`common/constants/theme.ts`), applied by `app.vue`. Features must NOT set their own page background — that is a DRY/SOC violation and caused the 20 Oct 2026 three-background bug. |
+| **Coding principles**  | LOCKED 20 Oct 2026: SOC · KISS · DRY · Single responsibility · Document your code. Full spec: `docs/26-Coding-Principles.md`; checklist in `AGENTS.md`. |
 | **Definition of done** | Checklist in `AGENTS.md`: lint 0, type-check 0, tests green, build exit 0, docs & boundaries preserved.                                           |
 
 ## 3. External Services

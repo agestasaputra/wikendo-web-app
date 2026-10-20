@@ -68,17 +68,7 @@ async function handleSubmit(): Promise<void> {
 </script>
 
 <template>
-  <div
-    class="max-w-md mx-auto px-4 pb-10 min-h-screen"
-    style="
-      background: #f2f2f2;
-      font-family:
-        Plus Jakarta Sans,
-        system-ui,
-        sans-serif;
-      padding-top: 2rem;
-    "
-  >
+  <div class="max-w-md mx-auto px-4 pb-10 pt-8 min-h-screen">
     <form class="space-y-4" @submit.prevent="handleSubmit">
       <div
         class="bg-white rounded-full flex items-center gap-2 px-4 py-3.5 shadow-sm"

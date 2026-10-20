@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { readSource } from "~/test/utils";
+import { readSource, rootTag } from "~/test/utils";
 
 /**
  * RegisterPage.spec.ts — 100% /register slicing per image (Oct 10 2026) + Option B magic-link (Agesta lock Oct 10).
@@ -20,9 +20,10 @@ const WIRING = readSource(
 );
 
 describe("register revamp 100% image — structure + exact text", () => {
-  it("mobile container max-w-md + paper background #F5F5F4 (not body/root)", () => {
+  it("mobile container max-w-md; canvas comes from PAGE_BG (no local background)", () => {
     expect(R).toContain("max-w-md mx-auto px-4 pb-10");
-    expect(R).toContain("#f5f5f4");
+    expect(R).not.toContain("#f5f5f4");
+    expect(rootTag(R)).not.toMatch(/background/i);
   });
 
   it("no duplicate local header (global header already in AppHeader, image starts from the banner)", () => {
@@ -102,9 +103,10 @@ describe("register revamp — app feature wiring (not a mock)", () => {
     expect(WIRING).toContain("google");
   });
 
-  it("inline error (not alert) + Plus Jakarta Sans font", () => {
+  it("inline error (not alert); font is owned globally by tailwind.css", () => {
     expect(PAGE).toContain("errorMsg");
-    expect(PAGE).toContain("Plus Jakarta Sans");
+    const css = readSource("assets/css/tailwind.css");
+    expect(css).toContain("Plus Jakarta Sans");
   });
 });
 

@@ -67,7 +67,7 @@ const wallet = computed(() => buildWalletLabel(quotaStatus.value));
 </script>
 
 <template>
-  <div class="max-w-md mx-auto px-4 pb-10" :style="{ background: hero.pageBg }">
+  <div class="max-w-md mx-auto px-4 pb-10">
     <!-- Greeting header — AS6 wallet-card: anonymous 1:1 (👦 + teman Wikendo), logged in avatar initial + Halo {displayName} + Sisa kamu sub -->
     <div class="flex justify-between items-center font-bold text-sm py-3">
       <span class="flex items-center gap-2">
