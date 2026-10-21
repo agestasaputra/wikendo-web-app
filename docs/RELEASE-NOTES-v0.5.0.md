@@ -1,9 +1,11 @@
 # Wikendo — Release Notes (1 halaman)
 
-**Versi:** v0.5.0 — "Directory-first" (21 Okt 2026)
+**Versi:** v0.5.1 — "Mall List & History sort/filter" (21 Okt 2026)
 **Scope:** Mall directory (GI, Senayan City, …) + tenant ranking + analytics
 
 ## Apa yang baru
+- **Mall List**: search + sort (A→Z/Z→A/Tenant terbanyak/Tenant sedikit) — server-side.
+- **History**: client-side filter (Semua/Tempat/Makanan) + sort (Terbaru/Terlama/A→Z/Z→A).
 - **Sort bisnis yang jujur.** Ranking default kini: `promo live → hype TikTok → verified → nama`.
   Promo bukan kolom palsu di `tenants`: promo nyata datang dari join tabel `vouchers`
   (`promo_active = true` & `valid_until > now`). Tidak ada lagi kolom `promo` fiktif.
