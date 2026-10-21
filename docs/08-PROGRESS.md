@@ -139,6 +139,7 @@
 - **What:** `common/composables/useFirstLoad.ts` (gate `task` + floor 260ms, `useState` per key jadi SSR-safe & sekali per app instance) + `AppLoader` varian history/account (shape-matching skeleton). HistoryPage: `load()` dipanggil lewat gate → `showSkeleton` menang atas empty state, `onMounted` dihapus (anti double-fetch merge). AccountPage: gate menunggu `auth.refresh()`.
 - **Files:** `common/composables/useFirstLoad.ts` (+spec), `common/components/AppLoader.vue`, `common/types/loader.ts`, `common/utils/loader.ts` (+spec), `features/history/HistoryPage.vue` (+spec), `features/account/AccountPage.vue` (+spec).
 - **Verification:** vitest **528/528 (66 files)** ✅ · eslint 0 error (prettier + explicit return type fixed) ✅ · `nuxt typecheck` 0 ✅ · build 11.2s 3.58MB (888kB gzip) ✅ · commit `616558d` + `7faca07` pushed main → Vercel auto-deploy.
+- **PROD audit (Chromium, 390x844, cache disabled):** `/history` skeleton muncul 690ms → konten 1691ms; `/account` skeleton 726ms → konten 1728ms — **skeleton SELALU sebelum konten** (flash state bohong hilang). Routes 200: `/` `/history` `/account` `/place` `/mall`.
 - **Next:** voucher claim UI (P0 NOW) atau GA4 cutover note + sitemap resubmit (NEXT).
 
 ## 2026-10-18 — Fix login spinner count for CI ✅
