@@ -16,7 +16,16 @@
 
 ## 📌 BOARD — position as of 21 Oct 2026 (Items 5-8 DONE ✅ — monitoring + business sort live + release notes)
 
-### 🐛 AUDIT E2E PROD — sort & filter DONE ✅ 21 Oct (Agesta: "Apa kamu sudah audit e2e di prod terkait fitur sort dan filter?")
+### 🐛 AUDIT E2E PROD — mall list search+sort & history filter+sort → **PASS ✅ 21 Oct** (Agesta: "Tolong audit e2e di prod di www.wikendo.id")
+
+**Hasil: PASS, nol bug fungsional.** Detail: `docs/AUDIT-MALL-LIST-HISTORY-PROD-21OCT.md`.
+
+- **✅ Mall List `/mall`** — search "grand"→1/1, "BSD"→1/1, "zzzz"→0/0, clear→5/5; sort Z→A / Tenant terbanyak / Tenant paling sedikit semua benar; combined search+sort benar. Semua benar-benar memanggil `/api/malls?search=&sort=` (fetch monkey-patch evidence).
+- **✅ History `/history`** — filter Semua/Tempat/Makanan benar, sort Terbaru/Terlama/A→Z/Z→A benar, empty state per-filter ("Belum ada riwayat makanan — …") tampil benar.
+- **⚠️ Kosmetik (bukan blocker):** mall list empty state cuma pill `0/0 mall`, belum ada copy "Tidak ada mall cocok".
+- **ℹ️ By design:** `?search=` match `name` saja (bukan city/area). Perluas bila produk mau.
+
+### 🐛 AUDIT E2E PROD — sort & filter (tenant detail) DONE ✅ 21 Oct
 **Jawaban: BELUM ADA audit e2e terstruktur → dilakukan sekarang. Hasil: filter chip OK, search keyword BUG, sort tidak ada di UI.** Rinci di bawah (`docs/AUDIT-SORT-FILTER-PROD-21OCT.md`).
 
 - **✅ Filter chip (Halal / 50-100rb / Nongkrong Lama) server-side, akurat di prod** — `?halal=true` → 37, `?budget=mid` → 14, `?mission=long_hangout` → 10; UI pill cocok 10/37, 10/14, 10/10. Empty state "Tidak ada tenant cocok" muncul benar.
@@ -82,6 +91,13 @@
 ---
 
 ## 📋 LOG (newest first)
+
+### 2026-10-21 — AUDIT E2E PROD: mall list search+sort & history filter+sort (PASS ✅)
+- **Phase:** Prod verification (fitur baru mall list + history).
+- **Why:** Agesta: "Tolong audit e2e di prod di www.wikendo.id" setelah mall list search/sort + history filter/sort di-push (`9083d52` + `1809725`).
+- **Files changed:** `docs/AUDIT-MALL-LIST-HISTORY-PROD-21OCT.md` (baru, 86 baris: oracle API + tabel UI per kontrol + verdict + evidence).
+- **Verification:** API oracle 12 kombinasi param (search×3, sort×4, pagination×3, combined×2) semuanya cocok. UI mall list: search "grand"→1, "BSD"→1, "zzzz"→0, clear→5, Z→A→Pondok→Aeon, Tenant terbanyak/paling sedikit→Aeon→PIM, combined search+sort→benar; semua benar-benar mengirim request ke `/api/malls` (fetch monkey-patch). UI history: 3 entry seed (place/food/place) → filter Tempat/Makanan/Semua benar, sort Terlama/A→Z/Z→A/Terbaru benar, empty state "Belum ada riwayat makanan — mulai quiz pertamamu →" tampil benar. **Verdict: PASS**, nol bug fungsional. Satu catatan kosmetik (bukan blocker): mall list empty state tidak punya copy khusus, hanya pill `0/0 mall`.
+- **Next:** opsional (kosmetik) tambah copy "Tidak ada mall cocok" di mall list + perluas search ke area/city bila produk mau.
 
 ### 2026-10-21 — AUDIT E2E PROD sort & filter + update docs (item 4)
 - **Phase:** Docs update (item 4 dari to-do list 8 item).
