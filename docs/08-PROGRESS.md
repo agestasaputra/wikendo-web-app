@@ -16,6 +16,17 @@
 
 ## 📌 BOARD — position as of 21 Oct 2026 (First-load skeleton LIVE ✅ — History & Account tidak lagi flash state bohong: `useFirstLoad` gate + `AppLoader` shape-matching skeleton; tests 528/528 (66 files) lint 0 typecheck 0 build 11.2s, pushed `616558d`)
 
+### 🐛 AUDIT E2E PROD — sort & filter DONE ✅ 21 Oct (Agesta: "Apa kamu sudah audit e2e di prod terkait fitur sort dan filter?")
+**Jawaban: BELUM ADA audit e2e terstruktur → dilakukan sekarang. Hasil: filter chip OK, search keyword BUG, sort tidak ada di UI.** Rinci di bawah (`docs/AUDIT-SORT-FILTER-PROD-21OCT.md`).
+- **✅ Filter chip (Halal / 50-100rb / Nongkrong) server-side, akurat di prod** — `?halal=true` → 37, `?budget=mid` → 14, `?mission=long_hangout` → 10; UI pill cocok 10/37, 10/14, 10/10. Empty state "Tidak ada tenant cocok" muncul benar.
+- **❌ BUG 1 — Search keyword client-side ONLY pada 10 item pertama.** API prod SUDAH punya `?search=` (server-side, `sushi`→4, `ramen`→1, `kopi`→1, `union`→1, `starbucks`→1, `solaria`→1, `din tai`→1) tapi UI tidak memanggilnya (0 request `search=` di network). Repro prod: ketik "sushi" → **empty state "Tidak ada tenant cocok"** padahal API ada 4 hasil. Hanya "bakmi" (Bakmi GM di page-1) yang lolos. → tenant di page 2-4 tidak bisa dicari kecuali scroll dulu.
+- **⚠️ CATATAN 2 — chip "Nongkrong" vs DB mission value.** DB values: `long_hangout`/`family`/`healing`/`quick_bite` (tidak ada "nongkrong"). UI chip "Nongkrong" mengirim `mission=long_hangout` (benar, 10 hasil). Tapi label vs value tidak self-explanatory; tidak ada chip untuk family/healing/quick_bite.
+- **⚠️ CATATAN 3 — Infinite scroll tidak auto-fire di headless Chromium** (IntersectionObserver sentinel tidak trigger, rootMargin 200px) → tombol "Muat tenant berikut" harus diklik manual. Di mobile/browser nyata kemungkinan auto. Perlu verifikasi di device nyata. Tombol manual ada → bukan blocker.
+- **✅ Pagination API benar** — offset/limit, no overlap antar page, total 40 GI; filter + pagination kombinasi (halal+nongkrong offset 0 limit 10 → 10/10) OK.
+- **✅ Sort feature TIDAK ADA di UI** — tidak ditemukan tombol "Urut"/"Sort" di `/`, `/mall`, `/mall/grand-indonesia`, `/food`, `/makan`, `/result-food`, `/result-place`, `/place`. API hanya sort by `name` (server-side, tidak expose ke UI).
+- **✅ Unit tests 35/35 pass** (directory.spec.ts, tenantFilters.spec.ts, useInfiniteList.spec.ts, pagination.spec.ts, MallPages.spec.ts) di `app/`.
+- **NEXT (belum dieksekusi, menunggu approval):** (1) buat search server-side (debounce → `/api/malls/{slug}/tenants?search=` reset offset 0) — rekomendasi A; (2) opsi tambah chip mission lain atau rename "Nongkrong" → "Nongkrong Lama"; (3) verifikasi infinite scroll di device nyata.
+
 ### 🔥 NOW (in progress)
 
 - [x] **Voucher claim state DONE ✅ 21 Oct** — read model `listClaimedCodes(db, userId, mallId?)` + `voucherClaimedByMallSlug(db, userId, slug)` + `GET /api/voucher/claims` (Bearer → mall scope via slug; empty slug → unscoped) + `FoodResultPage` `claimState()` (`loading|unauth|available|claimed`) + `heroClaimed` + `Buka →` → `Klaim` + `Sudah diklaim ✓` + `watch(isLoggedIn, mallSlug)` → `loadClaimedCodes()` (login flips AFTER async session read) + `VoucherSheet` disabled when claimed. TDD 9/9 + route E2E 6/6 ✅ full **542/542 (68 files)** ✅ lint 0 ✅ type-check 0 ✅ build 10.9s ✅ commit `66013a9` pushed → Vercel auto-deploy. NEXT: GA4 cutover `page_path` 20 Okt + Search Console resubmit sitemap.
