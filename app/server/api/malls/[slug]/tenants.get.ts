@@ -50,7 +50,10 @@ export default defineEventHandler(async (event) => {
     q = q.eq(column, value);
   }
   if (query.search) q = q.ilike("name", `%${query.search}%`);
-  const { data: tenants } = await q.order("name");
+  const { data: tenants } = await q
+    .order("promo", { ascending: false, nullsFirst: false })
+    .order("hype_tiktok", { ascending: false, nullsFirst: false })
+    .order("name");
 
   const list = filterByMission((tenants || []) as TenantRow[], query.mission);
 

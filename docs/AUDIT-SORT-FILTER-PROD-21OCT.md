@@ -56,3 +56,49 @@ Filter chip (Halal, 50-100rb, Nongkrong) dan pagination API sudah benar di prod.
 - app/server/utils/tenantFilters.ts
 - app/common/composables/useInfiniteList.ts
 - app/common/composables/useSentinelObserver.ts
+
+---
+
+## UPDATE 21 Oct 2026 — Perubahan yang sudah dieksekusi (item 1-3 + default sort)
+
+### ✅ Item 1 — Copy bug pill (selesai)
+- **Masalah:** saat `hasMore = false`, pill "scroll untuk 10 berikutnya" tetap muncul.
+- **Fix:** `MallDetailPage.vue` `dirCount` computed kondisional: `hasMore ? buildDirCountLabel(loaded, total) : 🟢 X/Y tenant (semua)`.
+- **Test:** `MallPages.spec.ts` source-assertion `HAS conditional dirCount pill (no 'scroll ↓' when hasMore false)`.
+- **Commit:** `1952c1d` — "fix: hide 'scroll ↓' pill when all tenants loaded" (push main, Vercel 200 OK).
+
+### ✅ Item 2 — Infinite scroll (selesai, verifikasi device)
+- **Status:** pengguna menyatakan mall detail sudah works.
+- **Fallback:** sentinel `<button>` tappable `list.loadMore()` (ref `HTMLElement`).
+- **Commit:** `feat: sentinel button fallback for infinite scroll` (push main).
+
+### ✅ Item 3 — Unit test sentinel (selesai)
+- **File:** `common/composables/__tests__/useSentinelObserver.spec.ts` (mock `IntersectionObserver`, test "returns a ref").
+- **Commit:** `test: add sentinel observer unit test` (push main).
+
+### ⚠️ Default sort business-fit (patch diterapkan, belum diverifikasi)
+- **Rekomendasi:** `promo` → `hype_tiktok` → `verified` → name.
+- **Patch saat ini:** `tenants.get.ts` `.order("promo", { ascending: false, nullsLast: true })` → `.order("hype_tiktok", { ascending: false, nullsLast: true })` → `.order("name")`.
+- **Catatan:** `verified` belum masuk ordering; `verified` hanya ada sebagai `verified_at` di `TenantRow`; `promo` ada di `@types/mall.ts` tetapi tidak di `common/types/api.ts` TenantRow. Belum diuji dengan build/deploy/verify prod.
+
+### ❓ Kenapa sort / filter UI belum ada di mall list page & history page prod?
+
+#### Mall list page (`/mall` — `MallListPage.vue`)
+- **Scope:** halaman ini adalah **hub direktori mall** (5 mall: GI, CP, Kokas, PIM, Aeon BSD), bukan halaman tenant. Isinya hanya daftar mall + tombol "Lihat Tenant" & "Cariin yang cocok". Tidak ada tenant yang bisa disort/filter, jadi chip sort/filter **tidak relevan**.
+- **Implementasi:** `fetchPage` hanya memanggil `/api/malls` (tanpa param search/halal/budget/mission). Infinity scroll dipakai untuk 5 mall, bukan 40 tenant.
+- **Kesimpulan:** fitur sort/filter tenant tidak ditampilkan karena entity yang ditampilkan adalah **mall**, bukan tenant. Jika nanti ada fitur "cari mall" (mis. by area/tenant count), baru perlu sort/filter di level mall.
+
+#### History page (`/history` — `HistoryPage.vue`)
+- **Scope:** halaman ini menampilkan **riwayat quiz user** (localStorage + server merged), bukan direktori tenant. Isinya: kartu history (kind, title, sub, at) max 20, newest-first.
+- **Implementasi:** data diambil dari `HistoryStore` (localStorage) dan `/api/history` (Bearer). Tidak ada query param search/filter/sort; urutan sudah newest-first (`at` descending) dan dedupe by title.
+- **Kesimpulan:** sort/filter tidak ditampilkan karena entity yang ditampilkan adalah **riwayat quiz**, bukan tenant. Jika nanti ada filter "tempat saja / makan saja" atau "7 hari terakhir", baru perlu sort/filter di level history.
+
+### File terkait (update 21 Oct)
+- app/features/mall/MallDetailPage.vue
+- app/features/mall/MallListPage.vue
+- app/features/history/HistoryPage.vue
+- app/features/mall/utils/directory.ts
+- app/server/api/malls/[slug]/tenants.get.ts
+- app/common/composables/useInfiniteList.ts
+- app/common/composables/useSentinelObserver.ts
+- app/common/composables/__tests__/useSentinelObserver.spec.ts
