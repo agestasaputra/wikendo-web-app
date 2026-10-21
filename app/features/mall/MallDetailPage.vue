@@ -6,6 +6,7 @@ Token lock: ink stays #0C0A09, rose stays #E11D48, paper = PAGE_BG (one owner). 
 import AppLoader from "~/common/components/AppLoader.vue";
 import { PAGE_BG } from "~/common/constants/theme";
 import { useInfiniteList } from "~/common/composables/useInfiniteList";
+import { watch } from "vue";
 import { useSentinelObserver } from "~/common/composables/useSentinelObserver";
 import type { InfiniteFetchPage } from "~/common/types/pagination";
 import { getMallName, getMallShortLabel } from "~/common/utils/mall";
@@ -15,7 +16,6 @@ import TenantCard from "~/features/mall/components/TenantCard.vue";
 import {
   buildDirCountLabel,
   buildTenantQuery,
-  filterTenantsByKeyword,
 } from "~/features/mall/utils/directory";
 import { getTenantPromo } from "~/features/mall/utils/tenantCard";
 
@@ -37,6 +37,20 @@ const filters = reactive<DirectoryFilters>({
   budget: false,
   mission: false,
 });
+
+let searchTimer: ReturnType<typeof setTimeout> | null = null;
+const searchQuery = ref("");
+watch(
+  keyword,
+  (value) => {
+    if (searchTimer) clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => {
+      searchQuery.value = value.trim();
+      list.reset();
+    }, 300);
+  },
+  { immediate: false },
+);
 
 // Directory SEO: title + description per mall (Google → tenant → quiz funnel).
 useHead({
@@ -70,7 +84,12 @@ const list = useInfiniteList<TenantItem>({
   keyOf: (t) => t.name,
   fetchPage: (limit, offset) =>
     $fetch<InfiniteFetchPage<TenantItem>>(`/api/malls/${slug}/tenants`, {
-      params: { limit, offset, ...buildTenantQuery(filters) },
+      params: {
+        limit,
+        offset,
+        ...buildTenantQuery(filters),
+        ...(searchQuery.value ? { search: searchQuery.value } : {}),
+      },
     }),
 });
 if (import.meta.server) await list.start();
@@ -87,9 +106,7 @@ function toggleFilter(key: keyof DirectoryFilters): void {
 const dirCount = computed(() =>
   buildDirCountLabel(tenants.value.length, total.value || tenants.value.length),
 );
-const filtered = computed(() =>
-  filterTenantsByKeyword(tenants.value, keyword.value),
-);
+const filtered = computed(() => tenants.value);
 // V13C promo strip (Addendum 23 v1.1): tenants that HAVE a real promo badge, above the list; slice 3 to save low-end phones.
 const promoStrip = computed(() =>
   tenants.value.filter((t) => !!getTenantPromo(t)).slice(0, 3),
