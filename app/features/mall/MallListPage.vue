@@ -1,9 +1,14 @@
-<!-- features/mall/MallListPage.vue → GET /mall (Directory hub index, D1 Neutral Mall Hub ⭐ + S2b infinity).
-WHAT: mall card list (name + area + tenant count) + 2 CTAs per card (Lihat Tenant / Cariin yang cocok), mall label INK (#0C0A09), "Cariin" CTA rose (#E11D48), paper bg = PAGE_BG (app.vue) + infinity scroll 10/page (sentinel + 2-row skeleton + sticky count).
-WHY: D1 "Mall Hub · Neutral" + S2b infinity — 5 malls is light now, but the SAME pattern as detail (40 tenants) → 1 useInfiniteList composable, backward-compat API (no ?limit = legacy array). Page-1 SSR via await start() (SEO stays).
+<!-- features/mall/MallListPage.vue → GET /mall (Directory hub index, D1 Neutral Mall Hub ⭐ + S2b infinity + FD14 filter).
+WHAT: mall card list (name + area + tenant count) + 2 CTAs per card (Lihat Tenant / Cariin yang cocok),
+  mall label INK (#0C0A09), "Cariin" CTA rose (#E11D48), paper bg = PAGE_BG (app.vue) + infinity scroll 10/page.
+WHY: D1 "Mall Hub · Neutral" + S2b infinity — 5 malls is light now, but the SAME pattern as detail (40 tenants)
+  → 1 useInfiniteList composable, backward-compat API (no ?limit = legacy array). Page-1 SSR via await start() (SEO stays).
+FD14: chip dikelompokkan + pill Urutkan + footer "Terapkan Filter" rose → satu komponen FilterDrawer
+  dipakai Mall List / Mall Detail / History supaya kontrol filter konsisten (bukan 3 implementasi).
 Token lock: ink stays #0C0A09, rose stays #E11D48, paper = PAGE_BG (one owner). -->
 <script setup lang="ts">
 import AppLoader from "~/common/components/AppLoader.vue";
+import FilterDrawer from "~/common/components/FilterDrawer.vue";
 import { PAGE_BG } from "~/common/constants/theme";
 import { useInfiniteList } from "~/common/composables/useInfiniteList";
 import { useSentinelObserver } from "~/common/composables/useSentinelObserver";
@@ -11,7 +16,7 @@ import type { InfiniteFetchPage } from "~/common/types/pagination";
 import { getMallName, getMallShortLabel } from "~/common/utils/mall";
 import type { MallItem } from "~/features/mall/@types/mall";
 import { shortArea } from "~/features/mall/utils/directory";
-import { ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
 
 const searchMall = ref("");
 const sortOption = ref("name_asc"); // name_asc | name_desc | tenant_asc | tenant_desc
@@ -43,6 +48,13 @@ useHead({
   link: [{ rel: "canonical", href: "https://www.wikendo.id/mall" }],
 });
 
+const SORT_OPTIONS = [
+  { value: "name_asc", label: "A→Z" },
+  { value: "name_desc", label: "Z→A" },
+  { value: "tenant_desc", label: "Tenant terbanyak" },
+  { value: "tenant_asc", label: "Tenant paling sedikit" },
+];
+
 // S2b infinity: page-1 SSR (await start, SEO stays), continues on client via sentinel.
 const list = useInfiniteList<MallItem>({
   pageSize: 10,
@@ -70,12 +82,22 @@ if (import.meta.server) await list.start();
 else void list.start();
 const { items: malls, total, hasMore, pending, loadingMore, error } = list;
 const sentinel = useSentinelObserver(() => list.loadMore());
-const SORT_OPTIONS = [
-  { value: "name_asc", label: "A→Z" },
-  { value: "name_desc", label: "Z→A" },
-  { value: "tenant_desc", label: "Tenant terbanyak" },
-  { value: "tenant_asc", label: "Tenant paling sedikit" },
-];
+
+// FD14 drawer state: `activeFilters` = token `grup:nilai`; mall list hanya punya grup Urutkan
+// karena /api/malls belum menerima filter kota/halal (jangan kirim param yang diabaikan server).
+const showFilter = ref(false);
+const activeFilters = ref<string[]>([]);
+const initialFilters = computed(() => activeFilters.value);
+
+function onFilterApply(payload: { filters: string[]; sort: string }): void {
+  activeFilters.value = payload.filters;
+  if (payload.sort) sortOption.value = payload.sort;
+}
+
+function onFilterReset(): void {
+  activeFilters.value = [];
+  sortOption.value = "name_asc";
+}
 
 // D1 1:1: short area = shortest '/' segment (Thamrin, Grogol), fallback city.
 function mallArea(m: MallItem): string {
@@ -95,25 +117,46 @@ function mallArea(m: MallItem): string {
       }}</span>
     </div>
 
-    <!-- Search + sort (server-side, reset page on change): 5 malls now, stays correct when the hub grows. -->
+    <!-- Search + Filter button + sort (server-side, reset page on change). -->
     <div class="sticky top-[38px] pt-1 pb-2" :style="{ background: PAGE_BG }">
-      <div
-        class="bg-white border border-[#e4e4e7] rounded-xl px-3.5 py-2.5 text-[13px] text-gray-500 flex gap-2 items-center"
-      >
-        🔍
-        <input
-          v-model="searchMall"
-          placeholder="Cari mall... mis. grand, BSD"
-          class="bg-transparent outline-none flex-1 text-ink placeholder:text-gray-400"
-        />
-        <button
-          v-if="searchMall"
-          type="button"
-          class="text-gray-400 font-bold"
-          aria-label="Hapus pencarian"
-          @click="searchMall = ''"
+      <div class="flex gap-2">
+        <div
+          class="flex-1 bg-white border border-[#e4e4e7] rounded-xl px-3.5 py-2.5 text-[13px] text-gray-500 flex gap-2 items-center"
         >
-          ✕
+          🔍
+          <input
+            v-model="searchMall"
+            placeholder="Cari mall... mis. grand, BSD"
+            class="bg-transparent outline-none flex-1 text-ink placeholder:text-gray-400"
+          />
+          <button
+            v-if="searchMall"
+            type="button"
+            class="text-gray-400 font-bold"
+            aria-label="Hapus pencarian"
+            @click="searchMall = ''"
+          >
+            ✕
+          </button>
+        </div>
+        <button
+          type="button"
+          class="shrink-0 text-[12px] font-extrabold rounded-xl px-3 border-[1.5px] flex items-center gap-1"
+          :style="
+            activeFilters.length
+              ? 'background:#18181b;color:#fff;border-color:#18181b'
+              : 'background:#fff;color:#18181b;border-color:#e4e4e7'
+          "
+          data-testid="open-filter"
+          @click="showFilter = true"
+        >
+          Filter
+          <span
+            v-if="activeFilters.length"
+            class="text-[10px] font-extrabold rounded-full px-1.5"
+            style="background: #e11d48; color: #fff"
+            >{{ activeFilters.length }}</span
+          >
         </button>
       </div>
       <div class="flex gap-1.5 mt-2 overflow-x-auto pb-0.5">
@@ -134,6 +177,7 @@ function mallArea(m: MallItem): string {
         </button>
       </div>
     </div>
+
     <AppLoader v-if="pending" variant="mall" />
     <div
       v-else-if="error"
@@ -196,5 +240,16 @@ function mallArea(m: MallItem): string {
         Muat mall berikut…
       </div>
     </div>
+
+    <FilterDrawer
+      v-model:open="showFilter"
+      title="Filter Mall"
+      :groups="[]"
+      :sort-options="SORT_OPTIONS"
+      :initial-filters="initialFilters"
+      :initial-sort="sortOption"
+      @apply="onFilterApply"
+      @reset="onFilterReset"
+    />
   </div>
 </template>

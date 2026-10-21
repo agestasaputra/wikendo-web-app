@@ -1,9 +1,16 @@
-<!-- common/components/FilterDrawer.vue → reusable bottom-sheet filter drawer (FD14 style).
-WHAT: bottom sheet from bottom with grouped chips + sort pills + Reset/Terapkan footer.
-WHY: satu komponen untuk MallList/MallDetail/History supaya UI konsisten (tiket.com style).
-EXAMPLE: <FilterDrawer v-model:open="show" title="Filter" :groups="groups" :sort-options="sorts" :initial-filters="selected" :initial-sort="sort" @apply="onApply" /> -->
+<!-- common/components/FilterDrawer.vue → reusable bottom-sheet filter drawer (FD14).
+WHAT: bottom sheet naik dari bawah: handle, judul, grup chip (Preferensi / Budget / Mission / Kota / Jenis),
+  pill Urutkan, footer Reset + "Terapkan Filter" rose (#E11D48).
+WHY: FD14 dipilih Agesta (chip dikelompokkan + apply rose) → SATU komponen untuk Mall List, Mall Detail, History
+  supaya kontrol filter konsisten, bukan 3 implementasi berbeda.
+NILAI FILTER: string ber-namespace `grup:nilai` (contoh `halal:true`, `mission:family`, `kind:food`, `range:7d`).
+  Halaman mem-parsing lewat util murni masing-masing → drawer tetap generik (tanpa tahu domain mall/history).
+EXAMPLE: <FilterDrawer v-model:open="showFilter" :groups="FILTER_GROUPS" :sort-options="SORT_OPTIONS"
+  :initial-filters="activeFilters" :initial-sort="sortOption" @apply="onApply" @reset="onReset" /> -->
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { onBeforeUnmount, ref, watch } from "vue";
+
+// --- Z-index drawer = 60 (di atas bottom nav z-50) agar bottom nav tidak menutupi backdrop.
 
 interface Option {
   value: string;
@@ -47,6 +54,7 @@ function syncFromProps(): void {
   selectedSort.value = props.initialSort || props.sortOptions?.[0]?.value || "";
 }
 
+// Setiap drawer dibuka = salinan dari state halaman (batal/tutup tidak mengubah hasil).
 watch(
   () => props.open,
   (isOpen) => {
@@ -58,22 +66,24 @@ function close(): void {
   emit("update:open", false);
 }
 
+/**
+ * Toggle 1 chip. `single` = maksimal 1 nilai per grup (klik chip yang sama = matikan).
+ * KENAPA buang nilai grup dulu baru push: tanpa itu klik "50-100rb" saat "Budget" nyala
+ * menyisakan 2 budget sekaligus → query server dapat 2 nilai yang saling bertentangan.
+ */
 function toggleFilter(group: Group, value: string): void {
-  const groupValues = new Set(group.options.map((o) => o.value));
+  const groupValues = group.options.map((o) => o.value);
+  const isOn = selectedFilters.value.includes(value);
   if (group.mode === "single") {
-    // remove peers first
     selectedFilters.value = selectedFilters.value.filter(
-      (v) => !groupValues.has(v) || v === value,
+      (v) => !groupValues.includes(v),
     );
-    // toggle
-    const idx = selectedFilters.value.indexOf(value);
-    if (idx >= 0) selectedFilters.value.splice(idx, 1);
-    else selectedFilters.value.push(value);
-  } else {
-    const idx = selectedFilters.value.indexOf(value);
-    if (idx >= 0) selectedFilters.value.splice(idx, 1);
-    else selectedFilters.value.push(value);
+    if (!isOn) selectedFilters.value.push(value);
+    return;
   }
+  if (isOn)
+    selectedFilters.value = selectedFilters.value.filter((v) => v !== value);
+  else selectedFilters.value.push(value);
 }
 
 function selectSort(value: string): void {
@@ -94,22 +104,55 @@ function doApply(): void {
   close();
 }
 
+// --- Body scroll lock + ESC: drawer 82vh tanpa ini bikin halaman di belakang ikut ke-scroll.
+let prevOverflow = "";
+function lockBody(): void {
+  if (typeof document === "undefined") return;
+  prevOverflow = document.body.style.overflow;
+  document.body.style.overflow = "hidden";
+}
+function unlockBody(): void {
+  if (typeof document === "undefined") return;
+  document.body.style.overflow = prevOverflow;
+}
+function onKeydown(e: KeyboardEvent): void {
+  if (e.key === "Escape" && props.open) close();
+}
 function isFilterSelected(value: string): boolean {
   return selectedFilters.value.includes(value);
 }
+watch(
+  () => props.open,
+  (isOpen) => {
+    if (typeof document === "undefined") return;
+    if (isOpen) {
+      lockBody();
+      document.addEventListener("keydown", onKeydown);
+    } else {
+      unlockBody();
+      document.removeEventListener("keydown", onKeydown);
+    }
+  },
+);
+onBeforeUnmount(() => {
+  unlockBody();
+  if (typeof document !== "undefined")
+    document.removeEventListener("keydown", onKeydown);
+});
 </script>
 
 <template>
   <Teleport to="body">
     <div
       v-if="open"
-      class="fixed inset-0 z-50 flex items-end justify-center"
+      class="fixed inset-0 z-[60] flex items-end justify-center"
       style="background: rgba(0, 0, 0, 0.35)"
+      data-testid="filter-drawer"
       @click.self="close"
     >
       <div
         class="w-full max-w-md bg-white rounded-t-2xl px-4 pt-3 pb-4 shadow-2xl"
-        style="max-height: 80vh; overflow-y: auto"
+        style="max-height: 82vh; overflow-y: auto"
       >
         <div
           class="w-10 h-1 rounded-full mx-auto mb-2"

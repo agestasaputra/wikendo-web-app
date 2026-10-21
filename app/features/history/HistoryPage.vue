@@ -18,6 +18,7 @@ import { storeToRefs } from "pinia";
 import { computed, ref } from "vue";
 
 import AppLoader from "~/common/components/AppLoader.vue";
+import FilterDrawer from "~/common/components/FilterDrawer.vue";
 import { useFirstLoad } from "~/common/composables/useFirstLoad";
 import { useHistoryStore } from "~/common/store/HistoryStore";
 import { timeAgo, mergeHistory } from "~/common/utils/history";
@@ -29,20 +30,36 @@ const historySort = ref<"newest" | "oldest" | "title_asc" | "title_desc">(
   "newest",
 );
 
+const showFilter = ref(false);
+const activeFilters = ref<string[]>([]);
+
 const history = useHistoryStore();
 const { items } = storeToRefs(history);
 
-const HISTORY_FILTERS = [
-  { value: "all", label: "Semua" },
-  { value: "place", label: "Tempat" },
-  { value: "food", label: "Makanan" },
-];
 const HISTORY_SORTS = [
   { value: "newest", label: "Terbaru" },
   { value: "oldest", label: "Terlama" },
   { value: "title_asc", label: "A→Z" },
   { value: "title_desc", label: "Z→A" },
 ];
+
+const HISTORY_GROUPS = [
+  {
+    title: "Jenis",
+    mode: "single" as const,
+    options: [
+      { value: "kind:all", label: "Semua" },
+      { value: "kind:place", label: "Tempat" },
+      { value: "kind:food", label: "Makanan" },
+    ],
+  },
+];
+
+function kindTokenToValue(token: string | undefined): "all" | "place" | "food" {
+  if (token === "place") return "place";
+  if (token === "food") return "food";
+  return "all";
+}
 
 const sortedItems = computed(() => {
   const filtered =
@@ -93,6 +110,8 @@ async function load(): Promise<void> {
 
 // Skeleton wins over the empty state: gate the FIRST paint, then run the real load.
 const { booting } = useFirstLoad({ key: "history", task: load });
+const initialFilters = computed(() => activeFilters.value);
+const initialSortToken = computed(() => "sort:" + historySort.value);
 const emptyState = computed(() => !sortedItems.value.length);
 const showSkeleton = computed(() => booting.value);
 
@@ -102,6 +121,25 @@ const emptyMessage = computed(() => {
     return "Belum ada riwayat — mulai quiz pertamamu →";
   return `Belum ada riwayat ${historyFilter.value === "place" ? "tempat" : "makanan"} — mulai quiz pertamamu →`;
 });
+function onFilterApply(payload: { filters: string[]; sort: string }): void {
+  const kindToken = payload.filters.find((t) => t.startsWith("kind:"));
+  const kindVal = kindToken ? kindToken.split(":")[1] : "all";
+  historyFilter.value = kindTokenToValue(kindVal);
+  if (payload.sort) {
+    const sortVal = payload.sort.startsWith("sort:")
+      ? payload.sort.slice(5)
+      : payload.sort;
+    if (HISTORY_SORTS.some((s) => s.value === sortVal))
+      historySort.value = sortVal as typeof historySort.value;
+  }
+  activeFilters.value = payload.filters;
+}
+
+function onFilterReset(): void {
+  historyFilter.value = "all";
+  historySort.value = "newest";
+  activeFilters.value = [];
+}
 </script>
 
 <template>
@@ -112,41 +150,31 @@ const emptyMessage = computed(() => {
       <p class="text-[11px] font-bold text-gray-500 mb-3">
         Terakhir dilihat — max 20 · simpan di HP ini
       </p>
-      <!-- Filter + sort (client-side; max 20 entries, no paging). -->
-      <div class="flex gap-1.5 mb-2 flex-wrap">
+      <!-- Filter + sort via FD14 drawer (client-side; max 20 entries, no paging). -->
+      <div class="flex gap-2 mb-3 items-center">
         <button
-          v-for="opt in HISTORY_FILTERS"
-          :key="opt.value"
           type="button"
-          class="text-[11.5px] font-bold rounded-full px-3 py-1.5 bg-white border-[1.5px] whitespace-nowrap"
+          class="text-[12px] font-extrabold rounded-xl px-3 py-2 border-[1.5px] flex items-center gap-1"
           :style="
-            historyFilter === opt.value
+            activeFilters.length
               ? 'background:#18181b;color:#fff;border-color:#18181b'
-              : 'border-color:#e4e4e7'
+              : 'background:#fff;color:#18181b;border-color:#e4e4e7'
           "
-          @click="historyFilter = opt.value as 'all' | 'place' | 'food'"
+          data-testid="open-filter"
+          @click="showFilter = true"
         >
-          {{ opt.label }}
+          Filter
+          <span
+            v-if="activeFilters.length"
+            class="text-[10px] font-extrabold rounded-full px-1.5"
+            style="background: #e11d48; color: #fff"
+            >{{ activeFilters.length }}</span
+          >
         </button>
-      </div>
-      <div class="flex gap-1.5 flex-wrap">
-        <button
-          v-for="opt in HISTORY_SORTS"
-          :key="opt.value"
-          type="button"
-          class="text-[11.5px] font-bold rounded-full px-3 py-1.5 bg-white border-[1.5px] whitespace-nowrap"
-          :style="
-            historySort === opt.value
-              ? 'background:#18181b;color:#fff;border-color:#18181b'
-              : 'border-color:#e4e4e7'
-          "
-          @click="
-            historySort = opt.value as
-              'newest' | 'oldest' | 'title_asc' | 'title_desc'
-          "
-        >
-          {{ opt.label }}
-        </button>
+        <span class="text-[11px] text-gray-500">
+          {{ historyFilter === "all" ? "Semua" : historyFilter }} ·
+          {{ historySort }}
+        </span>
       </div>
 
       <div
@@ -219,4 +247,16 @@ const emptyMessage = computed(() => {
       </div>
     </template>
   </div>
+  <FilterDrawer
+    v-model:open="showFilter"
+    title="Filter Riwayat"
+    :groups="HISTORY_GROUPS"
+    :sort-options="
+      HISTORY_SORTS.map((s) => ({ value: 'sort:' + s.value, label: s.label }))
+    "
+    :initial-filters="initialFilters"
+    :initial-sort="initialSortToken"
+    @apply="onFilterApply"
+    @reset="onFilterReset"
+  />
 </template>
