@@ -19,6 +19,11 @@ import {
   buildDirectoryEqFilters,
   filterByMission,
 } from "../../../utils/tenantFilters";
+import {
+  buildDirectoryMetric,
+  recordDirectoryMetric,
+} from "../../../utils/directoryMetrics";
+import { ensureSessionId } from "../../../utils/sessionId";
 
 export default defineEventHandler(async (event) => {
   const slug = getRouterParam(event, "slug") as string;
@@ -41,21 +46,14 @@ export default defineEventHandler(async (event) => {
       statusMessage: "Mall tidak ditemukan",
     });
 
-  let q = db
-    .from("tenants")
-    .select("*")
-    .eq("mall_id", mall.id)
-    .eq("is_open", true);
-  for (const [column, value] of buildDirectoryEqFilters(query)) {
-    q = q.eq(column, value);
-  }
-  if (query.search) q = q.ilike("name", `%${query.search}%`);
-  const { data: tenants } = await q
-    .order("promo", { ascending: false, nullsFirst: false })
-    .order("hype_tiktok", { ascending: false, nullsFirst: false })
-    .order("name");
+  const list = await loadTenants(db, mall.id, query);
 
-  const list = filterByMission((tenants || []) as TenantRow[], query.mission);
+  // Item 5: funnel metric (search / filter + result count). Fire-and-forget — the visitor
+  // must never wait on analytics and a DB hiccup must not empty the list.
+  void recordDirectoryMetric(db, buildDirectoryMetric(query, list.length), {
+    mallSlug: slug,
+    sessionId: ensureSessionId(event),
+  });
 
   // Legacy: without ?limit → full array (old contract).
   if (query.limit === undefined) return list;
@@ -70,3 +68,71 @@ export default defineEventHandler(async (event) => {
     hasMore: hasMorePages(offset + items.length, list.length),
   };
 });
+
+/**
+ * All filtered tenants for one mall (paging slices this afterwards so `total` is the
+ * post-filter count the sticky pill "10/40" needs).
+ *
+ * DEFAULT BUSINESS SORT: promo live → hype_tiktok (tren) → verified_at → name.
+ * CATATAN: kolom `promo` TIDAK ADA di tabel tenants (PostgREST 400, dicek live 21 Oct) —
+ * promo hidup di tabel `vouchers`. Jangan pernah .order("promo") di sini: PostgREST
+ * mengembalikan error → data null → listing kosong (insiden 21 Oct). Karena itu promo
+ * di-resolve lewat 1 query `vouchers` lalu dipartisi in-memory; sisanya sudah terurut
+ * oleh Postgres sehingga partisi stabil = urutan bisnis yang benar.
+ */
+async function loadTenants(
+  db: ReturnType<typeof supabaseAdmin>,
+  mallId: string,
+  query: Record<string, unknown>,
+): Promise<TenantRow[]> {
+  let q = db
+    .from("tenants")
+    .select("*")
+    .eq("mall_id", mallId)
+    .eq("is_open", true);
+  for (const [column, value] of buildDirectoryEqFilters(query)) {
+    q = q.eq(column, value);
+  }
+  if (query.search) q = q.ilike("name", `%${query.search}%`);
+
+  const { data: tenants } = await q
+    .order("hype_tiktok", { ascending: false, nullsFirst: false })
+    .order("verified_at", { ascending: false, nullsFirst: false })
+    .order("name");
+
+  const rows = filterByMission((tenants || []) as TenantRow[], query.mission);
+  return withPromoFirst(rows, await activePromoTenantIds(db, mallId));
+}
+
+/** Stable partition: tenants with a live voucher first, everything else keeps SQL order. */
+function withPromoFirst(rows: TenantRow[], promoIds: Set<string>): TenantRow[] {
+  if (promoIds.size === 0) return rows;
+  const first: TenantRow[] = [];
+  const rest: TenantRow[] = [];
+  for (const row of rows) {
+    (row.id && promoIds.has(row.id) ? first : rest).push(row);
+  }
+  return [...first, ...rest];
+}
+
+/** Ids of tenants in this mall with a live voucher. Empty set on any error (sort degrades gracefully). */
+async function activePromoTenantIds(
+  db: ReturnType<typeof supabaseAdmin>,
+  mallId: string,
+): Promise<Set<string>> {
+  const ids = new Set<string>();
+  try {
+    const { data } = await db
+      .from("vouchers")
+      .select("tenant_id,tenant:tenants!inner(mall_id)")
+      .eq("promo_active", true)
+      .gt("valid_until", new Date().toISOString())
+      .eq("tenant.mall_id", mallId);
+    for (const row of (data ?? []) as { tenant_id?: string }[]) {
+      if (row.tenant_id) ids.add(row.tenant_id);
+    }
+  } catch {
+    // Sort falls back to hype → verified → name; never break the directory.
+  }
+  return ids;
+}

@@ -68,6 +68,8 @@ export interface TenantRecommendation {
 
 /** 1 raw row of the Supabase `tenants` table. */
 export interface TenantRow {
+  /** UUID — present on rows read from the DB (select("*")), absent on LLM-ranked output. */
+  id?: string;
   name: string;
   category: string;
   floor: string;

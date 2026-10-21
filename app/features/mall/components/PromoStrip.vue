@@ -5,8 +5,23 @@ EXAMPLE: <PromoStrip :tenants="promoStrip" :slug="slug" :mall-short="mallShort" 
 <script setup lang="ts">
 import type { TenantItem } from "~/features/mall/@types/mall";
 import { buildTenantView } from "~/features/mall/utils/tenantCard";
+import { trackEvent } from "~/common/composables/useAnalytics";
+import { ANALYTICS_EVENTS } from "~/common/constants/analytics";
 
-defineProps<{ tenants: TenantItem[]; slug: string; mallShort: string }>();
+const props = defineProps<{
+  tenants: TenantItem[];
+  slug: string;
+  mallShort: string;
+}>();
+
+/** Item 5: promo CTR. The row navigates immediately, so trackEvent uses keepalive. */
+function onPromoClick(tenantName: string): void {
+  trackEvent(ANALYTICS_EVENTS.promoClick, {
+    mall_slug: props.slug,
+    tenant: tenantName,
+    surface: "promo_strip",
+  });
+}
 </script>
 
 <template>
@@ -22,6 +37,7 @@ defineProps<{ tenants: TenantItem[]; slug: string; mallShort: string }>();
       :key="'promo-' + t.name"
       :to="`/food?mall=${slug}`"
       class="flex gap-2 items-center border-t border-gray-100 py-2"
+      @click="onPromoClick(t.name)"
     >
       <div
         class="w-[30px] h-[30px] flex-none rounded-[9px] flex items-center justify-center text-[15px]"
