@@ -102,9 +102,14 @@ function toggleFilter(key: keyof DirectoryFilters): void {
   list.reset();
 }
 
-// Infinity pill S2c 1:1 (tested): 🟢 loaded/total tenants · scroll ↓
+// Infinity pill S2c 1:1 (tested): 🟢 loaded/total tenants · scroll ↓ (only show when more results exist)
 const dirCount = computed(() =>
-  buildDirCountLabel(tenants.value.length, total.value || tenants.value.length),
+  hasMore.value
+    ? buildDirCountLabel(
+        tenants.value.length,
+        total.value || tenants.value.length,
+      )
+    : `🟢 ${tenants.value.length}/${total.value || tenants.value.length} tenant (semua)`,
 );
 const filtered = computed(() => tenants.value);
 // V13C promo strip (Addendum 23 v1.1): tenants that HAVE a real promo badge, above the list; slice 3 to save low-end phones.

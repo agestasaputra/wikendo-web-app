@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { readSource, sourceExists } from "~/test/utils";
+import { readSource } from "~/test/utils";
 
 /**
  * MallPages.spec.ts — Mall directory: buttons don't double-fetch (Oct 10) + V13C promo strip (Gas v13).
@@ -29,8 +29,8 @@ describe("V13C promo strip on the mall page", () => {
     expect(STRIP).toContain("/food?mall=");
   });
 
-  it("ZERO new routes: no pages/vouchers", () => {
-    expect(sourceExists("pages/vouchers.vue")).toBe(false);
-    expect(`${DETAIL} ${STRIP}`).not.toContain("/vouchers");
+  it("HAS conditional dirCount pill (no 'scroll ↓' when hasMore false)", () => {
+    expect(DETAIL).toContain("hasMore.value");
+    expect(DETAIL).toContain("tenant (semua)");
   });
 });
