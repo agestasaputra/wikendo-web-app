@@ -140,3 +140,10 @@
 - **Files changed:** `app/server/api/malls/[slug]/tenants.get.ts` (`.order("promo")` → `.order("hype_tiktok")` → `.order("name")`).
 - **Verification:** prettier OK, lint 0, type-check 0. Build belum di-run. Belum commit/deploy/verify prod.
 - **Next:** tambahkan kolom `promo` (jika belum), update `TenantRow`, tambahkan `verified_at`, build, deploy, curl verify.
+
+### 2026-10-22 — FD14 FilterDrawer wiring (MallList / MallDetail / History) DONE ✅
+- **Phase:** UI refactor — reusable FilterDrawer FD14 wired into 3 pages + pure filterValue util.
+- **Why:** Agesta reaffirmed "Gua suka FD14" → direct slicing + deploy. Filter drawer now shared across MallList, MallDetail, History with grouped chips + sort pills, z-[60] above bottom nav, body-scroll-lock + ESC close.
+- **Files changed:** `app/common/components/FilterDrawer.vue` (z-[60], data-testid="filter-drawer", 82vh, body-lock/ESC), `app/common/utils/filterValue.ts` + spec (5 tests), `app/features/mall/MallListPage.vue` (256 lines), `app/features/mall/MallDetailPage.vue` (308 lines), `app/features/history/HistoryPage.vue` (HISTORY_GROUPS + kindTokenToValue + onFilterApply/onFilterReset + FilterDrawer).
+- **Verification:** tests 564/564 (72 files) ✅, lint 0 ✅, type-check 0 ✅, build 10.7s ✅, commit `2047477` pushed → Vercel auto-deploy.
+- **Next:** prod smoke (filter drawer opens, chips apply) + monitoring.
