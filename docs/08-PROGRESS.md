@@ -14,11 +14,10 @@
 
 ---
 
-## 📌 BOARD — position as of 20 Oct 2026 (Stored-result flow LIVE ✅ + history newest-deck-wins ✅ + one page canvas + one type ramp + coding principles as repo rule ✅ + `AppHeader` → `TopNav` rename ✅ — tests 467/467 lint 0 build ok, pushed — prod verified all routes)
+## 📌 BOARD — position as of 21 Oct 2026 (First-load skeleton LIVE ✅ — History & Account tidak lagi flash state bohong: `useFirstLoad` gate + `AppLoader` shape-matching skeleton; tests 528/528 (66 files) lint 0 typecheck 0 build 11.2s, pushed `616558d`)
 
 ### 🔥 NOW (in progress)
 
-- [x] **First-load skeleton** — `useFirstLoad` + `AppLoader` wired into HistoryPage & AccountPage; 4 spec hijau (HistoryPage/AccountPage/useFirstLoad/AppLoader); lint 0 + build 11.2s; commit `616558d` pushed → Vercel auto-deploy. Tests **528/528 (66 files)** ✅
 - [ ] **Voucher claim P0** — endpoint `POST /api/voucher/claim` sudah 401-correct untuk anon; belum ada UI claim + state "sudah diklaim" (next up)
 
 ### ⏭️ NEXT
@@ -111,6 +110,7 @@
 
 ### ✅ DONE (summary — details in the LOG below)
 
+- [x] First-load skeleton DONE ✅ 21 Oct: `useFirstLoad` (gate task + 260ms floor, `useState` per key) + `AppLoader` varian history/account. HistoryPage tidak lagi flash "Belum ada riwayat" (load lewat gate, `onMounted` dihapus), AccountPage tidak lagi flash "Belum login" (gate menunggu `auth.refresh()`). Tests 528/528 (66 files), lint 0, typecheck 0, build 11.2s — commit `616558d` + `7faca07`.
 - [x] Stored-result flow DONE ✅ 20 Oct: 1 hasil = 1 URL `?id=<uuid>`; GET gratis (0 quota, 0 LLM), share kirim URL kanonik, history card clickable. Tests 451/451, lint 0, build 10.3s, prod audit green (`/api/result/<uuid>` 200, junk 400, share note OK) — commit `a64b82f` + `ed8a4fc`.
 - [x] History newest-deck-wins DONE ✅ 20 Oct: 1 kartu per tempat, kartu terbaru menggantikan kartu lama (bukan di-drop); merge server+device memilih deck terbaru & clickable. Tests 459/459, lint 0, build 10.3s, prod audit green — commit `d3b1fd6`.
 - [x] One page canvas + one type ramp + coding principles as repo rule DONE ✅ 20 Oct: kanvas `#F5F5F4` dipunya `app.vue` (PAGE_BG) untuk semua route termasuk footer; font-family dipusatkan di `tailwind.css`; 11 tempat background lokal + `pageBg` field dibersihkan; skeleton pakai `bg-stone-100`; prinsip koding (SOC/KISS/DRY/single responsibility/document) dikunci di `docs/26-Coding-Principles.md` + `AGENTS.md` + GLOSSARY. Tests 464/464, lint 0, build ok — commit `c31b2ea`.
@@ -132,6 +132,14 @@
 - [x] Patch Addendum v1.1 → v1.2 (Section 5: metadata schema + `raw_scrape` + NULL rules)
 
 ---
+
+## 2026-10-21 — First-load skeleton (useFirstLoad → History & Account) DONE ✅
+
+- **Why:** dua halaman sempat "berbohong" satu frame. `HistoryPage` load dari localStorage sinkron → sempat paint "Belum ada riwayat" lalu kartu muncul; `AccountPage` state auth belum direstore → user login sempat lihat "Belum login".
+- **What:** `common/composables/useFirstLoad.ts` (gate `task` + floor 260ms, `useState` per key jadi SSR-safe & sekali per app instance) + `AppLoader` varian history/account (shape-matching skeleton). HistoryPage: `load()` dipanggil lewat gate → `showSkeleton` menang atas empty state, `onMounted` dihapus (anti double-fetch merge). AccountPage: gate menunggu `auth.refresh()`.
+- **Files:** `common/composables/useFirstLoad.ts` (+spec), `common/components/AppLoader.vue`, `common/types/loader.ts`, `common/utils/loader.ts` (+spec), `features/history/HistoryPage.vue` (+spec), `features/account/AccountPage.vue` (+spec).
+- **Verification:** vitest **528/528 (66 files)** ✅ · eslint 0 error (prettier + explicit return type fixed) ✅ · `nuxt typecheck` 0 ✅ · build 11.2s 3.58MB (888kB gzip) ✅ · commit `616558d` + `7faca07` pushed main → Vercel auto-deploy.
+- **Next:** voucher claim UI (P0 NOW) atau GA4 cutover note + sitemap resubmit (NEXT).
 
 ## 2026-10-18 — Fix login spinner count for CI ✅
 
