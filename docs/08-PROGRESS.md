@@ -147,3 +147,9 @@
 - **Files changed:** `app/common/components/FilterDrawer.vue` (z-[60], data-testid="filter-drawer", 82vh, body-lock/ESC), `app/common/utils/filterValue.ts` + spec (5 tests), `app/features/mall/MallListPage.vue` (256 lines), `app/features/mall/MallDetailPage.vue` (308 lines), `app/features/history/HistoryPage.vue` (HISTORY_GROUPS + kindTokenToValue + onFilterApply/onFilterReset + FilterDrawer).
 - **Verification:** tests 564/564 (72 files) ✅, lint 0 ✅, type-check 0 ✅, build 10.7s ✅, commit `2047477` pushed → Vercel auto-deploy.
 - **Next:** prod smoke (filter drawer opens, chips apply) + monitoring.
+### 2026-10-22 — FD14 prod smoke VERIFIED ✅
+- **Phase:** Prod verification end-to-end.
+- **Why:** Confirm Vercel auto-deploy served new bundle and drawer functional on prod.
+- **Files changed:** none (verification only).
+- **Verification:** Browser smoke on prod: `/mall`, `/mall/grand-indonesia`, `/history` all render open-filter button; drawer opens (data-testid="filter-drawer") with grouped chips + sort pills + Reset/Terapkan. Applied Halal on GI → 40→37 tenant. Applied Z→A on mall list → order reversed. Applied Jenis=Makanan on history → empty-state "Belum ada riwayat makanan". z-[60] above bottom nav confirmed via visual.
+- **Next:** monitoring.
