@@ -224,14 +224,17 @@ const promoStrip = computed(() =>
         layout="tenant-list"
         :count="2"
       />
-      <!-- Infinity scroll sentinel -->
-      <div
+      <!-- Infinity scroll sentinel — also tappable fallback if IntersectionObserver never fires -->
+      <button
         v-if="hasMore"
         ref="sentinel"
-        class="text-center text-xs text-gray-400 py-3"
+        type="button"
+        class="w-full text-center text-xs text-gray-400 py-3 disabled:opacity-50"
+        :disabled="loadingMore"
+        @click="list.loadMore()"
       >
         Muat tenant berikut… ({{ tenants.length }}/{{ total }})
-      </div>
+      </button>
       <p
         v-else-if="tenants.length"
         class="text-center text-xs text-gray-400 py-2"

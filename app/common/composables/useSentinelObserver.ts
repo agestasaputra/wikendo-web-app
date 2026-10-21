@@ -12,11 +12,11 @@ const ROOT_MARGIN = "320px";
 
 export function useSentinelObserver(
   onIntersect: () => void,
-): Ref<HTMLDivElement | null> {
+): Ref<HTMLElement | null> {
   // shallowRef, NOT ref: this is a DOM element ref. ref()'s deep UnwrapRef expansion produces a
   // structural clone that is not assignable to Element under noUncheckedIndexedAccess → vue-tsc
   // error that blocks the pre-commit hook. shallowRef returns the raw element → vue-tsc clean.
-  const sentinel = shallowRef<HTMLDivElement | null>(null);
+  const sentinel = shallowRef<HTMLElement | null>(null);
   let observer: IntersectionObserver | null = null;
 
   onMounted(() => {
