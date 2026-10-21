@@ -15,7 +15,7 @@ Example: after /result-place Kopi Kekinian → /history shows "Kopi Kenangan —
  */
 import { useSupabaseBrowser } from "~/common/composables/useSupabaseBrowser";
 import { storeToRefs } from "pinia";
-import { computed } from "vue";
+import { computed, ref } from "vue";
 
 import AppLoader from "~/common/components/AppLoader.vue";
 import { useFirstLoad } from "~/common/composables/useFirstLoad";
@@ -24,8 +24,45 @@ import { timeAgo, mergeHistory } from "~/common/utils/history";
 import { toHistoryEntries } from "~/common/utils/historyRow";
 import { buildResultUrl } from "~/common/utils/resultUrl";
 
+const historyFilter = ref<"all" | "place" | "food">("all");
+const historySort = ref<"newest" | "oldest" | "title_asc" | "title_desc">(
+  "newest",
+);
+
 const history = useHistoryStore();
 const { items } = storeToRefs(history);
+
+const HISTORY_FILTERS = [
+  { value: "all", label: "Semua" },
+  { value: "place", label: "Tempat" },
+  { value: "food", label: "Makanan" },
+];
+const HISTORY_SORTS = [
+  { value: "newest", label: "Terbaru" },
+  { value: "oldest", label: "Terlama" },
+  { value: "title_asc", label: "A→Z" },
+  { value: "title_desc", label: "Z→A" },
+];
+
+const sortedItems = computed(() => {
+  const filtered =
+    historyFilter.value === "all"
+      ? items.value
+      : items.value.filter((it) => it.kind === historyFilter.value);
+  return [...filtered].sort((a, b) => {
+    switch (historySort.value) {
+      case "oldest":
+        return a.at - b.at;
+      case "title_asc":
+        return a.title.localeCompare(b.title, "id", { sensitivity: "base" });
+      case "title_desc":
+        return b.title.localeCompare(a.title, "id", { sensitivity: "base" });
+      case "newest":
+      default:
+        return b.at - a.at;
+    }
+  });
+});
 
 async function load(): Promise<void> {
   // Always load localStorage first so we have something to show even if API fails.
@@ -56,7 +93,15 @@ async function load(): Promise<void> {
 
 // Skeleton wins over the empty state: gate the FIRST paint, then run the real load.
 const { booting } = useFirstLoad({ key: "history", task: load });
+const emptyState = computed(() => !sortedItems.value.length);
 const showSkeleton = computed(() => booting.value);
+
+// Copy for the empty state — placed AFTER the skeleton gate on purpose: the gate must win first paint.
+const emptyMessage = computed(() => {
+  if (historyFilter.value === "all")
+    return "Belum ada riwayat — mulai quiz pertamamu →";
+  return `Belum ada riwayat ${historyFilter.value === "place" ? "tempat" : "makanan"} — mulai quiz pertamamu →`;
+});
 </script>
 
 <template>
@@ -67,13 +112,49 @@ const showSkeleton = computed(() => booting.value);
       <p class="text-[11px] font-bold text-gray-500 mb-3">
         Terakhir dilihat — max 20 · simpan di HP ini
       </p>
+      <!-- Filter + sort (client-side; max 20 entries, no paging). -->
+      <div class="flex gap-1.5 mb-2 flex-wrap">
+        <button
+          v-for="opt in HISTORY_FILTERS"
+          :key="opt.value"
+          type="button"
+          class="text-[11.5px] font-bold rounded-full px-3 py-1.5 bg-white border-[1.5px] whitespace-nowrap"
+          :style="
+            historyFilter === opt.value
+              ? 'background:#18181b;color:#fff;border-color:#18181b'
+              : 'border-color:#e4e4e7'
+          "
+          @click="historyFilter = opt.value as 'all' | 'place' | 'food'"
+        >
+          {{ opt.label }}
+        </button>
+      </div>
+      <div class="flex gap-1.5 flex-wrap">
+        <button
+          v-for="opt in HISTORY_SORTS"
+          :key="opt.value"
+          type="button"
+          class="text-[11.5px] font-bold rounded-full px-3 py-1.5 bg-white border-[1.5px] whitespace-nowrap"
+          :style="
+            historySort === opt.value
+              ? 'background:#18181b;color:#fff;border-color:#18181b'
+              : 'border-color:#e4e4e7'
+          "
+          @click="
+            historySort = opt.value as
+              'newest' | 'oldest' | 'title_asc' | 'title_desc'
+          "
+        >
+          {{ opt.label }}
+        </button>
+      </div>
 
       <div
-        v-if="!items.length"
+        v-if="emptyState"
         class="rounded-2xl p-6 text-center bg-white border border-stone-200"
       >
         <p class="font-extrabold text-sm">
-          Belum ada riwayat — mulai quiz pertamamu →
+          {{ emptyMessage }}
         </p>
         <p class="text-[11px] text-gray-500 mt-1">
           Hasil quiz tempat & makan bakal muncul di sini
@@ -96,7 +177,7 @@ const showSkeleton = computed(() => booting.value);
       <!-- Image Cards (option 9) — vertical cards, 120px image band, info p-4 -->
       <div v-else class="flex flex-col gap-3">
         <NuxtLink
-          v-for="(it, i) in items"
+          v-for="(it, i) in sortedItems"
           :key="i"
           :to="it.id ? buildResultUrl(it.kind, it.id) : undefined"
           class="block rounded-2xl overflow-hidden bg-white border border-stone-200"
