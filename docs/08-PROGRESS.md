@@ -18,6 +18,7 @@
 
 ### 🔥 NOW (in progress)
 
+- [x] **First-load skeleton** — `useFirstLoad` + `AppLoader` wired into HistoryPage & AccountPage; 4 spec hijau (HistoryPage/AccountPage/useFirstLoad/AppLoader); lint 0 + build 11.2s; commit `616558d` pushed → Vercel auto-deploy. Tests **528/528 (66 files)** ✅
 - [ ] **Voucher claim P0** — endpoint `POST /api/voucher/claim` sudah 401-correct untuk anon; belum ada UI claim + state "sudah diklaim" (next up)
 
 ### ⏭️ NEXT
