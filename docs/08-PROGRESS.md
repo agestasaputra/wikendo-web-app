@@ -18,7 +18,7 @@
 
 ### 🔥 NOW (in progress)
 
-- [ ] **Voucher claim P0** — endpoint `POST /api/voucher/claim` sudah 401-correct untuk anon; belum ada UI claim + state "sudah diklaim" (next up)
+- [x] **Voucher claim state DONE ✅ 21 Oct** — read model `listClaimedCodes(db, userId, mallId?)` + `voucherClaimedByMallSlug(db, userId, slug)` + `GET /api/voucher/claims` (Bearer → mall scope via slug; empty slug → unscoped) + `FoodResultPage` `claimState()` (`loading|unauth|available|claimed`) + `heroClaimed` + `Buka →` → `Klaim` + `Sudah diklaim ✓` + `watch(isLoggedIn, mallSlug)` → `loadClaimedCodes()` (login flips AFTER async session read) + `VoucherSheet` disabled when claimed. TDD 9/9 + route E2E 6/6 ✅ full **542/542 (68 files)** ✅ lint 0 ✅ type-check 0 ✅ build 10.9s ✅ commit `66013a9` pushed → Vercel auto-deploy. NEXT: GA4 cutover `page_path` 20 Okt + Search Console resubmit sitemap.
 
 ### ⏭️ NEXT
 
