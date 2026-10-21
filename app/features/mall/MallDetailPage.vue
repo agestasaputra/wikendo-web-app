@@ -23,7 +23,7 @@ import { getTenantPromo } from "~/features/mall/utils/tenantCard";
 const FILTER_CHIPS: { key: keyof DirectoryFilters; label: string }[] = [
   { key: "halal", label: "✅ Halal" },
   { key: "budget", label: "💰 50-100rb" },
-  { key: "mission", label: "☕ Nongkrong" },
+  { key: "mission", label: "☕ Nongkrong Lama" },
 ];
 
 const route = useRoute();
