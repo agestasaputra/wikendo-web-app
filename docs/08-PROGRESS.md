@@ -14,7 +14,7 @@
 
 ---
 
-## 📌 BOARD — position as of 21 Oct 2026 (First-load skeleton LIVE ✅ — History & Account tidak lagi flash state bohong: `useFirstLoad` gate + `AppLoader` shape-matching skeleton; tests 528/528 (66 files) lint 0 typecheck 0 build 11.2s, pushed `616558d`)
+## 📌 BOARD — position as of 21 Oct 2026 (Items 5-8 DONE ✅ — monitoring + business sort live + release notes)
 
 ### 🐛 AUDIT E2E PROD — sort & filter DONE ✅ 21 Oct (Agesta: "Apa kamu sudah audit e2e di prod terkait fitur sort dan filter?")
 **Jawaban: BELUM ADA audit e2e terstruktur → dilakukan sekarang. Hasil: filter chip OK, search keyword BUG, sort tidak ada di UI.** Rinci di bawah (`docs/AUDIT-SORT-FILTER-PROD-21OCT.md`).
@@ -110,6 +110,13 @@
 - **Files changed:** `app/common/composables/__tests__/useSentinelObserver.spec.ts` (mock IntersectionObserver, test "returns a ref").
 - **Verification:** test exit 0, lint 0, type-check 0, build exit 0. Push main.
 - **Next:** item 4 docs update (selesai sekarang).
+
+### 2026-10-21 — Item 5-8 DONE ✅ (monitoring + business sort + release notes)
+- **Phase:** Item 5 (monitoring metric), Item 6 (smoke test), Item 7 (sort business-fit + deploy + verify), Item 8 (release note 1 halaman).
+- **Why:** 4 item terakhir to-do list. Metric funnel (search/filter/promo_click) + sort jujur tanpa kolom promo palsu + release notes.
+- **Files changed:** `app/common/constants/analytics.ts`, `app/common/composables/useAnalytics.ts`, `app/server/utils/directoryMetrics.ts`, `app/server/utils/clientEvent.ts`, `app/server/api/analytics/track.post.ts`, `app/server/api/malls/[slug]/tenants.get.ts` (promo-first from live vouchers), `app/features/mall/components/PromoStrip.vue` (promo_click), `docs/RELEASE-NOTES-v0.5.0.md`.
+- **Verification:** 558/558 tests ✅, lint 0 ✅, typecheck 0 ✅, build OK ✅, push main ✅, prod deploy ✅. Smoke: `/api/malls/central-park/tenants?limit=5` → 200 items=5 total=40; search kopi → 1; `/api/analytics/track` → 204 (body kosong) untuk promo_click & empty body.
+- **Next:** monitoring dashboard / voucher claim E2E di device nyata.
 
 ### 2026-10-21 — Default sort patch (unverified)
 - **Phase:** Backend ordering.
