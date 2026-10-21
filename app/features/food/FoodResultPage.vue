@@ -10,14 +10,17 @@ import ResultError from "~/common/components/ResultError.vue";
 import { useHistoryStore } from "~/common/store/HistoryStore";
 import type { TenantRecommendation } from "~/common/types/api";
 import { getMallShortLabel } from "~/common/utils/mall";
+import { isVoucherClaimWall } from "~/common/utils/authGate";
 import VoucherSheet from "~/features/food/components/VoucherSheet.vue";
 // NOTE: Previously we used a hard-coded `FOOD_PROMOS` list (static per tenant).
 // This caused vouchers from one mall to appear under another. We now fetch the
 // active offers for the current mall via the public `/api/vouchers` endpoint.
 import type { VoucherOffer } from "~/features/food/@types/food";
 import { useVoucherStore } from "~/features/food/store/VoucherStore";
+import { useAuthStore } from "~/common/store/AuthStore";
 import {
   buildDiscountLabel,
+  claimState,
   countdownLabel,
   otherOffers,
   pickHeroOffer,
@@ -130,14 +133,51 @@ const { data: voucherData } = await useFetch<VoucherOffer[]>("/api/vouchers", {
   watch: [mallSlug],
   default: () => [],
 });
-// Claimed rows are LOCAL (the public list cannot know per-user state); a claim flips the row here
-// so the sheet renders "Sudah diklaim" without re-fetching.
+// Claimed rows: LOCAL flip for instant feedback + SERVER read (GET /api/voucher/claims) so
+// "Sudah diklaim" survives a refresh, another device, and a return visit the same day.
+// WHY the server read is needed at all: the public /api/vouchers list cannot know per-user state
+// (it always answers claimed:false), so local-only state silently re-offered a voucher the user
+// had already claimed — the tap then failed with 409 and looked like a bug.
+const auth = useAuthStore();
 const claimedRows = ref<string[]>([]);
 const offers = computed<VoucherOffer[]>(() =>
   (voucherData.value ?? []).map((o) =>
     claimedRows.value.includes(o.code) ? { ...o, claimed: true } : o,
   ),
 );
+
+// Wall #4: claim REQUIRES login (server 401). An anonymous row shows "Login →", not "Klaim".
+// `sessionExpired` covers a session that died while the page was open: the store still says
+// logged-in, but the next claim answers 401 — showing "Klaim" again would just fail twice.
+const sessionExpired = ref(false);
+const loginWall = computed(
+  () => isVoucherClaimWall(auth.isLoggedIn) || sessionExpired.value,
+);
+
+// Authed read: only when logged in AND the mall is known. 401 for anon is expected, so we never
+// call it anonymously (saves a guaranteed-failing request on every result view).
+async function loadClaimedCodes(): Promise<void> {
+  if (loginWall.value || !mallSlug.value || typeof window === "undefined") {
+    claimedRows.value = [];
+    return;
+  }
+  try {
+    const res = await authFetch<{ codes: string[] }>("/api/voucher/claims", {
+      query: { mall_slug: mallSlug.value },
+    });
+    claimedRows.value = res.codes ?? [];
+  } catch {
+    // Network/DB hiccup → keep the local list; a wrong "Klaim" still ends in a friendly 409.
+  }
+}
+// isLoggedIn flips AFTER the session is read (async) → watch it, not just onMounted.
+function onClaimContextChange(): void {
+  void loadClaimedCodes();
+}
+const claimContext = [(): boolean => auth.isLoggedIn, mallSlug];
+watch(claimContext, onClaimContextChange, {
+  immediate: true,
+});
 // The gift banner must describe the HERO tenant's OWN offer — the old UI printed a hardcoded
 // "-20%" for every tenant, so a user in a mall with no promo still saw a claimable discount.
 // Matching by name (not id) because a STORED deck carries no tenant id.
@@ -146,6 +186,13 @@ const heroOffer = computed(() =>
 );
 const heroDiscount = computed(() =>
   heroOffer.value ? buildDiscountLabel(heroOffer.value) : "",
+);
+// Hero must not offer a second claim for a tenant the user already claimed today: the server
+// answers 409, so a live Buka button would be one that can only fail. Server read wins.
+const heroClaimed = computed(
+  () =>
+    claimState(heroOffer.value ?? ({ claimed: false } as VoucherOffer)) ===
+    "claimed",
 );
 const heroCountdown = computed(() =>
   heroOffer.value
@@ -194,6 +241,12 @@ const claimingCode = ref("");
 async function claimRow(code: string): Promise<void> {
   // UX lock: early-return guard against double-click (keyboard Enter bypasses :disabled).
   if (claiming.value) return;
+  // Wall #4 short-circuit: the server would answer 401. Send the user to login instead of
+  // showing "Gagal klaim" for an action that could never succeed without a session.
+  if (loginWall.value) {
+    goLogin();
+    return;
+  }
   claimingCode.value = code;
   try {
     const res = await voucherStore.claimVoucher(code);
@@ -202,11 +255,23 @@ async function claimRow(code: string): Promise<void> {
     showSheet.value = false;
     // mark the claimed offer in the local list so the sheet shows "Sudah diklaim"
     claimedRows.value = [...claimedRows.value, code];
-  } catch {
+  } catch (e: unknown) {
     claimNote.value = claimError.value || "Gagal klaim. Coba lagi.";
+    // Session expired mid-flight → 401: flip to the wall (Login →), not a dead "Klaim".
+    if (getErrorStatus(e) === 401) {
+      sessionExpired.value = true;
+      claimNote.value = "";
+    }
   } finally {
     claimingCode.value = "";
   }
+}
+
+/** Login wall CTA: come BACK to this exact deck after signing in. */
+function goLogin(): void {
+  const id = generatedId.value || storedId || "";
+  const redirect = id ? buildResultUrl("food", id) : "/result-food";
+  void navigateTo({ path: "/login", query: { redirect } });
 }
 
 // E1 history: write 1 entry per NEW generation (store: window guard + cap 20 + dedupe).
@@ -318,6 +383,7 @@ onMounted(() => {
               >
             </div>
             <button
+              v-if="!heroClaimed"
               class="font-extrabold text-[13px] rounded-full px-[14px] py-2 cursor-pointer disabled:opacity-60"
               :style="{ background: vGift.goBg, color: vGift.goColor }"
               :disabled="claiming"
@@ -325,6 +391,13 @@ onMounted(() => {
             >
               Buka →
             </button>
+            <span
+              v-else
+              class="font-extrabold text-[12px] rounded-full px-[12px] py-2 text-center"
+              style="background: #d1fae5; color: #065f46"
+            >
+              Sudah diklaim
+            </span>
           </div>
           <button
             v-if="promoLink"
@@ -360,7 +433,10 @@ onMounted(() => {
             :hero-name="hero.name"
             :claiming="claiming"
             :claiming-code="claimingCode"
+            :login-wall="loginWall"
+            :note="claimNote"
             @claim="claimRow"
+            @login="goLogin"
             @close="showSheet = false"
           />
 

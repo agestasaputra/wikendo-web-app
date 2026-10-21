@@ -6,7 +6,11 @@ WHY offers come from the server (V13D): the old list was hardcoded FOOD_PROMOS o
 WHY the countdown ticks locally every 30s: `expires_at` is absolute, so a static label goes stale on a
   page left open; the tick keeps "sisa 2j 59m" honest without extra API calls.
 WHY claim REQUIRES login: anti-farming — the server answers 401 and the page shows the login wall.
-EXAMPLE: <VoucherSheet :vouchers="offers" hero-name="Kopi" :claiming="claiming" :claiming-code="code" @claim="claimRow" @close="close" /> -->
+WHY the wall is a prop and not "Klaim": an anonymous "Klaim" button can only fail; the row shows
+  "Login →" so the tap lands on the action that actually unblocks the user (and the wall note lives
+  inside the sheet because the hero note is hidden behind this panel).
+EXAMPLE: <VoucherSheet :vouchers="offers" hero-name="Kopi" :claiming="claiming" :claiming-code="code"
+  :login-wall="!auth.isLoggedIn" :note="claimNote" @claim="claimRow" @login="goLogin" @close="close" /> -->
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref } from "vue";
 import AppSpinner from "~/common/components/AppSpinner.vue";
@@ -22,8 +26,10 @@ defineProps<{
   heroName: string;
   claiming: boolean;
   claimingCode: string;
+  loginWall: boolean;
+  note: string;
 }>();
-const emit = defineEmits<{ claim: [code: string]; close: [] }>();
+const emit = defineEmits<{ claim: [code: string]; login: []; close: [] }>();
 
 // 30s tick: one timer per open sheet, precise enough for a minute-level label.
 const nowMs = ref(Date.now());
@@ -70,8 +76,17 @@ onBeforeUnmount(() => {
         style="background: #fff7ed; color: #9a3412"
         >{{ buildDiscountLabel(v) }}</span
       >
+      <!-- Login wall first: an anon "Klaim" can only produce 401 → show the action that works. -->
       <button
-        v-if="claimState(v) !== 'claimed'"
+        v-if="loginWall"
+        class="text-[12px] font-extrabold rounded-full px-3 py-1.5"
+        style="background: #a3e635; color: #0c0a09"
+        @click="emit('login')"
+      >
+        Login →
+      </button>
+      <button
+        v-else-if="claimState(v) !== 'claimed'"
         class="text-[12px] font-extrabold rounded-full px-3 py-1.5 text-white disabled:opacity-60 flex items-center gap-1"
         style="background: #e11d48"
         :disabled="claiming"
@@ -96,8 +111,20 @@ onBeforeUnmount(() => {
     >
       Belum ada promo aktif di tenant ini hari ini.
     </p>
+    <!-- Claim feedback lives here: the hero note is covered by this panel. -->
+    <p
+      v-if="note"
+      class="text-[11px] font-bold text-center mt-1.5"
+      style="color: #c2410c"
+    >
+      {{ note }}
+    </p>
     <p class="text-[10.5px] font-bold text-gray-500 text-center mt-1.5">
-      1 tenant 1x/hari · login wajib
+      {{
+        loginWall
+          ? "Login gratis: klaim voucher + riwayat lintas device."
+          : "1 tenant 1x/hari · s/d 23:59 WIB"
+      }}
     </p>
     <button
       class="w-full text-center text-[12px] font-bold mt-1 underline"
