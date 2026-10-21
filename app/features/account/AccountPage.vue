@@ -3,8 +3,23 @@ WHAT: 2-state Account hub anonymous (Login/Daftar + 2+5 note) vs logged in (avat
 WHY mirrors AS6: the header already has a dropdown, but the thumb can't reach the header → needs a thumb-zone hub in BottomNav; 1 lightweight file without full /profile/Google photo/server quota (follows the Addendum 22 guard).
 Example: anonymous → Login → /login; Budi logged in → avatar S + budi@example.com + Keluar → signOut → / anonymous. -->
 <script setup lang="ts">
+/**
+ * AccountPage — hub akun 2-state (anon vs login) + 4 baris hub.
+ *
+ * APA: kartu identitas (avatar initial + nama + email + tombol Keluar) vs CTA login,
+ *      lalu baris Riwayat/Wishlist Segera/WA/Tentang.
+ * KENAPA skeleton dulu: state auth (Pinia) terisi setelah getSession(); tanpa gate,
+ *   user login bisa lihat "Belum login" satu frame lalu berganti — kebohongan.
+ *   useFirstLoad menunggu auth.refresh() selesai baru buka gate, jadi state yang benar
+ *   yang pertama kali nge-paint.
+ * CONTOH: Budi login → skeleton avatar+4 baris → kartu "B" + budi@... + Keluar.
+ */
+import { computed } from "vue";
 import { storeToRefs } from "pinia";
+
+import AppLoader from "~/common/components/AppLoader.vue";
 import AppSpinner from "~/common/components/AppSpinner.vue";
+import { useFirstLoad } from "~/common/composables/useFirstLoad";
 import { useAuthStore } from "~/common/store/AuthStore";
 
 const auth = useAuthStore();
@@ -22,10 +37,21 @@ async function handleLogout(): Promise<void> {
     loggingOut.value = false;
   }
 }
+
+// Gate first paint until the session is restored — never let anon flash before a logged-in user.
+async function load(): Promise<void> {
+  await auth.refresh();
+}
+
+const { booting } = useFirstLoad({ key: "account", task: load });
+const showSkeleton = computed(() => booting.value);
 </script>
 
 <template>
-  <div class="max-w-md mx-auto px-4 p-5">
+  <!-- First paint = skeleton, so a logged-in user never sees "Belum login" flash -->
+  <AppLoader v-if="showSkeleton" variant="account" />
+
+  <div v-else class="max-w-md mx-auto px-4 p-5">
     <!-- Anonymous state -->
     <div
       v-if="!isLoggedIn"

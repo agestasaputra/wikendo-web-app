@@ -15,12 +15,30 @@ import { readSource } from "~/test/utils";
 const LOADER = readSource("common/components/AppLoader.vue");
 
 describe("AppLoader · shape matches content", () => {
-  it("supports the 4 real layouts + an explicit fallback branch", () => {
+  it("supports every real layout + an explicit fallback branch", () => {
     expect(LOADER).toContain("mall-list");
     expect(LOADER).toContain("tenant-list");
     expect(LOADER).toContain("result-place");
     expect(LOADER).toContain("result-food");
+    expect(LOADER).toContain("history-list");
+    expect(LOADER).toContain("account");
     expect(LOADER).toContain("v-else");
+  });
+
+  it("history skeleton = Image Card (120px band + p-4 + title/sub/time)", () => {
+    expect(LOADER).toMatch(
+      /history-list[\s\S]{0,400}rounded-2xl overflow-hidden bg-white border border-stone-200/,
+    );
+    expect(LOADER).toMatch(/history-list[\s\S]{0,900}h-\[120px\] w-full/);
+    expect(LOADER).toMatch(/history-list[\s\S]{0,1400}class="p-4"/);
+  });
+
+  it("account skeleton = identity card + 4 hub rows", () => {
+    expect(LOADER).toMatch(
+      /layout === 'account'[\s\S]{0,500}rounded-2xl p-4 bg-white border border-stone-200/,
+    );
+    expect(LOADER).toMatch(/layout === 'account'[\s\S]{0,900}w-12 h-12/);
+    expect(LOADER).toMatch(/v-for="i in 4"[\s\S]{0,400}px-4 py-3\.5/);
   });
 
   it("mall list skeleton = the MallListPage card (pill + 2 CTA min-h 56)", () => {
@@ -75,7 +93,8 @@ describe("AppLoader · load-more reuses the same bones", () => {
   it("exposes a count prop instead of a hand-rolled 2-row copy", () => {
     expect(LOADER).toContain("count?: number");
     expect(LOADER).toContain('v-for="i in rows"');
-    expect(LOADER).toMatch(/props\.layout === "tenant-list" \? 7 : 4/);
+    // Count MUST come from the RESOLVED layout, else mall detail (tenant-list) gets 4 rows.
+    expect(LOADER).toMatch(/props\.count \?\? defaultCount\(layout\.value\)/);
   });
 
   it("mall list load-more = AppLoader count 2 (no duplicate skeleton markup)", () => {

@@ -12,6 +12,10 @@ describe("getLoaderMeta", () => {
   it("returns food accent #ee2c4b", () => {
     expect(getLoaderMeta("food").accent).toBe("#ee2c4b");
   });
+  it("returns ink accents for history + account", () => {
+    expect(getLoaderMeta("history").accent).toBe("#0c0a09");
+    expect(getLoaderMeta("account").accent).toBe("#0c0a09");
+  });
   it("returns fallback mall for unknown variant", () => {
     expect(getLoaderMeta("unknown" as LoaderVariant).accent).toBe("#0e7490");
   });
@@ -26,6 +30,10 @@ describe("defaultLayout", () => {
   });
   it("food → result-food (deck)", () => {
     expect(defaultLayout("food")).toBe("result-food");
+  });
+  it("history → history-list, account → account", () => {
+    expect(defaultLayout("history")).toBe("history-list");
+    expect(defaultLayout("account")).toBe("account");
   });
   it("unknown → mall-list (safe fallback)", () => {
     expect(defaultLayout("unknown" as LoaderVariant)).toBe("mall-list");

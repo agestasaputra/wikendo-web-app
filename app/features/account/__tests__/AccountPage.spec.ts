@@ -39,3 +39,20 @@ describe("E1 account hub 2-state mirroring AS6", () => {
     expect(ACC).toMatch(/Tentang|tentang/i);
   });
 });
+
+describe("account first load — skeleton before the 2-state card", () => {
+  it("renders the account skeleton while the session is restored", () => {
+    expect(ACC).toContain(
+      '<AppLoader v-if="showSkeleton" variant="account" />',
+    );
+  });
+
+  it("waits for auth.refresh() so anon never flashes before a logged-in user", () => {
+    // The gate's task IS the session restore; the skeleton is derived from the gate.
+    expect(ACC).toContain('useFirstLoad({ key: "account", task: load })');
+    expect(ACC).toMatch(/await auth\.refresh\(\)/);
+    expect(ACC).toMatch(
+      /const showSkeleton = computed\(\(\) => booting\.value\)/,
+    );
+  });
+});

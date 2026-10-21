@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { readSource } from "~/test/utils";
+import { readCode, readSource } from "~/test/utils";
 
 /**
  * HistoryPage.spec.ts — History E1 localStorage wikendo_history (Addendum docs/24)
@@ -16,6 +16,8 @@ const STORE = readSource(
   "common/constants/storage.ts",
 );
 const ROW = readSource("common/utils/historyRow.ts");
+/** Comments stripped → order asserts compare CODE positions, not prose. */
+const RIW_CODE = readCode("features/history/HistoryPage.vue");
 
 describe("E1 history localStorage wikendo_history", () => {
   it("page reads HistoryStore + honest empty matches home 1:1", () => {
@@ -75,5 +77,29 @@ describe("history cards — Image Cards (option 9) styling", () => {
     // design-correct emoji/tint placeholder, never a broken <img>.
     expect(RIW).toMatch(/🍜|📍/);
     expect(RIW).toContain("bg-stone-100");
+  });
+});
+
+describe("history first load — skeleton before content", () => {
+  it("renders the history skeleton while the page boots", () => {
+    expect(RIW).toContain(
+      '<AppLoader v-if="showSkeleton" variant="history" />',
+    );
+  });
+
+  it("the first-paint gate owns the load (no second onMounted race)", () => {
+    // Gate contract: ONE task = load, and showSkeleton is derived from the gate.
+    expect(RIW).toContain('useFirstLoad({ key: "history", task: load })');
+    expect(RIW).toMatch(
+      /const showSkeleton = computed\(\(\) => booting\.value\)/,
+    );
+    // load() replaced onMounted — two loaders would merge the server page twice.
+    expect(RIW_CODE).not.toContain("onMounted");
+  });
+
+  it("the skeleton branch wins over the empty state (no 'Belum ada riwayat' flash)", () => {
+    expect(RIW_CODE.indexOf("showSkeleton")).toBeLessThan(
+      RIW_CODE.indexOf("Belum ada riwayat"),
+    );
   });
 });

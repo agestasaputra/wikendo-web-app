@@ -1,12 +1,14 @@
 <!--
   common/components/AppLoader.vue — loading skeleton that MIRRORS the content it replaces.
-  WHAT: 4 shapes, one per real layout + `count` (how many rows/cards to draw, so a "load more"
+  WHAT: 6 shapes, one per real layout + `count` (how many rows/cards to draw, so a "load more"
     block reuses the SAME bones instead of hand-rolling a thinner copy). Classes are copied
     from the live components so the skeleton → content swap does not shift the page:
       mall-list    → MallListPage card (name/sub + mall pill + 2 CTAs at min-h 56px)
       tenant-list  → TenantCard row (46px thumb + name/sub + chevron)
       result-place → PlaceResultPage hero deck (5px strip + 150px photo + badges + 3 CTAs + rank box)
       result-food  → FoodResultPage BEST MATCH card (2 badges + gift banner + 2 CTAs)
+      history-list → HistoryPage Image Card (120px band + p-4 title/sub/time)
+      account      → AccountPage identity card (48px avatar + name/email) + 4 hub rows
   WHY: a spinner floating above a card list teaches nothing and causes layout jump. The shape
     itself is the loading affordance: the user already sees the list they are waiting for.
   Props: variant (copy + accent) · layout (override shape; mall detail uses tenant-list) ·
@@ -15,7 +17,11 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import type { LoaderLayout, LoaderVariant } from "~/common/types/loader";
-import { defaultLayout, getLoaderMeta } from "~/common/utils/loader";
+import {
+  defaultCount,
+  defaultLayout,
+  getLoaderMeta,
+} from "~/common/utils/loader";
 
 const props = withDefaults(
   defineProps<{
@@ -26,15 +32,13 @@ const props = withDefaults(
   { layout: undefined, count: undefined },
 );
 
-/** How many bones to draw: matches the page size pattern (4 cards / 7 rows / 2 load-more). */
-const rows = computed(
-  () => props.count ?? (props.layout === "tenant-list" ? 7 : 4),
-);
-
 const meta = computed(() => getLoaderMeta(props.variant));
+/** Resolve the shape BEFORE counting: a variant can override the layout (mall detail → rows). */
 const layout = computed<LoaderLayout>(
   () => props.layout ?? defaultLayout(props.variant),
 );
+/** How many bones to draw, from the RESOLVED layout (mall list 4 · tenant rows 7 · history 3). */
+const rows = computed(() => props.count ?? defaultCount(layout.value));
 const bone = "bg-gray-200 animate-pulse";
 </script>
 
@@ -176,6 +180,56 @@ const bone = "bg-gray-200 animate-pulse";
               style="min-height: 56px"
             />
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── history: the actual HistoryPage Image Card (120px band + p-4) ──── -->
+    <div
+      v-else-if="layout === 'history-list'"
+      class="flex flex-col gap-3"
+      aria-hidden="true"
+    >
+      <div
+        v-for="i in rows"
+        :key="i"
+        class="rounded-2xl overflow-hidden bg-white border border-stone-200"
+      >
+        <div :class="bone" class="h-[120px] w-full" />
+        <div class="p-4">
+          <div :class="bone" class="h-5 w-2/3 rounded" />
+          <div :class="bone" class="h-3 w-1/3 rounded mt-1.5" />
+          <div :class="bone" class="h-3 w-16 rounded mt-2" />
+        </div>
+      </div>
+    </div>
+
+    <!-- ── account: the actual identity card + 4 hub rows ─────────────────── -->
+    <div v-else-if="layout === 'account'" aria-hidden="true">
+      <div class="rounded-2xl p-4 bg-white border border-stone-200">
+        <div class="flex gap-3 items-center">
+          <div :class="bone" class="w-12 h-12 flex-none rounded-full" />
+          <div class="flex-1">
+            <div :class="bone" class="h-4 w-1/2 rounded" />
+            <div :class="bone" class="h-3 w-2/3 rounded mt-1.5" />
+          </div>
+        </div>
+        <div
+          :class="bone"
+          class="w-full mt-3 rounded-2xl"
+          style="height: 46px"
+        />
+      </div>
+      <div
+        class="rounded-2xl bg-white border border-stone-200 mt-3 overflow-hidden"
+      >
+        <div
+          v-for="i in 4"
+          :key="i"
+          class="flex justify-between items-center px-4 py-3.5 border-b border-stone-100"
+        >
+          <div :class="bone" class="h-3.5 w-28 rounded" />
+          <div :class="bone" class="h-3.5 w-3.5 rounded" />
         </div>
       </div>
     </div>
