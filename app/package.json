@@ -17,6 +17,7 @@
     "type-check": "nuxt typecheck",
     "test": "vitest run",
     "test:watch": "vitest",
+    "smoke": "node scripts/smoke.mjs",
     "test:seed": "cd ../supabase && python3 -m pytest tests/ -q",
     "test:related": "vitest related --run --passWithNoTests"
   },

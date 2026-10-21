@@ -11,6 +11,19 @@ import type { InfiniteFetchPage } from "~/common/types/pagination";
 import { getMallName, getMallShortLabel } from "~/common/utils/mall";
 import type { MallItem } from "~/features/mall/@types/mall";
 import { shortArea } from "~/features/mall/utils/directory";
+import { ref, watch } from "vue";
+
+const searchMall = ref("");
+const sortOption = ref("name_asc"); // name_asc | name_desc | tenant_asc | tenant_desc
+const searchMallQuery = ref("");
+let mallSearchTimer: ReturnType<typeof setTimeout> | null = null;
+watch(searchMall, (value) => {
+  if (mallSearchTimer) clearTimeout(mallSearchTimer);
+  // 300ms debounce: typing "grand" must not fire 5 mall requests.
+  mallSearchTimer = setTimeout(() => {
+    searchMallQuery.value = value.trim();
+  }, 300);
+});
 
 // SEO hub: /mall = directory entrypoint (hub → 5 leaves /mall/:slug, Google likes this structure).
 useHead({
@@ -37,13 +50,32 @@ const list = useInfiniteList<MallItem>({
   keyOf: (m) => m.slug,
   fetchPage: (limit, offset) =>
     $fetch<InfiniteFetchPage<MallItem>>("/api/malls", {
-      params: { limit, offset },
+      params: {
+        limit,
+        offset,
+        ...(searchMallQuery.value ? { search: searchMallQuery.value } : {}),
+        ...(sortOption.value !== "name_asc" ? { sort: sortOption.value } : {}),
+      },
     }),
 });
+// Any change of query/sort = new result set → back to page 1 (never append stale pages).
+watch(
+  [searchMallQuery, sortOption],
+  () => {
+    void list.reset();
+  },
+  { deep: true },
+);
 if (import.meta.server) await list.start();
 else void list.start();
-const { items: malls, hasMore, pending, loadingMore, error } = list;
+const { items: malls, total, hasMore, pending, loadingMore, error } = list;
 const sentinel = useSentinelObserver(() => list.loadMore());
+const SORT_OPTIONS = [
+  { value: "name_asc", label: "A→Z" },
+  { value: "name_desc", label: "Z→A" },
+  { value: "tenant_desc", label: "Tenant terbanyak" },
+  { value: "tenant_asc", label: "Tenant paling sedikit" },
+];
 
 // D1 1:1: short area = shortest '/' segment (Thamrin, Grogol), fallback city.
 function mallArea(m: MallItem): string {
@@ -59,8 +91,48 @@ function mallArea(m: MallItem): string {
     >
       <h1 class="text-xl font-extrabold">🏢 Mall</h1>
       <span class="text-xs font-bold text-gray-500">{{
-        pending ? "…" : "5 mall"
+        pending ? "…" : `${malls.length}/${total || malls.length} mall`
       }}</span>
+    </div>
+
+    <!-- Search + sort (server-side, reset page on change): 5 malls now, stays correct when the hub grows. -->
+    <div class="sticky top-[38px] pt-1 pb-2" :style="{ background: PAGE_BG }">
+      <div
+        class="bg-white border border-[#e4e4e7] rounded-xl px-3.5 py-2.5 text-[13px] text-gray-500 flex gap-2 items-center"
+      >
+        🔍
+        <input
+          v-model="searchMall"
+          placeholder="Cari mall... mis. grand, BSD"
+          class="bg-transparent outline-none flex-1 text-ink placeholder:text-gray-400"
+        />
+        <button
+          v-if="searchMall"
+          type="button"
+          class="text-gray-400 font-bold"
+          aria-label="Hapus pencarian"
+          @click="searchMall = ''"
+        >
+          ✕
+        </button>
+      </div>
+      <div class="flex gap-1.5 mt-2 overflow-x-auto pb-0.5">
+        <button
+          v-for="opt in SORT_OPTIONS"
+          :key="opt.value"
+          type="button"
+          :disabled="pending"
+          class="text-[11.5px] font-bold rounded-full px-3 py-1.5 bg-white border-[1.5px] whitespace-nowrap disabled:opacity-60"
+          :style="
+            sortOption === opt.value
+              ? 'background:#18181b;color:#fff;border-color:#18181b'
+              : 'border-color:#e4e4e7'
+          "
+          @click="sortOption = opt.value"
+        >
+          {{ opt.label }}
+        </button>
+      </div>
     </div>
     <AppLoader v-if="pending" variant="mall" />
     <div
