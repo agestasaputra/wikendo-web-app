@@ -37,6 +37,7 @@ useHead({ bodyAttrs: { class: "bg-stone-200" } });
       <p>Wikendo — biar weekend nggak bingung lagi.</p>
       <p>
         © 2026 Wikendo ·
+        <NuxtLink to="/about" class="underline">Tentang</NuxtLink> ·
         <NuxtLink to="/privacy" class="underline">Privacy</NuxtLink> ·
         <NuxtLink to="/terms" class="underline">Terms</NuxtLink>
       </p>

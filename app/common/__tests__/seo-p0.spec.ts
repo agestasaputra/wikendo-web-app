@@ -34,10 +34,11 @@ describe("robots.txt + sitemap (SEO teknis)", () => {
     expect(robots).toContain("/api/");
   });
 
-  it("sitemap dinamis server route: 4 halaman statis + mall dari DB (isr + cache)", () => {
+  it("sitemap dinamis server route: 5 halaman statis + mall dari DB (isr + cache)", () => {
     const sitemap = readSource("server/routes/sitemap.xml.ts");
     expect(sitemap).toContain("sitemap");
     expect(sitemap).toContain("/mall");
+    expect(sitemap).toContain("/about");
     expect(sitemap).toContain("supabaseAdmin");
     expect(sitemap).toContain("s-maxage=3600");
     expect(sitemap).toContain("lastmod");
@@ -93,9 +94,10 @@ describe("footer publik (kredibilitas share, bukan pesan dev)", () => {
     expect(APP).not.toContain("Hermes-combo");
   });
 
-  it("halaman privacy + terms ADA (stub jujur, gate review Google OAuth)", () => {
+  it("halaman privacy + terms + about ADA (stub jujur, gate review Google OAuth)", () => {
     expect(sourceExists("pages/privacy.vue")).toBe(true);
     expect(sourceExists("pages/terms.vue")).toBe(true);
+    expect(sourceExists("pages/about.vue")).toBe(true);
     expect(sourceExists("features/legal/LegalPage.vue")).toBe(true);
   });
 });

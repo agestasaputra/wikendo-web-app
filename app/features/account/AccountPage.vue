@@ -132,12 +132,12 @@ const showSkeleton = computed(() => booting.value);
       >
         <span>💬 Hubungi kami</span><span class="text-gray-400">↗</span>
       </a>
-      <a
-        href="/#tentang"
+      <NuxtLink
+        to="/about"
         class="flex justify-between items-center px-4 py-3.5 font-extrabold text-[13px] hover:bg-stone-50"
       >
         <span>ℹ️ Tentang</span><span class="text-gray-400">→</span>
-      </a>
+      </NuxtLink>
     </div>
   </div>
 </template>

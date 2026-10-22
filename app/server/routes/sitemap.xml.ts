@@ -44,6 +44,7 @@ export default defineEventHandler(async (event) => {
     { loc: `${SITE}/mall`, priority: "0.9", changefreq: "daily" },
     { loc: `${SITE}/place`, priority: "0.8", changefreq: "monthly" },
     { loc: `${SITE}/food`, priority: "0.8", changefreq: "monthly" },
+    { loc: `${SITE}/about`, priority: "0.5", changefreq: "monthly" },
     ...mallSlugs.map((slug) => ({
       loc: `${SITE}/mall/${slug}`,
       priority: "0.7",

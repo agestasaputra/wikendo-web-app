@@ -28,6 +28,7 @@ const STATIC_TITLES: Record<string, string> = {
   "/reset-password": "Reset Password",
   "/privacy": "Kebijakan Privasi",
   "/terms": "Syarat & Ketentuan",
+  "/about": "Tentang",
 };
 
 /** Path without query/hash and without a trailing slash, so "/place/?x=1" === "/place". */
