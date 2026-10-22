@@ -117,11 +117,12 @@ function mallArea(m: MallItem): string {
       }}</span>
     </div>
 
-    <!-- Search + Filter button + sort (server-side, reset page on change). -->
-    <div class="sticky top-[38px] pt-1 pb-2" :style="{ background: PAGE_BG }">
-      <div class="flex gap-2">
+    <!-- Search + Filter button (server-side, reset page on change). Sort pindah ke FilterDrawer:
+         satu kontrol untuk satu keputusan, jadi baris chip sort lama dihapus. -->
+    <div class="sticky-bar pt-1 pb-2" :style="{ background: PAGE_BG }">
+      <div class="flex gap-2 items-stretch">
         <div
-          class="flex-1 bg-white border border-[#e4e4e7] rounded-xl px-3.5 py-2.5 text-[13px] text-gray-500 flex gap-2 items-center"
+          class="flex-1 min-w-0 h-11 bg-white border border-[#e4e4e7] rounded-xl px-3.5 text-[13px] text-gray-500 flex gap-2 items-center"
         >
           🔍
           <input
@@ -141,7 +142,7 @@ function mallArea(m: MallItem): string {
         </div>
         <button
           type="button"
-          class="shrink-0 text-[12px] font-extrabold rounded-xl px-3 border-[1.5px] flex items-center gap-1"
+          class="flex-none h-11 text-[12px] font-extrabold rounded-xl px-3 border-[1.5px] flex items-center gap-1"
           :style="
             activeFilters.length
               ? 'background:#18181b;color:#fff;border-color:#18181b'
@@ -157,23 +158,6 @@ function mallArea(m: MallItem): string {
             style="background: #e11d48; color: #fff"
             >{{ activeFilters.length }}</span
           >
-        </button>
-      </div>
-      <div class="flex gap-1.5 mt-2 overflow-x-auto pb-0.5">
-        <button
-          v-for="opt in SORT_OPTIONS"
-          :key="opt.value"
-          type="button"
-          :disabled="pending"
-          class="text-[11.5px] font-bold rounded-full px-3 py-1.5 bg-white border-[1.5px] whitespace-nowrap disabled:opacity-60"
-          :style="
-            sortOption === opt.value
-              ? 'background:#18181b;color:#fff;border-color:#18181b'
-              : 'border-color:#e4e4e7'
-          "
-          @click="sortOption = opt.value"
-        >
-          {{ opt.label }}
         </button>
       </div>
     </div>

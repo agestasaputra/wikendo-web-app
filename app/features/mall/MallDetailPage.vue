@@ -162,8 +162,9 @@ const promoStrip = computed(() =>
       }}</span>
     </div>
 
-    <!-- Sticky: search + filter button (side by side) + CTA (S2b spec: not thrown off by scroll) -->
-    <div class="sticky top-0 pt-2 pb-2" :style="{ background: PAGE_BG }">
+    <!-- Sticky: search + filter button only. KENAPA CTA keluar dari blok ini: CTA tinggi ~64px,
+         kalau ikut sticky dia makan layar terus (list tenant jadi 2 baris) — sisa konten tetap ke-scroll. -->
+    <div class="sticky-bar pt-2 pb-2" :style="{ background: PAGE_BG }">
       <div class="flex gap-2 items-stretch">
         <div
           class="flex-1 min-w-0 h-11 bg-white border border-[#e4e4e7] rounded-xl px-3.5 text-[13px] text-gray-500 flex gap-2 items-center"
@@ -195,30 +196,31 @@ const promoStrip = computed(() =>
           >
         </button>
       </div>
-
-      <!-- Directory → quiz bridge CTA (S2c ASSISTANT CARD: lime strip + ink-lime avatar + 2 lines + arrow) -->
-      <NuxtLink
-        :to="`/food?mall=${slug}`"
-        class="block rounded-[14px] p-3.5 bg-white border border-gray-100 mt-1"
-        style="border-left: 4px solid #a3e635"
-      >
-        <div class="flex gap-2.5 items-center">
-          <div
-            class="w-9 h-9 flex-none rounded-full flex items-center justify-center text-[16px]"
-            style="background: #0c0a09"
-          >
-            🤖
-          </div>
-          <div class="flex-1 text-[13px] leading-snug">
-            <b>Ceritain mau makan apa →</b><br />
-            <small class="text-gray-500"
-              >quiz 20 dtk · tanpa login · hasil murni {{ mallShort }}</small
-            >
-          </div>
-          <div class="font-extrabold">→</div>
-        </div>
-      </NuxtLink>
     </div>
+
+    <!-- Directory → quiz bridge CTA (S2c ASSISTANT CARD: lime strip + ink-lime avatar + 2 lines + arrow).
+         Di LUAR .sticky-bar: CTA bukan kontrol list, dan kalau ikut sticky layar habis untuk header. -->
+    <NuxtLink
+      :to="`/food?mall=${slug}`"
+      class="block rounded-[14px] p-3.5 bg-white border border-gray-100 mt-1"
+      style="border-left: 4px solid #a3e635"
+    >
+      <div class="flex gap-2.5 items-center">
+        <div
+          class="w-9 h-9 flex-none rounded-full flex items-center justify-center text-[16px]"
+          style="background: #0c0a09"
+        >
+          🤖
+        </div>
+        <div class="flex-1 text-[13px] leading-snug">
+          <b>Ceritain mau makan apa →</b><br />
+          <small class="text-gray-500"
+            >quiz 20 dtk · tanpa login · hasil murni {{ mallShort }}</small
+          >
+        </div>
+        <div class="font-extrabold">→</div>
+      </div>
+    </NuxtLink>
 
     <!-- S2c infinity count pill -->
     <p

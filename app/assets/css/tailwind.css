@@ -11,4 +11,33 @@
   body {
     font-family: "Plus Jakarta Sans", system-ui, sans-serif;
   }
+
+  /*
+   * Tinggi TopNav (header sticky global) = 56px. SATU pemilik offset sticky.
+   * KENAPA: bar search + tombol Filter harus nempel TEPAT di bawah header. Dulu tiap halaman
+   * menebak sendiri (`top-[38px]` di mall list, `top-0` di tenant detail) padahal header 56px
+   * → bar slide ke BELAKANG header lalu hilang saat scroll (bug nyata di prod).
+   */
+  :root {
+    --topnav-h: 56px;
+  }
+}
+
+@layer components {
+  /*
+   * .sticky-bar — bar search + tombol Filter yang nempel di bawah TopNav.
+   * KENAPA full-bleed (-mx-4 + px-4): halaman punya gutter 16px; tanpa ini kartu list terlihat
+   * "bocor" di sisi kiri/kanan bar saat konten lewat di belakangnya.
+   * z-index 30: di atas kartu list, di bawah TopNav (z-40) dan FilterDrawer (z-60).
+   * Background TIDAK di sini — halaman mengisi PAGE_BG supaya kanvas tetap satu pemilik.
+   */
+  .sticky-bar {
+    position: sticky;
+    top: var(--topnav-h);
+    z-index: 30;
+    margin-left: -1rem;
+    margin-right: -1rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
 }

@@ -19,6 +19,7 @@ import { computed, ref } from "vue";
 
 import AppLoader from "~/common/components/AppLoader.vue";
 import FilterDrawer from "~/common/components/FilterDrawer.vue";
+import { PAGE_BG } from "~/common/constants/theme";
 import { useFirstLoad } from "~/common/composables/useFirstLoad";
 import { useHistoryStore } from "~/common/store/HistoryStore";
 import { timeAgo, mergeHistory } from "~/common/utils/history";
@@ -159,8 +160,14 @@ function onFilterReset(): void {
       <p class="text-[11px] font-bold text-gray-500 mb-3">
         Terakhir dilihat — max 20 · simpan di HP ini
       </p>
-      <!-- Search + filter button (side by side); filter drawer FD14 handles jenis + sort. -->
-      <div class="flex gap-2 mb-3 items-stretch">
+      <!-- Search + filter button (side by side); filter drawer FD14 handles jenis + sort.
+           KENAPA .sticky-bar: bar ini kontrol utama list — saat riwayat panjang di-scroll,
+           user harus tetap bisa ganti keyword/filter tanpa balik ke atas. Offset datang dari
+           satu token (--topnav-h), bukan angka tebakan per halaman. -->
+      <div
+        class="sticky-bar flex gap-2 mb-3 items-stretch"
+        :style="{ background: PAGE_BG }"
+      >
         <div
           class="flex-1 min-w-0 h-11 bg-white border border-[#e4e4e7] rounded-xl px-3.5 text-[13px] text-gray-500 flex gap-2 items-center"
         >
