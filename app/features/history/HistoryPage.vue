@@ -32,6 +32,7 @@ const historySort = ref<"newest" | "oldest" | "title_asc" | "title_desc">(
 
 const showFilter = ref(false);
 const activeFilters = ref<string[]>([]);
+const searchQuery = ref("");
 
 const history = useHistoryStore();
 const { items } = storeToRefs(history);
@@ -62,10 +63,16 @@ function kindTokenToValue(token: string | undefined): "all" | "place" | "food" {
 }
 
 const sortedItems = computed(() => {
-  const filtered =
-    historyFilter.value === "all"
-      ? items.value
-      : items.value.filter((it) => it.kind === historyFilter.value);
+  const q = searchQuery.value.trim().toLowerCase();
+  const filtered = items.value.filter((it) => {
+    if (historyFilter.value !== "all" && it.kind !== historyFilter.value)
+      return false;
+    if (!q) return true;
+    return (
+      it.title.toLowerCase().includes(q) ||
+      (it.sub || "").toLowerCase().includes(q)
+    );
+  });
   return [...filtered].sort((a, b) => {
     switch (historySort.value) {
       case "oldest":
@@ -117,6 +124,8 @@ const showSkeleton = computed(() => booting.value);
 
 // Copy for the empty state — placed AFTER the skeleton gate on purpose: the gate must win first paint.
 const emptyMessage = computed(() => {
+  if (searchQuery.value.trim())
+    return `Tidak ada riwayat untuk "${searchQuery.value.trim()}"`;
   if (historyFilter.value === "all")
     return "Belum ada riwayat — mulai quiz pertamamu →";
   return `Belum ada riwayat ${historyFilter.value === "place" ? "tempat" : "makanan"} — mulai quiz pertamamu →`;
@@ -150,11 +159,23 @@ function onFilterReset(): void {
       <p class="text-[11px] font-bold text-gray-500 mb-3">
         Terakhir dilihat — max 20 · simpan di HP ini
       </p>
-      <!-- Filter + sort via FD14 drawer (client-side; max 20 entries, no paging). -->
-      <div class="flex gap-2 mb-3 items-center">
+      <!-- Search + filter button (side by side); filter drawer FD14 handles jenis + sort. -->
+      <div class="flex gap-2 mb-3 items-stretch">
+        <div
+          class="flex-1 min-w-0 h-11 bg-white border border-[#e4e4e7] rounded-xl px-3.5 text-[13px] text-gray-500 flex gap-2 items-center"
+        >
+          🔍
+          <input
+            v-model="searchQuery"
+            type="search"
+            placeholder="Cari riwayat... mis. kopi"
+            class="bg-transparent outline-none flex-1 min-w-0 text-ink placeholder:text-gray-400"
+            data-testid="history-search"
+          />
+        </div>
         <button
           type="button"
-          class="text-[12px] font-extrabold rounded-xl px-3 py-2 border-[1.5px] flex items-center gap-1"
+          class="flex-none h-11 text-[12px] font-extrabold rounded-xl px-3.5 border-[1.5px] flex items-center gap-1"
           :style="
             activeFilters.length
               ? 'background:#18181b;color:#fff;border-color:#18181b'
@@ -171,10 +192,6 @@ function onFilterReset(): void {
             >{{ activeFilters.length }}</span
           >
         </button>
-        <span class="text-[11px] text-gray-500">
-          {{ historyFilter === "all" ? "Semua" : historyFilter }} ·
-          {{ historySort }}
-        </span>
       </div>
 
       <div
@@ -185,9 +202,13 @@ function onFilterReset(): void {
           {{ emptyMessage }}
         </p>
         <p class="text-[11px] text-gray-500 mt-1">
-          Hasil quiz tempat & makan bakal muncul di sini
+          {{
+            searchQuery.trim()
+              ? "Coba kata kunci lain atau ubah filter."
+              : "Hasil quiz tempat & makan bakal muncul di sini"
+          }}
         </p>
-        <div class="flex gap-2 mt-3">
+        <div v-if="!searchQuery.trim()" class="flex gap-2 mt-3">
           <NuxtLink
             to="/place"
             class="flex-1 text-center text-white rounded-2xl py-3 font-extrabold text-sm"

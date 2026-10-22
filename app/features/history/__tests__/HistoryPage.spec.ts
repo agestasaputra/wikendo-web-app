@@ -103,3 +103,27 @@ describe("history first load — skeleton before content", () => {
     );
   });
 });
+
+describe("history search + filter button (side by side)", () => {
+  it("has a search input bound to searchQuery", () => {
+    expect(RIW).toContain('data-testid="history-search"');
+    expect(RIW).toMatch(/v-model="searchQuery"/);
+  });
+
+  it("filters items by title and sub, case-insensitive", () => {
+    expect(RIW).toMatch(/searchQuery\.value\.trim\(\)\.toLowerCase\(\)/);
+    expect(RIW).toMatch(/it\.title\.toLowerCase\(\)\.includes\(q\)/);
+    expect(RIW).toMatch(/it\.sub/);
+  });
+
+  it("Filter button comes AFTER the search input (right side)", () => {
+    const code = RIW_CODE;
+    expect(code.indexOf('data-testid="history-search"')).toBeLessThan(
+      code.indexOf('data-testid="open-filter"'),
+    );
+  });
+
+  it("honest empty state for a search miss (not the generic copy)", () => {
+    expect(RIW).toContain("Tidak ada riwayat untuk");
+  });
+});

@@ -34,3 +34,23 @@ describe("V13C promo strip on the mall page", () => {
     expect(DETAIL).toContain("tenant (semua)");
   });
 });
+
+describe("detail search + filter button (side by side, no legacy chips)", () => {
+  it("search input and Filter button sit in the same flex row", () => {
+    // One wrapper row holds both: input first, then the Filter button.
+    expect(DETAIL).toMatch(
+      /<div class="flex gap-2 items-stretch">[\s\S]*?open-filter/,
+    );
+  });
+
+  it("Filter button renders AFTER the search input (right side)", () => {
+    expect(DETAIL.indexOf("Cari tenant")).toBeLessThan(
+      DETAIL.indexOf('data-testid="open-filter"'),
+    );
+  });
+
+  it("no leftover filter chip row between search and the quiz CTA", () => {
+    // The old chip strip was a flex-wrap row of buttons right under the input.
+    expect(DETAIL).not.toMatch(/flex gap-1\.5 flex-wrap my-2\.5/);
+  });
+});

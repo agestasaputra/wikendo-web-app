@@ -162,27 +162,26 @@ const promoStrip = computed(() =>
       }}</span>
     </div>
 
-    <!-- Sticky: search + chips + CTA (S2b spec: not thrown off by scroll) -->
+    <!-- Sticky: search + filter button (side by side) + CTA (S2b spec: not thrown off by scroll) -->
     <div class="sticky top-0 pt-2 pb-2" :style="{ background: PAGE_BG }">
-      <div
-        class="bg-white border border-[#e4e4e7] rounded-xl px-3.5 py-2.5 text-[13px] text-gray-500 flex gap-2 items-center"
-      >
-        🔍
-        <input
-          v-model="keyword"
-          placeholder="Cari tenant... mis. kopi, ramen"
-          class="bg-transparent outline-none flex-1 text-ink placeholder:text-gray-400"
-        />
-      </div>
-
-      <div class="flex gap-1.5 flex-wrap my-2.5 items-center">
+      <div class="flex gap-2 items-stretch">
+        <div
+          class="flex-1 min-w-0 h-11 bg-white border border-[#e4e4e7] rounded-xl px-3.5 text-[13px] text-gray-500 flex gap-2 items-center"
+        >
+          🔍
+          <input
+            v-model="keyword"
+            placeholder="Cari tenant... mis. kopi, ramen"
+            class="bg-transparent outline-none flex-1 min-w-0 text-ink placeholder:text-gray-400"
+          />
+        </div>
         <button
           type="button"
-          class="text-[11.5px] font-bold rounded-full px-3 py-1.5 border-[1.5px] flex items-center gap-1"
+          class="flex-none h-11 text-[12px] font-extrabold rounded-xl px-3.5 border-[1.5px] flex items-center gap-1"
           :style="
             activeFilters.length
               ? 'background:#18181b;color:#fff;border-color:#18181b'
-              : 'background:#fff;border-color:#e4e4e7;color:#18181b'
+              : 'background:#fff;color:#18181b;border-color:#e4e4e7'
           "
           data-testid="open-filter"
           @click="showFilter = true"
