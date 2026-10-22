@@ -94,6 +94,14 @@
 
 ## 📋 LOG (newest first)
 
+### 2026-10-22 — Sticky bar seragam 3 halaman + search/filter 44px ✅
+- **Fase:** UI consistency (MallList, MallDetail, History).
+- **Kenapa:** Tiap halaman punya offset sticky sendiri (`top-[38px]` vs `top-0`) → bar bisa ketutup TopNav atau nyelip di bawahnya saat scroll. Chip sort lama juga dobel kontrol dengan FilterDrawer FD14. Tinggi input & tombol beda-beda → baris terlihat goyang.
+- **File:** `app/assets/css/tailwind.css` (token `.sticky-bar` + `--topnav-h: 56px`), `app/features/mall/MallListPage.vue` (`sticky-bar pt-1 pb-2`, row `items-stretch`, input `flex-1 min-w-0 h-11`, Filter `flex-none h-11`, chip sort dihapus), `app/features/mall/MallDetailPage.vue` (`sticky-bar pt-2 pb-2`, CTA quiz-bridge dipindah keluar sticky karena ~64px memakan layar), `app/features/history/HistoryPage.vue` (`sticky-bar` + `:style="{ background: PAGE_BG }"` + import `PAGE_BG`), `app/common/components/__tests__/sticky-search.spec.ts` (baru, 13 test).
+- **Verifikasi:** TDD RED 8 gagal → GREEN 13/13 ✅ · full suite **584/584 (73 files)** ✅ · lint 0 ✅ · build 10.5s ✅.
+- **Deploy:** commit `81f8ef0` → push `main` → Vercel auto-deploy.
+- **Next:** smoke prod 390px di 3 halaman (bar nempel di bawah TopNav, tinggi 44px seragam, tanpa chip sort lama).
+
 ### 2026-10-22 — Search input + Filter button sejajar (tenant detail & history) ✅
 - **Fase:** UI refinement (2 halaman) — request langsung Agesta.
 - **Kenapa:** (1) Tenant detail: tombol Filter masih di baris chip terpisah dan chip filter lama (Halal / 50-100rb / Nongkrong Lama) memakan ruang vertikal + dobel kontrol dengan FilterDrawer. (2) History: belum ada search sama sekali, padahal riwayat bisa sampai 20 entri.
