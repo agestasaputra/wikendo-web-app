@@ -111,7 +111,6 @@ function mallArea(m: MallItem): string {
       class="flex justify-between items-center sticky top-0 py-2"
       :style="{ background: PAGE_BG }"
     >
-      <h1 class="text-xl font-extrabold">🏢 Mall</h1>
       <span class="text-xs font-bold text-gray-500">{{
         pending ? "…" : `${malls.length}/${total || malls.length} mall`
       }}</span>

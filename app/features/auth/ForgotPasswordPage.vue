@@ -41,7 +41,7 @@ async function handleSubmit(): Promise<void> {
 </script>
 
 <template>
-  <div class="max-w-md mx-auto px-4 pb-10 pt-8 min-h-screen">
+  <div class="max-w-md mx-auto px-4 pb-10 pt-8 min-h-[calc(100vh-64px)]">
     <form class="space-y-4" @submit.prevent="handleSubmit">
       <div
         class="bg-white rounded-full flex items-center gap-2 px-4 py-3.5 shadow-sm"

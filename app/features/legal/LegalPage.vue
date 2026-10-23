@@ -105,9 +105,8 @@ useHead(() => ({
 </script>
 
 <template>
-  <div class="max-w-md mx-auto px-4 pb-10">
-    <p class="text-xs text-gray-500 pt-3 mb-1">Home / {{ copy.title }}</p>
-    <h1 class="text-xl font-extrabold mb-1">{{ copy.title }}</h1>
+  <div class="max-w-md mx-auto px-4 pb-10 pt-3">
+    <b class="text-xl font-extrabold mb-1">{{ copy.title }}</b>
     <p class="text-[11px] text-gray-400 mb-3">{{ copy.updated }}</p>
     <div
       class="bg-white rounded-2xl border border-gray-100 p-4 flex flex-col gap-4"

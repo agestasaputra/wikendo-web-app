@@ -48,7 +48,7 @@ async function handleResend(): Promise<void> {
 </script>
 
 <template>
-  <div class="max-w-md mx-auto px-4 pb-10 min-h-screen">
+  <div class="max-w-md mx-auto px-4 pb-10 min-h-[calc(100vh-64px)]">
     <!-- 1. Black banner — 1:1 register (ember strip + radius 12 + light-lime number) -->
     <AuthBanner
       title="HAMPIR SELESAI"
@@ -59,7 +59,7 @@ async function handleResend(): Promise<void> {
     <!-- 2. White instruction card -->
     <div class="bg-white rounded-3xl mt-3 p-5 shadow-sm text-center">
       <div class="text-3xl">📩</div>
-      <h1 class="text-lg font-extrabold text-black mt-2">Cek email kamu</h1>
+      <b class="text-lg font-extrabold text-black mt-2">Cek email kamu</b>
       <p class="text-sm font-bold text-black mt-1 break-all">
         {{ displayEmail }}
       </p>

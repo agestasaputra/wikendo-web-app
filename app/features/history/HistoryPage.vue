@@ -265,13 +265,6 @@ function onFilterReset(): void {
             </div>
           </div>
         </NuxtLink>
-        <button
-          type="button"
-          class="text-[11px] font-bold text-gray-500 underline mt-1"
-          @click="history.clear()"
-        >
-          Hapus riwayat
-        </button>
       </div>
     </template>
   </div>
