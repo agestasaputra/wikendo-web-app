@@ -156,7 +156,7 @@ const promoStrip = computed(() =>
 <template>
   <div class="max-w-md mx-auto px-4 py-2 pb-10">
     <div class="flex justify-between items-center">
-      <h1 class="text-xl font-extrabold">🏢 {{ mallName }}</h1>
+      <b class="text-xl font-extrabold">🏢 {{ mallName }}</b>
       <span class="text-xs font-bold text-gray-500">{{
         pending ? "…" : `${total || tenants.length} tenant`
       }}</span>
