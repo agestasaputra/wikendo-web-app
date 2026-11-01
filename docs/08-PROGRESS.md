@@ -196,3 +196,11 @@
 - **Files changed:** `app/plugins/gtag.client.ts` (`send_page_view:false`), `app/plugins/gtagPageView.client.ts` (new), `app/common/composables/useGaAnalytics.ts` (`trackGaPageView`), `app/common/constants/analytics.ts` (`GA_EVENTS`), `PlaceResultPage.vue`, `FoodResultPage.vue`, specs, docs.
 - **Verification:** specs RED→GREEN. Headless Chrome with a fake GA ID: one page_view per route, correct title and path, no query/hash. Real GA4 DebugView NOT checked (needs the real ID).
 - **Next:** set `NUXT_PUBLIC_GA_ID` in Vercel, disable the history-change toggle in GA4 Enhanced measurement, add a consent gate.
+
+### 2026-11-01 — Fix: GA4 sent no hits (gtag shim pushed arrays)
+- **Phase:** Analytics bugfix.
+- **Why:** prod showed gtag loaded and `dataLayer` filled, but Realtime was empty and no `collect` request fired. `gtag.js` only executes `arguments` objects in `dataLayer`; the shim from `075f7f7` pushed plain arrays, so every config/event was ignored (also before the journey-tracking change).
+- **Files changed:** `app/plugins/gtag.client.ts` (push `arguments`, one justified `eslint-disable prefer-rest-params`), `app/common/composables/__tests__/gtagShim.spec.ts` (new, RED first).
+- **Verification:** spec RED→GREEN. Headless Chrome, fake ID, real gtag.js: `google-analytics.com/g/collect` fires after the fix; the unfixed prod build sent none. Real GA4 Realtime NOT yet checked (needs deploy).
+- **Next:** deploy, then confirm Realtime/DebugView with the real ID.
+
