@@ -96,6 +96,7 @@ sequenceDiagram
 - Quota exhausted → `403 FOOD_QUOTA_EXCEEDED`; mall not found → 404; no candidates → 404 ("Tidak ada tenant cocok").
 - LLM returns a wrong format / hallucinated names → retry 1x → `buildRankFallback` (Food never returns 500 because of the LLM).
 - The `food_quota_used` cookie (maxAge 1 day) is incremented by 1 only on success.
+- GA4: a FRESH result (no `?id=`) fires `quiz_complete {type}` once via `trackGaEvent`; re-opening a stored deck does not. Failures send nothing.
 
 ## See Also
 

@@ -8,6 +8,8 @@ code:
   - app/common/components/QuizHeader.vue
   - app/common/components/QuizOptionList.vue
   - app/common/components/ResultError.vue
+  - app/common/composables/useGaAnalytics.ts
+  - app/plugins/gtagPageView.client.ts
   - app/common/composables/useInfiniteList.ts
   - app/common/composables/useSentinelObserver.ts
   - app/common/composables/useSupabaseBrowser.ts
@@ -36,6 +38,7 @@ Everything used by ≥2 features lives in `app/common/` (components, composables
 
 | Item                     | File                                            | Role                                        |
 | ------------------------ | ----------------------------------------------- | ------------------------------------------- |
+| `trackGaEvent` / `trackGaPageView` | `app/common/composables/useGaAnalytics.ts` | Browser → GA4 event / page_view (path only), silent no-op without GA |
 | `useInfiniteList`        | `app/common/composables/useInfiniteList.ts`     | Paging start/loadMore/reset                 |
 | `useSentinelObserver`    | `app/common/composables/useSentinelObserver.ts` | Infinite-scroll sentinel                   |
 | `useSupabaseBrowser`     | `app/common/composables/useSupabaseBrowser.ts`  | Browser Supabase client                    |

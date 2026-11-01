@@ -6,6 +6,8 @@ EXAMPLE: Kopi Kekinian hero — GI L2 Halal 50-100rb kids → gift Buka then ten
 import { onMounted, onUnmounted, watch, ref } from "vue";
 import AppLoader from "~/common/components/AppLoader.vue";
 import { useAuthFetch } from "~/common/composables/useAuthFetch";
+import { trackGaEvent } from "~/common/composables/useGaAnalytics";
+import { GA_EVENTS } from "~/common/constants/analytics";
 import ResultError from "~/common/components/ResultError.vue";
 import { useHistoryStore } from "~/common/store/HistoryStore";
 import type { TenantRecommendation } from "~/common/types/api";
@@ -290,11 +292,19 @@ function pushHistory(): void {
     at: Date.now(),
   });
 }
+// GA4 funnel: 1 quiz_complete per NEW generation. A stored deck (?id=) is a re-open, not a completion.
+function reportComplete(): void {
+  if (isStored.value) return;
+  trackGaEvent(GA_EVENTS.quizComplete, { type: "food" });
+}
 onMounted(() => {
   watch(
     () => list.value.length,
     (n) => {
-      if (n) pushHistory();
+      if (n) {
+        pushHistory();
+        reportComplete();
+      }
     },
     { immediate: true },
   );

@@ -48,5 +48,6 @@ Single source of truth for terminology used across `docs/architecture/`. Use the
 | **Cloudflare Workers AI** | Production LLM provider (OpenAI-compatible endpoint). Chosen when `cfAccountId` + `cfApiToken` are set.                      |
 | **Hermes-combo**          | Local LLM provider for dev (`http://127.0.0.1:20128`). Fallback when the Cloudflare env is empty.                              |
 | **Vercel**                | Production hosting (root directory = `app/`).                                                                                 |
+| **GA4** | Google Analytics 4. Loaded by `plugins/gtag.client.ts` only when `NUXT_PUBLIC_GA_ID` is set; `page_view` is sent per route by `plugins/gtagPageView.client.ts` (gtag's own is off), custom events go through `trackGaEvent` (`useGaAnalytics`); `quiz_complete` marks a fresh result deck. Separate from `analytics_events` (our DB, `useAnalytics`). |
 | **Google OAuth**          | 1-click login via Supabase `signInWithOAuth({ provider: "google" })`.                                                      |
 | **GitHub Actions**        | CI `.github/workflows/ci.yml`: security (gitleaks + audit) and verify (lint, type-check, test, build).                      |

@@ -5,6 +5,8 @@ EXAMPLE: hero Rooftop Senayan — Senayan 4.8 sunset+live music → Navigate →
 <script setup lang="ts">
 import { onMounted, watch } from "vue";
 import { useAuthFetch } from "~/common/composables/useAuthFetch";
+import { trackGaEvent } from "~/common/composables/useGaAnalytics";
+import { GA_EVENTS } from "~/common/constants/analytics";
 import ResultError from "~/common/components/ResultError.vue";
 import { useHistoryStore } from "~/common/store/HistoryStore";
 import type { PlaceRecommendation } from "~/common/types/api";
@@ -125,11 +127,19 @@ function pushHistory(): void {
     at: Date.now(),
   });
 }
+// GA4 funnel: 1 quiz_complete per NEW generation. A stored deck (?id=) is a re-open, not a completion.
+function reportComplete(): void {
+  if (isStored.value) return;
+  trackGaEvent(GA_EVENTS.quizComplete, { type: "place" });
+}
 onMounted(() => {
   watch(
     () => list.value.length,
     (n) => {
-      if (n) pushHistory();
+      if (n) {
+        pushHistory();
+        reportComplete();
+      }
     },
     { immediate: true },
   );

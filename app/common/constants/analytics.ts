@@ -24,3 +24,12 @@ export type AnalyticsEventName =
 export const CLIENT_EVENT_WHITELIST: readonly string[] = [
   ANALYTICS_EVENTS.promoClick,
 ];
+
+/**
+ * GA4-only event names (browser → `trackGaEvent`). Kept apart from ANALYTICS_EVENTS because
+ * these never reach `analytics_events`, so they must not enter its whitelist.
+ */
+export const GA_EVENTS = {
+  /** A FRESH quiz submission produced a result deck (re-opening a saved deck does not count). */
+  quizComplete: "quiz_complete",
+} as const;

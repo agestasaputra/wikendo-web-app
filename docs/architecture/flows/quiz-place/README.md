@@ -87,6 +87,7 @@ sequenceDiagram
 - Anon quota exhausted → `403 LOGIN_REQUIRED`; the UI shows the wall (quota is not deducted on other errors).
 - LLM fails 2x → error is thrown (Place has no deterministic fallback yet, unlike Food).
 - Quota is tracked by the `quota_used` cookie (maxAge 1 day) + `session_id` (30 days).
+- GA4: a FRESH result (no `?id=`) fires `quiz_complete {type}` once via `trackGaEvent`; re-opening a stored deck does not. Failures send nothing.
 
 ## See Also
 

@@ -23,7 +23,9 @@ export default defineNuxtPlugin(() => {
     window.dataLayer?.push(args);
   };
   window.gtag("js", new Date());
-  window.gtag("config", gaId);
+  // page_view is sent per route by plugins/gtagPageView.client.ts (path only, SPA-aware);
+  // leaving gtag's own initial page_view on would count the first page twice.
+  window.gtag("config", gaId, { send_page_view: false });
 
   const script = document.createElement("script");
   script.src = `https://www.googletagmanager.com/gtag/js?id=${gaId}`;
