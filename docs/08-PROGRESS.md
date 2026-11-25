@@ -182,3 +182,25 @@
 - **Files changed:** none (verification only).
 - **Verification:** Browser smoke on prod: `/mall`, `/mall/grand-indonesia`, `/history` all render open-filter button; drawer opens (data-testid="filter-drawer") with grouped chips + sort pills + Reset/Terapkan. Applied Halal on GI → 40→37 tenant. Applied Z→A on mall list → order reversed. Applied Jenis=Makanan on history → empty-state "Belum ada riwayat makanan". z-[60] above bottom nav confirmed via visual.
 - **Next:** monitoring.
+
+### 2026-11-01 — useGaAnalytics composable (GA4 custom events)
+- **Phase:** Analytics — browser → GA4 sender.
+- **Why:** `useAnalytics` only writes to our DB; GA4 custom events need their own composable (one destination per job).
+- **Files changed:** `app/common/composables/useGaAnalytics.ts`, `app/common/composables/__tests__/useGaAnalytics.spec.ts`, docs (shared-ui spoke, GLOSSARY).
+- **Verification:** new spec 4/4 ✅ (RED first), lint 0, type-check 0. Full suite green (594/594), build not run. No call site wired yet.
+- **Next:** wire `trackGaEvent` at call sites (e.g. `promo_click`), register custom dimensions in GA4, consent gate.
+
+### 2026-11-01 — GA4 journey tracking (page_view per route + quiz_complete)
+- **Phase:** Analytics — journey funnel.
+- **Why:** track every page visited, the path up to a successful quiz result, and last page / time on site. Time on site and last page come from GA4 itself (engagement time, User explorer); the code only has to send a correct page_view per route.
+- **Files changed:** `app/plugins/gtag.client.ts` (`send_page_view:false`), `app/plugins/gtagPageView.client.ts` (new), `app/common/composables/useGaAnalytics.ts` (`trackGaPageView`), `app/common/constants/analytics.ts` (`GA_EVENTS`), `PlaceResultPage.vue`, `FoodResultPage.vue`, specs, docs.
+- **Verification:** specs RED→GREEN. Headless Chrome with a fake GA ID: one page_view per route, correct title and path, no query/hash. Real GA4 DebugView NOT checked (needs the real ID).
+- **Next:** set `NUXT_PUBLIC_GA_ID` in Vercel, disable the history-change toggle in GA4 Enhanced measurement, add a consent gate.
+
+### 2026-11-01 — Fix: GA4 sent no hits (gtag shim pushed arrays)
+- **Phase:** Analytics bugfix.
+- **Why:** prod showed gtag loaded and `dataLayer` filled, but Realtime was empty and no `collect` request fired. `gtag.js` only executes `arguments` objects in `dataLayer`; the shim from `075f7f7` pushed plain arrays, so every config/event was ignored (also before the journey-tracking change).
+- **Files changed:** `app/plugins/gtag.client.ts` (push `arguments`, one justified `eslint-disable prefer-rest-params`), `app/common/composables/__tests__/gtagShim.spec.ts` (new, RED first).
+- **Verification:** spec RED→GREEN. Headless Chrome, fake ID, real gtag.js: `google-analytics.com/g/collect` fires after the fix; the unfixed prod build sent none. Real GA4 Realtime NOT yet checked (needs deploy).
+- **Next:** deploy, then confirm Realtime/DebugView with the real ID.
+

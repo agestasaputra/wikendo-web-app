@@ -19,11 +19,16 @@ export default defineNuxtPlugin(() => {
   if (!gaId) return;
 
   window.dataLayer = window.dataLayer || [];
-  window.gtag = function gtag(...args: unknown[]): void {
-    window.dataLayer?.push(args);
+  // MUST push the `arguments` object itself (Google's official snippet): gtag.js ignores plain
+  // arrays in dataLayer, so a rest-param shim loads fine yet never sends a single hit.
+  window.gtag = function gtag(): void {
+    // eslint-disable-next-line prefer-rest-params
+    window.dataLayer?.push(arguments);
   };
   window.gtag("js", new Date());
-  window.gtag("config", gaId);
+  // page_view is sent per route by plugins/gtagPageView.client.ts (path only, SPA-aware);
+  // leaving gtag's own initial page_view on would count the first page twice.
+  window.gtag("config", gaId, { send_page_view: false });
 
   const script = document.createElement("script");
   script.src = `https://www.googletagmanager.com/gtag/js?id=${gaId}`;
