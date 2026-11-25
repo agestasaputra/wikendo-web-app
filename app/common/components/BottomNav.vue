@@ -4,7 +4,7 @@ WHY: thumbs can't reach the header; quota follows GET /api/quota (on failure = f
 EXAMPLE: tap + → sheet → Cari Tempat (remaining 1/1) → /place; empty → disabled Besok lagi 00.00. -->
 <script setup lang="ts">
 import { computed, ref, watch, type Component } from "vue";
-import { Home, Store, Clock, User } from "@lucide/vue";
+import { Home, Plus, Store, Clock, User } from "@lucide/vue";
 import QuizPlusSheet from "~/common/components/QuizPlusSheet.vue";
 import { useAuthFetch } from "~/common/composables/useAuthFetch";
 import { useAuthStore } from "~/common/store/AuthStore";
@@ -99,11 +99,11 @@ function go(path: string): void {
         <button
           type="button"
           aria-label="Quiz+ buka pilihan quiz"
-          class="w-14 h-14 rounded-full flex items-center justify-center text-2xl font-extrabold text-white shadow-lg border-4 border-white"
+          class="w-14 h-14 rounded-full flex items-center justify-center text-white shadow-lg border-4 border-white"
           style="background: #0c0a09"
           @click="showSheet = true"
         >
-          +
+          <Plus :size="28" />
         </button>
         <span class="text-[10px] font-extrabold" style="color: #0c0a09"
           >Quiz+</span

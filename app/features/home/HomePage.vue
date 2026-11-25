@@ -192,28 +192,36 @@ const wallet = computed(() => buildWalletLabel(quotaStatus.value));
     <!-- 4 quick icons -->
     <div class="grid grid-cols-4 gap-1.5 mt-2">
       <NuxtLink to="/mall" class="text-center text-[9.5px] font-extrabold"
-        ><i
+        ><div
           class="flex items-center justify-center w-[38px] h-[38px] rounded-full mx-auto mb-[3px] not-italic text-base bg-white shadow"
-          ><Store :size="16" /></i
-        >Mall</NuxtLink
+        >
+          <Store :size="16" />
+        </div>
+        Mall</NuxtLink
       >
       <span class="text-center text-[9.5px] font-extrabold"
-        ><i
+        ><div
           class="flex items-center justify-center w-[38px] h-[38px] rounded-full mx-auto mb-[3px] not-italic text-base bg-white shadow"
-          ><Gift :size="16" /></i
-        >Promo</span
+        >
+          <Gift :size="16" />
+        </div>
+        Promo</span
       >
       <span class="text-center text-[9.5px] font-extrabold"
-        ><i
+        ><div
           class="flex items-center justify-center w-[38px] h-[38px] rounded-full mx-auto mb-[3px] not-italic text-base bg-white shadow"
-          ><Heart :size="16" /></i
-        >Wishlist</span
+        >
+          <Heart :size="16" />
+        </div>
+        Wishlist</span
       >
       <span class="text-center text-[9.5px] font-extrabold"
-        ><i
+        ><div
           class="flex items-center justify-center w-[38px] h-[38px] rounded-full mx-auto mb-[3px] not-italic text-base bg-white shadow"
-          ><Clock :size="16" /></i
-        >Riwayat</span
+        >
+          <Clock :size="16" />
+        </div>
+        Riwayat</span
       >
     </div>
 
