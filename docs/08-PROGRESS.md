@@ -98,6 +98,14 @@
 
 ## 📋 LOG (newest first)
 
+### 2026-11-25 — Fix icon BottomNav Quiz+ (Plus lucide) + HomePage quick icons (i->div) ✅
+
+- **Phase:** Fix UI icon (BottomNav + HomePage quick icons).
+- **Why:** Pengguna minta: "Tolong remove icon '>' di bottomnav. Tolong pastikan icon lucide di halaman index, karena ada icon yg kosong di button mall, promo, wishlist dan riwayat".
+- **Files changed:** `app/common/components/BottomNav.vue` (tombol Quiz+ pakai `<Plus :size="28" />` dari `@lucide/vue` + import Plus; hapus text-2xl font-extrabold), `app/features/home/HomePage.vue` (quick icons wrapper `<i>` → `<div>` + ikon lucide `Store/Gift/Heart/Clock :size="16"`).
+- **Verifikasi:** eslint clean (prettier fix) ✅ · `nuxt typecheck` exit 0 ✅ · `vitest run` **604/604 (77 files)** ✅ · `nuxt build` exit 0 ✅. Commit `2e3a4f8` push `main` → Vercel auto-deploy.
+- **Next:** smoke test di browser (index mobile 390px: icon Mall/Promo/Wishlist/Riwayat tampil, tombol Quiz+ tampil sebagai plus lucide, tanpa icon kosong).
+
 ### 2026-10-22 — Halaman /about + footer/account link + sitemap/seo + audit E2E prod ✅
 - **Fase:** Feature baru (halaman statis About) + SEO.
 - **Kenapa:** Pengguna minta "create about page, follow repo convention" + eksekusi sampai deploy prod + audit E2E prod. Belum ada halaman About (search global 0 match) → greenfield. Konten 6 section sesuai spec Agesta (Apa itu Wikendo, Cara kerja, Gratis & jujur, Data & privasi, Kontak, Teknologi).
