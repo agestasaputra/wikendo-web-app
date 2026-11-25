@@ -11,34 +11,34 @@ import type { VoucherItem } from "../@types/food";
 export const FOOD_QUESTIONS: QuizQuestion[] = [
   {
     id: "mall_slug",
-    question: "Makan di mall mana? 📍",
+    question: "Makan di mall mana?",
     options: [
       {
-        icon: "🏬",
+        icon: "building",
         label: "Grand Indonesia",
         desc: "40 tenant • Thamrin",
         value: "grand-indonesia",
       },
       {
-        icon: "🏬",
+        icon: "building",
         label: "Central Park",
         desc: "Grogol, Jakbar",
         value: "central-park",
       },
       {
-        icon: "🏬",
+        icon: "building",
         label: "Kota Kasablanka",
         desc: "Tebet, Jaksel",
         value: "kota-kasablanka",
       },
       {
-        icon: "🏬",
+        icon: "building",
         label: "Pondok Indah Mall",
         desc: "PIM, Jaksel",
         value: "pondok-indah-mall",
       },
       {
-        icon: "🏬",
+        icon: "building",
         label: "Aeon BSD",
         desc: "BSD, Tangerang",
         value: "aeon-bsd",
@@ -47,28 +47,28 @@ export const FOOD_QUESTIONS: QuizQuestion[] = [
   },
   {
     id: "mission",
-    question: "Misi makan kali ini? 🎯",
+    question: "Misi makan kali ini",
     options: [
       {
-        icon: "⚡",
+        icon: "zap",
         label: "Makan Cepat",
         desc: "Laper, langsung makan",
         value: "quick_bite",
       },
       {
-        icon: "☕",
+        icon: "coffee",
         label: "Nongkrong Lama",
         desc: "Ngobrol, kerja, kopi",
         value: "long_hangout",
       },
       {
-        icon: "👨‍👩‍👧",
+        icon: "family",
         label: "Keluarga",
         desc: "Ajak anak / rame",
         value: "family",
       },
       {
-        icon: "🧘",
+        icon: "meditation",
         label: "Healing",
         desc: "Me time, santai",
         value: "healing",
@@ -77,17 +77,17 @@ export const FOOD_QUESTIONS: QuizQuestion[] = [
   },
   {
     id: "budget_tier",
-    question: "Budget per orang? 💰",
+    question: "Budget per orang",
     options: [
-      { icon: "💰", label: "Hemat", desc: "< Rp 50.000", value: "budget" },
+      { icon: "money", label: "Hemat", desc: "< Rp 50.000", value: "budget" },
       {
-        icon: "💰💰",
+        icon: "money2",
         label: "Menengah",
         desc: "Rp 50-150rb",
         value: "mid",
       },
       {
-        icon: "💰💰💰",
+        icon: "money3",
         label: "Leluasa",
         desc: "> Rp 150.000",
         value: "splurge",
@@ -96,17 +96,17 @@ export const FOOD_QUESTIONS: QuizQuestion[] = [
   },
   {
     id: "companion",
-    question: "Rombongan + pantangan? 👥",
+    question: "Rombongan + pantangan",
     toggles: true,
     options: [
-      { icon: "🧘", label: "Sendiri", desc: "Me time", value: "solo" },
+      { icon: "meditation", label: "Sendiri", desc: "Me time", value: "solo" },
       {
-        icon: "💑",
+        icon: "couple",
         label: "Berdua",
         desc: "Pasangan / teman",
         value: "couple",
       },
-      { icon: "👥", label: "Rame-rame", desc: "3+ orang", value: "group" },
+      { icon: "group", label: "Rame-rame", desc: "3+ orang", value: "group" },
     ],
   },
 ];

@@ -8,6 +8,7 @@
  *   page skip the fetch entirely and show the login wall copy instead.
  * EXAMPLE: $fetch("/api/voucher/claims", { query: { mall_slug: "grand-indonesia" }, headers: { Authorization: "Bearer ..." } })
  */
+import { defineEventHandler, getQuery } from "h3";
 import { supabaseAdmin } from "../../utils/db";
 import { requireBearerToken, requireUserId } from "../../utils/voucherClaim";
 import { listClaimedCodesByMallSlug } from "../../utils/voucherClaimedList";

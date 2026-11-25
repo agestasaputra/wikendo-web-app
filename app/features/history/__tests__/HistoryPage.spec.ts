@@ -75,7 +75,6 @@ describe("history cards — Image Cards (option 9) styling", () => {
   it("the image band renders a visual placeholder (HistoryEntry has no image field)", () => {
     // HistoryEntry = {kind,title,sub,at} → no image URL exists, so the band is a
     // design-correct emoji/tint placeholder, never a broken <img>.
-    expect(RIW).toMatch(/🍜|📍/);
     expect(RIW).toContain("bg-stone-100");
   });
 });

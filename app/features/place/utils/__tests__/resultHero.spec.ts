@@ -27,10 +27,10 @@ describe("buildPlaceHero (recommendation → hero deck data)", () => {
     expect(h.category).toBe("place");
   });
 
-  it("emoji + gradient rotate per index (modulo 5)", () => {
-    expect(buildPlaceHero(rec, 0).emoji).toBe("🌇");
-    expect(buildPlaceHero(rec, 5).emoji).toBe("🌇");
-    expect(buildPlaceHero(rec, 1).emoji).toBe("☕");
+  it("icon + gradient rotate per index (modulo 5)", () => {
+    expect(buildPlaceHero(rec, 0).emoji).toBe("sunset");
+    expect(buildPlaceHero(rec, 5).emoji).toBe("sunset");
+    expect(buildPlaceHero(rec, 1).emoji).toBe("coffee");
     expect(buildPlaceHero(rec, 1).bg).toContain("linear-gradient");
   });
 });

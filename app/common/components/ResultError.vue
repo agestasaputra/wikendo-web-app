@@ -3,6 +3,7 @@ WHAT: isWall = orange box selling the login (copy from the server wall message);
 WHY: place result + food result are identical except the wall text → 1 component; wall text via prop.
 EXAMPLE: <ResultError :is-wall="isWall" :login-cta="isLoginWall" :message="errorMessage" :pending="pending" :wall-text="wallText" @retry="refresh()" /> -->
 <script setup lang="ts">
+import { ArrowRight } from "@lucide/vue";
 defineProps<{
   isWall: boolean;
   message: string;
@@ -26,8 +27,9 @@ const emit = defineEmits<{ retry: [] }>();
     <template v-if="isWall">
       {{ wallText }}<br />
       <NuxtLink v-if="loginCta !== false" to="/login" class="underline"
-        >Login gratis → 2 tempat + 5 makan + riwayat →</NuxtLink
-      >
+        >Login gratis <ArrowRight :size="12" class="inline-block" /> 2 tempat +
+        5 makan + riwayat <ArrowRight :size="12" class="inline-block"
+      /></NuxtLink>
     </template>
     <template v-else>
       {{ message }}<br />
@@ -36,7 +38,8 @@ const emit = defineEmits<{ retry: [] }>();
         :disabled="pending"
         @click="emit('retry')"
       >
-        Coba lagi → (quota nggak kepotong)
+        >Coba lagi <ArrowRight :size="12" class="inline-block" /> (quota nggak
+        kepotong)
       </button>
     </template>
   </div>

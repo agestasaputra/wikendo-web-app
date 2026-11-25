@@ -16,6 +16,7 @@ Example: after /result-place Kopi Kekinian → /history shows "Kopi Kenangan —
 import { useSupabaseBrowser } from "~/common/composables/useSupabaseBrowser";
 import { storeToRefs } from "pinia";
 import { computed, ref } from "vue";
+import { Search } from "@lucide/vue";
 
 import AppLoader from "~/common/components/AppLoader.vue";
 import FilterDrawer from "~/common/components/FilterDrawer.vue";
@@ -128,8 +129,8 @@ const emptyMessage = computed(() => {
   if (searchQuery.value.trim())
     return `Tidak ada riwayat untuk "${searchQuery.value.trim()}"`;
   if (historyFilter.value === "all")
-    return "Belum ada riwayat — mulai quiz pertamamu →";
-  return `Belum ada riwayat ${historyFilter.value === "place" ? "tempat" : "makanan"} — mulai quiz pertamamu →`;
+    return "Belum ada riwayat — mulai quiz pertamamu";
+  return `Belum ada riwayat ${historyFilter.value === "place" ? "tempat" : "makanan"} — mulai quiz pertamamu`;
 });
 function onFilterApply(payload: { filters: string[]; sort: string }): void {
   const kindToken = payload.filters.find((t) => t.startsWith("kind:"));
@@ -171,7 +172,7 @@ function onFilterReset(): void {
         <div
           class="flex-1 min-w-0 h-11 bg-white border border-[#e4e4e7] rounded-xl px-3.5 text-[13px] text-gray-500 flex gap-2 items-center"
         >
-          🔍
+          <Search :size="16" class="text-gray-400" />
           <input
             v-model="searchQuery"
             type="search"
@@ -220,12 +221,12 @@ function onFilterReset(): void {
             to="/place"
             class="flex-1 text-center text-white rounded-2xl py-3 font-extrabold text-sm"
             style="background: #0c0a09"
-            >Cari Tempat →</NuxtLink
+            >Cari Tempat</NuxtLink
           >
           <NuxtLink
             to="/food"
             class="flex-1 text-center rounded-2xl py-3 font-extrabold text-sm bg-white border-2 border-gray-200"
-            >Cari Makan →</NuxtLink
+            >Cari Makan</NuxtLink
           >
         </div>
       </div>
@@ -242,7 +243,7 @@ function onFilterReset(): void {
           <div
             class="h-[120px] w-full bg-stone-100 flex items-center justify-center text-[32px]"
           >
-            {{ it.kind === "food" ? "🍜" : "📍" }}
+            {{ it.kind === "food" ? "makanan" : "tempat" }}
           </div>
           <div class="p-4">
             <div
@@ -261,7 +262,7 @@ function onFilterReset(): void {
               v-if="it.id"
               class="text-[11px] text-blue-600 mt-1 font-semibold"
             >
-              Buka hasil →
+              Buka hasil
             </div>
           </div>
         </NuxtLink>

@@ -27,10 +27,10 @@ function onPromoClick(tenantName: string): void {
 <template>
   <div class="rounded-2xl p-3 mt-3 bg-white border border-gray-100">
     <p class="font-extrabold text-[13px]">
-      🔥 Promo hari ini di {{ mallShort }} ({{ tenants.length }})
+      Promo hari ini di {{ mallShort }} ({{ tenants.length }})
     </p>
     <p class="text-[11px] font-bold text-gray-500 mb-1">
-      Weekday filler · s/d 23:59 · tap → tenant
+      Weekday filler · s/d 23:59 · tap lihat tenant
     </p>
     <NuxtLink
       v-for="t in tenants"
@@ -52,7 +52,7 @@ function onPromoClick(tenantName: string): void {
           {{ buildTenantView(t).halal }}</small
         >
       </div>
-      <span class="text-[12px] font-extrabold underline">Lihat →</span>
+      <span class="text-[12px] font-extrabold underline">Lihat</span>
     </NuxtLink>
   </div>
 </template>

@@ -10,6 +10,22 @@ import { useAuthFetch } from "~/common/composables/useAuthFetch";
 import type { QuotaStatus } from "~/common/types/quota";
 import { buildQuotaStatus, buildWalletLabel } from "~/common/utils/quota";
 import { getHomeHeroMeta } from "~/features/home/utils/homeHero";
+import {
+  ArrowRight,
+  Bot,
+  Clock,
+  Coffee,
+  Dices,
+  Eye,
+  Gift,
+  Heart,
+  Lock,
+  MapPin,
+  Store,
+  User,
+  Utensils,
+  Users,
+} from "@lucide/vue";
 
 // Auth-state AS6 wallet-card: anonymous 1:1, logged-in greeting Halo {displayName} + Sisa kamu sub.
 const { isLoggedIn, displayName, initial } = storeToRefs(useAuthStore());
@@ -68,14 +84,15 @@ const wallet = computed(() => buildWalletLabel(quotaStatus.value));
 
 <template>
   <div class="max-w-md mx-auto px-4 pb-10">
-    <!-- Greeting header — AS6 wallet-card: anonymous 1:1 (👦 + teman Wikendo), logged in avatar initial + Halo {displayName} + Sisa kamu sub -->
+    <!-- Greeting header — AS6 wallet-card: anonymous 1:1 (User + teman Wikendo), logged in avatar initial + Halo {displayName} + Sisa kamu sub -->
     <div class="flex justify-between items-center font-bold text-sm py-3">
       <span class="flex items-center gap-2">
         <span
           class="w-6 h-6 rounded-full flex items-center justify-center text-[13px] text-white"
           :style="{ background: hero.headBg }"
-          >{{ isLoggedIn ? initial : "👦" }}</span
-        >
+          >{{ isLoggedIn ? initial : ""
+          }}<User v-if="!isLoggedIn" :size="14" class="text-white"
+        /></span>
         <span
           >Halo,
           {{ isLoggedIn && displayName ? displayName : "teman Wikendo" }}</span
@@ -113,28 +130,31 @@ const wallet = computed(() => buildWalletLabel(quotaStatus.value));
       <div class="flex gap-1.5 mt-2">
         <span
           class="flex-1 rounded-lg px-1 py-1.5 text-center text-[10px] font-extrabold bg-white/10"
-          >👥 {{ quotaPending ? "…" : wallet.placeChip }}</span
+          ><Users :size="10" />
+          {{ quotaPending ? "…" : wallet.placeChip }}</span
         >
         <span
           class="flex-1 rounded-lg px-1 py-1.5 text-center text-[10px] font-extrabold bg-white/10"
-          >🍜 {{ quotaPending ? "…" : wallet.foodChip }}</span
+          ><Utensils :size="10" />
+          {{ quotaPending ? "…" : wallet.foodChip }}</span
         >
       </div>
       <NuxtLink
         to="/place"
         class="inline-block mt-2.5 rounded-full px-3.5 py-[7px] text-[11px] font-extrabold"
         :style="{ background: hero.pillBg, color: hero.pillColor }"
-        >Mulai Quiz →</NuxtLink
-      >
+        >Mulai Quiz <ArrowRight :size="12"
+      /></NuxtLink>
       <span
         class="absolute -right-2 top-1/2 -translate-y-1/2 text-[70px] opacity-20 pointer-events-none"
-        >🎲</span
-      >
+        ><Dices :size="70"
+      /></span>
       <NuxtLink
         v-if="!quotaPending && !quotaError && wallet.exhausted"
         to="/login"
         class="block text-center text-xs font-extrabold mt-2.5 underline"
-        >🔒 Gratis hari ini sudah dipakai — Login gratis → 2 tempat + 5 makan +
+        ><Lock :size="14" /> Gratis hari ini sudah dipakai — Login gratis
+        <ArrowRight :size="12" class="inline-block" /> 2 tempat + 5 makan +
         riwayat lintas device</NuxtLink
       >
     </div>
@@ -150,7 +170,9 @@ const wallet = computed(() => buildWalletLabel(quotaStatus.value));
           minHeight: '56px',
         }"
       >
-        🗺️<br />Cari Tempat<br /><small class="font-normal">quiz 30 dtk</small>
+        <MapPin :size="20" /><br />Cari Tempat<br /><small class="font-normal"
+          >quiz 30 dtk</small
+        >
       </NuxtLink>
       <NuxtLink
         to="/food"
@@ -161,7 +183,9 @@ const wallet = computed(() => buildWalletLabel(quotaStatus.value));
           minHeight: '56px',
         }"
       >
-        🍜<br />Cari Makan<br /><small class="font-normal">quiz 20 dtk</small>
+        <Utensils :size="20" /><br />Cari Makan<br /><small class="font-normal"
+          >quiz 20 dtk</small
+        >
       </NuxtLink>
     </div>
 
@@ -170,25 +194,25 @@ const wallet = computed(() => buildWalletLabel(quotaStatus.value));
       <NuxtLink to="/mall" class="text-center text-[9.5px] font-extrabold"
         ><i
           class="flex items-center justify-center w-[38px] h-[38px] rounded-full mx-auto mb-[3px] not-italic text-base bg-white shadow"
-          >🏬</i
+          ><Store :size="16" /></i
         >Mall</NuxtLink
       >
       <span class="text-center text-[9.5px] font-extrabold"
         ><i
           class="flex items-center justify-center w-[38px] h-[38px] rounded-full mx-auto mb-[3px] not-italic text-base bg-white shadow"
-          >🎁</i
+          ><Gift :size="16" /></i
         >Promo</span
       >
       <span class="text-center text-[9.5px] font-extrabold"
         ><i
           class="flex items-center justify-center w-[38px] h-[38px] rounded-full mx-auto mb-[3px] not-italic text-base bg-white shadow"
-          >❤️</i
+          ><Heart :size="16" /></i
         >Wishlist</span
       >
       <span class="text-center text-[9.5px] font-extrabold"
         ><i
           class="flex items-center justify-center w-[38px] h-[38px] rounded-full mx-auto mb-[3px] not-italic text-base bg-white shadow"
-          >🕒</i
+          ><Clock :size="16" /></i
         >Riwayat</span
       >
     </div>
@@ -200,13 +224,15 @@ const wallet = computed(() => buildWalletLabel(quotaStatus.value));
     >
       <div class="flex justify-between text-[11px] font-extrabold mb-1.5">
         <span>Rekomendasi buatmu</span>
-        <small class="opacity-55 font-bold">Lihat Semua →</small>
+        <small class="opacity-55 font-bold">
+          Lihat Semua <ArrowRight :size="10" class="inline-block" />
+        </small>
       </div>
       <div
         class="flex justify-between items-center text-[10.5px] font-extrabold px-2 py-[7px] rounded-lg bg-[#FAFAF9] mt-1"
       >
-        <span
-          >🗺️ Rooftop Senayan<small
+        <span class="flex items-center gap-1"
+          ><MapPin :size="12" /> Rooftop Senayan<small
             class="block font-bold opacity-60 text-[9.5px]"
             >Senayan • 4,8 ★</small
           ></span
@@ -220,8 +246,8 @@ const wallet = computed(() => buildWalletLabel(quotaStatus.value));
       <div
         class="flex justify-between items-center text-[10.5px] font-extrabold px-2 py-[7px] rounded-lg bg-[#FAFAF9] mt-1"
       >
-        <span
-          >☕ Kopi Kekinian<small
+        <span class="flex items-center gap-1"
+          ><Coffee :size="12" /> Kopi Kekinian<small
             class="block font-bold opacity-60 text-[9.5px]"
             >GI • 4,9 ★</small
           ></span
@@ -242,14 +268,16 @@ const wallet = computed(() => buildWalletLabel(quotaStatus.value));
       <span
         class="w-[30px] h-[30px] rounded-full flex items-center justify-center text-[15px] text-white flex-none"
         :style="{ background: hero.headBg }"
-        >🤖</span
-      >
+        ><Bot :size="16"
+      /></span>
       <span class="flex-1 text-[10.5px] font-extrabold"
-        >Wikendo AI<small class="block font-bold opacity-65 text-[9.5px]"
-          >Ceritain mood → rekomendasi instan</small
+        >Wikendo AI<small class="block font-bold opacity-65 text-[9.5px]">
+          >Ceritain mood
+          <ArrowRight :size="10" class="inline-block" /> rekomendasi
+          instan</small
         ></span
       >
-      <span class="text-sm font-extrabold">→</span>
+      <ArrowRight :size="12" />
     </div>
 
     <!-- Nearest Mall (M3 directory entrypoint, lock M1+M3 Oct 9) -->
@@ -261,14 +289,15 @@ const wallet = computed(() => buildWalletLabel(quotaStatus.value));
       <span
         class="w-[30px] h-[30px] rounded-full flex items-center justify-center text-[15px] text-white flex-none"
         :style="{ background: hero.headBg }"
-        >🏬</span
-      >
+        ><Store :size="16"
+      /></span>
       <span class="flex-1 text-[10.5px] font-extrabold"
-        >Mall Terdekat<small class="block font-bold opacity-65 text-[9.5px]"
-          >5 mall • 200 tenant → tanpa login</small
+        >Mall Terdekat<small class="block font-bold opacity-65 text-[9.5px]">
+          >5 mall • 200 tenant
+          <ArrowRight :size="10" class="inline-block" /> tanpa login</small
         ></span
       >
-      <span class="text-sm font-extrabold">→</span>
+      <ArrowRight :size="12" />
     </NuxtLink>
 
     <!-- Recently viewed -->
@@ -276,9 +305,10 @@ const wallet = computed(() => buildWalletLabel(quotaStatus.value));
       class="mt-2 rounded-xl px-2.5 py-2.5 bg-white shadow text-[10.5px]"
       :style="{ background: hero.cardBg }"
     >
-      <b class="text-[11px]">Terakhir dilihat 👀</b>
+      <b class="text-[11px]">Terakhir dilihat <Eye :size="12" /></b>
       <p class="opacity-65 text-[10px] font-bold mt-0.5">
-        Belum ada riwayat — mulai quiz pertamamu →
+        Belum ada riwayat — mulai quiz pertamamu
+        <ArrowRight :size="12" class="inline-block" />
       </p>
     </div>
     <p class="mt-6 text-[9.5px] font-bold opacity-55 text-center">

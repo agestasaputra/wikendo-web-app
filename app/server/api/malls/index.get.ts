@@ -8,6 +8,7 @@
  * No login/quota/LLM — the directory page is accessible to anyone.
  * EXAMPLE: /api/malls?limit=10&offset=0&sort=tenant_desc → { items:[...5], total:5, hasMore:false }.
  */
+import { defineEventHandler, getQuery, setHeader } from "h3";
 import { hasMorePages, parsePaginationParams } from "../../../utils/pagination";
 import { supabaseAdmin } from "../../utils/db";
 

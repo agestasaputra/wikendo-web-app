@@ -6,6 +6,7 @@
   EXAMPLE: anonymous exhausted sees 0 • 0 → Lanjutkan dengan Google / fill Email+Password → Masuk → back to ?redirect=. -->
 <script setup lang="ts">
 import AppSpinner from "~/common/components/AppSpinner.vue";
+import { Mail } from "@lucide/vue";
 import { useAuthFetch } from "~/common/composables/useAuthFetch";
 import { useSupabaseBrowser } from "~/common/composables/useSupabaseBrowser";
 import type { QuotaStatus } from "~/common/types/quota";
@@ -127,7 +128,7 @@ async function _handleForgot(): Promise<void> {
       <div
         class="bg-white rounded-full flex items-center gap-2 px-4 py-3.5 shadow-sm"
       >
-        <span class="text-gray-400 text-base">✉️</span>
+        <Mail :size="18" class="text-gray-400" />
         <input
           v-model="email"
           type="email"

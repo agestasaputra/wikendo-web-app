@@ -11,6 +11,7 @@
  * EXAMPLE: const db = supabaseAdmin(); const mallId = await findMallIdBySlug(db, "grand-indonesia");
  */
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { createError } from "h3";
 import type { MallRow } from "../../common/types/database";
 import type { VoucherOffer } from "../../features/food/@types/food";
 

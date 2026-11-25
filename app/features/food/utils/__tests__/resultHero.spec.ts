@@ -27,7 +27,7 @@ describe("buildFoodHero", () => {
       price: "Rp 50-100rb",
       floor: "2",
       halal: true,
-      kids: "👶 kids",
+      kids: "Kids-friendly",
       maps: "https://maps.example/x",
     });
   });
@@ -70,9 +70,11 @@ describe("buildFoodChips + buildRankItems", () => {
     expect(items[2]?.tags.startsWith("Non-halal")).toBe(true);
   });
 
-  it("halal null → ❓ (not yet verified)", () => {
+  it("halal null → Belum verifikasi (not yet verified)", () => {
     expect(
-      buildRankItems([rec({ halal: null })])[0]?.tags.startsWith("❓"),
+      buildRankItems([rec({ halal: null })])[0]?.tags.startsWith(
+        "Belum verifikasi",
+      ),
     ).toBe(true);
   });
 });

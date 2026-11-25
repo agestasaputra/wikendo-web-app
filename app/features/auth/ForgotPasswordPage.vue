@@ -4,6 +4,7 @@ WHY: Allows users to recover access when they forget their password.
 DESIGN: Matches existing auth page styling (black quota banner, Google button style not needed here).
 -->
 <script setup lang="ts">
+import { Mail } from "@lucide/vue";
 import { useSupabaseBrowser } from "~/common/composables/useSupabaseBrowser";
 import AppSpinner from "~/common/components/AppSpinner.vue";
 
@@ -46,7 +47,7 @@ async function handleSubmit(): Promise<void> {
       <div
         class="bg-white rounded-full flex items-center gap-2 px-4 py-3.5 shadow-sm"
       >
-        <span class="text-gray-400 text-base">✉️</span>
+        <Mail :size="18" class="text-gray-400" />
         <input
           v-model="email"
           type="email"

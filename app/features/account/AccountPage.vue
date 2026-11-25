@@ -14,6 +14,7 @@ Example: anonymous → Login → /login; Budi logged in → avatar S + budi@exam
  *   yang pertama kali nge-paint.
  * CONTOH: Budi login → skeleton avatar+4 baris → kartu "B" + budi@... + Keluar.
  */
+import { ArrowRight } from "@lucide/vue";
 import { computed } from "vue";
 import { storeToRefs } from "pinia";
 
@@ -59,20 +60,21 @@ const showSkeleton = computed(() => booting.value);
     >
       <p class="font-extrabold text-[15px]">Belum login</p>
       <p class="text-[12px] text-gray-500 mt-1">
-        Login gratis → buka <b>2 tempat + 5 makan</b>/hari · reset 00.00
+        Login gratis <ArrowRight :size="12" class="inline-block" /> buka
+        <b>2 tempat + 5 makan</b>/hari · reset 00.00
       </p>
       <div class="flex gap-2 mt-3">
         <NuxtLink
           to="/login"
           class="flex-1 text-center text-white rounded-2xl py-3 font-extrabold text-sm"
           style="background: #0c0a09"
-          >Login →</NuxtLink
-        >
+          >Login <ArrowRight :size="12" class="inline-block"
+        /></NuxtLink>
         <NuxtLink
           to="/register"
           class="flex-1 text-center rounded-2xl py-3 font-extrabold text-sm bg-white border-2 border-gray-200"
-          >Daftar →</NuxtLink
-        >
+          >Daftar <ArrowRight :size="12" class="inline-block"
+        /></NuxtLink>
       </div>
       <p class="text-[11px] text-gray-400 text-center mt-2">
         gratis selamanya · 10 detik pakai Google
@@ -114,12 +116,13 @@ const showSkeleton = computed(() => booting.value);
         to="/history"
         class="flex justify-between items-center px-4 py-3.5 font-extrabold text-[13px] hover:bg-stone-50 border-b border-stone-100"
       >
-        <span>🕒 Riwayat</span><span class="text-gray-400">→</span>
+        <span>Riwayat</span
+        ><ArrowRight :size="12" class="inline-block text-gray-400" />
       </NuxtLink>
       <div
         class="flex justify-between items-center px-4 py-3.5 font-extrabold text-[13px] text-gray-400 border-b border-stone-100"
       >
-        <span>❤️ Wishlist</span
+        <span>Wishlist</span
         ><span
           class="text-[11px] font-bold bg-stone-100 rounded-full px-2 py-0.5"
           >Segera</span
@@ -130,13 +133,15 @@ const showSkeleton = computed(() => booting.value);
         target="_blank"
         class="flex justify-between items-center px-4 py-3.5 font-extrabold text-[13px] hover:bg-stone-50 border-b border-stone-100"
       >
-        <span>💬 Hubungi kami</span><span class="text-gray-400">↗</span>
+        <span>Hubungi kami</span
+        ><ArrowRight :size="12" class="inline-block text-gray-400" />
       </a>
       <NuxtLink
         to="/about"
         class="flex justify-between items-center px-4 py-3.5 font-extrabold text-[13px] hover:bg-stone-50"
       >
-        <span>ℹ️ Tentang</span><span class="text-gray-400">→</span>
+        <span>Tentang</span
+        ><ArrowRight :size="12" class="inline-block text-gray-400" />
       </NuxtLink>
     </div>
   </div>

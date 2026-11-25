@@ -9,6 +9,7 @@ Token lock: ink stays #0C0A09, rose stays #E11D48, paper = PAGE_BG (one owner). 
 <script setup lang="ts">
 import AppLoader from "~/common/components/AppLoader.vue";
 import FilterDrawer from "~/common/components/FilterDrawer.vue";
+import { Building2, Compass, Search, X } from "@lucide/vue";
 import { PAGE_BG } from "~/common/constants/theme";
 import { useInfiniteList } from "~/common/composables/useInfiniteList";
 import { useSentinelObserver } from "~/common/composables/useSentinelObserver";
@@ -123,7 +124,7 @@ function mallArea(m: MallItem): string {
         <div
           class="flex-1 min-w-0 h-11 bg-white border border-[#e4e4e7] rounded-xl px-3.5 text-[13px] text-gray-500 flex gap-2 items-center"
         >
-          🔍
+          <Search :size="16" class="text-gray-400" />
           <input
             v-model="searchMall"
             placeholder="Cari mall... mis. grand, BSD"
@@ -136,7 +137,7 @@ function mallArea(m: MallItem): string {
             aria-label="Hapus pencarian"
             @click="searchMall = ''"
           >
-            ✕
+            <X :size="16" />
           </button>
         </div>
         <button
@@ -172,7 +173,7 @@ function mallArea(m: MallItem): string {
         :disabled="pending"
         @click="list.reset()"
       >
-        Coba lagi →
+        Coba lagi
       </button>
     </div>
     <div v-else class="flex flex-col gap-2.5 mt-3">
@@ -201,14 +202,14 @@ function mallArea(m: MallItem): string {
             class="flex-1 text-center bg-white rounded-[14px] p-3 font-extrabold text-[13px] border-2 border-gray-200"
             style="min-height: 56px"
           >
-            🏢 Lihat Tenant →
+            <Building2 :size="16" class="inline-block" /> Lihat Tenant
           </NuxtLink>
           <NuxtLink
             :to="`/food?mall=${m.slug}`"
             class="flex-1 text-center text-white rounded-[14px] p-3 font-extrabold text-[13px]"
             style="background: #e11d48; min-height: 56px"
           >
-            ✨ Carlin →
+            <Compass :size="16" class="inline-block" /> Carlin
           </NuxtLink>
         </div>
       </div>

@@ -4,6 +4,26 @@ WHY: identical markup in the place + food quiz → 1 component. Tap emits select
 EXAMPLE: <QuizOptionList :options="q.options" :selected="answers[q.id]" :meta="meta" @select="select" /> -->
 <script setup lang="ts">
 import type { QuizHeaderMeta, QuizOption } from "~/common/types/quiz";
+import {
+  Building,
+  Circle,
+  Coffee,
+  Compass,
+  Gamepad2,
+  Leaf,
+  Moon,
+  Palmtree,
+  Sofa,
+  Sun,
+  Sunrise,
+  Tent,
+  Utensils,
+  UtensilsCrossed,
+  Users,
+  Wallet,
+  Waves,
+  Zap,
+} from "@lucide/vue";
 
 defineProps<{
   options: QuizOption[];
@@ -11,6 +31,30 @@ defineProps<{
   meta: QuizHeaderMeta;
 }>();
 const emit = defineEmits<{ select: [value: string] }>();
+
+const ICONS: Record<string, Component> = {
+  building: Building,
+  coffee: Coffee,
+  compass: Compass,
+  gamepad2: Gamepad2,
+  leaf: Leaf,
+  moon: Moon,
+  palmtree: Palmtree,
+  sofa: Sofa,
+  sun: Sun,
+  sunrise: Sunrise,
+  tent: Tent,
+  utensils: Utensils,
+  utensilscrossed: UtensilsCrossed,
+  users: Users,
+  wallet: Wallet,
+  waves: Waves,
+  zap: Zap,
+};
+
+function iconFor(key: string): Component {
+  return (ICONS as Record<string, Component>)[key] ?? Circle;
+}
 </script>
 
 <template>
@@ -27,7 +71,7 @@ const emit = defineEmits<{ select: [value: string] }>();
       style="min-height: 56px"
       @click="emit('select', o.value)"
     >
-      <span class="text-2xl">{{ o.icon }}</span>
+      <component :is="iconFor(o.icon)" class="text-gray-400" :size="22" />
       <span
         >{{ o.label }}
         <small class="font-normal text-gray-500">{{ o.desc }}</small></span

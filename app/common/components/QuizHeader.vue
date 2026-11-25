@@ -1,7 +1,7 @@
 <!-- common/components/QuizHeader.vue → Quiz ink header Q2d/M3d (used by the place + food quiz).
 WHAT: ink card + white label + ember/rose dot + white question + lime block segments (filled = step+1).
 WHY: the two quiz pages use identical markup → 1 component. Color tokens from getQuizHeaderMeta (pure, tested).
-EXAMPLE: <QuizHeader :meta="meta" :seg-state="seg" :question="q.question" suffix=" · 1/5 · ⏱ 30 dtk" /> -->
+EXAMPLE: <QuizHeader :meta="meta" :seg-state="seg" :question="q.question" suffix=" · 1/5 · 30 dtk" /> -->
 <script setup lang="ts">
 import type { QuizHeaderMeta } from "~/common/types/quiz";
 

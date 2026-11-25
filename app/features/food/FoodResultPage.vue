@@ -5,6 +5,7 @@ EXAMPLE: Kopi Kekinian hero — GI L2 Halal 50-100rb kids → gift Buka then ten
 <script setup lang="ts">
 import { onMounted, onUnmounted, watch, ref } from "vue";
 import AppLoader from "~/common/components/AppLoader.vue";
+import { Gift, MapPin, Wallet } from "@lucide/vue";
 import { useAuthFetch } from "~/common/composables/useAuthFetch";
 import { trackGaEvent } from "~/common/composables/useGaAnalytics";
 import { GA_EVENTS } from "~/common/constants/analytics";
@@ -98,7 +99,7 @@ const loginCta = isWall;
 // Real quota: remaining from the POST response (quota_remaining). Anon food limit 2x.
 const quotaLeft = computed(() => data.value?.quota_remaining);
 const quotaLabel = computed(() =>
-  isWall.value ? "0/1 habis 🔒" : (quotaLeft.value ?? 1) + "/1",
+  isWall.value ? "0/1 habis" : (quotaLeft.value ?? 1) + "/1",
 );
 const mallSlug = computed(() =>
   String(quizQuery.mall_slug || quizQuery.mall || data.value?.mall_slug || ""),
@@ -229,7 +230,7 @@ function share(): void {
     return;
   }
   navigator.clipboard?.writeText(url);
-  claimNote.value = "Link hasil disalin ✅";
+  claimNote.value = "Link hasil disalin";
 }
 
 // V13A/B wiring (Addendum 23 v1.1): hero best-1 + link +2 more promos → 3-row sheet.
@@ -328,7 +329,7 @@ onMounted(() => {
       :login-cta="loginCta"
       :message="errorMessage"
       :pending="pending"
-      wall-text="🔒 Kuota makan anon habis (1x/hari). Login 10 detik → quota jadi 5x/hari, gratis."
+      wall-text="Lock Kuota makan anon habis (1x/hari). Login 10 detik - quota jadi 5x/hari, gratis."
       @retry="refresh()"
     />
     <div v-else-if="list.length" class="flex flex-col">
@@ -342,35 +343,42 @@ onMounted(() => {
             <span
               class="text-[11px] font-extrabold px-2.5 py-1 rounded-full"
               :style="{ background: meta.bestBg, color: '#0C0A09' }"
-              >★ BEST MATCH</span
             >
+              <span class="inline-block align-middle">BEST MATCH</span>
+            </span>
             <span
               v-if="hero.halal === true"
               class="text-[11px] font-extrabold px-2.5 py-1 rounded-full"
               :style="{ background: meta.halalBg, color: meta.halalColor }"
-              >✅ Halal</span
+            >
+              <CheckCircle :size="12" class="inline-block align-middle" />
+              Halal</span
             >
             <span
               v-else-if="hero.halal === false"
               class="text-[11px] font-extrabold px-2.5 py-1 rounded-full"
               style="background: #fef2f2; color: #991b1b"
-              >⚠️ Non-halal</span
+            >
+              <AlertCircle :size="12" class="inline-block align-middle" />
+              Non-halal</span
             >
             <span
               v-else
               class="text-[11px] font-extrabold px-2.5 py-1 rounded-full"
               style="background: #f4f4f5; color: #71717a"
-              >❓ Belum verifikasi</span
+            >
+              <HelpCircle :size="12" class="inline-block align-middle" />
+              Belum verifikasi</span
             >
           </div>
           <div class="font-extrabold text-[17px]">
-            🍜 {{ hero.name }} — {{ mallLabel }} L{{ hero.floor }}
+            {{ hero.name }} — {{ mallLabel }} L{{ hero.floor }}
           </div>
           <p class="text-[12.5px] text-gray-600 my-1.5">
             Kenapa: {{ hero.reason }}
           </p>
           <p class="text-[12.5px]">
-            💰 {{ hero.price }} · {{ hero.kids }} · 📍 L{{ hero.floor }}
+            {{ hero.price }} · {{ hero.kids }} · {{ hero.floor }}
           </p>
 
           <!-- Voucher gift inside the hero (moved from below, Oct 11 2026): Ada -20% + Buka banner, old top model removed -->
@@ -384,7 +392,7 @@ onMounted(() => {
               border: '1px solid ' + vGift.border,
             }"
           >
-            <div class="text-[26px]">🎁</div>
+            <Gift :size="26" class="text-gray-400" />
             <div class="flex-1 text-[13px] font-bold">
               Ada <b>{{ heroDiscount }}</b> buat lu<br /><small
                 class="font-normal text-gray-500"
@@ -399,7 +407,7 @@ onMounted(() => {
               :disabled="claiming"
               @click="showSheet = true"
             >
-              Buka →
+              Buka
             </button>
             <span
               v-else
@@ -426,7 +434,7 @@ onMounted(() => {
             class="text-xs text-center mt-2"
             style="color: #047857"
           >
-            🎟️ Kode: {{ claimedCode }} · s/d 23:59 WIB · 1 transaksi 1 kode
+            Kode: {{ claimedCode }} · s/d 23:59 WIB · 1 transaksi 1 kode
           </p>
           <p
             v-else-if="claimNote"
@@ -456,14 +464,15 @@ onMounted(() => {
               target="_blank"
               class="flex-1 text-center text-white p-[15px] rounded-2xl font-extrabold text-sm"
               :style="{ background: meta.ticketBg }"
-              >📍 Maps tenant →</a
+            >
+              <MapPin :size="14" class="inline-block" /> Maps tenant</a
             >
             <button
               class="flex-1 p-[15px] rounded-2xl font-extrabold text-sm bg-white border-2 border-gray-200"
               title="Login untuk simpan"
-              @click="claimNote = '🔒 Login 10 detik untuk simpan — gratis.'"
+              @click="claimNote = 'Lock Login 10 detik untuk simpan — gratis.'"
             >
-              💾
+              <Wallet :size="16" />
             </button>
           </div>
 

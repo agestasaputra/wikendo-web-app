@@ -9,23 +9,28 @@ import type { QuizQuestion } from "~/common/types/quiz";
 export const PLACE_QUESTIONS: QuizQuestion[] = [
   {
     id: "mood",
-    question: "Weekend ini pengen yang gimana? 🧭",
+    question: "Weekend ini pengen yang gimana",
     options: [
       {
-        icon: "🧘",
+        icon: "relax",
         label: "Santai / Healing",
         desc: "Slow living, recharge",
         value: "relax",
       },
       {
-        icon: "🎉",
+        icon: "fun",
         label: "Seru / Hype",
         desc: "Ramai, FOMO, viral",
         value: "fun",
       },
-      { icon: "🍜", label: "Kulineran", desc: "Makan enak", value: "foodie" },
       {
-        icon: "🌿",
+        icon: "foodie",
+        label: "Kulineran",
+        desc: "Makan enak",
+        value: "foodie",
+      },
+      {
+        icon: "nature",
         label: "Alam / Outdoor",
         desc: "Hijau, udara segar",
         value: "nature",
@@ -34,32 +39,37 @@ export const PLACE_QUESTIONS: QuizQuestion[] = [
   },
   {
     id: "companion",
-    question: "Dengan siapa? 👯",
+    question: "Dengan siapa",
     options: [
-      { icon: "🧘", label: "Sendiri", desc: "Me time", value: "solo" },
+      { icon: "relax", label: "Sendiri", desc: "Me time", value: "solo" },
       {
-        icon: "💑",
+        icon: "couple",
         label: "Pasangan",
         desc: "Pasangan / teman",
         value: "couple",
       },
-      { icon: "👥", label: "Teman 2–4", desc: "3+ orang", value: "group" },
-      { icon: "👨‍👩‍👧", label: "Keluarga", desc: "Anak / ortu", value: "family" },
+      { icon: "group", label: "Teman 2–4", desc: "3+ orang", value: "group" },
+      {
+        icon: "family",
+        label: "Keluarga",
+        desc: "Anak / ortu",
+        value: "family",
+      },
     ],
   },
   {
     id: "budget",
-    question: "Budget per orang? 💰",
+    question: "Budget per orang",
     options: [
-      { icon: "💰", label: "Hemat", desc: "< Rp 50.000", value: "budget" },
+      { icon: "money", label: "Hemat", desc: "< Rp 50.000", value: "budget" },
       {
-        icon: "💰💰",
+        icon: "money2",
         label: "Menengah",
         desc: "Rp 50-150rb",
         value: "mid",
       },
       {
-        icon: "💰💰💰",
+        icon: "money3",
         label: "Leluasa",
         desc: "> Rp 150.000",
         value: "splurge",
@@ -68,28 +78,28 @@ export const PLACE_QUESTIONS: QuizQuestion[] = [
   },
   {
     id: "location",
-    question: "Area mana? 📍",
+    question: "Area mana",
     options: [
       {
-        icon: "📍",
+        icon: "location",
         label: "Jakarta Selatan",
         desc: "Jaksel hype",
         value: "south-jakarta",
       },
       {
-        icon: "📍",
+        icon: "location",
         label: "Jakarta Pusat",
         desc: "Jakpus klasik",
         value: "central-jakarta",
       },
       {
-        icon: "📍",
+        icon: "location",
         label: "Jakarta Barat",
         desc: "Jakbar cozy",
         value: "west-jakarta",
       },
       {
-        icon: "📍",
+        icon: "location",
         label: "Bebas / Fleksibel",
         desc: "Dimana aja oke",
         value: "anywhere",
@@ -98,11 +108,16 @@ export const PLACE_QUESTIONS: QuizQuestion[] = [
   },
   {
     id: "time",
-    question: "Kapan mau jalan? ⏰",
+    question: "Kapan mau jalan",
     options: [
-      { icon: "☀️", label: "Siang", desc: "Siang-sore", value: "day" },
-      { icon: "🌙", label: "Malam", desc: "Malam-minggu", value: "night" },
-      { icon: "📅", label: "Fleksibel", desc: "Kapan aja", value: "flexible" },
+      { icon: "day", label: "Siang", desc: "Siang-sore", value: "day" },
+      { icon: "night", label: "Malam", desc: "Malam-minggu", value: "night" },
+      {
+        icon: "flexible",
+        label: "Fleksibel",
+        desc: "Kapan aja",
+        value: "flexible",
+      },
     ],
   },
 ];

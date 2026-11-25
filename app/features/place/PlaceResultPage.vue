@@ -5,6 +5,7 @@ EXAMPLE: hero Rooftop Senayan — Senayan 4.8 sunset+live music → Navigate →
 <script setup lang="ts">
 import { onMounted, watch } from "vue";
 import { useAuthFetch } from "~/common/composables/useAuthFetch";
+import { Bookmark, MapPin, Share2, Star } from "@lucide/vue";
 import { trackGaEvent } from "~/common/composables/useGaAnalytics";
 import { GA_EVENTS } from "~/common/constants/analytics";
 import ResultError from "~/common/components/ResultError.vue";
@@ -80,7 +81,7 @@ const loginCta = isWall;
 // Real quota: remaining from the POST response (quota_remaining). Anon place limit 1x → success = 0/1 (used up today, honest).
 const quotaLeft = computed(() => data.value?.quota_remaining);
 const quotaLabel = computed(() =>
-  isWall.value ? "1/1 habis 🔒" : (quotaLeft.value ?? 1) + "/1",
+  isWall.value ? "1/1 habis" : (quotaLeft.value ?? 1) + "/1",
 );
 // R3b token lock (tested): ember strip + best lime + action ink + Lainnya ink/lime.
 const meta = getResultPlaceMeta();
@@ -163,7 +164,7 @@ onMounted(() => {
       :login-cta="loginCta"
       :message="errorMessage"
       :pending="pending"
-      wall-text="🔒 Kuota anon habis (1x/hari). Login 10 detik → quota jadi 2x/hari, gratis."
+      wall-text="Lock Kuota anon habis (1x/hari). Login 10 detik - quota jadi 2x/hari, gratis."
       @retry="refresh()"
     />
     <div v-else-if="list.length" class="flex flex-col">
@@ -185,19 +186,25 @@ onMounted(() => {
           <span
             class="absolute bottom-2 left-1/2 -translate-x-1/2 text-[11px] font-extrabold px-3 py-1 rounded-full whitespace-nowrap"
             :style="{ background: meta.bestBg, color: meta.bestColor }"
-            >★ #1 BEST · {{ hero.areaLabel }} · {{ hero.rating }} ★</span
+          >
+            <Star :size="12" class="inline-block align-middle" />
+            #1 BEST · {{ hero.areaLabel }} · {{ hero.rating }}</span
           >
         </div>
         <div class="p-[14px_16px]">
           <span
             class="inline-block text-[11px] font-extrabold px-2.5 py-1 rounded-full mr-1.5 mb-2"
             :style="{ background: meta.bestBg, color: meta.bestColor }"
-            >★ #{{ idx + 1 }}{{ idx === 0 ? " BEST" : "" }}</span
+          >
+            <Star :size="12" class="inline-block align-middle" />
+            #{{ idx + 1 }}{{ idx === 0 ? " BEST" : "" }}</span
           >
           <span
             class="inline-block text-[11px] font-extrabold px-2.5 py-1 rounded-full mb-2"
             style="background: #ecfeff; color: #0e7490"
-            >⭐ {{ hero.rating }} · {{ hero.vibe }}</span
+          >
+            <Star :size="12" class="inline-block align-middle" />
+            {{ hero.rating }} · {{ hero.vibe }}</span
           >
           <div class="font-extrabold text-[17px]">
             {{ hero.name }} — {{ hero.area }}
@@ -206,7 +213,7 @@ onMounted(() => {
             Kenapa cocok: {{ hero.reason }}
           </p>
           <p class="text-[12.5px]">
-            💰 {{ hero.cost }} · 📍 {{ hero.area }} · ⏰ best {{ hero.time }}
+            {{ hero.cost }} · {{ hero.area }} · best {{ hero.time }}
           </p>
           <div class="flex gap-2.5 mt-3">
             <a
@@ -218,20 +225,22 @@ onMounted(() => {
                 color: meta.actionColor,
                 minHeight: '56px',
               }"
-              >📍 Navigasi →</a
+            >
+              <MapPin :size="14" class="inline-block" />
+              Navigasi</a
             >
             <button
               class="flex-1 p-[15px] rounded-2xl font-extrabold text-sm bg-white border-2 border-gray-200"
               title="Login untuk simpan (momen #2)"
               @click="wallNote = true"
             >
-              💾
+              <Bookmark :size="16" />
             </button>
             <button
               class="flex-1 p-[15px] rounded-2xl font-extrabold text-sm bg-white border-2 border-gray-200"
               @click="share()"
             >
-              ⤴
+              <Share2 :size="16" />
             </button>
           </div>
           <p
@@ -239,14 +248,14 @@ onMounted(() => {
             class="text-xs text-center mt-2"
             style="color: #c2410c"
           >
-            🔒 Login 10 detik untuk simpan — quota reset tiap hari, gratis.
+            Lock Login 10 detik untuk simpan - quota reset tiap hari, gratis.
           </p>
           <p
             v-if="shareNote"
             class="text-xs text-center mt-2"
             style="color: #047857"
           >
-            Link hasil disalin ✅
+            Link hasil disalin
           </p>
         </div>
       </div>
@@ -303,7 +312,7 @@ onMounted(() => {
             >[{{ r.category }} · {{ r.location_area }}]</span
           >
           <p class="text-gray-600 text-[13px] mt-1">
-            💡 {{ r.reason }} · 💰 {{ r.estimated_cost }} · ⏰
+            {{ r.reason }} · {{ r.estimated_cost }}
             {{ r.best_time }}
           </p>
         </div>

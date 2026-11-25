@@ -6,6 +6,7 @@
   EXAMPLE: anonymous sees 2 • 5 → Lanjutkan dengan Google / fill Email+Password → Daftar → home. -->
 <script setup lang="ts">
 import AppSpinner from "~/common/components/AppSpinner.vue";
+import { Mail } from "@lucide/vue";
 import { useSupabaseBrowser } from "~/common/composables/useSupabaseBrowser";
 import AuthBanner from "~/features/auth/components/AuthBanner.vue";
 import GoogleButton from "~/features/auth/components/GoogleButton.vue";
@@ -83,7 +84,7 @@ async function handleGoogle(): Promise<void> {
     <AuthBanner
       title="DAFTAR GRATIS"
       value="2 • 5"
-      footer="quota full + voucher 🎟️"
+      footer="quota full + voucher"
     />
 
     <!-- 2. Google button — official gray outline + 4-color G logo (Option A board v10 lock "A"). -->
@@ -109,7 +110,7 @@ async function handleGoogle(): Promise<void> {
       <div
         class="bg-white rounded-full flex items-center gap-2 px-4 py-3.5 shadow-sm"
       >
-        <span class="text-gray-400 text-base">✉️</span>
+        <Mail :size="18" class="text-gray-400" />
         <input
           v-model="email"
           type="email"

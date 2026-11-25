@@ -11,6 +11,7 @@ import AppSpinner from "~/common/components/AppSpinner.vue";
 import { useAuthStore } from "~/common/store/AuthStore";
 import { isHomePath } from "~/common/utils/nav";
 import { pageTitle } from "~/common/utils/pageTitle";
+import { Bell, ChevronLeft } from "@lucide/vue";
 
 const auth = useAuthStore();
 const { isLoggedIn, email } = storeToRefs(auth);
@@ -70,18 +71,7 @@ async function handleLogout(): Promise<void> {
         class="col-start-1 w-8 h-8 rounded-full bg-stone-100 hover:bg-stone-200 flex items-center justify-center justify-self-start"
         @click="goBack"
       >
-        <svg
-          viewBox="0 0 24 24"
-          class="w-4 h-4"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2.5"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          aria-hidden="true"
-        >
-          <path d="M19 12H5M12 19l-7-7 7-7" />
-        </svg>
+        <ChevronLeft :size="16" />
       </button>
       <!-- Page title: a <p> (not <h1>) so it never competes with the page's own <h1> for SEO/outline.
            justify-self-center is REQUIRED: max-w-[220px] stops the grid's default stretch, and without it
@@ -97,9 +87,9 @@ async function handleLogout(): Promise<void> {
           <button
             type="button"
             aria-label="Notifikasi"
-            class="text-lg leading-none"
+            class="text-lg leading-none flex items-center"
           >
-            🔔
+            <Bell :size="20" />
           </button>
         </div>
       </div>

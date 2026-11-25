@@ -53,9 +53,9 @@ describe("Home greeting", () => {
 });
 
 describe("Mall entrypoint on Home (M1+M3)", () => {
-  it("M1: 🏬 Mall icon links to /mall (dead Event replaced)", () => {
+  it("M1: Store icon links to /mall (dead Event replaced)", () => {
     expect(HOME).toContain('to="/mall"');
-    expect(HOME).toContain("🏬");
+    expect(HOME).toContain("Store");
     expect(HOME).not.toContain(">Event<");
     expect(HOME).not.toContain("🎡");
   });

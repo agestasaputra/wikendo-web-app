@@ -10,6 +10,7 @@
  */
 import type { TenantRow } from "../../../../common/types/api";
 import type { MallRow } from "../../../../common/types/database";
+import { defineEventHandler, getRouterParam, getQuery, setHeader } from "h3";
 import {
   hasMorePages,
   parsePaginationParams,

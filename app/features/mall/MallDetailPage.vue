@@ -11,6 +11,7 @@ Token lock: ink stays #0C0A09, rose stays #E11D48, paper = PAGE_BG (one owner). 
 <script setup lang="ts">
 import AppLoader from "~/common/components/AppLoader.vue";
 import FilterDrawer from "~/common/components/FilterDrawer.vue";
+import { Bot, ChevronRight, Search, Store } from "@lucide/vue";
 import { PAGE_BG } from "~/common/constants/theme";
 import { useInfiniteList } from "~/common/composables/useInfiniteList";
 import { useSentinelObserver } from "~/common/composables/useSentinelObserver";
@@ -32,17 +33,17 @@ const FILTER_GROUPS = [
   {
     title: "Preferensi",
     mode: "multi" as const,
-    options: [{ value: "halal:true", label: "✅ Halal" }],
+    options: [{ value: "halal:true", label: "Halal" }],
   },
   {
     title: "Budget",
     mode: "multi" as const,
-    options: [{ value: "budget:mid", label: "💰 50-100rb" }],
+    options: [{ value: "budget:mid", label: "Budget 50-100rb" }],
   },
   {
     title: "Mission",
     mode: "multi" as const,
-    options: [{ value: "mission:long_hangout", label: "☕ Nongkrong Lama" }],
+    options: [{ value: "mission:long_hangout", label: "Nongkrong Lama" }],
   },
 ];
 
@@ -137,14 +138,14 @@ function onFilterReset(): void {
   list.reset();
 }
 
-// Infinity pill S2c 1:1 (tested): 🟢 loaded/total tenants · scroll ↓ (only show when more results exist)
+// Infinity pill S2c 1:1 (tested): loaded/total tenants · scroll ↓ (only show when more results exist)
 const dirCount = computed(() =>
   hasMore.value
     ? buildDirCountLabel(
         tenants.value.length,
         total.value || tenants.value.length,
       )
-    : `🟢 ${tenants.value.length}/${total.value || tenants.value.length} tenant (semua)`,
+    : `${tenants.value.length}/${total.value || tenants.value.length} tenant (semua)`,
 );
 const filtered = computed(() => tenants.value);
 // V13C promo strip (Addendum 23 v1.1): tenants that HAVE a real promo badge, above the list; slice 3 to save low-end phones.
@@ -156,7 +157,9 @@ const promoStrip = computed(() =>
 <template>
   <div class="max-w-md mx-auto px-4 py-2 pb-10">
     <div class="flex justify-between items-center">
-      <b class="text-xl font-extrabold">🏢 {{ mallName }}</b>
+      <b class="text-xl font-extrabold"
+        ><Store :size="18" class="inline-block" /> {{ mallName }}</b
+      >
       <span class="text-xs font-bold text-gray-500">{{
         pending ? "…" : `${total || tenants.length} tenant`
       }}</span>
@@ -169,7 +172,7 @@ const promoStrip = computed(() =>
         <div
           class="flex-1 min-w-0 h-11 bg-white border border-[#e4e4e7] rounded-xl px-3.5 text-[13px] text-gray-500 flex gap-2 items-center"
         >
-          🔍
+          <Search :size="16" class="text-gray-400" />
           <input
             v-model="keyword"
             placeholder="Cari tenant... mis. kopi, ramen"
@@ -210,15 +213,17 @@ const promoStrip = computed(() =>
           class="w-9 h-9 flex-none rounded-full flex items-center justify-center text-[16px]"
           style="background: #0c0a09"
         >
-          🤖
+          <Bot :size="18" class="text-gray-400" />
         </div>
         <div class="flex-1 text-[13px] leading-snug">
-          <b>Ceritain mau makan apa →</b><br />
+          <b>Ceritain mau makan apa</b><br />
           <small class="text-gray-500"
             >quiz 20 dtk · tanpa login · hasil murni {{ mallShort }}</small
           >
         </div>
-        <div class="font-extrabold">→</div>
+        <div class="font-extrabold">
+          <ChevronRight :size="18" class="text-gray-400" />
+        </div>
       </div>
     </NuxtLink>
 
@@ -280,7 +285,7 @@ const promoStrip = computed(() =>
         v-else-if="tenants.length"
         class="text-center text-xs text-gray-400 py-2"
       >
-        Semua {{ total }} tenant tampil ✅
+        Semua {{ total }} tenant tampil
       </p>
     </div>
 

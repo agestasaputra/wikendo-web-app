@@ -4,6 +4,7 @@ WHY: Completes the forgot password flow.
 DESIGN: Similar styling to other auth pages.
 -->
 <script setup lang="ts">
+import { Lock } from "@lucide/vue";
 import { useSupabaseBrowser } from "~/common/composables/useSupabaseBrowser";
 import { useRouter, useRoute } from "#app";
 import AppSpinner from "~/common/components/AppSpinner.vue";
@@ -73,7 +74,7 @@ async function handleSubmit(): Promise<void> {
       <div
         class="bg-white rounded-full flex items-center gap-2 px-4 py-3.5 shadow-sm"
       >
-        <span class="text-gray-400 text-base">🔒</span>
+        <Lock class="text-gray-400" :size="18" />
         <input
           v-model="password"
           type="password"
@@ -85,7 +86,7 @@ async function handleSubmit(): Promise<void> {
       <div
         class="bg-white rounded-full flex items-center gap-2 px-4 py-3.5 shadow-sm"
       >
-        <span class="text-gray-400 text-base">🔒</span>
+        <Lock class="text-gray-400" :size="18" />
         <input
           v-model="passwordConfirm"
           type="password"

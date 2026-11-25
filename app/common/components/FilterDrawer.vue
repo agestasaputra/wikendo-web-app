@@ -8,6 +8,7 @@ NILAI FILTER: string ber-namespace `grup:nilai` (contoh `halal:true`, `mission:f
 EXAMPLE: <FilterDrawer v-model:open="showFilter" :groups="FILTER_GROUPS" :sort-options="SORT_OPTIONS"
   :initial-filters="activeFilters" :initial-sort="sortOption" @apply="onApply" @reset="onReset" /> -->
 <script setup lang="ts">
+import { X } from "@lucide/vue";
 import { onBeforeUnmount, ref, watch } from "vue";
 
 // --- Z-index drawer = 60 (di atas bottom nav z-50) agar bottom nav tidak menutupi backdrop.
@@ -166,7 +167,7 @@ onBeforeUnmount(() => {
             aria-label="Tutup"
             @click="close"
           >
-            ✕
+            <X :size="18" />
           </button>
         </div>
 

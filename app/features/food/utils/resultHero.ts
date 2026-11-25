@@ -9,11 +9,11 @@ import type { TenantRecommendation } from "~/common/types/api";
 import { formatPriceRange } from "~/utils/price";
 import type { FoodHero, RankItem } from "../@types/food";
 
-/** Halal tri-state → word (null = not yet verified ❓). */
+/** Halal tri-state → word (null = not yet verified). */
 function halalWord(halal: boolean | null | undefined): string {
   if (halal === true) return "Halal";
   if (halal === false) return "Non-halal";
-  return "❓";
+  return "Belum verifikasi";
 }
 
 /** 1 recommendation (may be empty) → hero data. Empty field = "—"/"?". */
@@ -27,7 +27,7 @@ export function buildFoodHero(
     price: formatPriceRange(r.price_min, r.price_max) || "—",
     floor: r.floor || "?",
     halal: r.halal ?? null,
-    kids: r.kids_friendly ? "👶 kids" : "—",
+    kids: r.kids_friendly ? "Kids-friendly" : "—",
     maps: r.maps_url || "#",
   };
 }

@@ -12,6 +12,7 @@ WHY the wall is a prop and not "Klaim": an anonymous "Klaim" button can only fai
 EXAMPLE: <VoucherSheet :vouchers="offers" hero-name="Kopi" :claiming="claiming" :claiming-code="code"
   :login-wall="!auth.isLoggedIn" :note="claimNote" @claim="claimRow" @login="goLogin" @close="close" /> -->
 <script setup lang="ts">
+import { ArrowRight } from "@lucide/vue";
 import { onBeforeUnmount, onMounted, ref } from "vue";
 import AppSpinner from "~/common/components/AppSpinner.vue";
 import type { VoucherOffer } from "~/features/food/@types/food";
@@ -54,7 +55,7 @@ onBeforeUnmount(() => {
       class="w-10 h-1 rounded-full mx-auto mb-1.5"
       style="background: #d6d3d1"
     />
-    <p class="font-extrabold text-[13px]">🎁 Promo di mall ini</p>
+    <p class="font-extrabold text-[13px]">Promo di mall ini</p>
     <p class="text-[11px] font-bold text-gray-500 mb-1">
       Pilih 1 · 1 transaksi 1 kode · s/d 23:59 WIB
     </p>
@@ -83,7 +84,7 @@ onBeforeUnmount(() => {
         style="background: #a3e635; color: #0c0a09"
         @click="emit('login')"
       >
-        Login →
+        Login <ArrowRight :size="12" class="inline-block" />
       </button>
       <button
         v-else-if="claimState(v) !== 'claimed'"

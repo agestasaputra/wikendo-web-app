@@ -9,6 +9,7 @@
  *   body: { event: "promo_click", props: { mall_slug: "grand-indonesia", tenant: "% Arabica" } } })
  */
 import { CLIENT_EVENT_WHITELIST } from "../../../common/constants/analytics";
+import { defineEventHandler, readBody } from "h3";
 import { supabaseAdmin } from "../../utils/db";
 import { sanitizeEventName, sanitizeProps } from "../../utils/clientEvent";
 import { ensureSessionId } from "../../utils/sessionId";

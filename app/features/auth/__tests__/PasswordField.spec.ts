@@ -41,9 +41,9 @@ describe("password toggle — login + register (professional SVG, no emoji/dot)"
   it("professional eye/eye-slash SVG icons (no 👁️/🙈 emoji)", () => {
     expect(FIELD).not.toContain("👁");
     expect(FIELD).not.toContain("🙈");
-    // Heroicons outline eye + eye-slash (stroke currentColor) — unique path marker
-    expect(FIELD).toContain("M2.036 12.322");
-    expect(FIELD).toContain("M3.98 8.223");
+    // Lucide eye + eye-slash outline icons (stroke currentColor) — icon marker
+    expect(FIELD).toContain("Eye");
+    expect(FIELD).toContain("EyeOff");
   });
 
   it("• separator dot next to the eye button removed + placeholder kept", () => {

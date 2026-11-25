@@ -22,8 +22,8 @@ describe("global header (TopNav.vue)", () => {
     expect(HEADER).not.toContain('to="/mall"');
   });
 
-  it("anonymous: Login + Register buttons; logged in: notification icon 🔔 on the right", () => {
-    expect(HEADER).toContain("🔔");
+  it("anonymous: Login + Register buttons; logged in: notification icon Bell on the right", () => {
+    expect(HEADER).toContain("Bell");
     expect(HEADER).toContain("Login");
     expect(HEADER).toContain("Register");
   });
@@ -112,7 +112,7 @@ describe("TopNav left slot (logo vs back button)", () => {
   it("shows a circular back button with an arrow icon on every other page", () => {
     expect(HEADER).toMatch(/v-else[\s\S]*aria-label="Kembali"/);
     expect(HEADER).toContain("rounded-full");
-    expect(HEADER).toContain("<svg");
+    expect(HEADER).toContain("<ChevronLeft");
     expect(HEADER).toContain('@click="goBack"');
   });
 

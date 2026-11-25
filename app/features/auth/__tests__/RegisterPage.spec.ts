@@ -50,8 +50,8 @@ describe("register revamp 100% image — structure + exact text", () => {
     expect(R).not.toContain("nama:");
     expect(R).toContain('placeholder="Email"');
     expect(R).toContain('placeholder="Password"');
-    expect(R).toContain("✉️");
-    expect(R).toContain("🔒");
+    expect(R).toContain("Mail");
+    expect(R).toContain("Lock");
   });
 
   it("strength meter below the password field: • separator + word label (not cramped inline)", () => {

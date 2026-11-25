@@ -14,6 +14,7 @@
  *   409: { status: "error", message: "sudah claim hari ini" }
  *   429: { status: "error", message: "max 3 claim/hari" }
  */
+import { defineEventHandler, readBody } from "h3";
 import { supabaseAdmin } from "../../utils/db";
 import {
   assertDailyLimit,

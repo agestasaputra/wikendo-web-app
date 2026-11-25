@@ -3,7 +3,8 @@ WHAT: 5 tabs in a sticky bottom-0 bar (last child of the app.vue flex column) (a
 WHY: thumbs can't reach the header; quota follows GET /api/quota (on failure = fallback to fresh anonymous 1 • 2, not fake numbers).
 EXAMPLE: tap + → sheet → Cari Tempat (remaining 1/1) → /place; empty → disabled Besok lagi 00.00. -->
 <script setup lang="ts">
-import { computed, ref, watch } from "vue";
+import { computed, ref, watch, type Component } from "vue";
+import { Home, Store, Clock, User } from "@lucide/vue";
 import QuizPlusSheet from "~/common/components/QuizPlusSheet.vue";
 import { useAuthFetch } from "~/common/composables/useAuthFetch";
 import { useAuthStore } from "~/common/store/AuthStore";
@@ -18,13 +19,20 @@ interface NavTab {
 }
 
 const LEFT_TABS: NavTab[] = [
-  { to: "/", label: "Home", icon: "🏠" },
-  { to: "/mall", label: "Mall", icon: "🏬" },
+  { to: "/", label: "Home", icon: "home" },
+  { to: "/mall", label: "Mall", icon: "store" },
 ];
 const RIGHT_TABS: NavTab[] = [
-  { to: "/history", label: "Riwayat", icon: "🕒" },
-  { to: "/account", label: "Akun", icon: "👤" },
+  { to: "/history", label: "Riwayat", icon: "clock" },
+  { to: "/account", label: "Akun", icon: "user" },
 ];
+
+const ICONS: Record<string, Component> = {
+  home: Home,
+  store: Store,
+  clock: Clock,
+  user: User,
+};
 
 const route = useRoute();
 const showSheet = ref(false);
@@ -79,7 +87,7 @@ function go(path: string): void {
           color: isNavActive(tab.to, route.path) ? '#0C0A09' : '#78716c',
         }"
       >
-        <span class="text-xl leading-none">{{ tab.icon }}</span
+        <component :is="ICONS[tab.icon]" :size="20" />
         >{{ tab.label }}
         <span
           v-if="isNavActive(tab.to, route.path)"
@@ -111,7 +119,7 @@ function go(path: string): void {
           color: isNavActive(tab.to, route.path) ? '#0C0A09' : '#78716c',
         }"
       >
-        <span class="text-xl leading-none">{{ tab.icon }}</span
+        <component :is="ICONS[tab.icon]" :size="20" />
         >{{ tab.label }}
         <span
           v-if="isNavActive(tab.to, route.path)"

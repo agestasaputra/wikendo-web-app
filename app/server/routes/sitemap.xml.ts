@@ -7,6 +7,7 @@
  * Cache: s-maxage=3600 — hemat DB; konten sitemap cukup segar per jam.
  * Contoh: curl https://www.wikendo.id/sitemap.xml | grep -c "<url>"
  */
+import { defineEventHandler, setHeader } from "h3";
 import { supabaseAdmin } from "../utils/db";
 
 const SITE = "https://www.wikendo.id";

@@ -9,6 +9,7 @@
  * EXAMPLE: const codes = await listClaimedCodes(supabaseAdmin(), userId, mallId);
  */
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { createError } from "h3";
 import { todayWIB } from "./voucherClaim";
 import { findMallIdBySlug } from "./voucherOffers";
 

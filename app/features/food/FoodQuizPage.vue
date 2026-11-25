@@ -5,6 +5,7 @@ EXAMPLE: opened from the directory (/food?mall=gi) → Q1 is skipped automatical
 <script setup lang="ts">
 import QuizHeader from "~/common/components/QuizHeader.vue";
 import QuizOptionList from "~/common/components/QuizOptionList.vue";
+import { ArrowLeft, CheckCircle, Users } from "@lucide/vue";
 import { getMallShortLabel } from "~/common/utils/mall";
 import {
   getQuestion,
@@ -39,7 +40,7 @@ const mallShort = computed(() =>
 );
 const headerSuffix = computed(
   () =>
-    `${mallShort.value ? " · " + mallShort.value + " 📍" : ""} · ${step.value + 1}/${questions.length}`,
+    `${mallShort.value ? " · " + mallShort.value : ""} · ${step.value + 1}/${questions.length}`,
 );
 
 function isMallChipActive(slug: string): boolean {
@@ -112,7 +113,8 @@ function select(v: string): void {
         "
         @click="halalOnly = !halalOnly"
       >
-        ✅ Halal only
+        <CheckCircle :size="14" class="inline-block align-middle" />
+        Halal only
       </button>
       <button
         class="flex-1 rounded-full py-2.5 font-bold text-xs bg-white border-[1.5px]"
@@ -123,7 +125,8 @@ function select(v: string): void {
         "
         @click="kidsFriendly = !kidsFriendly"
       >
-        👶 Kids-friendly
+        <Users :size="14" class="inline-block align-middle" />
+        Kids-friendly
       </button>
     </div>
 
@@ -131,7 +134,7 @@ function select(v: string): void {
     <p class="text-center text-xs text-gray-400 mt-4">
       {{
         step === questions.length - 1
-          ? "Lihat 5 tenant + voucher →"
+          ? "Lihat 5 tenant + voucher"
           : "Quota kepake pas Generate, bukan per tanya"
       }}
     </p>
@@ -140,7 +143,8 @@ function select(v: string): void {
       class="mt-2 text-gray-500 text-sm"
       @click="step--"
     >
-      ← Kembali
+      <ArrowLeft :size="16" class="inline-block" />
+      Kembali
     </button>
   </div>
 </template>

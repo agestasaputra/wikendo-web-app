@@ -8,6 +8,7 @@
  *   is a legit "this mall does not exist" — collapsing both hides broken links from the app.
  * EXAMPLE: $fetch("/api/vouchers", { query: { mall_slug: "grand-indonesia" } })
  */
+import { createError, defineEventHandler, getQuery } from "h3";
 import { supabaseAdmin } from "../utils/db";
 import { findMallIdBySlug, listMallOffers } from "../utils/voucherOffers";
 

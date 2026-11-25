@@ -8,7 +8,7 @@
 import type { PlaceRecommendation } from "~/common/types/api";
 import type { PlaceHero } from "../@types/place";
 
-const HERO_EMOJIS = ["🌇", "☕", "🌳", "🎡", "🌊"];
+const HERO_EMOJIS = ["sunset", "coffee", "park", "ride", "ocean"];
 const HERO_GRADIENTS = [
   "linear-gradient(140deg,#ffedd5,#fdba74)",
   "linear-gradient(140deg,#fef3c7,#fcd34d)",
@@ -46,7 +46,7 @@ export function buildPlaceHero(
     time: orDash(r.best_time),
     rating: "4.8",
     vibe: (r.reason || "sunset + live music").slice(0, 24),
-    emoji: HERO_EMOJIS[idx % HERO_EMOJIS.length] ?? "🌇",
+    emoji: HERO_EMOJIS[idx % HERO_EMOJIS.length] ?? "sunset",
     bg: HERO_GRADIENTS[idx % HERO_GRADIENTS.length] ?? "",
   };
 }

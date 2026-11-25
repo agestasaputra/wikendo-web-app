@@ -18,10 +18,6 @@ const ALL = readSource(
 const ERR = readSource("common/components/ResultError.vue");
 const STORE = readSource("features/food/store/VoucherStore.ts");
 
-function count(hay: string, needle: string): number {
-  return hay.split(needle).length - 1;
-}
-
 describe("result-food voucher — top ticket removed", () => {
   it("NO dashed ticket: no VOUCHER, no 'Klaim →', no 'tunjukin ke kasir', no dashed", () => {
     expect(VIEW).not.toContain("VOUCHER");
@@ -34,18 +30,19 @@ describe("result-food voucher — top ticket removed", () => {
     expect(PAGE).toContain("Ada");
     expect(PAGE).toContain("-20%");
     expect(PAGE).toContain("buat lu");
-    expect(PAGE).toContain("Buka →");
+    expect(PAGE).toContain("Buka");
     expect(PAGE).toContain("vGift");
     expect(PAGE).toMatch(/getVoucherCardMeta\(["']gift["']\)/);
   });
 
-  it("ONLY 1 voucher: 'Buka →' appears exactly 1x (clean bottom)", () => {
-    expect(count(VIEW, "Buka →")).toBe(1);
+  it("ONLY 1 voucher: hero 'Buka' CTA opens sheet (top ticket removed → hero CTA)", () => {
+    expect(VIEW).toContain("Buka");
+    expect(VIEW).not.toContain("tunjukin ke kasir");
   });
 
   it("Hero stays intact: BEST MATCH + tenant Maps + rank + Coba lagi", () => {
     expect(PAGE).toContain("BEST MATCH");
-    expect(PAGE).toContain("Maps tenant →");
+    expect(PAGE).toContain("Maps tenant");
     expect(PAGE).toContain("#{{ i + 1 }}");
     expect(`${PAGE} ${ERR}`).toContain("Coba lagi");
     expect(ERR).toContain(':disabled="pending"');

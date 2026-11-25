@@ -15,7 +15,7 @@ import type {
   QuizPlaceInput,
   RecommendationResponse,
 } from "../../../common/types/api";
-import { createError, readBody, type H3Event } from "h3";
+import { createError, defineEventHandler, readBody, type H3Event } from "h3";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { supabaseAdmin } from "../../utils/db";
 import { getOptionalUserId } from "../../utils/requireUser";

@@ -18,6 +18,6 @@ export function getFoodStartStep(
 export function getFoodHint(questionId: string): string {
   if (questionId === "mall_slug")
     return "Wajib 1 — biar hasil murni tenant situ";
-  if (questionId === "companion") return "Terakhir, janji 😄";
+  if (questionId === "companion") return "Terakhir, janji";
   return "Tap 1 — nggak ada jawaban salah";
 }

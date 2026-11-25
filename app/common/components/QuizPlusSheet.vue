@@ -4,6 +4,7 @@ WHY: 1 "+" button can't carry 2 different quota intents without lying → the 2-
 WHY dynamic numbers: a hardcoded per-tier number was a lie for anonymous users (1•1) and could disagree with the wallet after a refresh.
 EXAMPLE: <QuizPlusSheet :place-left="1" :place-limit="1" :food-left="0" :food-limit="1" :is-logged-in="false" @go="go" @close="close" /> -->
 <script setup lang="ts">
+import { ArrowRight, MapPin, Utensils, X } from "@lucide/vue";
 defineProps<{
   placeLeft: number;
   placeLimit: number;
@@ -29,14 +30,14 @@ const emit = defineEmits<{ go: [path: string]; close: [] }>();
           style="background: #d6d3d1"
         />
         <div class="flex justify-between items-center">
-          <p class="font-extrabold text-[14px]">Mau cari apa? 🎲</p>
+          <p class="font-extrabold text-[14px]">Mau cari apa?</p>
           <button
             type="button"
             aria-label="Tutup sheet pilihan quiz"
             class="text-gray-500 font-extrabold px-2 py-1"
             @click="emit('close')"
           >
-            ✕
+            <X :size="18" />
           </button>
         </div>
         <p class="text-[11px] font-bold text-gray-500 mb-2">
@@ -50,7 +51,7 @@ const emit = defineEmits<{ go: [path: string]; close: [] }>();
             style="border: 1.5px solid #e7e5e4"
             @click="emit('go', '/place')"
           >
-            <span class="text-2xl">🗺️</span>
+            <MapPin :size="26" class="text-gray-400" />
             <span class="flex-1 text-[13px] font-extrabold">
               Cari Tempat<br />
               <small class="font-bold text-gray-500">
@@ -61,7 +62,7 @@ const emit = defineEmits<{ go: [path: string]; close: [] }>();
               class="text-[12px] font-extrabold rounded-full px-3 py-1.5 text-white"
               style="background: #0c0a09"
             >
-              {{ placeLeft <= 0 ? "Besok lagi 00.00" : "Mulai →" }}
+              {{ placeLeft <= 0 ? "Besok lagi 00.00" : "Mulai" }}
             </span>
           </button>
           <button
@@ -71,7 +72,7 @@ const emit = defineEmits<{ go: [path: string]; close: [] }>();
             style="border: 1.5px solid #e7e5e4"
             @click="emit('go', '/food')"
           >
-            <span class="text-2xl">🍜</span>
+            <Utensils :size="26" class="text-gray-400" />
             <span class="flex-1 text-[13px] font-extrabold">
               Cari Makan<br />
               <small class="font-bold text-gray-500">
@@ -82,7 +83,7 @@ const emit = defineEmits<{ go: [path: string]; close: [] }>();
               class="text-[12px] font-extrabold rounded-full px-3 py-1.5 text-white"
               style="background: #e11d48"
             >
-              {{ foodLeft <= 0 ? "Besok lagi 00.00" : "Mulai →" }}
+              {{ foodLeft <= 0 ? "Besok lagi 00.00" : "Mulai" }}
             </span>
           </button>
         </div>
@@ -91,8 +92,8 @@ const emit = defineEmits<{ go: [path: string]; close: [] }>();
           to="/login"
           class="block text-center text-[11px] font-extrabold underline mt-2.5"
           >Login gratis: 2 tempat + 5 makan/hari + riwayat lintas device
-          →</NuxtLink
-        >
+          <ArrowRight :size="12" class="inline-block"
+        /></NuxtLink>
       </div>
     </div>
   </div>

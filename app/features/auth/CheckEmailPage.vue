@@ -5,6 +5,7 @@
   EXAMPLE: register A@mail.com → /check-email?email=A@mail.com → click link in inbox → HOME /. -->
 <script setup lang="ts">
 import AppSpinner from "~/common/components/AppSpinner.vue";
+import { MailCheck } from "@lucide/vue";
 import { useSupabaseBrowser } from "~/common/composables/useSupabaseBrowser";
 import AuthBanner from "~/features/auth/components/AuthBanner.vue";
 import { buildOriginUrl } from "~/features/auth/utils/redirect";
@@ -53,12 +54,12 @@ async function handleResend(): Promise<void> {
     <AuthBanner
       title="HAMPIR SELESAI"
       value="1 klik lagi"
-      footer="verifikasi email biar quota 2 • 5 aktif 🎟️"
+      footer="verifikasi email biar quota 2 • 5 aktif"
     />
 
     <!-- 2. White instruction card -->
     <div class="bg-white rounded-3xl mt-3 p-5 shadow-sm text-center">
-      <div class="text-3xl">📩</div>
+      <MailCheck :size="40" class="mx-auto text-gray-400" />
       <b class="text-lg font-extrabold text-black mt-2">Cek email kamu</b>
       <p class="text-sm font-bold text-black mt-1 break-all">
         {{ displayEmail }}
