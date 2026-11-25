@@ -8,11 +8,9 @@ EXAMPLE: mounted once in app.vue above <NuxtPage />. -->
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
 import AppSpinner from "~/common/components/AppSpinner.vue";
-import LogoWikendo from "~/common/components/LogoWikendo.vue";
 import { useAuthStore } from "~/common/store/AuthStore";
 import { isHomePath } from "~/common/utils/nav";
 import { pageTitle } from "~/common/utils/pageTitle";
-import { ChevronLeft } from "@lucide/vue";
 
 const auth = useAuthStore();
 const { isLoggedIn, email } = storeToRefs(auth);
@@ -57,7 +55,13 @@ async function handleLogout(): Promise<void> {
         class="col-start-1 flex items-center justify-self-start"
         aria-label="Wikendo — beranda"
       >
-        <LogoWikendo :size="32" color="#18181b" />
+        <img
+          src="/brand-icon-day.png"
+          alt="Wikendo"
+          width="32"
+          height="32"
+          class="rounded-lg"
+        />
       </NuxtLink>
       <button
         v-else
@@ -66,7 +70,18 @@ async function handleLogout(): Promise<void> {
         class="col-start-1 w-8 h-8 rounded-full bg-stone-100 hover:bg-stone-200 flex items-center justify-center justify-self-start"
         @click="goBack"
       >
-        <ChevronLeft :size="16" />
+        <svg
+          viewBox="0 0 24 24"
+          class="w-4 h-4"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M19 12H5M12 19l-7-7 7-7" />
+        </svg>
       </button>
       <!-- Page title: a <p> (not <h1>) so it never competes with the page's own <h1> for SEO/outline.
            justify-self-center is REQUIRED: max-w-[220px] stops the grid's default stretch, and without it
